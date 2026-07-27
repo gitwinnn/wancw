@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>エクセル計算式大全 — ブレーキパッドEMA（Fable1・Fable2 全式収録）</title>
+<style>
+:root{
+  --bg:#0E1522; --bg2:#0A1017;
+  --panel:#161F2E; --panel2:#1C2739; --panel3:#212E43;
+  --line:#28344A; --line2:#3A4C68;
+  --ink:#E9EFF8; --dim:#94A6C0; --faint:#63758F;
+  --amber:#F5B23E; --teal:#38D3B5; --coral:#FF6E6E; --violet:#9C8DF6; --sky:#4FB0E8;
+  --good-bg:rgba(56,211,181,.10); --bad-bg:rgba(255,110,110,.10); --warn-bg:rgba(245,178,62,.10); --info-bg:rgba(156,141,246,.10);
+  --mono: ui-monospace,"SF Mono","SFMono-Regular",Menlo,Consolas,"DejaVu Sans Mono",monospace;
+  --sans: system-ui,-apple-system,"Segoe UI","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",Meiryo,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(1200px 600px at 78% -8%,#182236 0,var(--bg) 46%,var(--bg2) 100%);color:var(--ink);font-family:var(--sans);line-height:1.8;-webkit-font-smoothing:antialiased;font-size:16px;letter-spacing:.01em;padding:0 0 90px}
+.wrap{max-width:980px;margin:0 auto;padding:0 22px}
+ruby rt{font-size:.56em;color:var(--amber);font-weight:600;letter-spacing:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--amber);display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.eyebrow::before{content:"";width:26px;height:2px;background:linear-gradient(90deg,var(--amber),transparent)}
+h1{font-size:clamp(26px,5vw,44px);font-weight:800;line-height:1.18;letter-spacing:-.02em;margin:6px 0 18px}
+h2{font-size:clamp(20px,3.4vw,27px);font-weight:800;letter-spacing:-.01em;margin:0 0 6px}
+h3{font-size:16.5px;font-weight:700;margin:14px 0 8px}
+.lead{font-size:clamp(15px,2.3vw,18px);color:var(--dim);max-width:76ch}
+.hl-teal{color:var(--teal);font-weight:700}.hl-coral{color:var(--coral);font-weight:700}.hl-amber{color:var(--amber);font-weight:700}.hl-violet{color:var(--violet);font-weight:700}.hl-sky{color:var(--sky);font-weight:700}
+strong,b{color:#fff;font-weight:700}
+.badge{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:700;padding:2px 8px;border-radius:6px;vertical-align:middle;margin-left:6px}
+.badge.ok{color:var(--teal);background:var(--good-bg);border:1px solid rgba(56,211,181,.35)}
+.badge.est{color:var(--amber);background:var(--warn-bg);border:1px solid rgba(245,178,62,.35)}
+.badge.chk{color:var(--coral);background:var(--bad-bg);border:1px solid rgba(255,110,110,.35)}
+header{padding:52px 0 24px;border-bottom:1px solid var(--line)}
+section{padding:38px 0;border-bottom:1px solid var(--line)}
+.callout{border-left:3px solid var(--line2);padding:12px 16px;border-radius:0 12px 12px 0;background:var(--panel2);margin:16px 0;font-size:15px}
+.callout.why{border-color:var(--sky)}.callout.warn{border-color:var(--amber);background:linear-gradient(90deg,var(--warn-bg),transparent)}
+.callout.good{border-color:var(--teal);background:linear-gradient(90deg,var(--good-bg),transparent)}
+.callout.bad{border-color:var(--coral);background:linear-gradient(90deg,var(--bad-bg),transparent)}
+.callout .tag{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;display:block;margin-bottom:4px}
+.callout.why .tag{color:var(--sky)}.callout.warn .tag{color:var(--amber)}.callout.good .tag{color:var(--teal)}.callout.bad .tag{color:var(--coral)}
+.tablewrap{overflow-x:auto;border-radius:14px;border:1px solid var(--line);margin-top:14px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:560px}
+th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--panel2);color:var(--dim);font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+.mono{font-family:var(--mono)}
+p{margin:10px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:6px 0}
+a{color:var(--sky)}
+.kw{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line2);border-radius:6px;padding:1px 7px;font-size:.92em;color:var(--teal);white-space:nowrap}
+.note{font-size:14px;color:var(--dim);margin-top:10px}
+/* ---- 検索バー ---- */
+.finder{position:sticky;top:0;z-index:40;background:rgba(14,21,34,.92);backdrop-filter:blur(8px);border-bottom:1px solid var(--line);padding:12px 0}
+.finder .row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+#q{flex:1;min-width:220px;background:#101826;border:1px solid var(--line2);border-radius:12px;color:var(--ink);padding:11px 16px;font-size:15px;font-family:var(--sans)}
+#q:focus{outline:none;border-color:var(--amber)}
+.chip{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--dim);background:var(--panel);border:1px solid var(--line2);border-radius:999px;padding:7px 13px;cursor:pointer;white-space:nowrap}
+.chip:hover{color:var(--ink)}
+.chip.on{color:#0B1220;background:var(--amber);border-color:var(--amber)}
+#count{font-family:var(--mono);font-size:12px;color:var(--dim);margin-left:auto}
+/* ---- 式カード ---- */
+.fx{background:#101826;border:1px solid var(--line2);border-radius:16px;margin-top:22px;overflow:hidden;scroll-margin-top:110px}
+.fx-head{display:flex;align-items:center;gap:12px;padding:12px 16px;background:var(--panel3);border-bottom:1px solid var(--line2);flex-wrap:wrap}
+.fno{font-family:var(--mono);font-size:12px;font-weight:800;letter-spacing:.08em;color:#0B1220;background:var(--amber);border-radius:8px;padding:3px 10px;white-space:nowrap}
+.fx-head b{font-size:15.5px}
+.fx-head .cp{margin-left:auto}
+.fx-body{padding:6px 16px 14px}
+.fx-when{font-size:14px;color:var(--dim);padding:10px 16px;border-bottom:1px dashed var(--line);background:rgba(79,176,232,.05)}
+.fx-when b{color:var(--sky)}
+.fx table{min-width:520px;font-size:13.5px}
+.fx .cell{font-family:var(--mono);color:var(--sky);white-space:nowrap}
+.fx .frm{font-family:var(--mono);color:var(--amber)}
+.fx .res{color:var(--teal);font-family:var(--mono);font-size:12.5px}
+.fx-foot{padding:10px 16px 14px;border-top:1px dashed var(--line);display:grid;gap:6px}
+.fline{font-size:13.5px;color:var(--dim)}
+.fline.mi::before{content:"⛔ やってはいけない：";color:var(--coral);font-weight:700}
+.fline.pro::before{content:"👑 プロの技：";color:var(--violet);font-weight:700}
+.fline.link::before{content:"🔗 連携プレイ：";color:var(--teal);font-weight:700}
+.fline.ex::before{content:"🧪 例文：";color:var(--sky);font-weight:700}
+.fline a{color:var(--teal);text-decoration:none;border-bottom:1px dotted var(--teal)}
+.cp{font-family:var(--mono);font-size:12px;font-weight:700;color:#0B1220;background:var(--teal);border:none;border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.cp:hover{filter:brightness(1.1)}
+.cat-h{margin-top:40px;display:flex;align-items:center;gap:12px}
+.cat-h .cl{font-family:var(--mono);font-size:13px;font-weight:800;color:#0B1220;border-radius:8px;padding:4px 11px}
+.top-link{position:fixed;right:18px;bottom:18px;background:var(--panel3);border:1px solid var(--line2);color:var(--ink);border-radius:999px;padding:9px 14px;font-size:13px;text-decoration:none;z-index:50}
+svg text{font-family:var(--sans)}
+</style>
+</head>
+<body>
+<a class="top-link" href="#top">▲ 検索へ</a>
+<header id="top">
+<div class="wrap">
+<div class="eyebrow">BRAKE PAD EMA — EXCEL FORMULA COMPENDIUM</div>
+<h1>エクセル<span class="hl-teal">計算式</span>大全<br><span style="font-size:.62em;color:var(--dim);font-weight:700">Fable1・Fable2 の全計算を、探せて・貼れて・使いこなせる形に</span></h1>
+<p class="lead">各式は「いつ使うか → 変数の意味 → セル配置 → 例文 → やってはいけない → プロの技 → 連携プレイ」の順で完結。コピーボタンで<b>セルA1に貼るだけ</b>で動きます。ピストン径 44 mm 確定など、Fable 5 の修正を反映済み。</p>
+<div class="callout good"><span class="tag">使い方（3ステップ）</span>
+① 下の検索窓に困りごとを入力（例：「うなり」「減衰」「トルク」）か、カテゴリのボタンを押す<br>
+② 目当ての式の「コピー（貼付用）」を押す<br>
+③ Excel／LibreOfficeで<b>セルA1を選んで貼り付け（Ctrl+V）</b> → A列にラベル、B列に数値と式が入り自動計算。<span class="hl-amber">式がエラーになったら</span>、関数の区切り「,」を「;」に置換（LibreOfficeの地域設定による）。青字＝入力するセル、橙字＝式、緑字＝結果の目安。
+</div>
+</div>
+</header>
+
+<div class="finder">
+<div class="wrap">
+<div class="row">
+<input id="q" type="text" placeholder="🔍 キーワードで探す（例：うなり／減衰／コヒーレンス／トルク／スティンガー）" oninput="applyFilter()">
+<button class="chip on" data-cat="all" onclick="setCat(this)">すべて</button>
+<button class="chip" data-cat="A" onclick="setCat(this)">A 準備・設計</button>
+<button class="chip" data-cat="B" onclick="setCat(this)">B 品質チェック</button>
+<button class="chip" data-cat="C" onclick="setCat(this)">C ピーク・減衰</button>
+<button class="chip" data-cat="D" onclick="setCat(this)">D 予測</button>
+<button class="chip" data-cat="E" onclick="setCat(this)">E スティンガー</button>
+<button class="chip" data-cat="F" onclick="setCat(this)">F シム治具</button>
+<button class="chip" data-cat="G" onclick="setCat(this)">G 加振点</button>
+<button class="chip" data-cat="H" onclick="setCat(this)">H 上級</button>
+<span id="count"></span>
+</div>
+</div>
+</div>
+
+<section id="quickmap" style="padding-top:26px">
+<div class="wrap">
+<div class="eyebrow">QUICK FINDER</div>
+<h2>困りごとから<span class="hl-amber">一発で</span>探す表</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>困りごと・やりたいこと</th><th>使う式</th></tr></thead>
+<tbody>
+<tr><td>測定時間・FFTライン数を決めたい</td><td><a href="#f1">式1</a>・<a href="#f2">式2</a></td></tr>
+<tr><td>ピークが2本に割れてる／波形がうなる</td><td><a href="#f2">式2</a>・<a href="#f12">式12</a>・<a href="#f13">式13</a></td></tr>
+<tr><td>この山、信用していい？（品質判定）</td><td><a href="#f5">式5</a>・<a href="#f6">式6</a>・<a href="#f7">式7</a>・<a href="#f9">式9</a></td></tr>
+<tr><td>何回平均すればいい？</td><td><a href="#f6">式6</a></td></tr>
+<tr><td>減衰（損失係数）を数値にしたい</td><td><a href="#f11">式11</a>（ハンマーなら＋<a href="#f15">式15</a>・<a href="#f16">式16</a>）</td></tr>
+<tr><td>センサー・おもりで周波数が下がった？</td><td><a href="#f10">式10</a></td></tr>
+<tr><td>加振器に「乗せるだけ」でいい？</td><td><a href="#f4">式4</a>（答え：ダメ）</td></tr>
+<tr><td>吊り方はこれで大丈夫？</td><td><a href="#f3">式3</a></td></tr>
+<tr><td>スティンガーの太さ・長さを決めたい</td><td><a href="#f21">式21</a>・<a href="#f22">式22</a></td></tr>
+<tr><td>シム治具を何Nで締める？（44 mm）</td><td><a href="#f23">式23</a>（おもり案の却下は<a href="#f24">式24</a>）</td></tr>
+<tr><td>どこを叩く／揺らすか決めたい</td><td><a href="#f25">式25</a></td></tr>
+<tr><td>設計を変えたら何Hz動く？ 面内は何Hz？</td><td><a href="#f17">式17</a>〜<a href="#f20">式20</a></td></tr>
+<tr><td>歪みと線形応答を切り分けたい（ESS）</td><td><a href="#f26">式26</a>・<a href="#f27">式27</a></td></tr>
+</tbody></table></div>
+</div>
+</section>
+<section>
+<div class="wrap" id="formulas">
+<div class="cat-h"><span class="cl" style="background:#4FB0E8">A</span><h2>準備・設計 — 測る前に決めること</h2></div>
+
+<div class="fx" data-cat="A" id="f1">
+<div class="fx-head"><span class="fno">式1</span><b>サンプリング周波数・分解能・測定時間 <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>測定の一番最初。「何kHzまで測る？」から機器の設定値（fs・ライン数・時間）を全部決めるとき。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味（変数の説明）</th></tr>
+<tr><td class="cell">B1</td><td class="frm">16000</td><td>測りたい最高周波数 fmax [Hz]（鳴きなら16000、安全側20000）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">2.56</td><td>アンチエイリアス係数（偽物の折り返しを防ぐ慣用の安全率）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=B1*B2</td><td>必要サンプリング周波数 fs [Hz] <span class="res">=40960</span></td></tr>
+<tr><td class="cell">B4</td><td class="frm">3200</td><td>FFTライン数（機器で選ぶ本数。多いほど細かいが時間が延びる）</td></tr>
+<tr><td class="cell">B5</td><td class="frm">=B1/B4</td><td>周波数分解能 Δf [Hz]（1目盛りの細かさ） <span class="res">=5</span></td></tr>
+<tr><td class="cell">B6</td><td class="frm">=1/B5</td><td>1レコードの測定時間 T [s]（Δfの逆数） <span class="res">=0.2</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+最高周波数fmax[Hz]|16000
+アンチエイリアス係数|2.56
+必要サンプリング周波数fs[Hz]|=B1*B2
+FFTライン数|3200
+周波数分解能Δf[Hz]|=B1/B4
+測定時間T[s]|=1/B5
+</pre>
+<div class="fx-foot">
+<div class="fline ex">16 kHzまで・3200ラインなら、Δf＝5 Hz・1回0.2秒。「5 Hzより近い双子は原理的に見えない」と設定前に分かる。</div>
+<div class="fline mi">サンプリングだけ上げてライン数そのまま → Δfが粗くなり双子が団子に。fsとライン数はセットで考える。</div>
+<div class="fline pro">機器表示が fs と点数Nのタイプなら Δf=fs/N・T=N/fs。どちらの流儀でも「T＝1/Δf」だけは絶対に成り立つ万能チェック。</div>
+<div class="fline link"><a href="#f2">式2</a>で双子に必要なΔfを先に出し、この式でライン数に翻訳するのが正しい順番。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="A" id="f2">
+<div class="fx-head"><span class="fno">式2</span><b>双子を分けるための T と Δf（設計） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>近接ピーク（穴あきパッドの縮退ペア）を2本に分けて見たいとき。測定時間と分解能を「先に」設計する。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">2500</td><td>双子ピークその1 f1 [Hz]</td></tr>
+<tr><td class="cell">B2</td><td class="frm">2508</td><td>双子ピークその2 f2 [Hz]</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=ABS(B1-B2)</td><td>双子の間隔 |f1−f2| [Hz] <span class="res">=8</span></td></tr>
+<tr><td class="cell">B4</td><td class="frm">=1/B3</td><td>うなり周期 [s]（時間波形のウワンウワンの間隔） <span class="res">=0.125</span></td></tr>
+<tr><td class="cell">B5</td><td class="frm">=5/B3</td><td>必要な測定時間 T [s]（うなり5周期ぶん確保） <span class="res">=0.625</span></td></tr>
+<tr><td class="cell">B6</td><td class="frm">=B3/4</td><td>必要な分解能 Δf [Hz]（間隔の1/4以下） <span class="res">=2</span></td></tr>
+<tr><td class="cell">B7</td><td class="frm">5</td><td>今の設定のΔf [Hz]（式1のB5を書く）</td></tr>
+<tr><td class="cell">B8</td><td class="frm">=IF(B7&lt;=B6,"分離できる見込み","Δfが粗い→ライン数UP")</td><td>判定 <span class="res">この例では要改善</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+双子ピーク1 f1[Hz]|2500
+双子ピーク2 f2[Hz]|2508
+間隔Δ[Hz]|=ABS(B1-B2)
+うなり周期[s]|=1/B3
+必要測定時間T[s]|=5/B3
+必要分解能Δf[Hz]|=B3/4
+今のΔf[Hz]|5
+判定|=IF(B7&lt;=B6,"分離できる見込み","Δfが粗い→ライン数UP")
+</pre>
+<div class="fx-foot">
+<div class="fline ex">8 Hz差の双子なら、T≥0.625秒・Δf≤2 Hz。式1に戻すと16 kHz帯で8000ライン必要、と即決まる。</div>
+<div class="fline mi">Δfより狭い分裂は「原理的に」見えない。見えないのを窓や平均のせいにして時間を溶かさない。</div>
+<div class="fline pro">Tを伸ばすほど分離は良くなるがノイズ拾いも増える。まず4倍則（Δf≤差/4）、ダメなら疑わしい帯域だけズームFFT。</div>
+<div class="fline link">実測のうなり周期から逆算するなら<a href="#f12">式12</a>。分離してもダメならMIMO＋ポリリファレンス（図解まとめ第3章）。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="A" id="f3">
+<div class="fx-head"><span class="fno">式3</span><b>吊りチェック（1/10ルール＋振り子） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>ピアノ線吊り（自由-自由）が本当に「自由」になっているか確認するとき。測定前の儀式。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">1500</td><td>実測の1次弾性モード f1 [Hz]（軽く叩いて最初の構造ピーク）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">=B1/10</td><td>剛体モード（ゆらゆら・バウンス）の上限目安 [Hz] <span class="res">=150</span></td></tr>
+<tr><td class="cell">B3</td><td class="frm">40</td><td>実測の剛体モード [Hz]（吊ったまま軽く押して測る）</td></tr>
+<tr><td class="cell">B4</td><td class="frm">=IF(B3&lt;=B2,"OK 自由-自由とみなせる","NG 線を細く/長くする")</td><td>判定 <span class="res">OK</span></td></tr>
+<tr><td class="cell">B5</td><td class="frm">1.0</td><td>ワイヤ長 L [m]</td></tr>
+<tr><td class="cell">B6</td><td class="frm">=(1/(2*PI()))*SQRT(9.81/B5)</td><td>振り子モードの理論値 [Hz] <span class="res">≒0.50</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+1次弾性モードf1[Hz]|1500
+剛体モード上限[Hz]|=B1/10
+実測の剛体モード[Hz]|40
+判定|=IF(B3&lt;=B2,"OK 自由-自由とみなせる","NG 線を細く/長くする")
+ワイヤ長L[m]|1.0
+振り子モード理論値[Hz]|=(1/(2*PI()))*SQRT(9.81/B5)
+</pre>
+<div class="fx-foot">
+<div class="fline ex">1次が1500 Hzなら剛体は150 Hz以下でOK。長さ1 mの振り子成分は約0.5 Hzで問題外に低い（＝上下バウンスだけ見張ればよい）。</div>
+<div class="fline mi">ゴム吊りに替えて「減衰が増えた」を材料の性質と誤読（ゴムは粘弾性で減衰を水増し。損失係数目的ならピアノ線）。</div>
+<div class="fline pro">パッドは軽いので線径をφ0.3〜0.5 mmに細くすると、減衰ほぼゼロのままバウンスも下げられる。吊り位置は節の近く。</div>
+<div class="fline link">吊りOKを確認してから<a href="#f1">式1</a>・<a href="#f2">式2</a>の測定設計へ。減衰測定なら<a href="#f11">式11</a>とセット。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="A" id="f4">
+<div class="fx-head"><span class="fno">式4</span><b>「乗せるだけ加振」の離間限界 X_max <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>「加振器の平面にパッドを乗せて揺らせばいいのでは？」と誰かが言い出したとき、数字で却下する。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">9.81</td><td>重力加速度 g [m/s²]</td></tr>
+<tr><td class="cell">B2</td><td class="frm">5000</td><td>見たい周波数 f [Hz]（好きに変える）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=B1/(2*PI()*B2)^2</td><td>浮かずに済む限界振幅 X_max [m]</td></tr>
+<tr><td class="cell">B4</td><td class="frm">=B3*1000000</td><td>同 [μm] <span class="res">≒0.0099</span></td></tr>
+<tr><td class="cell">B5</td><td class="frm">=B3*1000000000</td><td>同 [nm] <span class="res">≒9.9</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+重力加速度g[m/s2]|9.81
+見たい周波数f[Hz]|5000
+限界振幅X_max[m]|=B1/(2*PI()*B2)^2
+同[μm]|=B3*1000000
+同[nm]|=B3*1000000000
+</pre>
+<div class="fx-foot">
+<div class="fline ex">B2に周波数を入れるだけ。100 Hz→24.8 μm、1 kHz→248 nm、5 kHz→9.9 nm、16 kHz→0.97 nm。鳴き帯域はナノの世界＝乗せ加振は即跳ねて破綻。</div>
+<div class="fline mi">「パワーがある加振器だから大丈夫」→ パワーの問題ではなく、押せても引けない片側接触の問題。</div>
+<div class="fline pro">この式は「振動台に乗せた物が飛び跳ねる」古典問題そのもの。上司への説明はB4の表を見せるのが最速。</div>
+<div class="fline link">正解のセットアップ（吊ったまま＋スティンガー＋力センサー）は図解まとめ第11章。棒の設計は<a href="#f21">式21</a>・<a href="#f22">式22</a>。</div>
+</div>
+</div>
+
+<div class="cat-h"><span class="cl" style="background:#38D3B5">B</span><h2>品質チェック — その山、信用できる？</h2></div>
+
+<div class="fx" data-cat="B" id="f5">
+<div class="fx-head"><span class="fno">式5</span><b>コヒーレンス γ²（信頼度メーターの中身） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>アナライザが出す γ² の意味を確かめたいとき／Gxx・Gyy・Gxy をエクスポートして自分で計算するとき。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">0.92</td><td>|Gxy|²＝力×応答のクロススペクトルの大きさの2乗（<b>平均後</b>の値）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">1.00</td><td>Gxx＝力の自己スペクトル（平均後）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">1.05</td><td>Gyy＝応答の自己スペクトル（平均後）</td></tr>
+<tr><td class="cell">B4</td><td class="frm">=B1/(B2*B3)</td><td>コヒーレンス γ²（0〜1） <span class="res">≒0.876</span></td></tr>
+<tr><td class="cell">B5</td><td class="frm">=IF(B4&gt;=0.9,"合格の目安",IF(B4&gt;=0.8,"グレー","要調査"))</td><td>判定 <span class="res">グレー</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+Gxyの大きさ2乗(平均後)|0.92
+Gxx 力の自己スペクトル|1.00
+Gyy 応答の自己スペクトル|1.05
+コヒーレンスγ2|=B1/(B2*B3)
+判定|=IF(B4&gt;=0.9,"合格の目安",IF(B4&gt;=0.8,"グレー","要調査"))
+</pre>
+<div class="fx-foot">
+<div class="fline ex">周波数列ごとに縦にデータを並べ、E列に =D2^2/(B2*C2) を下へコピーすれば全帯域のγ²カーブが自作できる。</div>
+<div class="fline mi">1回だけの測定で計算 → 数学的に必ず1になり無意味。必ず複数回平均したスペクトルで。反共振の谷で落ちるのは正常。</div>
+<div class="fline pro">γ²良好は「必要条件」であって十分条件ではない。節乗りの欠落・双子の未分離・窓による減衰ズレは検出できない（駆動点FRFの共振↔反共振交互チェックを併用）。</div>
+<div class="fline link">γ²から必要平均回数は<a href="#f6">式6</a>、誤差の見積りは<a href="#f7">式7</a>。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="B" id="f6">
+<div class="fx-head"><span class="fno">式6</span><b>必要平均回数（目標誤差から逆算・Bendat &amp; Piersol） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>「何回叩けば／何ブロック平均すればいい？」を勘でなく数字で決めるとき。特にホワイトノイズ測定。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">0.9</td><td>その帯域のコヒーレンス γ²（実測か想定）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">0.05</td><td>許したいFRFの相対誤差 ε（5%なら0.05）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=(1-B1)/(2*B1*B2^2)</td><td>必要平均回数 nd <span class="res">≒22 → 23回以上</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+コヒーレンスγ2|0.9
+許容相対誤差ε|0.05
+必要平均回数nd|=(1-B1)/(2*B1*B2^2)
+</pre>
+<div class="fx-foot">
+<div class="fline ex">γ²=0.9で誤差5%なら約23回。γ²=0.99なら約2回で済む——コヒーレンスを上げる段取りが平均回数を激減させる、が体感できる。</div>
+<div class="fline mi">ハンマリングで4回未満の平均 → 最低ラインは1点4打（2度打ちは棄却してから数える）。</div>
+<div class="fline pro">帯域で一番γ²が低い所（谷以外）に合わせて回数を決めると、全帯域が目標誤差以内に収まる。</div>
+<div class="fline link">逆向き（回数→誤差）は<a href="#f7">式7</a>。γ²の中身は<a href="#f5">式5</a>。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="B" id="f7">
+<div class="fx-head"><span class="fno">式7</span><b>FRFの相対誤差（いまの平均回数でどれだけ揺れる？） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>測定後に「この振幅、あと何%くらい信じていい？」を数字にするとき。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">0.9</td><td>コヒーレンス γ²</td></tr>
+<tr><td class="cell">B2</td><td class="frm">22</td><td>実際の平均回数 nd</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=SQRT(1-B1)/(SQRT(B1)*SQRT(2*B2))</td><td>FRF振幅の相対誤差 ε <span class="res">≒0.050（±5%）</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+コヒーレンスγ2|0.9
+平均回数nd|22
+FRF相対誤差ε|=SQRT(1-B1)/(SQRT(B1)*SQRT(2*B2))
+</pre>
+<div class="fx-foot">
+<div class="fline ex">γ²=0.9・22回平均なら振幅は±5%程度の揺らぎ。2つの測定の差が5%以内なら「同じ」と言ってよい根拠になる。</div>
+<div class="fline mi">誤差を無視して0.1 dBの差を議論する（その差は平均不足の揺らぎかもしれない）。</div>
+<div class="fline pro">式6とペアで往復すると「品質⇔手間」の交渉が一瞬で終わる。報告書に書くと説得力が跳ね上がる。</div>
+<div class="fline link"><a href="#f6">式6</a>と表裏一体。手法間のピーク比較は<a href="#f13">式13</a>。</div>
+</div>
+</div>
+<div class="fx" data-cat="B" id="f8">
+<div class="fx-head"><span class="fno">式8</span><b>波高率（クレストファクター）＝信号の「とがり具合」 <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>ホワイトノイズでクリップ（頭打ち）していないか、信号がチャープ的かランダム的かを数字で確認するとき。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">8.0</td><td>時間波形のピーク値（絶対値の最大）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">2.3</td><td>実効値 RMS（機器表示 or 下のプロ技で計算）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=B1/B2</td><td>波高率 <span class="res">≒3.5</span></td></tr>
+<tr><td class="cell">B4</td><td class="frm">=IF(B3&lt;2,"チャープ的(1.4〜1.7)",IF(B3&lt;4,"ランダム的(3〜3.5)","クリップ/スパイク疑い"))</td><td>判定 <span class="res">ランダム的</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+ピーク値(絶対値最大)|8.0
+実効値RMS|2.3
+波高率|=B1/B2
+判定|=IF(B3&lt;2,"チャープ的(1.4〜1.7)",IF(B3&lt;4,"ランダム的(3〜3.5)","クリップ/スパイク疑い"))
+</pre>
+<div class="fx-foot">
+<div class="fline ex">同じアンプ上限なら、波高率が低いチャープほど多くのエネルギーを送り込める＝ピークがくっきり・谷が低い理由が数字で分かる。</div>
+<div class="fline mi">ホワイトノイズのレベルを上げすぎて瞬間クリップ → 偽ピークと歪み。時間波形とこの値を必ず確認。</div>
+<div class="fline pro">時間データ列（A2:A10001）から直接出すなら：ピーク =MAX(MAX(A2:A10001),-MIN(A2:A10001))、RMS =SQRT(SUMSQ(A2:A10001)/COUNT(A2:A10001))。</div>
+<div class="fline link">クリップが疑わしい帯域は<a href="#f5">式5</a>のγ²も落ちる。信号選びの全体像は図解まとめ第7章。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="B" id="f9">
+<div class="fx-head"><span class="fno">式9</span><b>反復ばらつき CV%（同じ測定を繰り返して健康診断） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>「測るたびに値が微妙に違う」と感じたら最初にやる。装置＋腕前の「基礎ばらつき」を知る。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1〜B5</td><td class="frm">1524.0／1523.2／1525.1／1523.8／1524.6</td><td>各回の固有振動数 [Hz]（同条件で5回。回数は増やしてOK、範囲も合わせる）</td></tr>
+<tr><td class="cell">B7</td><td class="frm">=AVERAGE(B1:B5)</td><td>平均</td></tr>
+<tr><td class="cell">B8</td><td class="frm">=STDEV(B1:B5)</td><td>標準偏差（散らばりの大きさ）</td></tr>
+<tr><td class="cell">B9</td><td class="frm">=STDEV(B1:B5)/AVERAGE(B1:B5)*100</td><td><b>変動係数 CV [%]（主役）</b> <span class="res">周波数は0.5%未満で正常目安</span></td></tr>
+<tr><td class="cell">B10</td><td class="frm">=IF(B9&lt;0.5,"正常",IF(B9&lt;1,"やや大","要調査"))</td><td>ざっくり判定</td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+測定1[Hz]|1524.0
+測定2[Hz]|1523.2
+測定3[Hz]|1525.1
+測定4[Hz]|1523.8
+測定5[Hz]|1524.6
+|
+平均|=AVERAGE(B1:B5)
+標準偏差|=STDEV(B1:B5)
+変動係数CV[%]|=STDEV(B1:B5)/AVERAGE(B1:B5)*100
+判定|=IF(B9&lt;0.5,"正常",IF(B9&lt;1,"やや大","要調査"))
+</pre>
+<div class="fx-foot">
+<div class="fline ex">シム付きで暴れる？ → まず裸パッドで5回測ってCVの下限（自分の腕＋装置の実力）を知り、その後シム付きと比べれば犯人が分かる。</div>
+<div class="fline mi">周波数と減衰を同じ基準で判定（減衰のCVは±10〜20%でも正常。周波数と別基準）。</div>
+<div class="fline pro">新しいExcelなら STDEV.S でも同じ結果。列を増やして「裸／シム付き／加圧」の3条件を横に並べると診断表が完成。</div>
+<div class="fline link">ばらつきの原因切り分けは<a href="#f10">式10</a>（質量）や<a href="#f5">式5</a>（品質）と併用。シム問題の本丸は<a href="#f23">式23</a>。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="B" id="f10">
+<div class="fx-head"><span class="fno">式10</span><b>質量負荷による周波数シフト（センサー・おもりの副作用） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>加速度センサー・磁石・おもりを付けたら何%下がるかを見積もる／「周波数が動いた」原因の切り分け。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">300</td><td>パッドの実効質量 m [g]（概算。実測が理想）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">200</td><td>付け加えた質量 Δm [g]</td></tr>
+<tr><td class="cell">B3</td><td class="frm">1524</td><td>元の固有振動数 f1 [Hz]</td></tr>
+<tr><td class="cell">B4</td><td class="frm">=B3*SQRT(B1/(B1+B2))</td><td>シフト後 f2 [Hz] <span class="res">≒1181</span></td></tr>
+<tr><td class="cell">B5</td><td class="frm">=(1-SQRT(B1/(B1+B2)))*100</td><td><b>低下率 [%]</b> <span class="res">≒22.5</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+実効質量m[g]|300
+付加質量Δm[g]|200
+元の周波数f1[Hz]|1524
+シフト後f2[Hz]|=B3*SQRT(B1/(B1+B2))
+低下率[%]|=(1-SQRT(B1/(B1+B2)))*100
+</pre>
+<div class="fx-foot">
+<div class="fline ex">200 gのおもりは周波数を2割以上引き下げる——「圧をかけたつもり」が「別の構造を測っていた」になる理由がこの1行。</div>
+<div class="fline mi">軽いパッドに重い加速度計を貼って、そのズレたまま比較（LDVの非接触という長所を捨てている）。</div>
+<div class="fline pro">逆に使うと質量校正になる：既知のΔmを貼って周波数の下がり方から実効質量mを逆算できる（B4を実測し、mについて解く）。</div>
+<div class="fline link">おもり案の圧力不足は<a href="#f24">式24</a>。正しい加圧は<a href="#f23">式23</a>。</div>
+</div>
+</div>
+
+<div class="cat-h"><span class="cl" style="background:#F5B23E;color:#0B1220">C</span><h2>ピーク・減衰の解析 — 数値に落とす</h2></div>
+
+<div class="fx" data-cat="C" id="f11">
+<div class="fx-head"><span class="fno">式11</span><b>半値幅法（損失係数 η・減衰比 ζ・Q値） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b><b>孤立した</b>単独ピークの減衰を素早く数値化するとき。半値点＝ピーク振幅×0.707（＝−3 dB）の左右の周波数。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">2500</td><td>共振周波数 fn [Hz]（山のてっぺん）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">2490</td><td>下側の−3 dB点 f1 [Hz]（振幅が0.707倍に落ちる所）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">2512</td><td>上側の−3 dB点 f2 [Hz]</td></tr>
+<tr><td class="cell">B4</td><td class="frm">=B3-B2</td><td>半値幅 Δf [Hz] <span class="res">=22</span></td></tr>
+<tr><td class="cell">B5</td><td class="frm">=B4/B1</td><td><b>損失係数 η</b>（＝Δf/fn） <span class="res">≒0.0088</span></td></tr>
+<tr><td class="cell">B6</td><td class="frm">=B4/(2*B1)</td><td>減衰比 ζ（＝η/2） <span class="res">≒0.0044</span></td></tr>
+<tr><td class="cell">B7</td><td class="frm">=B1/B4</td><td>Q値（＝1/η、鋭さ） <span class="res">≒114</span></td></tr>
+<tr><td class="cell">B8</td><td class="frm">=B6*100</td><td>減衰比 [%] <span class="res">≒0.44</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+共振周波数fn[Hz]|2500
+下側-3dB点f1[Hz]|2490
+上側-3dB点f2[Hz]|2512
+半値幅Δf[Hz]|=B3-B2
+損失係数η|=B4/B1
+減衰比ζ|=B4/(2*B1)
+Q値|=B1/B4
+減衰比[%]|=B6*100
+</pre>
+<div class="fx-foot">
+<div class="fline ex">η=0.0088・Q≒114——金属パッドらしい低減衰。シムを付けてηがどれだけ増えるかがそのまま制振効果。</div>
+<div class="fline mi"><b>双子（近接）ピークに使う</b> → 裾が重なって帯域幅を過大評価し破綻。うなり・歪んだ円・妙に大きい減衰は双子のサイン→カーブフィットへ。振幅表示がdBのときは「ピーク−3 dB」の点を読む（0.707倍と同じ意味）。</div>
+<div class="fline pro">読み取り精度はΔfの細かさで決まる。半値幅の中に最低5〜10ラインは欲しい（Δf≤半値幅/5を目安に式1へ戻る）。</div>
+<div class="fline link">ハンマー測定なら<a href="#f15">式15</a>の窓補正を必ず後段に。双子判定は<a href="#f2">式2</a>・<a href="#f12">式12</a>・<a href="#f14">式14</a>。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="C" id="f12">
+<div class="fx-head"><span class="fno">式12</span><b>うなりから双子の間隔を逆算（時間波形→周波数） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>スペクトルでは1本に見えるのに、時間波形がウワンウワン脈打つとき。「隠れた双子」を暴く。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">0.125</td><td>うなり周期 [s]（波形の「山→次の山」の時間を実測）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">=1/B1</td><td><b>双子の間隔 |f1−f2| [Hz]</b> <span class="res">=8</span></td></tr>
+<tr><td class="cell">B3</td><td class="frm">5</td><td>今のΔf [Hz]（式1）</td></tr>
+<tr><td class="cell">B4</td><td class="frm">=IF(B2&gt;4*B3,"今の設定でも2本に見えるはず","Δf不足→式2で再設計")</td><td>判定 <span class="res">再設計</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+うなり周期[s]|0.125
+双子の間隔[Hz]|=1/B1
+今のΔf[Hz]|5
+判定|=IF(B2&gt;4*B3,"今の設定でも2本に見えるはず","Δf不足→式2で再設計")
+</pre>
+<div class="fx-foot">
+<div class="fline ex">0.125秒周期のうなり→8 Hz差の双子が確定。スペクトルに1本しか見えないのは分解能不足、と犯人まで分かる。</div>
+<div class="fline mi">うなりを「測定エラー」と思って潰しにいく（穴が作った本物の物理。消すのではなく分離して読む）。</div>
+<div class="fline pro">録画やスマホのスロー動画でも周期は測れる。現場で電卓1回、が最速の縮退検出器。</div>
+<div class="fline link">設計へのフィードバックは<a href="#f2">式2</a>。分離の最終確認は<a href="#f14">式14</a>のMAC。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="C" id="f13">
+<div class="fx-head"><span class="fno">式13</span><b>ピーク一致判定（ハンマー vs チャープ vs ノイズ） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>手法を変えたらピークがズレて見えるとき、「同じモードか別物か」を数字で裁定する。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">A2</td><td class="frm">512.0</td><td>手法1のピーク [Hz]（例：ハンマー）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">509.5</td><td>手法2のピーク [Hz]（例：チャープ）</td></tr>
+<tr><td class="cell">C2</td><td class="frm">=ABS(A2-B2)/AVERAGE(A2:B2)*100</td><td>相対差 [%] <span class="res">≒0.49</span></td></tr>
+<tr><td class="cell">D2</td><td class="frm">=IF(C2&lt;2,"ほぼ同一",IF(C2&lt;5,"同一の可能性大","別モード疑い"))</td><td>判定 <span class="res">ほぼ同一</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+手法1[Hz]|手法2[Hz]|相対差[%]|判定
+512.0|509.5|=ABS(A2-B2)/AVERAGE(A2:B2)*100|=IF(C2&lt;2,"ほぼ同一",IF(C2&lt;5,"同一の可能性大","別モード疑い"))
+</pre>
+<div class="fx-foot">
+<div class="fline ex">ピークを縦に並べてC・D列を下へコピーすれば、3手法の突き合わせ表が一気に完成する。</div>
+<div class="fline mi">応答スペクトル同士で比較（加振の形が乗るので当然ズレる）。比べるのはFRF同士。付加質量の差（ハンマーは0、シェーカーはあり）も先に考慮。</div>
+<div class="fline pro">2%・5%のしきい値は経験則。低次モード（周波数が低い）ほど絶対Hz差でも見ると誤判定が減る。</div>
+<div class="fline link">周波数が同じでも形が違えば別モード → <a href="#f14">式14</a>でとどめ。振幅差の言い訳は<a href="#f7">式7</a>。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="C" id="f14">
+<div class="fx-head"><span class="fno">式14</span><b>MAC（モード形の一致度：1＝同じ形、0＝無関係） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>2つのピークが「同じモードの二重取りか、本当に別の双子か」を形で最終判定するとき（実数近似）。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">C2:C10</td><td class="frm">（モード形1の値を縦に）</td><td>φ1＝各測定点の振れ幅（符号つき。例：9点分）</td></tr>
+<tr><td class="cell">D2:D10</td><td class="frm">（モード形2の値を縦に）</td><td>φ2＝比べたい相手のモード形</td></tr>
+<tr><td class="cell">F2</td><td class="frm">=SUMPRODUCT(C2:C10,D2:D10)^2/(SUMPRODUCT(C2:C10,C2:C10)*SUMPRODUCT(D2:D10,D2:D10))</td><td><b>MAC</b> <span class="res">0.9超＝実質同じ形／0.1未満＝別モード</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+点||モード形1φ1|モード形2φ2||MAC
+P1||1.00|1.00||=SUMPRODUCT(C2:C10,D2:D10)^2/(SUMPRODUCT(C2:C10,C2:C10)*SUMPRODUCT(D2:D10,D2:D10))
+P2||0.71|0.00|
+P3||0.00|-1.00|
+P4||-0.71|0.00|
+P5||-1.00|1.00|
+P6||-0.71|0.00|
+P7||0.00|-1.00|
+P8||0.71|0.00|
+P9||1.00|1.00|
+</pre>
+<div class="fx-foot">
+<div class="fline ex">縮退ペアを分離できたつもりでMACが0.95 → 実は同じモードを二重に拾っていた、が一発でバレる（AutoMACの非対角チェックと同じ思想）。</div>
+<div class="fline mi">点数が少なすぎるφで判定（形の情報が足りず何でも似て見える）。最低でも両者共通の9点以上を推奨。</div>
+<div class="fline pro">双子は「周波数ほぼ同じ・MAC低い（形が直交）」が正解の姿。周波数もMACも高いなら分離失敗のサイン。</div>
+<div class="fline link">分離の入口は<a href="#f2">式2</a>・<a href="#f12">式12</a>。参照点の置き方は図解まとめ第3章の鉄のルール。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="C" id="f15">
+<div class="fx-head"><span class="fno">式15</span><b>指数窓の減衰補正（ハンマー測定の後始末） <span class="badge ok">🟢 理論</span><span class="badge chk">🔴 機種の定義確認</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>ハンマリングで指数窓を使ったとき。窓が足した「人工の減衰」を引き算して、本当の減衰に戻す。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">2500</td><td>対象モードの固有振動数 fn [Hz]</td></tr>
+<tr><td class="cell">B2</td><td class="frm">0.4</td><td>ブロック長 T [s]（＝1/Δf）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">5</td><td>窓の終端残存率 P [%]（「最後に何%残す」設定。機種により定義が違う→要取説）</td></tr>
+<tr><td class="cell">B4</td><td class="frm">=B2/LN(100/B3)</td><td>窓の時定数 τ [s] <span class="res">≒0.134</span></td></tr>
+<tr><td class="cell">B5</td><td class="frm">=1/(2*PI()*B1*B4)</td><td>窓が足した減衰比 ζ_add <span class="res">≒0.00048</span></td></tr>
+<tr><td class="cell">B6</td><td class="frm">0.0044</td><td>測定で得た減衰比 ζ_meas（式11のB6）</td></tr>
+<tr><td class="cell">B7</td><td class="frm">=B6-B5</td><td><b>補正後の真の ζ</b> <span class="res">≒0.0039</span></td></tr>
+<tr><td class="cell">B8</td><td class="frm">=2*B7</td><td>補正後の損失係数 η <span class="res">≒0.0078</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+固有振動数fn[Hz]|2500
+ブロック長T[s]|0.4
+終端残存率P[%]|5
+窓の時定数τ[s]|=B2/LN(100/B3)
+窓が足した減衰比ζ_add|=1/(2*PI()*B1*B4)
+測定減衰比ζ_meas|0.0044
+真のζ(補正後)|=B6-B5
+補正後の損失係数η|=2*B7
+</pre>
+<div class="fx-foot">
+<div class="fline ex">「シムの減衰が思ったより大きい」の半分は窓のせい、がよくある。補正でζが約1割下がった＝それが窓の水増し分。</div>
+<div class="fline mi">補正を忘れて損失係数を報告／B7が負になるのに気づかない（負＝窓が強すぎ。窓を弱めるかブロック長を伸ばして窓なしに）。機種が「時定数直接入力」ならB4に直接入れ、B3行は使わない。</div>
+<div class="fline pro">一番きれいなのは「補正しない」こと＝ブロック長を伸ばし、応答が自然にゼロまで減衰したら窓は不要（振幅も減衰も最も正確）。</div>
+<div class="fline link">補正の入力は<a href="#f11">式11</a>から。窓そのものの選び方は<a href="#f16">式16</a>と図解まとめ第8章。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="C" id="f16">
+<div class="fx-head"><span class="fno">式16</span><b>窓の振幅補正と ENBW（ハニングの後始末） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>ハニング窓を使った測定で、山の高さの目減りを戻す／ノイズ帯域幅を周波数[Hz]に直すとき。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">0.5</td><td>ハニングのコヒーレントゲイン（山の高さが半分になる係数）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">=1/B1</td><td>振幅補正係数 <span class="res">=2.0（測った高さ×2が元の高さ）</span></td></tr>
+<tr><td class="cell">B3</td><td class="frm">1.5</td><td>ハニングのENBW係数（矩形=1.0）</td></tr>
+<tr><td class="cell">B4</td><td class="frm">5</td><td>分解能 Δf [Hz]（式1）</td></tr>
+<tr><td class="cell">B5</td><td class="frm">=B3*B4</td><td>実効ノイズ帯域幅 [Hz] <span class="res">=7.5</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+ハニングのコヒーレントゲイン|0.5
+振幅補正係数|=1/B1
+ENBW係数(ハニング)|1.5
+分解能Δf[Hz]|5
+実効ノイズ帯域幅[Hz]|=B3*B4
+</pre>
+<div class="fx-foot">
+<div class="fline ex">ハニングで測った山が半分の高さに見えても慌てない——B2を掛ければ元通り（多くの機器は自動補正。二重に掛けないこと）。</div>
+<div class="fline mi">振幅の<b>二重補正</b>（機器が既に補正済みなのに、もう一度×2）。周期チャープに窓を掛ける（矩形が原則、掛けたら情報を捨てるだけ）。</div>
+<div class="fline pro">窓の性格の暗記法：矩形＝裾−13 dBで高い／ハニング＝−32 dB／ブラックマン＝−58 dBで深く沈む。「分解能なら矩形・迷ったらハニング・高さならフラットトップ・小信号ならブラックマン」。</div>
+<div class="fline link">ハンマーの指数窓は<a href="#f15">式15</a>。窓と漏れの物語は図解まとめ第8章。</div>
+</div>
+</div>
+<div class="cat-h"><span class="cl" style="background:#9C8DF6">D</span><h2>予測・設計計算 — 測る前に当たりを付ける</h2></div>
+
+<div class="fx" data-cat="D" id="f17">
+<div class="fx-head"><span class="fno">式17</span><b>板の曲げ1次周波数（Leissaの古典板理論） <span class="badge ok">🟢 式</span><span class="badge est">🟡 λは表で確認</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>単純な板（裏板だけ・試験片）の面直1次モードを、寸法と物性から予測するとき。FEMの桁チェックにも。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">2.0E11</td><td>ヤング率 E [Pa]（鋼＝2.0E11）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">0.005</td><td>板厚 h [m]（例：5 mm）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">0.3</td><td>ポアソン比 ν（鋼≒0.3）</td></tr>
+<tr><td class="cell">B4</td><td class="frm">7850</td><td>密度 ρ [kg/m³]（鋼）</td></tr>
+<tr><td class="cell">B5</td><td class="frm">0.1</td><td>代表辺長 a [m]（例：100 mm角）</td></tr>
+<tr><td class="cell">B6</td><td class="frm">13.49</td><td>境界条件の係数 λ（完全自由の正方形板の1次。Leissa表で最終確認）</td></tr>
+<tr><td class="cell">B7</td><td class="frm">=B1*B2^3/(12*(1-B3^2))</td><td>曲げ剛性 D [N·m]（h の3乗で効く！） <span class="res">≒2289</span></td></tr>
+<tr><td class="cell">B8</td><td class="frm">=B4*B2</td><td>面密度 μ [kg/m²] <span class="res">=39.25</span></td></tr>
+<tr><td class="cell">B9</td><td class="frm">=B6/(2*PI()*B5^2)*SQRT(B7/B8)</td><td><b>1次周波数 f [Hz]</b> <span class="res">≒1640</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+ヤング率E[Pa]|2E11
+板厚h[m]|0.005
+ポアソン比ν|0.3
+密度ρ[kg/m3]|7850
+代表辺長a[m]|0.1
+係数λ(自由正方形1次)|13.49
+曲げ剛性D[N・m]|=B1*B2^3/(12*(1-B3^2))
+面密度μ[kg/m2]|=B4*B2
+1次周波数f[Hz]|=B6/(2*PI()*B5^2)*SQRT(B7/B8)
+</pre>
+<div class="fx-foot">
+<div class="fline ex">100 mm角×5 mm厚の自由な鋼板 → 約1.6 kHz。実測とFEMの答え合わせに「桁が合っているか」を3分で確認できる。</div>
+<div class="fline mi">この式を摩擦材つきの本物パッドにそのまま適用（複合断面・穴・直交異方性で崩れる。当たりは付くが絶対値はFEM）。</div>
+<div class="fline pro">最大の不確かさは摩擦材のヤング率（配合で55 MPa〜35 GPa、600倍！）。だから王道は「実測→逆算→その物性でFEM」の順。</div>
+<div class="fline link">設計をいじった影響は<a href="#f18">式18</a>で。面内は別の式（<a href="#f19">式19</a>・<a href="#f20">式20</a>）。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="D" id="f18">
+<div class="fx-head"><span class="fno">式18</span><b>スケーリング則（設計変更で何Hz動く？） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>絶対値は分からなくても「板厚を1割増したら」「寸法を変えたら」周波数が何倍になるかを即答したいとき。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">3200</td><td>現状の周波数 f1 [Hz]（実測値でOK）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">5</td><td>現状の板厚 h1 [mm]</td></tr>
+<tr><td class="cell">B3</td><td class="frm">5.5</td><td>変更後の板厚 h2 [mm]</td></tr>
+<tr><td class="cell">B4</td><td class="frm">100</td><td>現状の代表寸法 L1 [mm]</td></tr>
+<tr><td class="cell">B5</td><td class="frm">100</td><td>変更後の寸法 L2 [mm]</td></tr>
+<tr><td class="cell">B6</td><td class="frm">1</td><td>√(E/ρ) の比（材質同じなら1）</td></tr>
+<tr><td class="cell">B7</td><td class="frm">=B1*(B3/B2)*(B4/B5)^2*B6</td><td><b>変更後の周波数 f2 [Hz]</b> <span class="res">=3520（+10%）</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+現状の周波数f1[Hz]|3200
+現状の板厚h1[mm]|5
+変更後の板厚h2[mm]|5.5
+現状の寸法L1[mm]|100
+変更後の寸法L2[mm]|100
+材質比(E/ρ平方根の比)|1
+変更後の周波数f2[Hz]|=B1*(B3/B2)*(B4/B5)^2*B6
+</pre>
+<div class="fx-foot">
+<div class="fline ex">覚え方：<b>厚み2倍→周波数2倍。寸法2倍→1/4</b>。鳴き帯域（1.25〜16 kHz）から逃がす設計の当たり付けが電卓1回。</div>
+<div class="fline mi">曲げのスケール（h¹・L⁻²）を面内モードに適用（面内は h に依存しない別スケール、<a href="#f20">式20</a>参照）。</div>
+<div class="fline pro">f∝h·√(E/ρ)/L² は「実測値を基準に比率だけ動かす」使い方が最強＝材料定数を知らなくても使える。</div>
+<div class="fline link">絶対値の当たりは<a href="#f17">式17</a>。曲げ-捻じれ300 Hz離隔ルールの検討にも（図解まとめ第5章）。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="D" id="f19">
+<div class="fx-head"><span class="fno">式19</span><b>面内／面直の周波数比 √12×L/h <span class="badge est">🟡 均質板の概算</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>「面直の1次に対して、面内の1次はだいたい何倍上にいる？」を10秒で見積もるとき。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">0.10</td><td>代表寸法 L [m]</td></tr>
+<tr><td class="cell">B2</td><td class="frm">0.015</td><td>板厚 h [m]</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=SQRT(12)*B1/B2</td><td><b>面内1次 ÷ 面直1次 の概算倍率</b> <span class="res">≒23</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+代表寸法L[m]|0.10
+板厚h[m]|0.015
+面内/面直の倍率|=SQRT(12)*B1/B2
+</pre>
+<div class="fx-foot">
+<div class="fline ex">L=100 mm・h=15 mmなら約23倍——低周波では面直と面内は完全に別世界、が数字で腹落ちする。</div>
+<div class="fline mi">「面内のピークが見えない＝存在しない」（垂直入射のLDVは面内感度ゼロ。測っていないだけ）。</div>
+<div class="fline pro">高周波では面直モードが密集して面内が割り込み、比が意味を失う——そこが鳴きの舞台（図解まとめ第6章）。</div>
+<div class="fline link">面内の絶対値は<a href="#f20">式20</a>。測り方は端面ハンマー→PZTの二段構え。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="D" id="f20">
+<div class="fx-head"><span class="fno">式20</span><b>面内1次周波数（棒の縦振動 f＝c/2L） <span class="badge ok">🟢 桁の見積り</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>面内モードがだいたい何kHzに出るか、測る前に桁を知りたいとき（測定帯域の設定にも直結）。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">2.0E11</td><td>ヤング率 E [Pa]（鋼）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">7850</td><td>密度 ρ [kg/m³]</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=SQRT(B1/B2)</td><td>縦波の速さ c [m/s] <span class="res">≒5048</span></td></tr>
+<tr><td class="cell">B4</td><td class="frm">0.16</td><td>パッドの長さ L [m]（例：160 mm）</td></tr>
+<tr><td class="cell">B5</td><td class="frm">=B3/(2*B4)</td><td><b>面内1次の桁 [Hz]</b> <span class="res">≒15800（約16 kHz）</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+ヤング率E[Pa]|2E11
+密度ρ[kg/m3]|7850
+縦波の速さc[m/s]|=SQRT(B1/B2)
+パッド長さL[m]|0.16
+面内1次の桁[Hz]|=B3/(2*B4)
+</pre>
+<div class="fx-foot">
+<div class="fline ex">160 mmの鋼裏板なら面内1次は約16 kHz——鳴き帯域の上端に面内がいる、が測る前から分かる。</div>
+<div class="fline mi">面直の式（<a href="#f17">式17</a>）で面内を予測しようとする（支配する剛性が別物）。</div>
+<div class="fline pro">加振器＋スティンガーは可動部共振より上で力が痩せるので、この帯域は「端面ハンマー」か「PZT＋周期チャープ」が現実解。</div>
+<div class="fline link">倍率の相場観は<a href="#f19">式19</a>。測定帯域の設定は<a href="#f1">式1</a>へ戻す。</div>
+</div>
+</div>
+
+<div class="cat-h"><span class="cl" style="background:#FF6E6E">E</span><h2>スティンガー設計 — 細い棒の科学</h2></div>
+
+<div class="fx" data-cat="E" id="f21">
+<div class="fx-head"><span class="fno">式21</span><b>スティンガーの横曲げ1次共振（偽ピークの出る場所） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>φと長さを決める前に「棒自身の共振が何Hzに出るか」を予言しておく。FRFに出た謎ピークの容疑者リスト作り。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">2.0E11</td><td>ヤング率 E [Pa]（鋼。ばね鋼SWP-Aもほぼ同じ）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">7850</td><td>密度 ρ [kg/m³]</td></tr>
+<tr><td class="cell">B3</td><td class="frm">0.0015</td><td>直径 d [m]（例：1.5 mm）</td></tr>
+<tr><td class="cell">B4</td><td class="frm">0.05</td><td>長さ L [m]（例：50 mm）</td></tr>
+<tr><td class="cell">B5</td><td class="frm">=PI()*B3^4/64</td><td>断面2次モーメント I [m⁴]（曲げにくさ。d の4乗）</td></tr>
+<tr><td class="cell">B6</td><td class="frm">=PI()*B3^2/4</td><td>断面積 A [m²]</td></tr>
+<tr><td class="cell">B7</td><td class="frm">=B2*B6</td><td>単位長さ質量 m [kg/m]</td></tr>
+<tr><td class="cell">B8</td><td class="frm">=PI()/(2*B4^2)*SQRT(B1*B5/B7)</td><td><b>横曲げ1次 [Hz]</b>（両端ピン近似） <span class="res">≒1190</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+ヤング率E[Pa]|2E11
+密度ρ[kg/m3]|7850
+直径d[m]|0.0015
+長さL[m]|0.05
+断面2次モーメントI[m4]|=PI()*B3^4/64
+断面積A[m2]|=PI()*B3^2/4
+単位長さ質量m[kg/m]|=B2*B6
+横曲げ1次[Hz]|=PI()/(2*B4^2)*SQRT(B1*B5/B7)
+</pre>
+<div class="fx-foot">
+<div class="fline ex">φ1.5×50 mmの鋼線 → 約1.2 kHzに棒の共振。この付近のFRFの変な山は、長さを変えた2本のFRF重ね合わせで棒由来か判定。</div>
+<div class="fline mi">アルミでも同じ周波数だから同等と思う（√(E/ρ)がほぼ同じで共振は似るが、勝負は降伏と軸剛性——軟アルミは降伏34 MPa vs ピアノ線1900 MPa、56倍差で失格）。</div>
+<div class="fline pro">棒の共振＝横柔らかさの裏返しなので存在自体は悪ではない。「どこに出るか知っていて」「構造モードと切り分けられる」ことが実力。</div>
+<div class="fline link">押して座屈しないかは<a href="#f22">式22</a>とセットで最適長さを挟み撃ち。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="E" id="f22">
+<div class="fx-head"><span class="fno">式22</span><b>座屈限界（どこまで押せるか・オイラー式） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>スティンガーが「長すぎて押した瞬間ぐにゃり」にならないか、加振力に対する余裕を確認するとき。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1〜B5</td><td class="frm">（式21と同じ E・ρ・d・L・I を使用）</td><td>同じシートで続けて計算するのが楽</td></tr>
+<tr><td class="cell">B10</td><td class="frm">=PI()^2*B1*B5/B4^2</td><td><b>座屈限界荷重 Pcr [N]</b>（両端ピン） <span class="res">≒196</span></td></tr>
+<tr><td class="cell">B11</td><td class="frm">5</td><td>予定の最大加振力 [N]</td></tr>
+<tr><td class="cell">B12</td><td class="frm">=B10/B11</td><td>安全率 <span class="res">≒39（十分）</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+ヤング率E[Pa]|2E11
+密度ρ[kg/m3]|7850
+直径d[m]|0.0015
+長さL[m]|0.05
+断面2次モーメントI[m4]|=PI()*B3^4/64
+|
+|
+|
+|
+座屈限界Pcr[N]|=PI()^2*B1*B5/B4^2
+最大加振力[N]|5
+安全率|=B10/B11
+</pre>
+<div class="fx-foot">
+<div class="fline ex">φ1.5×50 mmなら約196 Nまで押せる。低レベル加振の数Nに対して余裕たっぷり——だが長さ2倍でPcrは1/4に急減する。</div>
+<div class="fline mi">吊り用のピアノ線をそのまま「押す棒」に流用（予張力を掛けられない細線は押した瞬間に座屈。押すのは固体の細棒）。</div>
+<div class="fline pro">最適長さは「短すぎ→加振器の癖が乗る／長すぎ→座屈・力痩せ」の挟み撃ち。30〜60 mmから始め、2〜3種の長さで比較が定石。</div>
+<div class="fline link">共振側の制約は<a href="#f21">式21</a>。全体セットアップは図解まとめ第11章。</div>
+</div>
+</div>
+<div class="cat-h"><span class="cl" style="background:#F5B23E;color:#0B1220">F</span><h2>シム加圧治具 — 44 mm 確定版</h2></div>
+
+<div class="fx" data-cat="F" id="f23">
+<div class="fx-head"><span class="fno">式23</span><b>圧力→力→トルク 一式（ピストン径 44 mm 確定） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>実車のピストン圧（0.5〜3 MPa）を治具で再現するとき。ロードセルの目標値と、当たり付け用トルクを同時に出す。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">44</td><td>ピストン（パック）直径 [mm]（<b>確定値</b>。4.4は誤記だった）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">1</td><td>目標圧力 P [MPa]（0.5〜3で圧スイープ）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">4</td><td>ボルト本数 n</td></tr>
+<tr><td class="cell">B4</td><td class="frm">6</td><td>ボルト呼び径 d [mm]（M6なら6）</td></tr>
+<tr><td class="cell">B5</td><td class="frm">0.2</td><td>ナットファクター K（乾いた鋼の典型。±25〜35%ばらつく前提の当たり値）</td></tr>
+<tr><td class="cell">B7</td><td class="frm">=PI()/4*B1^2</td><td>パック面積 A [mm²] <span class="res">≒1521</span></td></tr>
+<tr><td class="cell">B8</td><td class="frm">=B2*B7</td><td><b>合計締付力 F [N]＝ロードセル目標値</b> <span class="res">1 MPa→≒1521</span></td></tr>
+<tr><td class="cell">B9</td><td class="frm">=B8/B3</td><td>ボルト1本の力 f [N] <span class="res">≒380</span></td></tr>
+<tr><td class="cell">B10</td><td class="frm">=B5*B4*B9/1000</td><td>1本トルク T [N·m]（÷1000でmm→m） <span class="res">≒0.46</span></td></tr>
+<tr><td class="cell">B11</td><td class="frm">=B10*100</td><td>同 [N·cm]（トルクドライバー表示用）</td></tr>
+<tr><td class="cell">B12</td><td class="frm">=B10/0.0980665</td><td>同 [kgf·cm] <span class="res">≒4.7</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+ピストン直径[mm]|44
+目標圧力P[MPa]|1
+ボルト本数|4
+ボルト呼び径[mm]|6
+ナットファクターK|0.2
+|
+パック面積A[mm2]|=PI()/4*B1^2
+合計締付力F[N]=ロードセル目標|=B2*B7
+ボルト1本の力[N]|=B8/B3
+1本トルク[N・m]|=B5*B4*B9/1000
+1本トルク[N・cm]|=B10*100
+1本トルク[kgf・cm]|=B10/0.0980665
+</pre>
+<div class="fx-foot">
+<div class="fline ex">B2を0.5→1→2→3と変えるだけで、圧スイープの目標値表が完成：合計力760／1521／3041／4562 N、M6トルク0.23／0.46／0.91／1.37 N·m。</div>
+<div class="fline mi">クリック式トルクレンチで締める（必要トルクは下限5 N·mより小さく設定不能。しかもK法は±25〜35%の誤差）。パッドに穴を開ける（対称性を壊し双子分裂を自作）。締めっぱなし（ゴムのクリープで圧が抜ける→数分後に締め直し）。ステンレスボルト無潤滑（Kが0.35以上に化ける）。</div>
+<div class="fline pro">本命は<b>B8をロードセルで直読</b>しながら締める（±数%）。4本は対角順に少しずつ×数周で均等化。円柱がその側の唯一の接触点になっているか毎回確認（力の分流防止）。</div>
+<div class="fline link">おもり案の却下は<a href="#f24">式24</a>。加圧前後の周波数変化に質量の言い訳が要るなら<a href="#f10">式10</a>。減衰の定量は<a href="#f11">式11</a>で圧ごとに。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="F" id="f24">
+<div class="fx-head"><span class="fno">式24</span><b>おもりで出せる圧力チェック（200 g案の裁判） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>「おもりを乗せれば圧がかかるのでは？」案を、必要圧（5〜30 bar）と比べて定量的に判定するとき。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">200</td><td>おもりの質量 [g]</td></tr>
+<tr><td class="cell">B2</td><td class="frm">70</td><td>力を受ける接触面積 [cm²]（シム全面なら例70。小さい円柱接触なら小さく）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=B1/1000*9.81</td><td>おもりの力 [N] <span class="res">≒1.96</span></td></tr>
+<tr><td class="cell">B4</td><td class="frm">=B3/(B2*100)</td><td>出せる圧力 [MPa]（面積cm²→mm²で×100） <span class="res">≒0.00028</span></td></tr>
+<tr><td class="cell">B5</td><td class="frm">=B4*10</td><td>同 [bar] <span class="res">≒0.003</span></td></tr>
+<tr><td class="cell">B6</td><td class="frm">=0.5/B4</td><td>必要下限0.5 MPaに対する不足倍率 <span class="res">≒1800倍足りない</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+おもり質量[g]|200
+接触面積[cm2]|70
+おもりの力[N]|=B1/1000*9.81
+出せる圧力[MPa]|=B3/(B2*100)
+同[bar]|=B4*10
+0.5MPaへの不足倍率|=0.5/B4
+</pre>
+<div class="fx-foot">
+<div class="fline ex">200 g・シム全面受けなら約0.003 bar。接触面積を小さく見積もっても0.03 bar程度で、必要な5 barの<b>百分の一以下</b>——桁で不可能と即答できる。</div>
+<div class="fline mi">「効かないなら、もっと重く」→ 圧が届く前に質量負荷（<a href="#f10">式10</a>）で周波数が壊れる。「軽すぎて効かず・重すぎて壊す」の二重罠。</div>
+<div class="fline pro">この式は逆算にも使える：B4に目標圧を置けば必要な力が出て、「おもりでは無理＝ネジ＋ロードセル」へ自然に着地する。</div>
+<div class="fline link">正解の治具は<a href="#f23">式23</a>と図解まとめ第13章（C型ヨーク＋ロードセル＋締め直し）。</div>
+</div>
+</div>
+
+<div class="cat-h"><span class="cl" style="background:#4FB0E8">G</span><h2>加振点選び — 節を機械的に避ける</h2></div>
+
+<div class="fx" data-cat="G" id="f25">
+<div class="fx-head"><span class="fno">式25</span><b>節にならない点のスクリーニング（FEMのモード形を使う） <span class="badge est">🟡 簡易法</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>FEMのモード形（固有ベクトル）が手元にあり、「どのモードでも動く点＝加振の当たり点」を機械的に選ぶとき。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">A2:A20</td><td class="frm">P01, P02, …</td><td>候補点の名前（縦に）</td></tr>
+<tr><td class="cell">B2:F20</td><td class="frm">（数値を貼る）</td><td>モード1〜5の |φ|（各点の振れ幅の絶対値。FEMから）</td></tr>
+<tr><td class="cell">G2</td><td class="frm">=MIN(B2:F2)</td><td>その点の「最悪モードでの動きやすさ」（下へコピー）</td></tr>
+<tr><td class="cell">I2</td><td class="frm">=INDEX(A2:A20,MATCH(MAX(G2:G20),G2:G20,0))</td><td><b>最も節になりにくい点</b>＝加振点の第一候補</td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+点|モード1|モード2|モード3|モード4|モード5|最悪値(MIN)||第一候補
+P01|0.9|0.8|0.7|0.6|0.5|=MIN(B2:F2)||=INDEX(A2:A6,MATCH(MAX(G2:G6),G2:G6,0))
+P02|0.2|0.9|0.8|0.1|0.7|=MIN(B3:F3)|
+P03|0.8|0.1|0.9|0.7|0.2|=MIN(B4:F4)|
+P04|0.7|0.7|0.6|0.8|0.6|=MIN(B5:F5)|
+P05|0.1|0.5|0.2|0.9|0.9|=MIN(B6:F6)|
+</pre>
+<div class="fx-foot">
+<div class="fline ex">「全モードのうち一番苦手なモードですら、そこそこ動く点」を選ぶ発想。max-min法のエクセル版。</div>
+<div class="fline mi">重心・対称軸上を候補に入れる（多くのモードの節。FEMが無くても経験則で「対称軸から外した角」が第一候補）。</div>
+<div class="fline pro">本格運用は駆動点残差や最適化手法（Imamovic &amp; Ewins 1997）が標準。この式はその前段の高速ふるい。選んだ点は駆動点FRFの「共振↔反共振が交互」で実測検証。</div>
+<div class="fline link">三原則（吊り＝節・加振＝腹・測定＝オフ軸）は図解まとめ第2章。双子がらみの基準点配置は第3章。</div>
+</div>
+</div>
+
+<div class="cat-h"><span class="cl" style="background:#38D3B5">H</span><h2>上級 — ESSと非線形の切り分け</h2></div>
+
+<div class="fx" data-cat="H" id="f26">
+<div class="fx-head"><span class="fno">式26</span><b>ESS高調波の時間分離 Δt（Farina 2000） <span class="badge ok">🟢</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>指数スイープ＋逆フィルタで、n次歪みが線形応答よりどれだけ「手前」に出るかを予言し、時間窓の幅を決めるとき。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">10</td><td>掃引時間 T [s]</td></tr>
+<tr><td class="cell">B2</td><td class="frm">100</td><td>開始周波数 f1 [Hz]</td></tr>
+<tr><td class="cell">B3</td><td class="frm">10000</td><td>終了周波数 f2 [Hz]</td></tr>
+<tr><td class="cell">B4</td><td class="frm">2</td><td>高調波次数 n（2次なら2）</td></tr>
+<tr><td class="cell">B5</td><td class="frm">=B1*LN(B4)/LN(B3/B2)</td><td><b>Δt(n)＝線形応答より手前に出る時間 [s]</b> <span class="res">≒1.51</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+掃引時間T[s]|10
+開始周波数f1[Hz]|100
+終了周波数f2[Hz]|10000
+高調波次数n|2
+手前に出る時間Δt[s]|=B1*LN(B4)/LN(B3/B2)
+</pre>
+<div class="fx-foot">
+<div class="fline ex">T=10 s・100 Hz→10 kHzなら、2次歪みは1.5秒手前・3次は2.4秒手前に整列。t=0付近だけ窓で切れば歪みゼロの線形応答。</div>
+<div class="fline mi">窓を広げすぎて手前の歪み成分まで巻き込む（Δtの半分以下を目安に窓幅を決める）。</div>
+<div class="fline pro">同じ発想の実務技：入力レベルを2段階変えてFRF比較＝「非線形の健康診断」（ズレたら非線形の証拠）。PSVの周期チャープでもそのまま使える。</div>
+<div class="fline link">スイープの見た目問題（アーマチュア共振・力ドロップアウト）は図解まとめ第7章。速度制約は<a href="#f27">式27</a>。</div>
+</div>
+</div>
+
+<div class="fx" data-cat="H" id="f27">
+<div class="fx-head"><span class="fno">式27</span><b>スイープ最大速度の目安 <span class="badge est">🟡 自作式・要検証</span></b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="fx-when"><b>いつ使う：</b>真の正弦掃引（ゆっくりスイープ）で、鋭いモードを通過中に立ち上がらせるための速度上限を概算するとき。</div>
+<div class="fx-body"><div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">4</td><td>対象モードの半値幅 Δf_3dB [Hz]（式11のB4）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">4</td><td>余裕係数 k（3〜5。立ち上がり時定数を何回分待つか）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=PI()*B1^2/B2</td><td><b>最大スイープ速度 [Hz/s]</b> <span class="res">≒12.6</span></td></tr>
+</table></div></div>
+<pre class="tsv" style="display:none">
+半値幅Δf_3dB[Hz]|4
+余裕係数k|4
+最大スイープ速度[Hz/s]|=PI()*B1^2/B2
+</pre>
+<div class="fx-foot">
+<div class="fline ex">半値幅4 Hzの鋭い山なら約12.6 Hz/s以下——減衰が小さいほど急激に厳しくなり、速いスイープが山を潰す理由が体感できる。</div>
+<div class="fline mi">規格そのものと誤解しない（第一基準は慣用の2〜4 oct/min。本式はその妥当性チェック用の物理概算で、確信度は中）。</div>
+<div class="fline pro">迷ったら真のスイープではなく周期チャープに切り替えるのが早い（周期信号＝漏れゼロ・矩形窓・短時間で本来の鋭さ）。</div>
+<div class="fline link">半値幅の入手は<a href="#f11">式11</a>。信号の使い分け全体は図解まとめ第7章。</div>
+</div>
+</div>
+
+</div>
+</section>
+
+<section id="combo">
+<div class="wrap">
+<div class="eyebrow">COMBO MAP</div>
+<h2>計算式どうしの<span class="hl-teal">連携プレイ</span> 早見表</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>コンボ名</th><th>流れ</th><th>何が完成する？</th></tr></thead>
+<tbody>
+<tr><td><b>測定設計コンボ</b></td><td><a href="#f2">式2</a>（必要Δf・T）→ <a href="#f1">式1</a>（ライン数に翻訳）→ 足りなければ<a href="#f12">式12</a>で実測逆算</td><td>双子を潰さない測定条件</td></tr>
+<tr><td><b>品質三点セット</b></td><td><a href="#f5">式5</a>（γ²）→ <a href="#f6">式6</a>（必要回数）→ <a href="#f7">式7</a>（残る誤差）</td><td>「何回・どこまで信じる」の根拠</td></tr>
+<tr><td><b>減衰の完全体</b></td><td><a href="#f11">式11</a>（半値幅）→ ハンマーなら<a href="#f15">式15</a>（窓補正）＋<a href="#f16">式16</a>（振幅補正）</td><td>水増しゼロの損失係数</td></tr>
+<tr><td><b>双子裁判</b></td><td><a href="#f12">式12</a>（うなり→間隔）→ <a href="#f13">式13</a>（周波数一致）→ <a href="#f14">式14</a>（形の直交）</td><td>1本か2本かの最終判決</td></tr>
+<tr><td><b>スティンガー挟み撃ち</b></td><td><a href="#f21">式21</a>（共振の場所）×<a href="#f22">式22</a>（座屈余裕）を長さで両立</td><td>φと長さの最適解</td></tr>
+<tr><td><b>治具フルコース</b></td><td><a href="#f24">式24</a>（おもり却下）→ <a href="#f23">式23</a>（目標F・T）→ <a href="#f9">式9</a>（再現性）→ <a href="#f11">式11</a>（圧ごとのη）</td><td>圧力-減衰カーブ（頭打ち探し）</td></tr>
+<tr><td><b>予測コンボ</b></td><td><a href="#f17">式17</a>（絶対値の桁）→ <a href="#f18">式18</a>（設計変更）／面内は<a href="#f19">式19</a>→<a href="#f20">式20</a></td><td>測る前の当たりとFEMの桁チェック</td></tr>
+</tbody></table></div>
+<div class="callout warn"><span class="tag">全式共通の「やってはいけない」トップ3</span>
+① 双子（近接）ピークに<a href="#f11">式11</a>（半値幅法）を使う　
+② 1回だけの測定で<a href="#f5">式5</a>（γ²）を計算して「1だから完璧」と喜ぶ　
+③ 応答スペクトル同士を<a href="#f13">式13</a>で比較する（比べるのはFRF同士）
+</div>
+<p class="note">貼り付け後にエラーが出る場合：関数の区切り「,」を「;」に置換（LibreOffice）。STDEVは新しいExcelではSTDEV.Sでも同じ結果です。数値のうち「🟢検証済み」以外は概算なので、最終値は現物の実測で確定してください。理屈の本文・図解は相棒ファイル「図解_全知識まとめ_Ver1_0_00.html」へ。</p>
+<hr style="border:none;border-top:1px solid var(--line);margin:26px 0 14px">
+<p class="note" style="text-align:center">Ver1.0.00 ｜ ブレーキパッドEMAシリーズ ｜ エクセル計算式大全（式1〜式27） ｜ ダークモード ｜ 生成: 2026-07</p>
+</div>
+</section>
+
+<script>
+var CAT='all';
+function setCat(btn){
+  CAT=btn.dataset.cat;
+  var chips=document.querySelectorAll('.chip');
+  for(var i=0;i<chips.length;i++){ chips[i].classList.remove('on'); }
+  btn.classList.add('on');
+  applyFilter();
+}
+function applyFilter(){
+  var q=document.getElementById('q').value.trim().toLowerCase();
+  var cards=document.querySelectorAll('.fx');
+  var shown=0;
+  for(var i=0;i<cards.length;i++){
+    var el=cards[i];
+    var okc=(CAT==='all')||(el.getAttribute('data-cat')===CAT);
+    var okq=(!q)||(el.textContent.toLowerCase().indexOf(q)>=0);
+    var vis=okc&&okq;
+    el.style.display=vis?'':'none';
+    if(vis) shown++;
+  }
+  var heads=document.querySelectorAll('.cat-h');
+  for(var j=0;j<heads.length;j++){
+    var h=heads[j];
+    var any=false;
+    var sib=h.nextElementSibling;
+    while(sib&&!sib.classList.contains('cat-h')){
+      if(sib.classList.contains('fx')&&sib.style.display!=='none'){ any=true; break; }
+      sib=sib.nextElementSibling;
+    }
+    h.style.display=any?'':'none';
+  }
+  document.getElementById('count').textContent=shown+' / '+cards.length+' 式';
+}
+function cp(btn){
+  var box=btn.closest('.fx');
+  var pre=box?box.querySelector('.tsv'):null;
+  if(!pre){ return; }
+  var raw=pre.textContent.replace(/^\s*\n/,'').replace(/\n\s*$/,'');
+  var tsv=raw.split('\n').map(function(line){ return line.split('|').join('\t'); }).join('\n');
+  function done(){
+    var old=btn.textContent;
+    btn.textContent='コピーしました';
+    btn.style.background='#4fd8eb';
+    setTimeout(function(){ btn.textContent=old; btn.style.background=''; },1500);
+  }
+  if(navigator.clipboard&&navigator.clipboard.writeText){
+    navigator.clipboard.writeText(tsv).then(done,function(){ fb(tsv,done); });
+  } else { fb(tsv,done); }
+}
+function fb(text,done){
+  var ta=document.createElement('textarea');
+  ta.value=text;
+  ta.style.position='fixed'; ta.style.top='0'; ta.style.left='0'; ta.style.opacity='0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try{ document.execCommand('copy'); done(); }
+  catch(e){ window.prompt('下のテキストをコピーして下さい（Ctrl+C）:',text); }
+  document.body.removeChild(ta);
+}
+applyFilter();
+</script>
+</body>
+</html>

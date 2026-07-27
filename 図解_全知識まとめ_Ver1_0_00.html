@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ブレーキパッド測定の全知識 まとめ図解 — Fable1・Fable2 完全復習版</title>
+<style>
+:root{
+  --bg:#0E1522; --bg2:#0A1017;
+  --panel:#161F2E; --panel2:#1C2739; --panel3:#212E43;
+  --line:#28344A; --line2:#3A4C68;
+  --ink:#E9EFF8; --dim:#94A6C0; --faint:#63758F;
+  --amber:#F5B23E; --teal:#38D3B5; --coral:#FF6E6E; --violet:#9C8DF6; --sky:#4FB0E8;
+  --good-bg:rgba(56,211,181,.10); --bad-bg:rgba(255,110,110,.10); --warn-bg:rgba(245,178,62,.10); --info-bg:rgba(156,141,246,.10);
+  --mono: ui-monospace,"SF Mono","SFMono-Regular",Menlo,Consolas,"DejaVu Sans Mono",monospace;
+  --sans: system-ui,-apple-system,"Segoe UI","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Noto Sans JP",Meiryo,sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth}
+body{background:radial-gradient(1200px 600px at 78% -8%,#182236 0,var(--bg) 46%,var(--bg2) 100%);color:var(--ink);font-family:var(--sans);line-height:1.8;-webkit-font-smoothing:antialiased;font-size:16px;letter-spacing:.01em;padding:0 0 84px}
+.wrap{max-width:960px;margin:0 auto;padding:0 22px}
+ruby rt{font-size:.56em;color:var(--amber);font-weight:600;letter-spacing:0}
+.eyebrow{font-family:var(--mono);font-size:12px;letter-spacing:.28em;text-transform:uppercase;color:var(--amber);display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.eyebrow::before{content:"";width:26px;height:2px;background:linear-gradient(90deg,var(--amber),transparent)}
+h1{font-size:clamp(26px,5vw,44px);font-weight:800;line-height:1.18;letter-spacing:-.02em;margin:6px 0 18px}
+h2{font-size:clamp(21px,3.6vw,29px);font-weight:800;letter-spacing:-.01em;margin:0 0 6px}
+h3{font-size:17px;font-weight:700;color:var(--ink);margin:14px 0 8px}
+.lead{font-size:clamp(15px,2.3vw,18px);color:var(--dim);max-width:74ch}
+.hl-teal{color:var(--teal);font-weight:700}.hl-coral{color:var(--coral);font-weight:700}.hl-amber{color:var(--amber);font-weight:700}.hl-violet{color:var(--violet);font-weight:700}.hl-sky{color:var(--sky);font-weight:700}
+strong,b{color:#fff;font-weight:700}
+mark{background:var(--warn-bg);color:var(--amber);padding:.05em .35em;border-radius:4px;font-weight:600}
+.badge{display:inline-block;font-family:var(--mono);font-size:10.5px;font-weight:700;letter-spacing:.03em;padding:2px 8px;border-radius:6px;vertical-align:middle;margin-left:6px}
+.badge.ok{color:var(--teal);background:var(--good-bg);border:1px solid rgba(56,211,181,.35)}
+.badge.est{color:var(--amber);background:var(--warn-bg);border:1px solid rgba(245,178,62,.35)}
+.badge.chk{color:var(--coral);background:var(--bad-bg);border:1px solid rgba(255,110,110,.35)}
+header{padding:56px 0 28px;border-bottom:1px solid var(--line)}
+section{padding:42px 0;border-bottom:1px solid var(--line)}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:20px 22px;margin-top:18px}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+@media(max-width:720px){.grid2{grid-template-columns:1fr}}
+.note{font-size:14px;color:var(--dim);margin-top:10px}
+p{margin:10px 0}
+ul,ol{margin:8px 0 8px 2px;padding-left:22px}
+li{margin:7px 0}
+.callout{border-left:3px solid var(--line2);padding:12px 16px;border-radius:0 12px 12px 0;background:var(--panel2);margin:16px 0;font-size:15px}
+.callout.why{border-color:var(--sky);background:linear-gradient(90deg,rgba(79,176,232,.10),transparent)}
+.callout.warn{border-color:var(--amber);background:linear-gradient(90deg,var(--warn-bg),transparent)}
+.callout.bad{border-color:var(--coral);background:linear-gradient(90deg,var(--bad-bg),transparent)}
+.callout.good{border-color:var(--teal);background:linear-gradient(90deg,var(--good-bg),transparent)}
+.callout.memo{border-color:var(--violet);background:linear-gradient(90deg,var(--info-bg),transparent)}
+.callout .tag{font-family:var(--mono);font-size:11px;letter-spacing:.18em;text-transform:uppercase;display:block;margin-bottom:4px}
+.callout.why .tag{color:var(--sky)}.callout.warn .tag{color:var(--amber)}.callout.bad .tag{color:var(--coral)}.callout.good .tag{color:var(--teal)}.callout.memo .tag{color:var(--violet)}
+.tablewrap{overflow-x:auto;border-radius:14px;border:1px solid var(--line);margin-top:16px}
+table{border-collapse:collapse;width:100%;font-size:14px;min-width:600px}
+th,td{padding:10px 13px;text-align:left;border-bottom:1px solid var(--line);vertical-align:top}
+thead th{background:var(--panel2);color:var(--dim);font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;text-transform:uppercase;font-weight:600}
+tbody tr:last-child td{border-bottom:none}
+tbody tr:hover{background:rgba(255,255,255,.02)}
+.mono{font-family:var(--mono)}
+.pill{display:inline-block;font-family:var(--mono);font-size:11px;font-weight:700;padding:2px 9px;border-radius:999px}
+.pill.g{color:var(--teal);background:var(--good-bg)}.pill.b{color:var(--coral);background:var(--bad-bg)}.pill.w{color:var(--amber);background:var(--warn-bg)}
+.figwrap{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line2);border-radius:16px;padding:16px;margin-top:16px;overflow-x:auto}
+.figcap{font-size:13px;color:var(--dim);margin-top:8px;text-align:center}
+svg text{font-family:var(--sans)}
+svg .m{font-family:var(--mono)}
+.toc{display:grid;grid-template-columns:1fr 1fr;gap:8px 18px;margin-top:14px}
+@media(max-width:720px){.toc{grid-template-columns:1fr}}
+.toc a{color:var(--ink);text-decoration:none;font-size:14.5px;padding:8px 12px;border:1px solid var(--line);border-radius:10px;background:var(--panel);display:flex;gap:10px;align-items:baseline}
+.toc a:hover{border-color:var(--amber);color:var(--amber)}
+.toc .n{font-family:var(--mono);color:var(--amber);font-size:12px;min-width:26px}
+.story{background:var(--panel2);border:1px dashed var(--line2);border-radius:14px;padding:14px 18px;margin:14px 0;font-size:15px}
+.story .stag{font-size:11.5px;font-family:var(--mono);letter-spacing:.2em;color:var(--violet);display:block;margin-bottom:4px}
+.xl{background:#101826;border:1px solid var(--line2);border-radius:14px;margin-top:16px;overflow:hidden}
+.xl-h{display:flex;justify-content:space-between;align-items:center;gap:10px;padding:10px 14px;background:var(--panel3);border-bottom:1px solid var(--line2);font-size:14.5px}
+.xl table{min-width:520px;font-size:13.5px}
+.xl .cell{font-family:var(--mono);color:var(--sky);white-space:nowrap}
+.xl .frm{font-family:var(--mono);color:var(--amber)}
+.xl .res{color:var(--teal);font-family:var(--mono);font-size:12.5px}
+.cp{font-family:var(--mono);font-size:12px;font-weight:700;color:#0B1220;background:var(--teal);border:none;border-radius:8px;padding:6px 12px;cursor:pointer;white-space:nowrap}
+.cp:hover{filter:brightness(1.1)}
+a{color:var(--sky)}
+.mistake li{margin:9px 0}
+.kw{font-family:var(--mono);background:var(--panel3);border:1px solid var(--line2);border-radius:6px;padding:1px 7px;font-size:.92em;color:var(--teal);white-space:nowrap}
+.fixgrid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px;margin-top:16px}
+.fixcard{border:1px solid rgba(156,141,246,.4);background:linear-gradient(180deg,var(--info-bg),transparent);border-radius:14px;padding:14px 16px}
+.fixcard .fno{font-family:var(--mono);color:var(--violet);font-weight:800;font-size:12px;letter-spacing:.15em}
+.fixcard .ft{font-weight:800;margin:6px 0 4px;font-size:15px}
+.fixcard .fd{font-size:13px;color:var(--dim)}
+.top-link{position:fixed;right:18px;bottom:18px;background:var(--panel3);border:1px solid var(--line2);color:var(--ink);border-radius:999px;padding:9px 14px;font-size:13px;text-decoration:none;z-index:50}
+</style>
+</head>
+<body>
+<a class="top-link" href="#top">▲ 目次へ</a>
+<header id="top">
+<div class="wrap">
+<div class="eyebrow">BRAKE PAD EMA — MASTER SUMMARY</div>
+<h1>ブレーキパッド測定の全知識<br>まとめ<span class="hl-amber">図解</span> 完全復習版</h1>
+<p class="lead">過去の会話（Fable1・Fable2）を Fable 5 が読み直し、<b>間違い・古い評価を修正</b>したうえで、手順を忘れても「これを読めば確実に思い出せる」ように再構成した保存版です。専門用語には<ruby>振<rt>ふ</rt></ruby>り<ruby>仮名<rt>がな</rt></ruby>、各所にたとえ話・数値・エクセル式・よくあるミスを入れてあります。</p>
+<div class="callout memo"><span class="tag">確信度バッジの読み方</span>
+<span class="badge ok">🟢 検証済み</span>＝一次情報（公式・論文）で裏取り済み　
+<span class="badge est">🟡 推定</span>＝理屈は固いが数値は概算　
+<span class="badge chk">🔴 要確認</span>＝あなたの実機・現物での確認が必要
+</div>
+</div>
+</header>
+
+<section id="fixes">
+<div class="wrap">
+<div class="eyebrow">FABLE 5 REVISIONS</div>
+<h2>まず最初に：Fable 5 が<span class="hl-violet">修正</span>した4点</h2>
+<p>過去チャットの内容は大部分が正しいのですが、次の4点は<b>そのまま覚えると危ない</b>ので先に直します。以降の本文はすべて修正後の内容です。</p>
+<div class="fixgrid">
+<div class="fixcard"><div class="fno">FIX 1</div><div class="ft">「磁力で加振」は2つの別物だった</div><div class="fd">過去の否定的評価は「磁石を<b>貼り付けて</b>接触で揺らす」案へのもの。<b>非接触</b>の電磁加振は ASTM E756 で標準化された正当な手法（ただし罠が3つ、第11章）。混ぜて評価していたのを分離しました。</div></div>
+<div class="fixcard"><div class="fno">FIX 2</div><div class="ft">シムの減衰は「加圧して初めて」ではない</div><div class="fd">接着式シムなら<b>吊るしただけでも</b>CLD（拘束層）減衰は出ます。正確には「加圧すると量が実機値に近づく」「ピストン接触面の摩擦減衰は加圧が必須」。まず自分のシムが接着式か圧着式かの確認を（第13章）。</div></div>
+<div class="fixcard"><div class="fno">FIX 3</div><div class="ft">ピストン径は 44 mm で確定</div><div class="fd">「4.4 mm」は誤記で、ご本人の再測定により<b>直径 44 mm・厚み 4 mm</b>が正と確定。治具の全計算は 44 mm 前提に更新済み（第13章）。</div></div>
+<div class="fixcard"><div class="fno">FIX 4</div><div class="ft">ESSの時間差の式は「検証済み」に格上げ</div><div class="fd">Δt(n)=T·ln(n)/ln(f2/f1) は「一次資料未確認」とされていましたが、これは Farina(2000) 原論文そのものの標準結果です。原論文PDFリンク付きで 🟢 に更新（第15章）。</div></div>
+</div>
+</div>
+</section>
+
+<section id="toc-sec">
+<div class="wrap">
+<div class="eyebrow">CONTENTS</div>
+<h2>目次 — 迷ったらここから飛ぶ</h2>
+<div class="toc">
+<a href="#s1"><span class="n">01</span>ふるえの三兄弟（変位・速度・加速度）</a>
+<a href="#s2"><span class="n">02</span>モードと節・腹 — すべての土台</a>
+<a href="#s3"><span class="n">03</span>双子モードとピーク割れ・うなり</a>
+<a href="#s4"><span class="n">04</span>叩く場所で周波数は変わる？</a>
+<a href="#s5"><span class="n">05</span>曲げと捻じれの見分け方（位相）</a>
+<a href="#s6"><span class="n">06</span>面直と面内 — 別世界の住人</a>
+<a href="#s7"><span class="n">07</span>加振信号の三銃士</a>
+<a href="#s8"><span class="n">08</span>窓関数 — 音をそっと包む封筒</a>
+<a href="#s9"><span class="n">09</span>コヒーレンス — 信頼度メーター</a>
+<a href="#s10"><span class="n">10</span>鳴きの地図（SAE J2521）</a>
+<a href="#s11"><span class="n">11</span>正しい加振セットアップ</a>
+<a href="#s12"><span class="n">12</span>吊り方 — ゴム vs ピアノ線</a>
+<a href="#s13"><span class="n">13</span>シム付きパッドの加圧試験（44mm確定版）</a>
+<a href="#s14"><span class="n">14</span>ピークは計算で予測できるか</a>
+<a href="#s15"><span class="n">15</span>Farinaの魔法（ESS）</a>
+<a href="#s16"><span class="n">16</span>全体ワークフロー（結論）</a>
+<a href="#s17"><span class="n">17</span>よくあるミス大全</a>
+<a href="#s18"><span class="n">18</span>用語ミニ辞典＋出典</a>
+</div>
+<p class="note">エクセル式を一覧で探したいときは、相棒ファイル「<b>エクセル計算式大全_Ver1_0_00.html</b>」へ。本書には各章の要所にだけ式を置いています。</p>
+</div>
+</section>
+<section id="s1">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 01</div>
+<h2>ふるえの三兄弟 — <span class="hl-teal">変位・速度・加速度</span> <span class="badge ok">🟢 検証済み（基礎物理）</span></h2>
+<div class="story"><span class="stag">おはなし</span>ブランコに乗った子を想像してください。「今どの位置にいるか」＝<ruby>変位<rt>へんい</rt></ruby>、「どれくらいの速さで動いているか」＝速度、「どれくらい勢いよく速さが変わっているか」＝<ruby>加速度<rt>かそくど</rt></ruby>。<b>同じひとつの動きを、3つの違う物差しで見ているだけ</b>です。</div>
+<ul>
+<li><b>変位</b>：位置のズレ（単位 m や μm）。</li>
+<li><b>速度</b>：変位が変わる速さ（m/s）。<span class="hl-teal">レーザードップラー（LDV）が直接測っているのはこれ</span>。</li>
+<li><b>加速度</b>：速度が変わる速さ（m/s²）。<span class="hl-amber">ハンマリングの加速度ピックアップが測るのはこれ</span>。</li>
+</ul>
+<div class="figwrap">
+<svg viewBox="0 0 860 300" width="100%" role="img" aria-label="変位・速度・加速度の3つの正弦波">
+<rect x="0" y="0" width="860" height="300" fill="none"/>
+<line x1="60" y1="60" x2="820" y2="60" stroke="#3A4C68" stroke-width="1"/>
+<line x1="60" y1="150" x2="820" y2="150" stroke="#3A4C68" stroke-width="1"/>
+<line x1="60" y1="240" x2="820" y2="240" stroke="#3A4C68" stroke-width="1"/>
+<path d="M60,60 C 100,20 140,20 180,60 S 260,100 300,60 S 380,20 420,60 S 500,100 540,60 S 620,20 660,60 S 740,100 780,60" fill="none" stroke="#38D3B5" stroke-width="2.5"/>
+<path d="M60,150 C 100,196 140,196 180,150 S 260,104 300,150 S 380,196 420,150 S 500,104 540,150 S 620,196 660,150 S 740,104 780,150" fill="none" stroke="#F5B23E" stroke-width="2.5"/>
+<path d="M60,240 C 100,180 140,180 180,240 S 260,300 300,240 S 380,180 420,240 S 500,300 540,240 S 620,180 660,240 S 740,300 780,240" fill="none" stroke="#FF6E6E" stroke-width="2.5"/>
+<text x="60" y="40" fill="#38D3B5" font-size="14" font-weight="700">変位 x ＝ X·sin(ωt)　…振幅 X</text>
+<text x="60" y="130" fill="#F5B23E" font-size="14" font-weight="700">速度 v ＝ X·ω·cos(ωt)　…振幅が ω 倍（90°先回り）</text>
+<text x="60" y="220" fill="#FF6E6E" font-size="14" font-weight="700">加速度 a ＝ −X·ω²·sin(ωt)　…振幅が ω² 倍（180°反対）</text>
+<text x="500" y="288" fill="#94A6C0" font-size="12.5">ω（オメガ）＝ 2πf。周波数 f が高いほど ω は大きい</text>
+</svg>
+<div class="figcap">同じ揺れでも、周波数が高くなるほど「速度は ω 倍」「加速度は ω² 倍」に大きく見える</div>
+</div>
+<div class="callout why"><span class="tag">なぜ実務で大事？</span>高い周波数（鳴きの 1.25〜16 kHz 帯）では、加速度の信号がぐんと大きくなる → <b>加速度センサが有利</b>。低い周波数では変位・速度で見た方がノイズに埋もれにくい。「どの物差しで見るか」を帯域で使い分ける根拠がこれです。</div>
+<div class="xl">
+<div class="xl-h"><b>ミニ式：変位 → 速度・加速度の換算</b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">0.000001</td><td>変位振幅 X [m]（例：1 μm）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">2000</td><td>周波数 f [Hz]</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=2*PI()*B2</td><td>角周波数 ω [rad/s]</td></tr>
+<tr><td class="cell">B4</td><td class="frm">=B1*B3</td><td>速度振幅 [m/s] <span class="res">≒0.0126</span></td></tr>
+<tr><td class="cell">B5</td><td class="frm">=B1*B3^2</td><td>加速度振幅 [m/s²] <span class="res">≒158</span></td></tr>
+</table></div>
+<pre class="tsv" style="display:none">
+変位振幅X[m]|0.000001
+周波数f[Hz]|2000
+ω[rad/s]|=2*PI()*B2
+速度振幅[m/s]|=B1*B3
+加速度振幅[m/s2]|=B1*B3^2
+</pre>
+</div>
+</div>
+</section>
+
+<section id="s2">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 02</div>
+<h2>モードと<span class="hl-amber">節・腹</span> — すべての土台 <span class="badge ok">🟢 検証済み</span></h2>
+<div class="story"><span class="stag">おはなし</span><b>モード</b>とは、その部品が生まれつき持っている「揺れ方のクセ」です。①何Hzで揺れたがるか（<ruby>固有振動数<rt>こゆうしんどうすう</rt></ruby>）、②どんな形で揺れるか（モード形状）、③どれくらい早く鳴りやむか（<ruby>減衰<rt>げんすい</rt></ruby>）の3点セット。<b>叩き方とは無関係の、構造そのものの性質</b>です。</div>
+<p>揺れの形の中で、<span class="hl-coral">まったく動かない線・点</span>を<b><ruby>節<rt>ふし</rt></ruby></b>（node）、<span class="hl-teal">いちばん大きく動く場所</span>を<b><ruby>腹<rt>はら</rt></ruby></b>（antinode）と呼びます。縄跳びの縄で、手で持っている両端は動かず（節）、真ん中が大きく回る（腹）のと同じです。</p>
+<div class="figwrap">
+<svg viewBox="0 0 860 330" width="100%" role="img" aria-label="パッドの節と腹、吊り点と加振点">
+<rect x="70" y="60" width="380" height="180" rx="14" fill="#1C2739" stroke="#3A4C68" stroke-width="2"/>
+<line x1="260" y1="60" x2="260" y2="240" stroke="#FF6E6E" stroke-width="2.5" stroke-dasharray="7 6"/>
+<text x="260" y="266" fill="#FF6E6E" font-size="13" text-anchor="middle" font-weight="700">捻じれの節線（中心軸）</text>
+<line x1="70" y1="150" x2="450" y2="150" stroke="#F5B23E" stroke-width="2" stroke-dasharray="4 6"/>
+<text x="455" y="154" fill="#F5B23E" font-size="12.5">1次曲げの節線（この例）</text>
+<circle cx="150" cy="150" r="8" fill="#4FB0E8"/>
+<circle cx="370" cy="150" r="8" fill="#4FB0E8"/>
+<text x="150" y="130" fill="#4FB0E8" font-size="12.5" text-anchor="middle">吊り点①</text>
+<text x="370" y="130" fill="#4FB0E8" font-size="12.5" text-anchor="middle">吊り点②</text>
+<path d="M420,222 l18,-18 M438,222 l-18,-18" stroke="#38D3B5" stroke-width="4" stroke-linecap="round"/>
+<circle cx="429" cy="213" r="15" fill="none" stroke="#38D3B5" stroke-width="2.5"/>
+<text x="429" y="258" fill="#38D3B5" font-size="13" text-anchor="middle" font-weight="700">加振は「角」＝腹</text>
+<rect x="540" y="60" width="250" height="200" rx="14" fill="#101826" stroke="#3A4C68"/>
+<text x="665" y="88" fill="#E9EFF8" font-size="14" text-anchor="middle" font-weight="700">三原則（暗記用）</text>
+<text x="558" y="122" fill="#4FB0E8" font-size="13.5" font-weight="700">吊るす → 節で</text>
+<text x="558" y="144" fill="#94A6C0" font-size="12">（動かない所なら邪魔しない）</text>
+<text x="558" y="178" fill="#38D3B5" font-size="13.5" font-weight="700">揺らす → 腹（角）で</text>
+<text x="558" y="200" fill="#94A6C0" font-size="12">（動く所でないと力が入らない）</text>
+<text x="558" y="232" fill="#F5B23E" font-size="13.5" font-weight="700">測る → 中心線の外も</text>
+<text x="558" y="252" fill="#94A6C0" font-size="12">（節線の上には情報が無い）</text>
+</svg>
+<div class="figcap">吊り＝節、加振＝腹（角）、測定グリッド＝オフ軸を含む。この三原則がほぼ全章の親玉</div>
+</div>
+<div class="callout bad"><span class="tag">絶対にダメ</span>同じ1点を「<b>固定して</b>加振する」ことは物理的に矛盾です。固定＝変位ゼロ＝揺れない。<b>吊る・締める・揺らすは3つの別の操作</b>で、それぞれ別の場所を選びます。</div>
+<div class="callout why"><span class="tag">鐘のたとえ（超重要・何度も出ます）</span>お寺の鐘は、木づちで叩いても指で弾いても<b>「音の高さ」は変わりません</b>。高さは鐘の形と材質で決まるから。変わるのは大きさと響き方だけ。→ 固有振動数は構造の性質で、加振方法では動かない、の直感版です。</div>
+</div>
+</section>
+
+<section id="s3">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 03</div>
+<h2><span class="hl-violet">双子モード</span>（縮退）とピーク割れ・うなり <span class="badge ok">🟢 検証済み</span></h2>
+<div class="story"><span class="stag">おはなし</span>丸いトランポリンを思い浮かべてください。「前後にゆらす」揺れ方と「左右にゆらす」揺れ方は、丸くてどちらの向きも条件が同じなので、<b>まったく同じ速さ（同じ固有振動数）</b>で起きます。向きが違うだけで中身はそっくり——これが<b>双子モード</b>（正式名：<ruby>縮退<rt>しゅくたい</rt></ruby>モード／repeated roots）。ワイングラスを指で弾くと「ウワンウワン」うなるのは、この双子がケンカ（干渉）しているからです。</div>
+<p>ブレーキパッドでは、<b>穴</b>が左右対称をわずかに崩します。すると「ぴったり同じ」だった双子の周波数が<span class="hl-coral">数Hzだけズレた2本</span>に割れます（mode splitting）。これが<b>ピーク割れ</b>の正体その1。時間波形では2つの近い周波数が重なって、振幅がゆっくり波打つ「<b>うなり</b>（beating）」に見えます。</p>
+<div class="figwrap">
+<svg viewBox="0 0 860 320" width="100%" role="img" aria-label="ピークが2本に割れる様子とうなり波形">
+<line x1="50" y1="150" x2="400" y2="150" stroke="#3A4C68"/>
+<path d="M50,150 L150,148 C180,145 195,40 210,40 C225,40 240,145 270,148 L400,150" fill="none" stroke="#38D3B5" stroke-width="2.5"/>
+<text x="210" y="28" fill="#38D3B5" font-size="13" text-anchor="middle" font-weight="700">完全対称（理論）＝1本</text>
+<line x1="460" y1="150" x2="820" y2="150" stroke="#3A4C68"/>
+<path d="M460,150 L560,148 C580,144 590,55 600,55 C610,55 615,118 625,120 C635,118 640,48 650,48 C660,48 672,144 692,148 L820,150" fill="none" stroke="#F5B23E" stroke-width="2.5"/>
+<text x="628" y="30" fill="#F5B23E" font-size="13" text-anchor="middle" font-weight="700">穴あり実物＝2本に割れる（数Hz差）</text>
+<text x="600" y="172" fill="#94A6C0" font-size="11.5" text-anchor="middle" class="m">f1</text>
+<text x="652" y="172" fill="#94A6C0" font-size="11.5" text-anchor="middle" class="m">f2</text>
+<text x="120" y="205" fill="#E9EFF8" font-size="13.5" font-weight="700">時間波形は「うなり」に：</text>
+<path d="M50,265 q6,-38 12,0 q6,38 12,0 q6,-34 12,0 q6,30 12,0 q6,-22 12,0 q6,14 12,0 q6,-7 12,0 q6,4 12,0 q6,-10 12,0 q6,18 12,0 q6,-27 12,0 q6,34 12,0 q6,-38 12,0 q6,38 12,0 q6,-33 12,0 q6,27 12,0 q6,-19 12,0 q6,11 12,0 q6,-5 12,0 q6,5 12,0 q6,-12 12,0 q6,20 12,0 q6,-29 12,0 q6,36 12,0 q6,-38 12,0 q6,37 12,0 q6,-31 12,0 q6,24 12,0 q6,-16 12,0 q6,8 12,0" fill="none" stroke="#9C8DF6" stroke-width="2"/>
+<path d="M50,265 C 140,215 190,215 235,265 C 300,318 360,318 410,265 C 480,213 540,213 600,265 C 660,318 720,318 790,265" fill="none" stroke="#FF6E6E" stroke-width="1.6" stroke-dasharray="5 5"/>
+<text x="640" y="300" fill="#FF6E6E" font-size="12.5">ゆっくりした「うなりの封筒」＝周期 1/|f1−f2|</text>
+</svg>
+<div class="figcap">1本のはずの山が2本に割れ、時間波形はウワンウワンと脈打つ。これは<b>エラーではなく本物の物理</b></div>
+</div>
+<h3>ピーク割れには「もう1つの意味」もある（文脈で区別）</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>意味</th><th>原因</th><th>見分け方</th></tr></thead>
+<tbody>
+<tr><td><b>A：縮退モードの分裂</b>（本章の主役）</td><td>穴などで対称性が崩れる</td><td>FRF上で近接ダブルピーク。時間波形にうなり</td></tr>
+<tr><td><b>B：過負荷・クリッピング</b></td><td>叩きすぎ・センサのレンジオーバー</td><td>ピークの形が不自然にギザギザ・頭打ち。コヒーレンス悪化</td></tr>
+</tbody></table></div>
+<h3>双子はどうやって分離する？ — オーケストラのたとえ</h3>
+<p>2人の歌手がまったく同じ音程で歌っていると、1本のマイク（＝1点測定）では1人か2人か分かりません。でも会場のあちこちにマイクを立てれば、<b>響き方（形）の違い</b>から2人いると分かる——双子分離はこれと同じで、<span class="hl-teal">周波数ではなく「形の違い」を数学で使います</span>。</p>
+<div class="tablewrap"><table>
+<thead><tr><th>手法</th><th>やっていること</th><th>効き目</th></tr></thead>
+<tbody>
+<tr><td><b>CMIF</b>（複素モード<ruby>指示<rt>しじ</rt></ruby>関数）</td><td>多点FRF行列を各周波数で特異値分解（SVD）</td><td>重なった山でも<b>特異値曲線が2本立つ</b>＝双子確定の判定機</td></tr>
+<tr><td><b>MIMO</b>（多入力・多出力）</td><td>複数の場所から独立に加振</td><td>「前後だけ」「左右だけ」を狙って起こせる＝双子を1人ずつ撮影</td></tr>
+<tr><td><b>ポリリファレンス曲線あてはめ</b></td><td>複数基準点のデータを同時にフィット</td><td>1つの団子を<b>2つの独立モードとして数値で解く</b></td></tr>
+</tbody></table></div>
+<div class="callout warn"><span class="tag">鉄のルール</span>①基準点（リファレンス）の数は<b>双子の数以上</b>（双子2つなら最低2か所）。②基準点は<b>2つのモードで動きが違う場所</b>に置く（両方で同じに見える場所だと台数を増やしても無意味）。③<b><ruby>半値幅<rt>はんちはば</rt></ruby>法は双子に使うと破綻</b>（裾が重なって帯域幅を過大評価）→ カーブフィットへ。</div>
+<div class="xl">
+<div class="xl-h"><b>ミニ式：うなりから双子の間隔と必要な測定時間を出す</b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">2500</td><td>双子ピーク f1 [Hz]</td></tr>
+<tr><td class="cell">B2</td><td class="frm">2508</td><td>双子ピーク f2 [Hz]</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=ABS(B1-B2)</td><td>モード差 |f1−f2| [Hz] <span class="res">=8</span></td></tr>
+<tr><td class="cell">B4</td><td class="frm">=1/B3</td><td>うなり周期 [s] <span class="res">=0.125</span></td></tr>
+<tr><td class="cell">B5</td><td class="frm">=5/B3</td><td>必要記録長 T [s]（うなり5周期分） <span class="res">=0.625</span></td></tr>
+<tr><td class="cell">B6</td><td class="frm">=B3/4</td><td>必要分解能 Δf [Hz]（差の1/4） <span class="res">=2</span></td></tr>
+</table></div>
+<pre class="tsv" style="display:none">
+双子f1[Hz]|2500
+双子f2[Hz]|2508
+モード差[Hz]|=ABS(B1-B2)
+うなり周期[s]|=1/B3
+必要記録長T[s]|=5/B3
+必要分解能df[Hz]|=B3/4
+</pre>
+</div>
+<p class="note">逆向きにも使えます：時間波形のうなり周期を測れば、B4 の逆数で「双子が何Hz離れて割れているか」を逆算できます。</p>
+</div>
+</section>
+<section id="s4">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 04</div>
+<h2>叩く場所で<span class="hl-sky">周波数は変わる？</span> <span class="badge ok">🟢 検証済み</span></h2>
+<p><b>結論：線形なら変わりません。</b>鐘のたとえの通り、固有振動数は構造そのものの性質です。ただし実務で「変わったように<b>見える</b>」ケースが3つあります。</p>
+<div class="tablewrap"><table>
+<thead><tr><th>ケース</th><th>何が起きている</th><th>正しい読み方</th></tr></thead>
+<tbody>
+<tr><td>① <ruby>節<rt>ふし</rt></ruby>を叩いた</td><td>そのモードが励振されず、山が<b>消える</b></td><td>「周波数が変わった」ではなく「見えなくなった」だけ</td></tr>
+<tr><td>② 双子モードの近く</td><td>叩く位置で2つの双子の<b>励振比率</b>が変わり、合成された団子の「重心」が動く</td><td>2つの固有振動数自体は不動。<b>どちらが強く見えるか</b>が変わっただけ</td></tr>
+<tr><td>③ 非線形・付加質量</td><td>強打で接触剛性が変わる／ハンマーやセンサの質量が乗る</td><td>わずかにシフトしうる。自由-自由のパッド単体なら影響は小。<b>力を2段階変えて</b>再現性を確認</td></tr>
+</tbody></table></div>
+<div class="callout good"><span class="tag">覚え方</span>「音の高さは鐘が決める。木づちは決めない。ただし<b>節を叩けば音は出ないし、双子は叩く場所で顔の見え方が変わる</b>」</div>
+</div>
+</section>
+
+<section id="s5">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 05</div>
+<h2>曲げと捻じれの見分け方 — <span class="hl-amber">位相がすべて</span> <span class="badge ok">🟢 検証済み</span></h2>
+<div class="story"><span class="stag">おはなし</span>シーソーに2人が乗って、<b>2人いっしょに上下</b>すればそれは「板ごと持ち上がる＝<ruby>曲<rt>ま</rt></ruby>げ」。<b>片方が上・片方が下</b>ならそれは「ひねり＝<ruby>捻<rt>ねじ</rt></ruby>れ」。周波数（何Hzか）だけを見ても絶対に区別できません。<b>左右対称な2点が同じ向きに動くか、逆向きに動くか（＝<ruby>位相<rt>いそう</rt></ruby>）</b>だけが決め手です。</div>
+<div class="figwrap">
+<svg viewBox="0 0 860 250" width="100%" role="img" aria-label="曲げは同位相、捻じれは逆位相">
+<rect x="60" y="100" width="320" height="26" rx="6" fill="#1C2739" stroke="#3A4C68"/>
+<line x1="220" y1="70" x2="220" y2="156" stroke="#63758F" stroke-dasharray="4 4"/>
+<path d="M95,86 l0,-34 m-9,12 l9,-12 l9,12" stroke="#38D3B5" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<path d="M345,86 l0,-34 m-9,12 l9,-12 l9,12" stroke="#38D3B5" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<text x="220" y="196" fill="#38D3B5" font-size="14.5" text-anchor="middle" font-weight="800">曲げ ＝ 同位相（両側とも↑）</text>
+<text x="220" y="220" fill="#94A6C0" font-size="12.5" text-anchor="middle">中心も一緒に動く</text>
+<rect x="480" y="100" width="320" height="26" rx="6" fill="#1C2739" stroke="#3A4C68"/>
+<line x1="640" y1="70" x2="640" y2="156" stroke="#FF6E6E" stroke-dasharray="4 4"/>
+<path d="M515,86 l0,-34 m-9,12 l9,-12 l9,12" stroke="#F5B23E" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<path d="M765,140 l0,34 m-9,-12 l9,12 l9,-12" stroke="#F5B23E" stroke-width="3.5" fill="none" stroke-linecap="round"/>
+<text x="640" y="196" fill="#F5B23E" font-size="14.5" text-anchor="middle" font-weight="800">捻じれ ＝ 逆位相（片側↑ 片側↓）</text>
+<text x="640" y="220" fill="#FF6E6E" font-size="12.5" text-anchor="middle">中心軸は動かない ＝ 節線</text>
+</svg>
+<div class="figcap">同位相＝曲げ／逆位相＝捻じれ。位相差が 0° か 180° かを見る</div>
+</div>
+<h3>測定グリッド（点の並べ方）の鉄則</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>置き方</th><th>曲げ</th><th>捻じれ</th><th>判定</th></tr></thead>
+<tbody>
+<tr><td>中心線に1列だけ</td><td>見える</td><td><b class="hl-coral">見えない</b>（節線上）</td><td><span class="pill b">✕ NG</span></td></tr>
+<tr><td>左右2列＋長さ方向</td><td>見える</td><td>見える</td><td><span class="pill w">○ 最低ライン</span></td></tr>
+<tr><td>格子状（縦横）に多点</td><td>明瞭</td><td>明瞭</td><td><span class="pill g">◎ 推奨</span></td></tr>
+</tbody></table></div>
+<div class="callout warn"><span class="tag">空間エイリアシングの罠</span>点が<ruby>疎<rt>まば</rt></ruby>らだと、高次の曲げが捻じれに「化けて」見えます。<b>1つの半波長の中に最低2〜3点</b>を目安に。PSV-400の面スキャンはここで圧倒的に有利。</div>
+<div class="callout good"><span class="tag">設計の金言</span>加振は<b>中心軸から外した角</b>で（曲げと捻じれを同時励起）。さらに設計知見として、<b>曲げと捻じれの固有振動数が300 Hz以上離れている</b>と両者の連成がほぼ起きず鳴きが激減する、という報告があります。捻じれの周波数を測れないと、この判定すらできません。</div>
+</div>
+</section>
+
+<section id="s6">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 06</div>
+<h2><span class="hl-teal">面直</span>と<span class="hl-violet">面内</span> — 別世界の住人 <span class="badge ok">🟢 検証済み</span></h2>
+<div class="story"><span class="stag">おはなし</span>下敷きを想像してください。<b>ペラペラ反らせる</b>のは簡単（＝<ruby>面直<rt>めんちょく</rt></ruby>・面外の曲げ）。でも<b>横方向にビヨーンと伸ばす</b>のはほぼ無理（＝<ruby>面内<rt>めんない</rt></ruby>の伸び）。曲げの硬さは板厚 h の<b>3乗</b>、面内の硬さは h の<b>1乗</b>で効くので、薄い板では曲げだけが桁違いに柔らかい——だから<b>面直モードは低い周波数に密集し、面内モードはずっと高い周波数</b>に出ます。</div>
+<div class="figwrap">
+<svg viewBox="0 0 860 240" width="100%" role="img" aria-label="周波数軸上の面直モード群と面内モード、鳴きの帯域">
+<line x1="60" y1="150" x2="820" y2="150" stroke="#3A4C68" stroke-width="2"/>
+<text x="820" y="174" fill="#94A6C0" font-size="12" text-anchor="end">周波数 →（対数イメージ）</text>
+<rect x="330" y="52" width="430" height="34" rx="8" fill="rgba(255,110,110,.14)" stroke="#FF6E6E" stroke-dasharray="5 4"/>
+<text x="545" y="74" fill="#FF6E6E" font-size="13" text-anchor="middle" font-weight="700">鳴き帯域 1.25〜16 kHz（SAE J2521）</text>
+<g stroke="#38D3B5" stroke-width="3">
+<line x1="110" y1="150" x2="110" y2="112"/><line x1="150" y1="150" x2="150" y2="104"/>
+<line x1="185" y1="150" x2="185" y2="118"/><line x1="230" y1="150" x2="230" y2="100"/>
+<line x1="275" y1="150" x2="275" y2="112"/><line x1="330" y1="150" x2="330" y2="106"/>
+<line x1="385" y1="150" x2="385" y2="115"/><line x1="440" y1="150" x2="440" y2="102"/>
+<line x1="495" y1="150" x2="495" y2="110"/><line x1="545" y1="150" x2="545" y2="108"/>
+</g>
+<text x="270" y="200" fill="#38D3B5" font-size="13.5" font-weight="700">面直（曲げ・捻じれ）モード群 ＝ 低い側に密集</text>
+<line x1="700" y1="150" x2="700" y2="92" stroke="#9C8DF6" stroke-width="5"/>
+<text x="700" y="216" fill="#9C8DF6" font-size="13.5" text-anchor="middle" font-weight="700">第1面内モード ＝ ずっと高い（概算15 kHz級）</text>
+<path d="M600,120 q40,-26 84,-16" stroke="#F5B23E" fill="none" stroke-width="2" marker-end="url(#ar1)"/>
+<defs><marker id="ar1" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#F5B23E"/></marker></defs>
+<text x="600" y="112" fill="#F5B23E" font-size="12.5" text-anchor="middle">高周波では接近＝鳴きの核心</text>
+</svg>
+<div class="figcap">低い周波数では明確に別世界。高周波域で面直の群れに面内が割り込むと、鳴きの舞台がそろう</div>
+</div>
+<ul>
+<li><b>周波数比の目安</b>：第1面内 ÷ 第1面直 ≒ <span class="kw">√12 × L/h</span>（均質板の概算）。例：L=100 mm、h=15 mm → 約23倍。<span class="badge est">🟡 推定（複合材パッドは要補正）</span></li>
+<li><b>連成の例外</b>：摩擦材＋鋼裏板のように<b>板厚方向に材質が変わる</b>と、面内と面直が連成します（反り・穴も連成の種）。</li>
+</ul>
+<div class="callout bad"><span class="tag">測定の最大の落とし穴</span>レーザー（LDV）は<b>ビーム方向の速度成分しか測れません</b>。面に垂直に当てる標準スキャンでは、面内モードは信号ほぼゼロ。<b>「面内のピークが見えない＝存在しない」ではなく「測っていないだけ」</b>。3ヘッド（Top/Left/Right）の3D構成なら面内を直接測れます<span class="badge chk">🔴 実機で3分確認</span>。</div>
+<div class="callout good"><span class="tag">面内を測る二段構え（確定方針）</span><b>STEP 1</b>：追加費用ゼロ。ハンマーでパッドの<b>端面（横っ腹）</b>を叩き、レーザーは端面に向けて固定 → RIONで面内の周波数サーベイ。<b>STEP 2</b>：<ruby>圧電<rt>あつでん</rt></ruby>素子（PZT、数百円）を鋼の裏板に接着し、周期チャープで全面スキャン。接着は<b>必ず裏板側</b>（摩擦材は剥がれる）。</div>
+</div>
+</section>
+<section id="s7">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 07</div>
+<h2>加振信号の三銃士 — <span class="hl-amber">ハンマー・チャープ・ホワイトノイズ</span> <span class="badge ok">🟢 検証済み</span></h2>
+<p>まず大原則。線形なら<b>ピークの周波数（位置）は3手法とも同じ</b>に出ます（鐘のたとえ）。違って見えるのは<b>見た目（高さ・幅・ノイズ床・本数）</b>で、その理由は信号の性格の違いです。</p>
+<div class="callout why"><span class="tag">最重要の分かれ道：FRFか、応答スペクトルか</span>測定が「応答 ÷ <b>力</b>」＝<b>FRF</b>なら、加振の形は割り算で消えて山の位置だけ残る。「応答だけ」＝応答スペクトルなら、加振スペクトルの形がそのまま乗って見た目がズレる。<b>比較の前に、まず自分がどちらを見ているかを確認</b>（Acquisition のリファレンス設定）。</div>
+<div class="tablewrap"><table>
+<thead><tr><th>項目</th><th>ハンマー（打撃）</th><th>スウィープ＝周期チャープ</th><th>ホワイトノイズ（純ランダム）</th></tr></thead>
+<tbody>
+<tr><td>信号の性格</td><td><ruby>過渡<rt>かと</rt></ruby>・広帯域</td><td>決定論的・周期的（毎回同じ）</td><td>ランダム（毎回違う）</td></tr>
+<tr><td><ruby>漏<rt>も</rt></ruby>れ（リーケージ）</td><td>応答が窓内で減衰しないと発生</td><td><b class="hl-teal">原理的にゼロ</b>（周期信号）</td><td><b class="hl-coral">出る</b>（非周期）</td></tr>
+<tr><td>必要な窓</td><td>力窓＋<ruby>指数<rt>しすう</rt></ruby>窓</td><td><b>矩形（方形）窓が必須</b></td><td>ハニング必須＋多数平均</td></tr>
+<tr><td>ピークの見た目</td><td>指数窓ぶん幅広に</td><td>鋭くて高い（本来の姿）</td><td>太く低く、にじむ</td></tr>
+<tr><td><ruby>減衰<rt>げんすい</rt></ruby>の精度</td><td>低〜中（窓の補正が要る）</td><td><b class="hl-teal">最も正確</b></td><td>低（過大評価しがち）</td></tr>
+<tr><td><ruby>波高率<rt>はこうりつ</rt></ruby>（peak/RMS）</td><td>とても高い</td><td>低い（1.4〜1.7）＝エネルギーを送りやすい</td><td>高い（3〜3.5）＝クリップ注意</td></tr>
+<tr><td>得意技</td><td>速い初期サーベイ・質量負荷ゼロ</td><td>損失係数の確定・高SNR</td><td>非線形系の「最良の線形近似」</td></tr>
+</tbody></table></div>
+<h3>「スウィープで、どでかいピークが1つだけ」の正体 <span class="badge ok">🟢 検証済み（Sandia）</span></h3>
+<div class="story"><span class="stag">実際に起きた事件</span>スウィープでは巨大な山が1つ、あとはホワイトノイズと同じ場所にかすかな山——この観察の答え：<b>巨大な山＝加振器自身のアーマチュア（可動部）共振</b>。小型シェーカーは力の大半を自分の共振周波数に注ぎ込みます。さらに構造の共振点では「力ドロップアウト」が起きて本物の山が痩せます。そして<b>かすかな山がホワイトノイズと同じ周波数に出た時点で、それらは本物のモード</b>と確定（両方の手法で検出＝偽物ではない）。</div>
+<div class="callout warn"><span class="tag">軽い減衰の金属パッドで差が極端になる理由</span>金属パッドは一度叩くと長く鳴り続ける（減衰が小さい）。ホワイトノイズでは応答が1ブロック内で収まりきらず、漏れが猛烈に悪化 → 山が特に太く低く見える。周期チャープは定常状態で測るので本来の鋭い山が出る。</div>
+<div class="callout good"><span class="tag">使い分けの結論</span>①周波数マップの初期調査＝<b>ハンマー</b>。②モード形のきれいなアニメと損失係数＝<b>周期チャープ（またはバーストランダム）</b>。③非線形の「ならし」や線形性の当たり＝<b>ホワイトノイズを補助で</b>。1つで全部を賄わない。</div>
+</div>
+</section>
+
+<section id="s8">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 08</div>
+<h2>窓関数 — <span class="hl-sky">音をそっと包む封筒</span> <span class="badge ok">🟢 検証済み（Harris 1978）</span></h2>
+<div class="story"><span class="stag">おはなし</span>FFTは、切り取った1コマの波形が「無限にループしている」と思い込みます。コマの終わりと始まりに段差があると、そこが「プツッ」というニセの音になり、無いはずの周波数へエネルギーが<b>にじみます</b>（＝スペクトル<ruby>漏<rt>も</rt></ruby>れ）。<b>窓関数はコマの両端をそっと0に落として段差を消す封筒</b>です。ただし魔法ではなく、にじみ（裾）を減らす代わりに<b>山の幅が太る</b>——このトレードオフが窓選びのすべて。</div>
+<div class="figwrap">
+<svg viewBox="0 0 860 210" width="100%" role="img" aria-label="信号×窓＝なめらか、の3枚図">
+<rect x="40" y="40" width="220" height="120" rx="10" fill="#101826" stroke="#3A4C68"/>
+<path d="M50,100 q9,-42 18,0 q9,42 18,0 q9,-42 18,0 q9,42 18,0 q9,-42 18,0 q9,42 18,0 q9,-42 18,0 q9,42 18,0 q9,-42 18,0 q9,42 18,0 q9,-42 18,0" fill="none" stroke="#4FB0E8" stroke-width="2"/>
+<line x1="252" y1="62" x2="252" y2="138" stroke="#FF6E6E" stroke-width="3"/>
+<text x="150" y="184" fill="#4FB0E8" font-size="13" text-anchor="middle" font-weight="700">① 生の信号（端に段差）</text>
+<text x="292" y="106" fill="#94A6C0" font-size="20" text-anchor="middle">×</text>
+<rect x="322" y="40" width="220" height="120" rx="10" fill="#101826" stroke="#3A4C68"/>
+<path d="M332,150 C 380,40 484,40 532,150" fill="none" stroke="#F5B23E" stroke-width="2.5"/>
+<text x="432" y="184" fill="#F5B23E" font-size="13" text-anchor="middle" font-weight="700">② 窓（両端が0の封筒）</text>
+<text x="574" y="106" fill="#94A6C0" font-size="20" text-anchor="middle">＝</text>
+<rect x="604" y="40" width="220" height="120" rx="10" fill="#101826" stroke="#3A4C68"/>
+<path d="M614,100 q8,-4 15,0 q8,10 15,0 q8,-20 15,0 q8,30 15,0 q8,-40 15,0 q8,44 15,0 q8,-44 15,0 q8,40 15,0 q8,-30 15,0 q8,20 15,0 q8,-10 15,0 q8,4 15,0" fill="none" stroke="#38D3B5" stroke-width="2"/>
+<text x="714" y="184" fill="#38D3B5" font-size="13" text-anchor="middle" font-weight="700">③ そっと始まりそっと終わる</text>
+</svg>
+<div class="figcap">信号 × 窓 ＝ 段差消滅。にじみは減るが、山は少し太る</div>
+</div>
+<h3>30秒ルール（迷ったらこれ）</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>目的</th><th>窓</th><th>サイドローブ（裾の高さ）</th></tr></thead>
+<tbody>
+<tr><td>2本の山を細かく分けたい（分解能）</td><td>矩形（レクタングル）</td><td class="mono">−13 dB（裾は高い）</td></tr>
+<tr><td>迷ったら</td><td>ハニング</td><td class="mono">−32 dB</td></tr>
+<tr><td>山の高さを正確に</td><td>フラットトップ</td><td>幅は太いが振幅誤差が最小</td></tr>
+<tr><td>小さい信号を大きい信号のそばで見る</td><td>ブラックマン系</td><td class="mono">−58 dB（裾が深く沈む）</td></tr>
+</tbody></table></div>
+<div class="callout good"><span class="tag">あなたの2台では</span>ハンマリング（RION）＝<b>力窓＋指数窓</b>（ただし指数窓は減衰を水増しするので後で補正、可能ならブロック長を伸ばして窓なしが最良）。ドップラー（PSV）＝<b>周期チャープなら矩形窓で漏れゼロ</b>、純ランダムならハニング。<span class="badge chk">🔴 力窓の長さと指数窓の定義（終端%か時定数か）は機種で違うので取説確認</span></div>
+</div>
+</section>
+
+<section id="s9">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 09</div>
+<h2>コヒーレンス — <span class="hl-teal">信頼度メーター</span>（必要だが十分でない） <span class="badge ok">🟢 検証済み</span></h2>
+<div class="story"><span class="stag">おはなし</span>コヒーレンス γ²（ガンマ2乗）は、「その周波数で、出てきた揺れのうち何割が<b>自分の加えた力のせい</b>か」を0〜1で表す成績表。γ²=1なら100%説明できる＝信用できる山。γ²=0.5なら半分はノイズ・非線形・測っていない別の力のせい。</div>
+<div class="figwrap">
+<svg viewBox="0 0 860 130" width="100%" role="img" aria-label="コヒーレンスの判定ゾーン">
+<rect x="60" y="42" width="740" height="30" rx="15" fill="#101826" stroke="#3A4C68"/>
+<rect x="60" y="42" width="440" height="30" rx="15" fill="rgba(255,110,110,.25)"/>
+<rect x="500" y="42" width="160" height="30" fill="rgba(245,178,62,.25)"/>
+<rect x="660" y="42" width="140" height="30" rx="15" fill="rgba(56,211,181,.3)"/>
+<text x="60" y="100" fill="#94A6C0" font-size="12" class="m">0</text>
+<text x="500" y="100" fill="#F5B23E" font-size="12" class="m" text-anchor="middle">0.8</text>
+<text x="660" y="100" fill="#38D3B5" font-size="12" class="m" text-anchor="middle">0.9</text>
+<text x="800" y="100" fill="#94A6C0" font-size="12" class="m" text-anchor="end">1.0</text>
+<text x="280" y="33" fill="#FF6E6E" font-size="12.5" text-anchor="middle" font-weight="700">要注意・原因を切り分け</text>
+<text x="580" y="33" fill="#F5B23E" font-size="12.5" text-anchor="middle" font-weight="700">グレー</text>
+<text x="730" y="33" fill="#38D3B5" font-size="12.5" text-anchor="middle" font-weight="700">合格（関心帯域の目安）</text>
+</svg>
+<div class="figcap">関心帯域で γ² &gt; 0.9 が実務目安。ただし反共振の谷では自然に落ちる（正常）</div>
+</div>
+<h3>コヒーレンスが「保証すること・しないこと」</h3>
+<div class="grid2">
+<div class="card"><h3 style="margin-top:0" class="hl-teal">保証すること ○</h3><ul>
+<li>その山が背景ノイズではなく、<b>自分の加えた力で起きた本物の応答</b>であること</li>
+<li>測定に繰り返し性があり、線形の範囲で取れていること</li>
+</ul></div>
+<div class="card"><h3 style="margin-top:0" class="hl-coral">保証しないこと ✕</h3><ul>
+<li><b>そのモードを励起できたか</b>（節の上で加振すればモードは消えるが、残った山のコヒーレンスは良く見える）</li>
+<li><b>減衰（損失係数）が正確か</b>（漏れ・窓しだいで系統的にズレる）</li>
+<li><b>双子が分離できているか</b>（分離は参照点の数の問題）</li>
+</ul></div>
+</div>
+<div class="callout warn"><span class="tag">3つの落とし穴</span>①<b>1回だけの測定では数学的に必ず1</b>になり無意味（必ず複数回平均）。②反共振の谷で落ちるのは正常。③下がる原因は1つではない（ノイズ・分解能不足・非線形・<b>測っていない横力</b>・二度打ち）——磁石加振の横力汚染はまさに「測っていない入力」でした。</div>
+<div class="xl">
+<div class="xl-h"><b>ミニ式：コヒーレンスの中身（アナライザ表示の意味を知る）</b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">0.92</td><td>|Gxy|²（力×応答のクロススペクトルの大きさの2乗・平均後）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">1.00</td><td>Gxx（力の自己スペクトル・平均後）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">1.05</td><td>Gyy（応答の自己スペクトル・平均後）</td></tr>
+<tr><td class="cell">B4</td><td class="frm">=B1/(B2*B3)</td><td>コヒーレンス γ² <span class="res">≒0.876 → もう少し平均か原因調査</span></td></tr>
+</table></div>
+<pre class="tsv" style="display:none">
+|Gxy|^2|0.92
+Gxx|1.00
+Gyy|1.05
+コヒーレンスγ2|=B1/(B2*B3)
+</pre>
+</div>
+<p class="note">PSV 9.0 の画面にコヒーレンスを直接表示できるかは<span class="badge chk">🔴 要確認</span>（マニュアル該当章）。RION SA-01 系はFFTアナライザなので計算可能なはずですが、これも取説で確認を。</p>
+</div>
+</section>
+<section id="s10">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 10</div>
+<h2>鳴きの地図 — <span class="hl-coral">SAE J2521</span> と周波数帯 <span class="badge ok">🟢 検証済み（規格）</span></h2>
+<p>規格 SAE J2521（ダイノ鳴き試験の国際デファクト）の定義：<b>スキール＝ピーク音圧 70 dB(A) 以上で、1.25〜16 kHz</b>（フルコーナー無しのブレーキは 2〜16 kHz）に生じる音。「鳴き＝低いブー音」ではありません。低音系は別メカニズムです。</p>
+<div class="figwrap">
+<svg viewBox="0 0 860 250" width="100%" role="img" aria-label="ブレーキ異音の周波数マップ">
+<line x1="60" y1="170" x2="820" y2="170" stroke="#3A4C68" stroke-width="2"/>
+<g font-size="11" fill="#94A6C0" class="m">
+<text x="70" y="192">10 Hz</text><text x="215" y="192">100 Hz</text><text x="380" y="192">1 kHz</text><text x="555" y="192">10 kHz</text><text x="760" y="192">20 kHz</text>
+</g>
+<rect x="65" y="128" width="105" height="30" rx="6" fill="rgba(99,117,143,.35)"/><text x="117" y="148" fill="#E9EFF8" font-size="11.5" text-anchor="middle">ジャダー</text>
+<rect x="150" y="90" width="130" height="30" rx="6" fill="rgba(79,176,232,.28)"/><text x="215" y="110" fill="#4FB0E8" font-size="11.5" text-anchor="middle">グローン／モーン</text>
+<rect x="255" y="128" width="140" height="30" rx="6" fill="rgba(156,141,246,.28)"/><text x="325" y="148" fill="#9C8DF6" font-size="11.5" text-anchor="middle">低周波ノイズ</text>
+<rect x="395" y="90" width="150" height="30" rx="6" fill="rgba(245,178,62,.30)"/><text x="470" y="110" fill="#F5B23E" font-size="11.5" text-anchor="middle" font-weight="700">低周波スキール 1〜3k</text>
+<rect x="500" y="128" width="230" height="30" rx="6" fill="rgba(255,110,110,.30)"/><text x="615" y="148" fill="#FF6E6E" font-size="11.5" text-anchor="middle" font-weight="700">高周波スキール 3〜16k</text>
+<path d="M405,60 L740,60" stroke="#FF6E6E" stroke-width="3"/>
+<path d="M405,52 L405,68 M740,52 L740,68" stroke="#FF6E6E" stroke-width="3"/>
+<text x="572" y="46" fill="#FF6E6E" font-size="13" text-anchor="middle" font-weight="800">J2521の「鳴き」＝1.25〜16 kHz・≥70 dB(A)</text>
+<text x="440" y="228" fill="#94A6C0" font-size="12.5">境界値（3 kHzか5 kHzか等）は文献で幅あり。引用時は必ず出典の定義とセットで</text>
+</svg>
+<div class="figcap">対策を考える前に「どの音の話か」を地図で確定。低音系（ジャダー等）は固着すべり系で対策が別物</div>
+</div>
+<ul>
+<li>メカニズム：摩擦そのものに周波数があるのではなく、<b>パッドとローターの構造共振どうしが摩擦で連成</b>（mode coupling）して自励振動になる、が主流説。だから帯域は「部品の固有振動数がどこにあるか」で決まる。</li>
+<li>パッドの振動は、第1曲げより上（おおむね<b>2.5 kHz以上</b>）で曲げと捻じれの複合になりやすい → オフ軸グリッドが効く理由。</li>
+<li>測定帯域は最低<b>〜16 kHz</b>（安全側〜20 kHz）。ただしサンプリングだけ上げてΔfが粗いままだと双子が団子になる（第3章のミニ式で設計）。</li>
+</ul>
+<div class="xl">
+<div class="xl-h"><b>ミニ式：測定帯域からPSV設定の当たりを付ける</b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">16000</td><td>測りたい最高周波数 fmax [Hz]</td></tr>
+<tr><td class="cell">B2</td><td class="frm">2.56</td><td>アンチエイリアス係数（慣用の安全係数）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">=B1*B2</td><td>必要サンプリング周波数の目安 [Hz] <span class="res">=40960</span></td></tr>
+<tr><td class="cell">B4</td><td class="frm">3200</td><td>FFTライン数（機器の設定値）</td></tr>
+<tr><td class="cell">B5</td><td class="frm">=B1/B4</td><td>周波数分解能 Δf [Hz] <span class="res">=5</span></td></tr>
+<tr><td class="cell">B6</td><td class="frm">=1/B5</td><td>1レコードの取得時間 T [s] <span class="res">=0.2</span></td></tr>
+</table></div>
+<pre class="tsv" style="display:none">
+最高周波数fmax[Hz]|16000
+AA係数|2.56
+必要fs[Hz]|=B1*B2
+FFTライン数|3200
+分解能df[Hz]|=B1/B4
+取得時間T[s]|=1/B5
+</pre>
+</div>
+</div>
+</section>
+
+<section id="s11">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 11</div>
+<h2>正しい<span class="hl-teal">加振セットアップ</span> — 乗せるだけは絶対NG <span class="badge ok">🟢 検証済み</span></h2>
+<div class="story"><span class="stag">なぜ「加振器に乗せるだけ」がダメか</span>乗せているだけの加振器は「押す」ことはできても「引く」ことができません。面が下がる瞬間、パッドは慣性で付いていけず<b>宙に浮いて跳ねます</b>。浮かずに済む限界の振幅は X_max ＝ g ÷ (2πf)²。数字にすると衝撃的です。</div>
+<div class="tablewrap"><table>
+<thead><tr><th>周波数 f</th><th>浮かない限界振幅 X_max</th><th>ひとこと</th></tr></thead>
+<tbody>
+<tr><td class="mono">100 Hz</td><td class="mono">約 24.8 μm</td><td>まだ余裕</td></tr>
+<tr><td class="mono">1 kHz</td><td class="mono">約 0.248 μm</td><td>かなり厳しい</td></tr>
+<tr><td class="mono">2.5 kHz</td><td class="mono">約 39.7 nm</td><td><b class="hl-amber">鳴き帯域の入口でもうナノの世界</b></td></tr>
+<tr><td class="mono">5 kHz</td><td class="mono">約 9.9 nm</td><td>ほぼ無理</td></tr>
+<tr><td class="mono">16 kHz</td><td class="mono">約 0.97 nm</td><td>桁が違う（原子数個ぶん）</td></tr>
+</tbody></table></div>
+<p>つまり鳴き帯域で意味のある振幅を入れた瞬間、パッドは跳ね回って<b>非線形と非再現データしか出ません</b>。加えて、①境界条件が宙ぶらりん、②力が測れずFRFが作れない、③底面全体が面拘束＋摩擦で<ruby>損失係数<rt>そんしつけいすう</rt></ruby>が汚れる、④大型機のアーマチュア共振も乗る——この案は却下です。</p>
+<h3>本命：自由-自由のまま、スティンガー＋力センサー <span class="badge ok">🟢</span></h3>
+<div class="figwrap">
+<svg viewBox="0 0 860 360" width="100%" role="img" aria-label="正しい加振セットアップの構成図">
+<line x1="250" y1="30" x2="250" y2="96" stroke="#4FB0E8" stroke-width="2"/>
+<line x1="470" y1="30" x2="470" y2="96" stroke="#4FB0E8" stroke-width="2"/>
+<text x="360" y="24" fill="#4FB0E8" font-size="12.5" text-anchor="middle">ピアノ線 φ0.3〜0.5（節の近くで吊る）＝自由-自由を維持</text>
+<rect x="200" y="96" width="320" height="70" rx="12" fill="#1C2739" stroke="#3A4C68" stroke-width="2"/>
+<text x="360" y="126" fill="#E9EFF8" font-size="14" text-anchor="middle" font-weight="700">ブレーキパッド（吊ったまま）</text>
+<text x="360" y="148" fill="#94A6C0" font-size="11.5" text-anchor="middle">加振は角＝腹。穴は避ける</text>
+<rect x="497" y="150" width="46" height="34" rx="7" fill="rgba(56,211,181,.18)" stroke="#38D3B5" stroke-width="2"/>
+<text x="590" y="171" fill="#38D3B5" font-size="12.5" font-weight="700">力センサー（★構造側に接着）</text>
+<rect x="514" y="184" width="12" height="86" fill="#F5B23E" rx="4"/>
+<text x="600" y="228" fill="#F5B23E" font-size="12.5" font-weight="700">スティンガー：細い鋼線</text>
+<text x="600" y="246" fill="#94A6C0" font-size="11.5">軸に硬く・横に柔らかい／φ1.5〜2.0・長さ30〜60 mm</text>
+<rect x="470" y="270" width="100" height="60" rx="10" fill="#212E43" stroke="#3A4C68" stroke-width="2"/>
+<text x="520" y="298" fill="#E9EFF8" font-size="12.5" text-anchor="middle" font-weight="700">小型加振器</text>
+<text x="520" y="316" fill="#94A6C0" font-size="10.5" text-anchor="middle">(B&amp;K 4809)</text>
+<text x="118" y="252" fill="#94A6C0" font-size="12">流れ：加振器 → スティンガー →</text>
+<text x="118" y="272" fill="#94A6C0" font-size="12">力センサー → パッド（角）</text>
+<text x="118" y="300" fill="#FF6E6E" font-size="12" font-weight="700">力センサーを加振器側に付けるのは</text>
+<text x="118" y="318" fill="#FF6E6E" font-size="12" font-weight="700">典型ミス（棒の癖が力に混入）</text>
+</svg>
+<div class="figcap">吊り＝節／加振＝角／力は構造の直前で測る。この形が EMA → FE更新 → CEA の標準ルートに乗る</div>
+</div>
+<ul>
+<li><b>スティンガーの役目</b>：軸方向の力だけ伝え、横力・モーメントを曲がって逃がす。一軸の力センサーは横力を測れないので、逃がさないと「測れない力＝正体不明ノイズ」が混入。</li>
+<li><b>材質は数字で決着</b> <span class="badge ok">🟢</span>：ダイソーの軟アルミ針金は<ruby>降伏<rt>こうふく</rt></ruby>応力 ≒34 MPa（触るだけで折れ癖）。ピアノ線 ≒1900 MPa で<b>約56倍</b>。買うのは「ピアノ線 SWP-A」か「ばね用ステンレス線 SUS304-WPB」表記のもの（ミスミ・モノタロウ）。焼きなましの工作用ハリガネは不可。</li>
+<li><b>長さの調整</b>：短すぎ→加振器の癖が乗る／長すぎ→<ruby>座屈<rt>ざくつ</rt></ruby>して力が伝わらない。2〜3種の長さでFRFを重ね、変わった山＝スティンガー由来と切り分ける。</li>
+<li><b>センサー固定</b>：高周波（〜16 kHz）は瞬間接着剤かエポキシで剛結合。ワックス・両面テープ・磁石は高域で減衰・非線形の元。犠牲パッド（接着ベース）を挟むと取り外しが安全。</li>
+</ul>
+<h3>磁力・音波の正しい評価（FIX 1 の本文）</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>方式</th><th>正体</th><th>評価</th></tr></thead>
+<tbody>
+<tr><td>磁石を<b>貼り付けて</b>加振</td><td>接触結合（スティンガー無し）</td><td><span class="pill b">卒業</span> 接触摩擦・横力・剥離・局所質量で汚染。配置（角）は正しいので結合だけ替える</td></tr>
+<tr><td><b>非接触</b>電磁加振</td><td>電磁石でパッド（鋼裏板）を離れて揺らす。ASTM E756（オーベルスト法）で標準採用</td><td><span class="pill w">条件付き有効</span> 質量負荷ゼロ・接触減衰ゼロ。ただし3つの罠：①力∝電流²で周波数が2倍になる→<b>DCバイアス</b>で回避 ②電磁石が「ばね」になり固有振動数が下がる→空隙を変えて検証 ③<b>力を直接測れない</b>→運動基準の伝達関数で評価</td></tr>
+<tr><td>音波（スピーカー）加振</td><td>空気の圧力で揺らす</td><td><span class="pill w">サーベイ用</span> 揺れるのは本当。ただし周波数特性が平坦でなく、<b>力が測れない</b>のでFRFにならずODS止まり。面内とはほぼ結合しない</td></tr>
+<tr><td>あなたの B&amp;K 4809</td><td>動電型＝内部は永久磁石の「電磁式」</td><td><span class="pill g">既に磁力加振器</span> 追加購入は不要</td></tr>
+</tbody></table></div>
+</div>
+</section>
+
+<section id="s12">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 12</div>
+<h2>吊り方 — <span class="hl-sky">ゴム vs ピアノ線</span> <span class="badge ok">🟢 検証済み</span></h2>
+<div class="story"><span class="stag">おはなし</span>「ピアノ線は硬いから捻じれを止めるのでは？」——数字で見るとほぼ誤解です。線が硬いのは<b>縦（軸）方向だけ</b>。横方向・ねじり方向は、振り子として約24万倍やわらかい（軸ばね約140万 N/m に対し、横の振り子ばね約5.9 N/m の実例）。パッドの曲げ・捻じれはほぼ自由に動けます。</div>
+<div class="tablewrap"><table>
+<thead><tr><th>吊り材</th><th>利点</th><th>欠点</th><th>用途</th></tr></thead>
+<tbody>
+<tr><td><b>ピアノ線 φ0.3〜0.5</b></td><td><b class="hl-teal">減衰ほぼゼロ</b>・伸びない・横は柔らかい</td><td>軸剛性で上下バウンスの剛体モードがやや高め→要チェック</td><td><span class="pill g">損失係数測定の正解</span></td></tr>
+<tr><td>柔らかいゴム</td><td>手軽・剛体モードを下げやすい（教科書標準）</td><td><b class="hl-coral">粘弾性が振動を吸い、減衰を水増し</b>（Qが2〜3倍悪化した実測例）</td><td>周波数だけ知りたい予備調査</td></tr>
+<tr><td>柔らかいコイルばね</td><td>低剛性＋低減衰で理論上の最適</td><td>段取りがやや手間</td><td>こだわる場合の代替</td></tr>
+</tbody></table></div>
+<div class="callout good"><span class="tag">唯一やるべき確認 — 1/10ルール</span>吊りの剛体モード（ゆらゆら・バウンス）が、<b>実測の1次弾性モードの 1/10 以下</b>（緩くても1/5以下）にあること。パッドは軽いので、線を細く（φ0.3〜0.5）すれば減衰を保ったままバウンスも下げられます。吊る位置は<b>節の近く</b>。</div>
+<div class="xl">
+<div class="xl-h"><b>ミニ式：吊りチェック（1/10ルール＋振り子）</b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">1500</td><td>実測の1次弾性モード f1 [Hz]</td></tr>
+<tr><td class="cell">B2</td><td class="frm">=B1/10</td><td>剛体モードの上限目安 [Hz] <span class="res">=150（これ以下ならOK）</span></td></tr>
+<tr><td class="cell">B3</td><td class="frm">1.0</td><td>ワイヤ長 L [m]</td></tr>
+<tr><td class="cell">B4</td><td class="frm">=(1/(2*PI()))*SQRT(9.81/B3)</td><td>振り子（ゆらゆら）モード [Hz] <span class="res">≒0.5（長いほど自由に近い）</span></td></tr>
+</table></div>
+<pre class="tsv" style="display:none">
+1次弾性f1[Hz]|1500
+剛体モード上限[Hz]|=B1/10
+ワイヤ長L[m]|1.0
+振り子モード[Hz]|=(1/(2*PI()))*SQRT(9.81/B3)
+</pre>
+</div>
+</div>
+</section>
+<section id="s13">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 13</div>
+<h2>シム付きパッドの<span class="hl-amber">加圧試験</span>（ピストン径44 mm確定版） <span class="badge ok">🟢 検証済み＋FIX 2・3反映</span></h2>
+<div class="story"><span class="stag">おはなし — なぜ圧力をかけるのか</span>シムは「鋼板＋ゴム（粘弾性）層」のサンドイッチ。実車ではキャリパのピストンが<b>0.5〜3 MPa（5〜30 bar）</b>で押し付け、ゴム層が<ruby>剪断<rt>せんだん</rt></ruby>方向にモニョモニョ変形してエネルギーを熱に変える＝<ruby>減衰<rt>げんすい</rt></ruby>します。鳴きは低圧（2 MPa未満）・低速で出やすいので、この低圧域を再現したいのは正しい狙いです。</div>
+<div class="callout memo"><span class="tag">FIX 2 の正確な言い方</span>「加圧して初めて減衰が出る」は言い過ぎ。<b>接着式シム</b>なら吊るしただけ（無加圧）でもCLD（<ruby>拘束層<rt>こうそくそう</rt></ruby>）減衰は出ます。正確には——①加圧すると減衰量が実機値に近づく、②ピストン接触面の<b>摩擦減衰は加圧しないと出ない</b>。まず<b>自分のシムが接着式か圧着式（爪だけ）かを確認</b><span class="badge chk">🔴 現物確認</span>。</div>
+<h3>ダメな案・良い案のふるい分け</h3>
+<div class="tablewrap"><table>
+<thead><tr><th>案</th><th>判定</th><th>理由</th></tr></thead>
+<tbody>
+<tr><td>ビニールシート＋200 gのおもりを乗せる</td><td><span class="pill b">✕ NG</span></td><td>200 g（約2 N）をシム面（例：約70 cm²）で受けると圧力は<b>約0.03 bar＝必要圧の約1/180</b>。減衰は働かないのに、200 gの質量負荷で周波数は十数%下がり、良い自由-自由も壊す。「軽すぎて効かず・重すぎて壊す」の同時失敗</td></tr>
+<tr><td>あなたの案：ピストン形パック（44 mm×4〜5 mm）をシムに当て、プレートで挟んでボルト締め</td><td><span class="pill g">◎ 筋が良い</span></td><td>文献で確立した「圧力依存モーダル試験」の簡易版そのもの。下の3改善で実用レベルに</td></tr>
+</tbody></table></div>
+<h3>実用化のための3つの改善（これが本体）</h3>
+<ol>
+<li><b>トルクではなくロードセルで力を直読</b>：トルク→力の変換はナットファクター K のばらつきで<b>±25〜35%</b>もズレる。しかも必要トルクは<b>0.2〜2.3 N·m</b>で、普通のクリック式トルクレンチの下限（約5 N·m）より小さく設定不能。荷重経路に<ruby>ロードセル<rt>力センサー</rt></ruby>を挟み、目標F[N]まで締めれば±数%。</li>
+<li><b>貫通ボルト → C型ヨーク</b>：パッドに穴を開けると対称性が崩れて双子分裂を自分で作ってしまう。C字の枠でパッドの外から挟めば無傷。</li>
+<li><b>クリープ後の締め直し</b>：ゴムは締めた後にジワッと逃げて圧が抜ける。数分後にもう一度目標値まで締め直す。</li>
+</ol>
+<div class="figwrap">
+<svg viewBox="0 0 860 340" width="100%" role="img" aria-label="C型ヨーク加圧治具の断面と力の流れ">
+<path d="M300,40 h240 a18,18 0 0 1 18,18 v40 h-52 v-24 a6,6 0 0 0 -6,-6 h-160 a6,6 0 0 0 -6,6 v190 a6,6 0 0 0 6,6 h160 a6,6 0 0 0 6,-6 v-24 h52 v40 a18,18 0 0 1 -18,18 h-240 a18,18 0 0 1 -18,-18 v-222 a18,18 0 0 1 18,-18 z" fill="#212E43" stroke="#3A4C68" stroke-width="2"/>
+<text x="255" y="176" fill="#94A6C0" font-size="12.5" transform="rotate(-90 255 176)" text-anchor="middle">C型ヨーク（パッドに穴を開けない）</text>
+<rect x="352" y="96" width="150" height="26" rx="5" fill="#101826" stroke="#4FB0E8"/>
+<text x="427" y="113" fill="#4FB0E8" font-size="11.5" text-anchor="middle">押しネジ（上から締める）</text>
+<rect x="368" y="126" width="118" height="26" rx="5" fill="rgba(56,211,181,.16)" stroke="#38D3B5" stroke-width="2"/>
+<text x="427" y="143" fill="#38D3B5" font-size="11.5" text-anchor="middle" font-weight="700">ロードセル（力を直読）</text>
+<rect x="384" y="156" width="86" height="20" rx="10" fill="#2A3A55" stroke="#F5B23E" stroke-width="2"/>
+<text x="427" y="170" fill="#F5B23E" font-size="11" text-anchor="middle" font-weight="700">ピストン形パック φ44×4</text>
+<rect x="352" y="180" width="150" height="12" rx="3" fill="#9C8DF6"/>
+<text x="620" y="190" fill="#9C8DF6" font-size="12">シム（爪はいつも通り装着）</text>
+<rect x="344" y="194" width="166" height="40" rx="6" fill="#1C2739" stroke="#3A4C68" stroke-width="2"/>
+<text x="427" y="219" fill="#E9EFF8" font-size="12.5" text-anchor="middle" font-weight="700">パッド（摩擦材＋裏板）</text>
+<rect x="352" y="238" width="150" height="14" rx="4" fill="#2A3A55" stroke="#3A4C68"/>
+<text x="620" y="250" fill="#94A6C0" font-size="11.5">受け面（下側の腕）</text>
+<g stroke="#FF6E6E" stroke-width="3" fill="none">
+<path d="M427,74 v18 m-8,-10 l8,10 l8,-10"/>
+</g>
+<text x="620" y="98" fill="#FF6E6E" font-size="12.5" font-weight="700">力の流れ：ネジ→ロードセル→</text>
+<text x="620" y="116" fill="#FF6E6E" font-size="12.5" font-weight="700">パック→シム→パッド→受け面</text>
+<text x="620" y="140" fill="#94A6C0" font-size="11.5">直列スタックなので、どの断面でも力は同じ</text>
+<text x="620" y="158" fill="#94A6C0" font-size="11.5">＝ロードセルの表示がそのままシムへの力</text>
+<text x="427" y="300" fill="#94A6C0" font-size="12" text-anchor="middle">パック直径＝ピストン直径（44 mm）にするから「表示した力 ÷ パック面積 ＝ 狙いの圧力」が成立</text>
+</svg>
+<div class="figcap">改善版の治具。ボルト4本方式でも考え方は同じ（対角順に少しずつ均等締め）</div>
+</div>
+<div class="xl">
+<div class="xl-h"><b>ミニ式：圧力→力→トルク（44 mm確定・入力を変えるだけ）</b><button class="cp" onclick="cp(this)">コピー（貼付用）</button></div>
+<div class="tablewrap"><table>
+<tr><th>セル</th><th>入力・式</th><th>意味</th></tr>
+<tr><td class="cell">B1</td><td class="frm">44</td><td>ピストン（パック）直径 [mm]（確定値）</td></tr>
+<tr><td class="cell">B2</td><td class="frm">1</td><td>目標圧力 P [MPa]（0.5〜3で振る）</td></tr>
+<tr><td class="cell">B3</td><td class="frm">4</td><td>ボルト本数</td></tr>
+<tr><td class="cell">B4</td><td class="frm">6</td><td>ボルト呼び径 [mm]（M6なら6）</td></tr>
+<tr><td class="cell">B5</td><td class="frm">0.2</td><td>ナットファクター K（乾いた鋼の典型値）</td></tr>
+<tr><td class="cell">B7</td><td class="frm">=PI()/4*B1^2</td><td>パック面積 [mm²] <span class="res">≒1521</span></td></tr>
+<tr><td class="cell">B8</td><td class="frm">=B2*B7</td><td><b class="hl-teal">合計締付力 F [N] ＝ ロードセル目標値</b> <span class="res">≒1521（1 MPa時）</span></td></tr>
+<tr><td class="cell">B9</td><td class="frm">=B8/B3</td><td>ボルト1本の力 [N] <span class="res">≒380</span></td></tr>
+<tr><td class="cell">B10</td><td class="frm">=B5*B4*B9/1000</td><td>1本トルク [N·m]（当たり付け用） <span class="res">≒0.46</span></td></tr>
+<tr><td class="cell">B11</td><td class="frm">=B10*100</td><td>同 [N·cm]（トルクドライバー表示用）</td></tr>
+</table></div>
+<pre class="tsv" style="display:none">
+ピストン直径[mm]|44
+目標圧力P[MPa]|1
+ボルト本数|4
+ボルト呼び径[mm]|6
+ナットファクターK|0.2
+|
+パック面積[mm2]|=PI()/4*B1^2
+合計締付力F[N]=ロードセル目標|=B2*B7
+ボルト1本の力[N]|=B8/B3
+1本トルク[N・m]|=B5*B4*B9/1000
+1本トルク[N・cm]|=B10*100
+</pre>
+</div>
+<div class="tablewrap"><table>
+<thead><tr><th>目標圧力</th><th>合計力（ロードセル目標）</th><th>M6・1本トルク（K=0.2の目安）</th></tr></thead>
+<tbody>
+<tr><td class="mono">0.5 MPa</td><td class="mono">約 760 N（78 kgf）</td><td class="mono">約 0.23 N·m</td></tr>
+<tr><td class="mono">1 MPa</td><td class="mono">約 1521 N（155 kgf）</td><td class="mono">約 0.46 N·m</td></tr>
+<tr><td class="mono">2 MPa</td><td class="mono">約 3041 N（310 kgf）</td><td class="mono">約 0.91 N·m</td></tr>
+<tr><td class="mono">3 MPa</td><td class="mono">約 4562 N（465 kgf）</td><td class="mono">約 1.37 N·m</td></tr>
+</tbody></table></div>
+<div class="callout warn"><span class="tag">この治具で測っているもの</span>プレートで挟んだ時点で自由-自由ではなく「治具＋パッドのサンドイッチ系」。<b>加圧下のシム減衰を見る目的ならこれで正しい</b>ですが、無加圧の自由-自由モードとは別物として記録を分けること。プレートはパッドより十分重く硬く（たわむと中央の実圧が減る）。圧力を段階的に振って（圧スイープ）、周波数・減衰が頭打ちになる圧を探すのが次の一手。</div>
+</div>
+</section>
+
+<section id="s14">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 14</div>
+<h2>ピークは<span class="hl-violet">計算で予測</span>できるか <span class="badge ok">🟢 原理検証済み</span></h2>
+<p><b>できます。ただし精度に4段階</b>あります。①傾向・スケーリング（◎公式で十分）→ ②単純板の1次モード（±10〜20%）→ ③複合断面の当たり（±15%）→ ④本物のパッドの絶対値（<b>FEMが本命</b>、公式は桁チェック用）。</p>
+<div class="callout good"><span class="tag">一番の実用ポイント：スケーリング則</span><span class="kw">f ∝ h·√(E/ρ) ÷ L²</span>。<b>板厚2倍→周波数2倍。寸法2倍→1/4</b>。絶対値を知らなくても「設計をどういじれば鳴き帯域（1.25〜16 kHz）から何Hz逃げるか」の当たりが付きます。</div>
+<ul>
+<li>面直（曲げ）の基本式：<span class="kw">f = λ/(2πa²)·√(D/μ)</span>、曲げ剛性 <span class="kw">D = E·h³/12(1−ν²)</span>、面密度 μ=ρ·h。λはLeissa（NASA SP-160）の数表<span class="badge est">🟡 FFFF正方形のλ≈13.49は現物の表で最終確認</span>。</li>
+<li>面内1次の桁：棒の縦振動 <span class="kw">f = c/2L</span>（c=√(E/ρ)、鋼で約5060 m/s）→ L=160 mmで約15.8 kHz。面直の式では予測できない別物。</li>
+<li><b>最大の不確かさ＝摩擦材のヤング率</b>：配合で<b>55 MPa〜35 GPa（600倍）</b>ばらつく。だから王道は「<b>測ってから逆算 → その物性でFEM → 予測</b>」の順。</li>
+</ul>
+</div>
+</section>
+
+<section id="s15">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 15</div>
+<h2>Farinaの魔法 — <span class="hl-sky">ESSと歪みの時間分離</span> <span class="badge ok">🟢 検証済み（FIX 4で格上げ）</span></h2>
+<div class="story"><span class="stag">2000年の革命ものがたり</span>かつてインパルス応答の測定はMLS（擬似白色雑音）が主流でした。2000年、Angelo Farina がAESで発表した「掃引正弦によるインパルス応答と歪みの同時測定」が流れを変えます。安い機材で、弱い非線形を持つ系の伝達関数を測れる新手法。以来、精密測定の標準は<b>指数スイープ（ESS）</b>になり、同条件でMLSより約15 dB広いダイナミックレンジという報告もあります。</div>
+<p><b>仕組み（直感）</b>：指数スイープは周波数が「対数目盛りで一定速度」で上がる信号。系に歪みがあると2次・3次…の高調波も出ますが、測定後に<b>逆フィルタで畳み込む</b>と、面白いことに<b>n次高調波の応答が、線形応答（t=0）より決まった時間だけ「前（過去側）」にズレて並びます</b>。</p>
+<div class="figwrap">
+<svg viewBox="0 0 860 200" width="100%" role="img" aria-label="ESS逆畳み込み後の時間軸：歪みが過去側に並ぶ">
+<line x1="60" y1="130" x2="820" y2="130" stroke="#3A4C68" stroke-width="2"/>
+<text x="820" y="152" fill="#94A6C0" font-size="12" text-anchor="end">時間 →</text>
+<line x1="640" y1="130" x2="640" y2="40" stroke="#38D3B5" stroke-width="5"/>
+<text x="640" y="30" fill="#38D3B5" font-size="13.5" text-anchor="middle" font-weight="800">t=0：純粋な線形インパルス応答</text>
+<line x1="470" y1="130" x2="470" y2="70" stroke="#F5B23E" stroke-width="4"/>
+<text x="470" y="60" fill="#F5B23E" font-size="12" text-anchor="middle">2次歪み</text>
+<line x1="370" y1="130" x2="370" y2="82" stroke="#FF6E6E" stroke-width="4"/>
+<text x="370" y="72" fill="#FF6E6E" font-size="12" text-anchor="middle">3次歪み</text>
+<line x1="300" y1="130" x2="300" y2="92" stroke="#9C8DF6" stroke-width="4"/>
+<text x="300" y="82" fill="#9C8DF6" font-size="12" text-anchor="middle">4次…</text>
+<rect x="600" y="42" width="180" height="96" rx="10" fill="none" stroke="#38D3B5" stroke-dasharray="6 5" stroke-width="2"/>
+<text x="690" y="168" fill="#38D3B5" font-size="12.5" text-anchor="middle" font-weight="700">ここだけ時間窓で切り出せば歪みゼロの線形応答</text>
+<text x="220" y="168" fill="#94A6C0" font-size="12" text-anchor="middle">高調波は Δt(n)=T·ln(n)/ln(f2/f1) だけ手前に出る</text>
+</svg>
+<div class="figcap">歪みが時間軸上で自動的に「仕分け」される。窓で切るだけでクリーンな線形応答が取れる</div>
+</div>
+<ul>
+<li>時間差の式（Farina 2000の標準結果）：<span class="kw">Δt(n) ＝ T·ln(n) ÷ ln(f2/f1)</span>（T=掃引時間、f1→f2=掃引範囲、n=高調波次数）。</li>
+<li>おまけの技：<b>入力レベルを2段階変えてFRFを比べれば線形性チェック</b>（ズレたら非線形の証拠）。これはPSVの周期チャープ運用でもそのまま使える「非線形の健康診断」。</li>
+</ul>
+</div>
+</section>
+<section id="s16">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 16</div>
+<h2>全体<span class="hl-teal">ワークフロー</span>（結論・この順でやる） <span class="badge ok">🟢</span></h2>
+<div class="figwrap">
+<svg viewBox="0 0 860 240" width="100%" role="img" aria-label="測定ワークフローの流れ図">
+<defs><marker id="fa" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="#63758F"/></marker></defs>
+<g font-size="12" text-anchor="middle" font-weight="700">
+<rect x="30" y="40" width="150" height="52" rx="10" fill="#1C2739" stroke="#4FB0E8" stroke-width="2"/><text x="105" y="62" fill="#4FB0E8">① 段取り</text><text x="105" y="80" fill="#94A6C0" font-weight="400">吊り1/10・格子・角加振</text>
+<rect x="220" y="40" width="150" height="52" rx="10" fill="#1C2739" stroke="#F5B23E" stroke-width="2"/><text x="295" y="62" fill="#F5B23E">② ハンマー</text><text x="295" y="80" fill="#94A6C0" font-weight="400">周波数サーベイ</text>
+<rect x="410" y="40" width="150" height="52" rx="10" fill="#1C2739" stroke="#38D3B5" stroke-width="2"/><text x="485" y="62" fill="#38D3B5">③ チャープ</text><text x="485" y="80" fill="#94A6C0" font-weight="400">スキャン＋損失係数</text>
+<rect x="600" y="40" width="150" height="52" rx="10" fill="#1C2739" stroke="#9C8DF6" stroke-width="2"/><text x="675" y="62" fill="#9C8DF6">④ 形を見る</text><text x="675" y="80" fill="#94A6C0" font-weight="400">ODS・位相で曲げ/捻じれ</text>
+<rect x="220" y="150" width="150" height="52" rx="10" fill="#1C2739" stroke="#FF6E6E" stroke-width="2"/><text x="295" y="172" fill="#FF6E6E">⑤ 双子判定</text><text x="295" y="190" fill="#94A6C0" font-weight="400">うなり・CMIF</text>
+<rect x="410" y="150" width="150" height="52" rx="10" fill="#1C2739" stroke="#FF6E6E" stroke-width="2"/><text x="485" y="172" fill="#FF6E6E">⑥ 分離</text><text x="485" y="190" fill="#94A6C0" font-weight="400">MIMO＋ポリリファレンス</text>
+<rect x="600" y="150" width="150" height="52" rx="10" fill="#1C2739" stroke="#38D3B5" stroke-width="2"/><text x="675" y="172" fill="#38D3B5">⑦ 検証</text><text x="675" y="190" fill="#94A6C0" font-weight="400">MAC・線形性2レベル</text>
+</g>
+<g stroke="#63758F" stroke-width="2" fill="none" marker-end="url(#fa)">
+<line x1="180" y1="66" x2="214" y2="66"/><line x1="370" y1="66" x2="404" y2="66"/><line x1="560" y1="66" x2="594" y2="66"/>
+<path d="M675,92 v28 h-380 v22"/><line x1="370" y1="176" x2="404" y2="176"/><line x1="560" y1="176" x2="594" y2="176"/>
+</g>
+<text x="105" y="180" fill="#94A6C0" font-size="11.5" text-anchor="middle">全工程で</text>
+<text x="105" y="197" fill="#38D3B5" font-size="12.5" text-anchor="middle" font-weight="800">γ² &gt; 0.9 を監視</text>
+</svg>
+<div class="figcap">役割分担が正解：ハンマー＝速いサーベイ／チャープ＝きれいな形と減衰／MIMO＝双子の決定打</div>
+</div>
+<ol>
+<li>吊り（ピアノ線・節・1/10ルール確認）→ 格子は<b>穴を避けてオフ軸列を含める</b>。</li>
+<li>加振は<b>角（対称軸から外す）</b>。駆動点FRFで<b>共振と反共振が交互</b>に並ぶか自己診断（谷が抜けたら節に乗っている→数cm動かす）。</li>
+<li>ハンマーで固有振動数を速く洗い出す（2度打ち棄却・1点4打以上の平均・チップは上限周波数で6 dB落ち以内）。</li>
+<li>周期チャープ＋矩形窓でスキャン。損失係数はここで確定（漏れゼロ）。</li>
+<li>近接・うなりが出たら第3章のミニ式で必要T・Δfを設計し、CMIFで本数を数える。</li>
+<li>双子確定なら参照2点以上のMIMO＋ポリリファレンスで分離。</li>
+<li>MAC/AutoMACで直交性を確認、加振レベル2段階で線形性チェック。</li>
+</ol>
+</div>
+</section>
+
+<section id="s17">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 17</div>
+<h2>よくある<span class="hl-coral">ミス大全</span>（やってしまう前に読む）</h2>
+<div class="grid2">
+<div class="card"><h3 style="margin-top:0">段取り・吊り・加振点</h3><ul class="mistake">
+<li>ピアノ線を節以外で吊る → 拘束が入り低次モードが変わる</li>
+<li>重心（中心）に加振 → 捻じれ・偶数次曲げが<b>定義上見えない</b></li>
+<li>対称軸の上に加振 → 双子の片割れを取りこぼす</li>
+<li>加振器に「乗せるだけ」→ 鳴き帯域ではナノで離間、全滅（第11章）</li>
+<li>力センサーを加振器側に付ける → 棒の癖が力に混入</li>
+<li>スティンガーが軟アルミ・工作用ハリガネ → 折れ癖で毎回別の測定に</li>
+</ul></div>
+<div class="card"><h3 style="margin-top:0">レーザー・グリッド</h3><ul class="mistake">
+<li>穴の上にスキャン点 → 光が返らず<b>ドロップアウトのスパイク</b>。不良品と誤判定しない（測定欠損であって物理ではない）</li>
+<li>中心線1列だけの格子 → 捻じれが丸ごと消える</li>
+<li>点が疎ら → 高次曲げが捻じれに化ける（空間エイリアシング）</li>
+<li>反射テープの貼りすぎ → 質量負荷で周波数低下、比較が狂う</li>
+<li>垂直入射のまま「面内が無い」と結論 → 測っていないだけ</li>
+</ul></div>
+<div class="card"><h3 style="margin-top:0">信号処理・窓・平均</h3><ul class="mistake">
+<li>周期チャープにハニングを掛ける → 漏れゼロなのにわざわざ山を太らせる（<b>矩形が必須</b>）</li>
+<li>ホワイトノイズの平均不足 → ガタつく床を偽ピークと誤読</li>
+<li>指数窓の減衰上乗せを補正し忘れ → 損失係数が過大のまま</li>
+<li>2度打ちを棄却しない → 櫛状リップルをモードと誤読</li>
+<li>Δfが粗いまま → 割れた双子が団子になり1モードと誤読</li>
+</ul></div>
+<div class="card"><h3 style="margin-top:0">解釈・解析</h3><ul class="mistake">
+<li>1ピーク＝1モードと決めつけ → 穴あきパッド最大の罠。うなり・歪んだナイキスト円・妙に大きい減衰は双子のサイン</li>
+<li>双子に半値幅法 → 帯域幅を過大評価して破綻。カーブフィットへ</li>
+<li>応答スペクトル同士を比較して「ピークが違う！」→ FRFで比べる</li>
+<li>コヒーレンス良好＝良い測定と早合点 → 節乗りの欠落は見抜けない（駆動点FRFで交互確認）</li>
+<li>割れたモード（本物の物理）を「エラー」と思って潰す → 正しく分離して読むが正解</li>
+<li>シム治具でパッドに穴あけ・トルクレンチ頼み・締めっぱなし → C型ヨーク・ロードセル・締め直しで回避</li>
+</ul></div>
+</div>
+</div>
+</section>
+
+<section id="s18">
+<div class="wrap">
+<div class="eyebrow">CHAPTER 18</div>
+<h2>用語ミニ<span class="hl-amber">辞典</span> ＋ 出典</h2>
+<div class="tablewrap"><table>
+<thead><tr><th>用語（読み）</th><th>一言でいうと</th></tr></thead>
+<tbody>
+<tr><td>モード</td><td>その物が生まれつき持つ揺れ方のクセ（周波数・形・減衰の3点セット）</td></tr>
+<tr><td><ruby>固有振動数<rt>こゆうしんどうすう</rt></ruby></td><td>その物が「得意なゆれの速さ」。鐘の音の高さ</td></tr>
+<tr><td><ruby>節<rt>ふし</rt></ruby>／<ruby>腹<rt>はら</rt></ruby></td><td>揺れない線・点／いちばん揺れる場所</td></tr>
+<tr><td><ruby>縮退<rt>しゅくたい</rt></ruby>モード（双子・repeated roots）</td><td>ほぼ同じ周波数にそっくりな揺れ方が2つペアで出る現象</td></tr>
+<tr><td>うなり（beating）</td><td>近い2周波数が重なり、振幅がゆっくり波打つこと。周期＝1/|f1−f2|</td></tr>
+<tr><td>FRF（周波数応答関数）</td><td>応答÷力。加振の形が消えて構造の性質だけが残る「正しい比べ方」</td></tr>
+<tr><td>コヒーレンス γ²</td><td>「その揺れの何割が自分の力のせいか」0〜1の成績表</td></tr>
+<tr><td><ruby>減衰<rt>げんすい</rt></ruby>／<ruby>損失係数<rt>そんしつけいすう</rt></ruby> η</td><td>鳴りやみの速さ。η＝半値幅÷共振周波数、ζ＝η/2、Q＝1/η</td></tr>
+<tr><td><ruby>半値幅<rt>はんちはば</rt></ruby>法</td><td>ピークの−3 dB幅から減衰を出す簡便法。<b>孤立した単独ピーク専用</b></td></tr>
+<tr><td>リーケージ（<ruby>漏<rt>も</rt></ruby>れ）</td><td>FFTのコマ端の段差がニセ周波数ににじむこと。窓か周期信号で対処</td></tr>
+<tr><td><ruby>窓関数<rt>まどかんすう</rt></ruby></td><td>コマの両端をそっと0に落とす封筒。にじみ減 ⇔ 山太るの交換条件</td></tr>
+<tr><td>SIMO／MIMO</td><td>1入力多出力／多入力多出力。双子分離にはMIMOが決定打</td></tr>
+<tr><td>CMIF</td><td>多点FRF行列をSVDして「モードが何個いるか」を数える判定機</td></tr>
+<tr><td>ポリリファレンス</td><td>複数基準点で同時カーブフィット。団子を2つの独立モードに解く</td></tr>
+<tr><td>MAC</td><td>2つのモード形の似ている度合い（1=同じ形、0=無関係）</td></tr>
+<tr><td>ODS</td><td>各周波数での「見た目の変形」。モード形そのものではない可視化</td></tr>
+<tr><td>スティンガー</td><td>軸に硬く横に柔らかい細棒。横力を逃がして力を綺麗に伝える</td></tr>
+<tr><td>アーマチュア</td><td>加振器の可動部。自分の共振に力を注ぎ込む癖がある</td></tr>
+<tr><td><ruby>波高率<rt>はこうりつ</rt></ruby>（クレストファクター）</td><td>ピーク÷実効値。低いほど同じ機材で多くのエネルギーを送れる</td></tr>
+<tr><td><ruby>座屈<rt>ざくつ</rt></ruby>／<ruby>降伏<rt>こうふく</rt></ruby></td><td>細長い棒が押されて横に逃げる／力を抜いても元に戻らなくなる境目</td></tr>
+<tr><td>CLD（拘束層減衰）</td><td>鋼板でゴムを挟み、剪断変形で振動を熱に変える仕組み（＝シムの原理）</td></tr>
+<tr><td>ロードセル</td><td>力を電気信号に変えるセンサー。ひずみゲージ式が主流</td></tr>
+<tr><td>C型ヨーク</td><td>C字型の枠。外から挟んで荷重をかけられ、対象に穴を開けずに済む</td></tr>
+<tr><td>ESS（指数スイープ）</td><td>対数目盛りで一定速度に上がるスイープ。歪みを時間で仕分けできる</td></tr>
+</tbody></table></div>
+<h3>主要な一次情報（クリックで確認できます）</h3>
+<ul style="font-size:14px">
+<li>SAE J2521（鳴き定義 1.25〜16 kHz・70 dB(A)）：<a href="https://saemobilus.sae.org/standards/j2521_201304-disc-drum-brake-dynamometer-squeal-noise-test-procedure">saemobilus.sae.org</a></li>
+<li>HP/Agilent AN 243-3「The Fundamentals of Modal Testing」（節では励起できない）：<a href="https://rotorlab.tamu.edu/me459/APP%20Note%20243-3%20The%20Fundamentals%20of%20Modal%20Testing.pdf">rotorlab.tamu.edu</a></li>
+<li>Avitabile／UMass Lowell（EMA非数学的入門・信号比較）：<a href="https://www.uml.edu/docs/s-v-jan2001_modal_analysis_tcm18-189939.pdf">uml.edu</a></li>
+<li>Crystal Instruments（加振方式・コヒーレンス・窓）：<a href="https://www.crystalinstruments.com/modal-testing-excitation-consideration">crystalinstruments.com</a></li>
+<li>The Modal Shop（スティンガー実寸・FAQ）：<a href="https://www.modalshop.com/vibration-test/learn/modal-testing-faq">modalshop.com</a></li>
+<li>Peres/Bono/Avitabile「Modal Testing Excitation Guidelines」S&amp;V 2011：<a href="http://www.sandv.com/downloads/1111pere.pdf">sandv.com</a></li>
+<li>Carne（柔支持でも減衰が汚染される・OSTI）：<a href="https://www.osti.gov/servlets/purl/1266149">osti.gov</a></li>
+<li>Polytec モーダル解析（対称構造とMIMO）：<a href="https://www.polytec.com/int/vibrometry/solutions/measurement-tasks/modal-analysis">polytec.com</a></li>
+<li>Polytec PSV ソフト v9.1 マニュアル（チャープ＝矩形窓等）：<a href="https://pearl-hifi.com/06_Lit_Archive/15_Mfrs_Publications/28_Polytec/Polytec_Software_Manuals/Polytec_PSV_Software_Ver_9.1.pdf">pearl-hifi.com</a></li>
+<li>Farina 2000（ESS原論文・著者公開PDF）：<a href="https://angelofarina.it/Public/Papers/134-AES00.PDF">angelofarina.it</a></li>
+<li>Harris 1978（窓関数の古典・数値表の原典）：Proc. IEEE, Vol.66 No.1</li>
+<li>Leissa「Vibration of Plates」NASA SP-160（板のλ数表）：NASA公式アーカイブ</li>
+<li>ASTM E756（非接触の電磁/音響ドライバによる減衰測定）：<a href="https://www.astm.org/e0756-05r17.html">astm.org</a></li>
+<li>B&amp;K アプリケーションノート（指数窓と減衰・多参照モーダル）：<a href="https://www.bksv.com/-/media/literature/Application-Note/bo0505.ashx">bksv.com</a></li>
+</ul>
+<p class="note">「検証済み」以外の数値は概算です。最終的な絶対値は、あなたの現物での実測で確定してください。エクセル式の完全版は相棒ファイル「エクセル計算式大全_Ver1_0_00.html」へ。</p>
+<hr style="border:none;border-top:1px solid var(--line);margin:26px 0 14px">
+<p class="note" style="text-align:center">Ver1.0.00 ｜ ブレーキパッドEMAシリーズ ｜ Fable1＋Fable2 総まとめ（Fable 5 修正版） ｜ ダークモード ｜ 生成: 2026-07</p>
+</div>
+</section>
+
+<script>
+function cp(btn){
+  var box = btn.closest('.xl');
+  var pre = box.querySelector('.tsv');
+  if(!pre){ return; }
+  var raw = pre.textContent.replace(/^\s*\n/,'').replace(/\n\s*$/,'');
+  var tsv = raw.split('\n').map(function(line){ return line.split('|').join('\t'); }).join('\n');
+  function done(){
+    var old = btn.textContent;
+    btn.textContent = 'コピーしました';
+    btn.style.background = '#4fd8eb';
+    setTimeout(function(){ btn.textContent = old; btn.style.background=''; }, 1500);
+  }
+  if(navigator.clipboard && navigator.clipboard.writeText){
+    navigator.clipboard.writeText(tsv).then(done, function(){ fb(tsv, done); });
+  } else { fb(tsv, done); }
+}
+function fb(text, done){
+  var ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.position = 'fixed'; ta.style.top = '0'; ta.style.left = '0'; ta.style.opacity = '0';
+  document.body.appendChild(ta);
+  ta.focus(); ta.select();
+  try { document.execCommand('copy'); done(); }
+  catch(e){ window.prompt('下のテキストをコピーして下さい（Ctrl+C）:', text); }
+  document.body.removeChild(ta);
+}
+</script>
+</body>
+</html>
