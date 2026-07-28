@@ -1,0 +1,1362 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>MD Editor - Joplin風マークダウンエディタ</title>
+<style>
+  :root{
+    --bg-0:#1a1c20;
+    --bg-1:#212327;
+    --bg-2:#2a2d32;
+    --bg-3:#33363c;
+    --border:#3d4046;
+    --text-0:#e6e6e6;
+    --text-1:#a8adb5;
+    --text-2:#6f757e;
+    --accent:#5ea1e6;
+    --accent-2:#7fd0a6;
+    --danger:#e07070;
+    --warn:#e0b95e;
+    --mono:"Cascadia Code","JetBrains Mono","Consolas","Menlo",monospace;
+    --sans:"Segoe UI","Hiragino Kaku Gothic ProN","Noto Sans JP",sans-serif;
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;margin:0;}
+  body{
+    background:var(--bg-0);
+    color:var(--text-0);
+    font-family:var(--sans);
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+    font-size:14px;
+  }
+  button{
+    font-family:inherit;
+    background:var(--bg-2);
+    color:var(--text-0);
+    border:1px solid var(--border);
+    border-radius:4px;
+    padding:5px 9px;
+    cursor:pointer;
+    font-size:13px;
+  }
+  button:hover{background:var(--bg-3);}
+  button:active{transform:translateY(1px);}
+  button.active{background:var(--accent);color:#0d1620;border-color:var(--accent);}
+  button.icon-btn{padding:5px 8px;min-width:30px;text-align:center;}
+  input[type=text],input[type=number]{
+    background:var(--bg-1);color:var(--text-0);border:1px solid var(--border);
+    border-radius:4px;padding:5px 7px;font-family:inherit;
+  }
+  /* ---------- top bar ---------- */
+  #topbar{
+    display:flex;align-items:center;gap:6px;
+    padding:6px 8px;background:var(--bg-1);border-bottom:1px solid var(--border);
+    flex-wrap:wrap;
+  }
+  #topbar .spacer{flex:1;}
+  #appTitle{font-weight:600;color:var(--text-1);margin-right:8px;font-size:13px;white-space:nowrap;}
+  #saveStatus{font-size:12px;color:var(--text-2);white-space:nowrap;}
+  #saveStatus.dirty{color:var(--warn);}
+  #saveStatus.saved{color:var(--accent-2);}
+  /* ---------- tab bar ---------- */
+  #tabbar{
+    display:flex;align-items:stretch;background:var(--bg-1);
+    border-bottom:1px solid var(--border);overflow-x:auto;min-height:34px;
+  }
+  .tab{
+    display:flex;align-items:center;gap:6px;padding:0 10px;
+    background:var(--bg-1);border-right:1px solid var(--border);
+    cursor:pointer;white-space:nowrap;font-size:13px;color:var(--text-1);
+    user-select:none;
+  }
+  .tab.active{background:var(--bg-2);color:var(--text-0);border-bottom:2px solid var(--accent);}
+  .tab .dot{width:6px;height:6px;border-radius:50%;background:var(--warn);display:none;}
+  .tab.dirty .dot{display:inline-block;}
+  .tab .fsa{color:var(--accent-2);font-size:11px;}
+  .tab .close{color:var(--text-2);padding:2px 4px;border-radius:3px;}
+  .tab .close:hover{background:var(--danger);color:#fff;}
+  #newTabBtn{padding:0 12px;color:var(--text-1);border-right:1px solid var(--border);}
+  #newTabBtn:hover{color:var(--text-0);background:var(--bg-2);}
+  /* ---------- format toolbar ---------- */
+  #formatbar{
+    display:flex;gap:4px;padding:6px 8px;background:var(--bg-1);
+    border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center;
+  }
+  #formatbar .sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+  /* ---------- main area ---------- */
+  #main{flex:1;display:flex;min-height:0;position:relative;}
+  #dropOverlay{
+    position:fixed;inset:0;background:rgba(20,25,35,0.85);
+    display:none;align-items:center;justify-content:center;
+    font-size:24px;color:var(--accent-2);z-index:999;
+    border:4px dashed var(--accent-2);pointer-events:none;
+  }
+  #dropOverlay.show{display:flex;}
+  #emptyState{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    color:var(--text-2);font-size:15px;flex-direction:column;gap:14px;text-align:center;
+  }
+  #emptyState button{padding:10px 18px;}
+  .pane-wrap{flex:1;display:none;min-width:0;}
+  .pane-wrap.active{display:flex;}
+  .editor-pane{
+    flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg-0);
+  }
+  .editor-pane textarea{
+    flex:1;resize:none;border:none;outline:none;
+    background:var(--bg-0);color:var(--text-0);
+    font-family:var(--mono);font-size:14.5px;line-height:1.65;
+    padding:16px 18px;tab-size:2;white-space:pre-wrap;word-break:break-word;
+  }
+  .divider{width:5px;background:var(--bg-1);cursor:col-resize;flex:none;}
+  .divider:hover{background:var(--accent);}
+  .preview-pane{
+    flex:1;min-width:0;overflow-y:auto;background:var(--bg-1);
+    padding:20px 28px;
+  }
+  .preview-pane h1,.preview-pane h2,.preview-pane h3,.preview-pane h4{
+    border-bottom:1px solid var(--border);padding-bottom:6px;color:var(--text-0);
+  }
+  .preview-pane a{color:var(--accent);}
+  .preview-pane code{background:var(--bg-3);padding:1px 5px;border-radius:3px;font-family:var(--mono);}
+  .preview-pane pre{background:var(--bg-3);padding:12px 14px;border-radius:6px;overflow-x:auto;border:1px solid var(--border);}
+  .preview-pane pre code{background:none;padding:0;}
+  .preview-pane blockquote{
+    border-left:3px solid var(--accent);margin:0 0 12px 0;padding:2px 14px;color:var(--text-1);background:var(--bg-2);
+  }
+  .preview-pane table{border-collapse:collapse;margin-bottom:14px;}
+  .preview-pane th,.preview-pane td{border:1px solid var(--border);padding:6px 10px;}
+  .preview-pane th{background:var(--bg-3);}
+  .preview-pane img{max-width:100%;border-radius:4px;}
+  .preview-pane ul,.preview-pane ol{padding-left:26px;}
+  .preview-pane li.task-item{list-style:none;margin-left:-20px;}
+  .preview-pane hr{border:none;border-top:1px solid var(--border);margin:18px 0;}
+  /* ---------- status bar ---------- */
+  #statusbar{
+    display:flex;align-items:center;gap:14px;padding:4px 12px;
+    background:var(--bg-1);border-top:1px solid var(--border);
+    font-size:12px;color:var(--text-2);
+  }
+  #statusbar .spacer{flex:1;}
+  #statusbar .viewmode button{padding:3px 8px;font-size:12px;}
+  /* ---------- modal ---------- */
+  .modal-backdrop{
+    position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;
+    align-items:center;justify-content:center;z-index:500;
+  }
+  .modal-backdrop.show{display:flex;}
+  .modal{
+    background:var(--bg-1);border:1px solid var(--border);border-radius:8px;
+    width:520px;max-width:92vw;max-height:82vh;overflow-y:auto;padding:18px 20px;
+  }
+  .modal h2{margin-top:0;font-size:16px;color:var(--text-0);}
+  .modal h3{font-size:13px;color:var(--text-1);margin:16px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px;}
+  .modal label{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;color:var(--text-0);}
+  .modal .row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;}
+  .modal .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
+  .modal textarea.pluginlog{width:100%;height:70px;background:var(--bg-0);color:var(--text-1);border:1px solid var(--border);font-family:var(--mono);font-size:11px;padding:6px;}
+  .checklist-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;}
+  .hint{color:var(--text-2);font-size:12px;line-height:1.6;margin-top:4px;}
+  code.kbd{background:var(--bg-3);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:var(--mono);}
+</style>
+</head>
+<body>
+
+<div id="dropOverlay">📄 ファイルをドロップして開く（.md / .markdown / .txt）</div>
+
+<div id="topbar">
+  <span id="appTitle">📝 MD Editor</span>
+  <button id="btnOpen" title="ファイルを開く">📂 開く</button>
+  <button id="btnNew" title="新規タブ">➕ 新規</button>
+  <button id="btnSaveNow" title="今すぐ保存 (Ctrl+S)">💾 保存</button>
+  <div class="spacer"></div>
+  <span id="saveStatus">-</span>
+  <button id="btnSettings" title="設定">⚙️ 設定</button>
+</div>
+
+<div id="tabbar">
+  <button id="newTabBtn" title="新規タブ">＋</button>
+</div>
+
+<div id="formatbar"></div>
+
+<div id="main">
+  <div id="emptyState">
+    <div>ファイルをここにドラッグ&amp;ドロップするか、「開く」または「新規」で始めてください。</div>
+    <div style="display:flex;gap:10px;">
+      <button id="emptyOpenBtn">📂 ファイルを開く</button>
+      <button id="emptyNewBtn">➕ 新規ファイル</button>
+    </div>
+  </div>
+</div>
+
+<div id="statusbar">
+  <span id="stCount">0 文字 / 0 語 / 0 行</span>
+  <span id="stCursor">行 1, 列 1</span>
+  <span class="spacer"></span>
+  <span id="stAutosave"></span>
+  <span class="viewmode">
+    <button data-mode="split" class="vmBtn active">分割</button>
+    <button data-mode="edit" class="vmBtn">編集</button>
+    <button data-mode="preview" class="vmBtn">プレビュー</button>
+  </span>
+</div>
+
+<input type="file" id="fileInputHidden" accept=".md,.markdown,.txt" multiple style="display:none;">
+<input type="file" id="pluginInputHidden" accept=".js" style="display:none;">
+
+<!-- ===================== 設定モーダル ===================== -->
+<div class="modal-backdrop" id="settingsModal">
+  <div class="modal">
+    <h2>⚙️ 設定</h2>
+
+    <h3>表示するツールバーボタン</h3>
+    <div class="checklist-grid" id="toolbarPrefsList"></div>
+
+    <h3>編集</h3>
+    <div class="row">
+      <label style="flex:1;">インデント幅（半角スペース）</label>
+      <input type="number" id="prefIndentWidth" min="1" max="8" style="width:60px;">
+    </div>
+    <div class="row">
+      <label style="flex:1;">自動保存の間隔（秒）</label>
+      <input type="number" id="prefAutosaveSec" min="2" max="120" style="width:60px;">
+    </div>
+
+    <h3>プラグイン</h3>
+    <div class="row">
+      <button id="btnLoadPlugin">📥 プラグイン(.js)を読み込む</button>
+      <button id="btnDemoPlugin">🧩 サンプルプラグイン（目次生成）を有効化</button>
+    </div>
+    <div class="hint">
+      独自プラグインは <code class="kbd">window.MDEditor.registerPlugin(...)</code> を呼び出すJSファイルとして作成できます。詳細はファイル冒頭のコメント、または「プラグインAPIヘルプ」を参照してください。
+    </div>
+    <textarea class="pluginlog" id="pluginLog" readonly placeholder="プラグインの読み込みログがここに表示されます"></textarea>
+
+    <div class="modal-actions">
+      <button id="btnShowPluginHelp">📘 プラグインAPIヘルプ</button>
+      <button id="btnCloseSettings">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop" id="helpModal">
+  <div class="modal" style="width:640px;">
+    <h2>📘 プラグインAPIヘルプ</h2>
+    <pre style="white-space:pre-wrap;font-family:var(--mono);font-size:12px;color:var(--text-1);background:var(--bg-0);padding:12px;border-radius:6px;border:1px solid var(--border);" id="helpText"></pre>
+    <div class="modal-actions"><button id="btnCloseHelp">閉じる</button></div>
+  </div>
+</div>
+
+<script>
+(function(){
+"use strict";
+
+/* =========================================================================
+   MD Editor — Joplin風・単一HTMLファイル完結型マークダウンエディタ
+   -------------------------------------------------------------------------
+   構成:
+     1. 状態管理 (tabs, settings)
+     2. Markdown -> HTML レンダラ（外部ライブラリ不使用・自作）
+     3. エディタの挙動（自動インデント／リスト継続／Tab字下げ）
+     4. ファイル入出力（ドラッグ&ドロップ／File System Access API／
+        フォールバックのダウンロード保存）
+     5. 自動保存（localStorageへの一時保存 + 可能ならディスク直書き込み）
+     6. ツールバー（表示ボタンをカスタマイズ可能）
+     7. プラグインAPI（window.MDEditor）
+   このファイルは完全にオフラインで動作します（外部CDN等への依存なし）。
+   ========================================================================= */
+
+/* ------------------------------------------------------------------ *
+ * 1. 状態
+ * ------------------------------------------------------------------ */
+const DEFAULT_TOOLBAR = [
+  {id:'bold',      label:'B',   title:'太字 (Ctrl+B)',        on:true},
+  {id:'italic',    label:'I',   title:'斜体 (Ctrl+I)',        on:true},
+  {id:'strike',    label:'S',   title:'取り消し線',           on:true},
+  {id:'h1',        label:'H1',  title:'見出し1',              on:true},
+  {id:'h2',        label:'H2',  title:'見出し2',              on:true},
+  {id:'h3',        label:'H3',  title:'見出し3',              on:false},
+  {id:'ul',        label:'• 箇条',  title:'箇条書きリスト',    on:true},
+  {id:'ol',        label:'1. 番号', title:'番号付きリスト',     on:true},
+  {id:'check',     label:'☑ チェック', title:'チェックリスト', on:true},
+  {id:'quote',     label:'❝ 引用', title:'引用',               on:true},
+  {id:'code',      label:'`code`', title:'インラインコード',   on:true},
+  {id:'codeblock', label:'```',  title:'コードブロック',       on:true},
+  {id:'link',      label:'🔗',  title:'リンク挿入',            on:true},
+  {id:'image',     label:'🖼️',  title:'画像挿入',              on:false},
+  {id:'hr',        label:'―',   title:'水平線',                on:false},
+  {id:'table',     label:'⊞ 表', title:'表（テーブル）を挿入', on:false},
+  {id:'indent',    label:'→|',  title:'字下げ (Tab)',          on:true},
+  {id:'outdent',   label:'|←',  title:'字上げ (Shift+Tab)',    on:true},
+];
+
+let settings = loadJSON('mdeditor_settings', {
+  toolbar: Object.fromEntries(DEFAULT_TOOLBAR.map(b=>[b.id,b.on])),
+  indentWidth: 2,
+  autosaveSec: 5,
+  viewMode: 'split',
+  splitRatio: 0.5
+});
+// 新しいボタンが将来追加された場合に備えて欠損分を補完
+DEFAULT_TOOLBAR.forEach(b=>{ if(!(b.id in settings.toolbar)) settings.toolbar[b.id]=b.on; });
+
+let tabs = [];           // {id,name,content,dirty,fileHandle,hasFSA,lastSavedAt}
+let activeTabId = null;
+let tabCounter = 0;
+let autosaveTimer = null;
+
+function loadJSON(key, fallback){
+  try{
+    const raw = localStorage.getItem(key);
+    if(!raw) return fallback;
+    return Object.assign({}, fallback, JSON.parse(raw));
+  }catch(e){ return fallback; }
+}
+function saveJSON(key, obj){
+  try{ localStorage.setItem(key, JSON.stringify(obj)); }catch(e){ /* quota等は無視 */ }
+}
+
+/* ------------------------------------------------------------------ *
+ * 2. Markdown -> HTML レンダラ（自作・依存なし）
+ *    対応: 見出し / 太字・斜体・取消線 / インラインコード・コードブロック /
+ *          箇条書き・番号付き・チェックリスト（ネスト対応） / 引用 /
+ *          水平線 / リンク・画像 / 簡易テーブル / 段落
+ * ------------------------------------------------------------------ */
+function escapeHtml(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function renderInline(text){
+  // コードスパンを先に保護
+  const spans = [];
+  text = text.replace(/`([^`]+)`/g, (m,c)=>{
+    spans.push(escapeHtml(c));
+    return `\u0001SPAN${spans.length-1}\u0001`;
+  });
+  text = escapeHtml(text);
+  // 画像 ![alt](url)
+  text = text.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g,
+    (m,alt,url,title)=>`<img src="${url}" alt="${alt}"${title?` title="${title}"`:''}>`);
+  // リンク [text](url)
+  text = text.replace(/\[([^\]]+)\]\(([^)\s]+)(?:\s+"([^"]*)")?\)/g,
+    (m,label,url,title)=>`<a href="${url}"${title?` title="${title}"`:''} target="_blank" rel="noopener">${label}</a>`);
+  // 太字
+  text = text.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>');
+  text = text.replace(/__([^_]+)__/g,'<strong>$1</strong>');
+  // 取り消し線
+  text = text.replace(/~~([^~]+)~~/g,'<del>$1</del>');
+  // 斜体（太字処理後の単一記号）
+  text = text.replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<em>$2</em>');
+  text = text.replace(/(^|[^_])_([^_\n]+)_/g,'$1<em>$2</em>');
+  // コードスパン復元
+  text = text.replace(/\u0001SPAN(\d+)\u0001/g,(m,i)=>`<code>${spans[+i]}</code>`);
+  return text;
+}
+
+function renderMarkdown(src){
+  // --- フェンス付きコードブロックを退避 ---
+  const codeBlocks = [];
+  src = src.replace(/```([a-zA-Z0-9_+-]*)\n([\s\S]*?)```/g, (m, lang, code)=>{
+    codeBlocks.push({lang, code});
+    return `\u0002CODEBLOCK${codeBlocks.length-1}\u0002`;
+  });
+
+  const lines = src.split('\n');
+  let out = [];
+  let i = 0;
+  let listStack = []; // {type:'ul'|'ol', indent}
+
+  function closeListsTo(indent){
+    while(listStack.length && listStack[listStack.length-1].indent >= indent){
+      out.push(listStack.pop().type === 'ul' ? '</ul>' : '</ol>');
+    }
+  }
+  function closeAllLists(){ closeListsTo(-1); }
+
+  while(i < lines.length){
+    const line = lines[i];
+
+    if(/^\u0002CODEBLOCK(\d+)\u0002$/.test(line.trim())){
+      closeAllLists();
+      const idx = +line.trim().match(/^\u0002CODEBLOCK(\d+)\u0002$/)[1];
+      const cb = codeBlocks[idx];
+      out.push(`<pre><code class="lang-${escapeHtml(cb.lang||'text')}">${escapeHtml(cb.code)}</code></pre>`);
+      i++; continue;
+    }
+
+    if(/^\s*$/.test(line)){ closeAllLists(); i++; continue; }
+
+    // 水平線
+    if(/^\s*([-*_])\1{2,}\s*$/.test(line)){
+      closeAllLists(); out.push('<hr>'); i++; continue;
+    }
+
+    // 見出し
+    let m;
+    if((m = line.match(/^(#{1,6})\s+(.*)$/))){
+      closeAllLists();
+      const lvl = m[1].length;
+      out.push(`<h${lvl}>${renderInline(m[2].trim())}</h${lvl}>`);
+      i++; continue;
+    }
+
+    // 引用（連続行をまとめる）
+    if((m = line.match(/^\s*>\s?(.*)$/))){
+      closeAllLists();
+      const buf = [m[1]];
+      i++;
+      while(i < lines.length && (m = lines[i].match(/^\s*>\s?(.*)$/))){ buf.push(m[1]); i++; }
+      out.push(`<blockquote>${renderInline(buf.join(' '))}</blockquote>`);
+      continue;
+    }
+
+    // 表（パイプテーブル）: ヘッダ行 + 区切り行(---|---)
+    if(/\|/.test(line) && i+1 < lines.length && /^\s*\|?[\s:|-]+\|?\s*$/.test(lines[i+1]) && /-/.test(lines[i+1])){
+      closeAllLists();
+      const headers = line.split('|').map(s=>s.trim()).filter((s,idx,arr)=> !(idx===0&&s==='') && !(idx===arr.length-1&&s===''));
+      i += 2;
+      const rows = [];
+      while(i < lines.length && /\|/.test(lines[i]) && lines[i].trim() !== ''){
+        const cells = lines[i].split('|').map(s=>s.trim()).filter((s,idx,arr)=> !(idx===0&&s==='') && !(idx===arr.length-1&&s===''));
+        rows.push(cells); i++;
+      }
+      let tbl = '<table><thead><tr>' + headers.map(h=>`<th>${renderInline(h)}</th>`).join('') + '</tr></thead><tbody>';
+      rows.forEach(r=>{ tbl += '<tr>' + r.map(c=>`<td>${renderInline(c)}</td>`).join('') + '</tr>'; });
+      tbl += '</tbody></table>';
+      out.push(tbl);
+      continue;
+    }
+
+    // チェックリスト
+    if((m = line.match(/^(\s*)[-*+]\s\[([ xX])\]\s+(.*)$/))){
+      const indent = m[1].length;
+      const checked = m[2].toLowerCase()==='x';
+      while(listStack.length && listStack[listStack.length-1].indent > indent) { out.push(listStack.pop().type==='ul'?'</ul>':'</ol>'); }
+      if(!listStack.length || listStack[listStack.length-1].indent < indent || listStack[listStack.length-1].type!=='ul'){
+        out.push('<ul class="task-list">'); listStack.push({type:'ul', indent});
+      }
+      out.push(`<li class="task-item"><input type="checkbox" disabled${checked?' checked':''}> ${renderInline(m[3])}</li>`);
+      i++; continue;
+    }
+
+    // 番号付きリスト
+    if((m = line.match(/^(\s*)\d+[.)]\s+(.*)$/))){
+      const indent = m[1].length;
+      closeListsTo(indent+1); // 同階層以下の異種を整理
+      while(listStack.length && listStack[listStack.length-1].indent > indent) { out.push(listStack.pop().type==='ul'?'</ul>':'</ol>'); }
+      if(!listStack.length || listStack[listStack.length-1].indent < indent || listStack[listStack.length-1].type!=='ol'){
+        if(listStack.length && listStack[listStack.length-1].indent===indent && listStack[listStack.length-1].type==='ul'){
+          out.push('</ul>'); listStack.pop();
+        }
+        out.push('<ol>'); listStack.push({type:'ol', indent});
+      }
+      out.push(`<li>${renderInline(m[2])}</li>`);
+      i++; continue;
+    }
+
+    // 箇条書きリスト
+    if((m = line.match(/^(\s*)[-*+]\s+(.*)$/))){
+      const indent = m[1].length;
+      while(listStack.length && listStack[listStack.length-1].indent > indent) { out.push(listStack.pop().type==='ul'?'</ul>':'</ol>'); }
+      if(!listStack.length || listStack[listStack.length-1].indent < indent || listStack[listStack.length-1].type!=='ul'){
+        if(listStack.length && listStack[listStack.length-1].indent===indent && listStack[listStack.length-1].type==='ol'){
+          out.push('</ol>'); listStack.pop();
+        }
+        out.push('<ul>'); listStack.push({type:'ul', indent});
+      }
+      out.push(`<li>${renderInline(m[2])}</li>`);
+      i++; continue;
+    }
+
+    // 段落（連続する通常行をまとめる）
+    closeAllLists();
+    const buf = [line];
+    i++;
+    while(i < lines.length && lines[i].trim() !== '' &&
+          !/^(#{1,6})\s/.test(lines[i]) &&
+          !/^\s*[-*+]\s/.test(lines[i]) &&
+          !/^\s*\d+[.)]\s/.test(lines[i]) &&
+          !/^\s*>/.test(lines[i]) &&
+          !/^\u0002CODEBLOCK\d+\u0002$/.test(lines[i].trim())){
+      buf.push(lines[i]); i++;
+    }
+    out.push(`<p>${renderInline(buf.join(' '))}</p>`);
+  }
+  closeAllLists();
+  return out.join('\n');
+}
+
+/* ------------------------------------------------------------------ *
+ * 3. タブ管理
+ * ------------------------------------------------------------------ */
+function newTab(name, content, fileHandle){
+  tabCounter++;
+  const tab = {
+    id: 't'+tabCounter+'_'+Date.now(),
+    name: name || `無題-${tabCounter}.md`,
+    content: content || '',
+    dirty: false,
+    fileHandle: fileHandle || null,
+    hasFSA: !!fileHandle,
+    lastSavedAt: null,
+    scrollTop: 0
+  };
+  tabs.push(tab);
+  activeTabId = tab.id;
+  renderAll();
+  focusEditor();
+  persistSession();
+  return tab;
+}
+
+function closeTab(id){
+  const idx = tabs.findIndex(t=>t.id===id);
+  if(idx===-1) return;
+  const t = tabs[idx];
+  if(t.dirty && !confirm(`「${t.name}」に未保存の変更があります。閉じてよろしいですか？`)) return;
+  tabs.splice(idx,1);
+  localStorage.removeItem('mdeditor_backup_'+id);
+  if(activeTabId === id){
+    activeTabId = tabs.length ? tabs[Math.max(0, idx-1)].id : null;
+  }
+  renderAll();
+  persistSession();
+}
+
+function getActiveTab(){ return tabs.find(t=>t.id===activeTabId) || null; }
+
+function switchTab(id){
+  const cur = getActiveTab();
+  if(cur){ const ta = document.getElementById('editorTextarea'); if(ta) cur.scrollTop = ta.scrollTop; }
+  activeTabId = id;
+  renderAll();
+  focusEditor();
+}
+
+/* ------------------------------------------------------------------ *
+ * 4. ファイル入出力
+ * ------------------------------------------------------------------ */
+const hasFSAApi = 'showOpenFilePicker' in window;
+
+async function openViaPicker(){
+  if(hasFSAApi){
+    try{
+      const handles = await window.showOpenFilePicker({
+        multiple:true,
+        types:[{description:'Markdown', accept:{'text/markdown':['.md','.markdown'],'text/plain':['.txt']}}]
+      });
+      for(const h of handles){
+        const file = await h.getFile();
+        const text = await file.text();
+        newTab(file.name, text, h);
+      }
+      return;
+    }catch(e){ if(e.name==='AbortError') return; /* それ以外はフォールバック */ }
+  }
+  document.getElementById('fileInputHidden').click();
+}
+
+document.getElementById('fileInputHidden').addEventListener('change', async (e)=>{
+  const files = Array.from(e.target.files || []);
+  for(const f of files){
+    const text = await f.text();
+    newTab(f.name, text, null);
+  }
+  e.target.value = '';
+});
+
+async function handleDropItems(dataTransfer){
+  const items = Array.from(dataTransfer.items || []);
+  if(items.length && items[0].getAsFileSystemHandle){
+    for(const item of items){
+      if(item.kind !== 'file') continue;
+      try{
+        const handle = await item.getAsFileSystemHandle();
+        if(handle && handle.kind === 'file'){
+          const file = await handle.getFile();
+          const text = await file.text();
+          newTab(file.name, text, handle);
+          continue;
+        }
+      }catch(e){ /* フォールバックへ */ }
+    }
+    return;
+  }
+  const files = Array.from(dataTransfer.files || []);
+  for(const f of files){
+    const text = await f.text();
+    newTab(f.name, text, null);
+  }
+}
+
+async function writeToHandle(handle, content){
+  const writable = await handle.createWritable();
+  await writable.write(content);
+  await writable.close();
+}
+
+function downloadAsFile(name, content){
+  const blob = new Blob([content], {type:'text/markdown;charset=utf-8'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = name;
+  document.body.appendChild(a); a.click(); a.remove();
+  setTimeout(()=>URL.revokeObjectURL(url), 4000);
+}
+
+async function saveTab(tab, {forceDownload=false}={}){
+  if(!tab) return;
+  if(tab.hasFSA && tab.fileHandle && !forceDownload){
+    try{
+      // 書き込み権限を確認・要求（ユーザー操作起因の保存時のみ要求可能）
+      if((await tab.fileHandle.queryPermission({mode:'readwrite'})) !== 'granted'){
+        const perm = await tab.fileHandle.requestPermission({mode:'readwrite'});
+        if(perm !== 'granted') throw new Error('permission-denied');
+      }
+      await writeToHandle(tab.fileHandle, tab.content);
+      tab.dirty = false; tab.lastSavedAt = Date.now();
+      localStorage.removeItem('mdeditor_backup_'+tab.id);
+      renderTabs(); renderStatus();
+      return {mode:'disk'};
+    }catch(err){
+      // ディスク書き込みに失敗 → localStorageへ一時保存にフォールバック
+    }
+  }
+  // フォールバック：ブラウザ内に一時保存
+  saveJSON('mdeditor_backup_'+tab.id, {name:tab.name, content:tab.content, savedAt:Date.now()});
+  tab.dirty = tab.hasFSA ? tab.dirty : false; // FSA権限拒否時はdirtyのまま扱う
+  if(!tab.hasFSA) tab.dirty = false;
+  tab.lastSavedAt = Date.now();
+  renderTabs(); renderStatus();
+  return {mode:'local'};
+}
+
+function manualSaveOrDownload(tab){
+  if(!tab) return;
+  if(tab.hasFSA){ saveTab(tab); return; }
+  downloadAsFile(tab.name, tab.content);
+  tab.dirty = false;
+  saveJSON('mdeditor_backup_'+tab.id, {name:tab.name, content:tab.content, savedAt:Date.now()});
+  renderTabs(); renderStatus();
+}
+
+/* ------------------------------------------------------------------ *
+ * 5. 自動保存
+ * ------------------------------------------------------------------ */
+function scheduleAutosaveTimer(){
+  if(autosaveTimer) clearInterval(autosaveTimer);
+  autosaveTimer = setInterval(()=>{
+    tabs.forEach(t=>{ if(t.dirty) saveTab(t); });
+  }, Math.max(2, settings.autosaveSec)*1000);
+}
+
+function persistSession(){
+  // タブ一覧（本文含む）をセッション復元用に保存。FSAハンドルはシリアライズ不可なので
+  // 名前と内容のみ保持し、次回起動時は「一時タブ」として復元する。
+  const snapshot = tabs.map(t=>({id:t.id, name:t.name, content:t.content, dirty:t.dirty, hasFSA:t.hasFSA}));
+  saveJSON('mdeditor_session', {tabs:snapshot, activeTabId, savedAt:Date.now()});
+}
+
+function restoreSession(){
+  const s = loadJSON('mdeditor_session', null);
+  if(!s || !s.tabs || !s.tabs.length) return false;
+  s.tabs.forEach(t=>{
+    tabCounter++;
+    tabs.push({
+      id:t.id, name:t.name, content:t.content, dirty:t.dirty,
+      fileHandle:null, hasFSA:false, lastSavedAt:null, scrollTop:0
+    });
+  });
+  activeTabId = s.activeTabId && tabs.find(t=>t.id===s.activeTabId) ? s.activeTabId : tabs[0].id;
+  return true;
+}
+
+/* ------------------------------------------------------------------ *
+ * 6. エディタ挙動：自動インデント・リスト継続・Tab字下げ
+ * ------------------------------------------------------------------ */
+function lineStartIndex(value, pos){
+  const idx = value.lastIndexOf('\n', pos-1);
+  return idx+1;
+}
+function lineEndIndex(value, pos){
+  const idx = value.indexOf('\n', pos);
+  return idx===-1 ? value.length : idx;
+}
+
+function handleEnterKey(ta){
+  const value = ta.value;
+  const pos = ta.selectionStart;
+  if(ta.selectionStart !== ta.selectionEnd) return false; // 選択中は既定動作
+  const ls = lineStartIndex(value, pos);
+  const currentLine = value.substring(ls, pos);
+
+  let m;
+  // チェックリスト
+  if((m = currentLine.match(/^(\s*)([-*+])\s\[([ xX])\]\s(.*)$/))){
+    return continueList(ta, ls, pos, m[1], `${m[2]} [ ] `, m[4]);
+  }
+  // 番号付きリスト
+  if((m = currentLine.match(/^(\s*)(\d+)([.)])\s(.*)$/))){
+    const nextNum = parseInt(m[2],10)+1;
+    return continueList(ta, ls, pos, m[1], `${nextNum}${m[3]} `, m[4]);
+  }
+  // 箇条書きリスト
+  if((m = currentLine.match(/^(\s*)([-*+])\s(.*)$/))){
+    return continueList(ta, ls, pos, m[1], `${m[2]} `, m[3]);
+  }
+  // 引用
+  if((m = currentLine.match(/^(\s*)>\s?(.*)$/))){
+    return continueList(ta, ls, pos, m[1], '> ', m[2]);
+  }
+  // 通常行：インデントのみ引き継ぐ
+  if((m = currentLine.match(/^(\s+)/))){
+    insertText(ta, '\n'+m[1]);
+    return true;
+  }
+  return false;
+}
+
+function continueList(ta, ls, pos, indent, marker, restOfLine){
+  if(restOfLine.trim() === ''){
+    // 空のリスト項目でEnter → リストを抜ける（マーカーを削除）
+    const value = ta.value;
+    ta.setSelectionRange(ls, pos);
+    document.execCommand && document.execCommand('insertText', false, indent);
+    if(ta.value === value){ // execCommand未対応環境向けフォールバック
+      ta.value = value.substring(0, ls) + indent + value.substring(pos);
+      ta.selectionStart = ta.selectionEnd = ls + indent.length;
+      dispatchInput(ta);
+    }
+    return true;
+  }
+  insertText(ta, '\n'+indent+marker);
+  return true;
+}
+
+function insertText(ta, text){
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const ok = document.execCommand && document.execCommand('insertText', false, text);
+  if(!ok){
+    const value = ta.value;
+    ta.value = value.substring(0,start) + text + value.substring(end);
+    ta.selectionStart = ta.selectionEnd = start + text.length;
+    dispatchInput(ta);
+  }
+}
+
+function dispatchInput(ta){ ta.dispatchEvent(new Event('input', {bubbles:true})); }
+
+function handleTabKey(ta, shiftKey){
+  const value = ta.value;
+  let start = ta.selectionStart, end = ta.selectionEnd;
+  const blockStart = lineStartIndex(value, start);
+  const blockEnd = end === start ? lineEndIndex(value, end) : (value[end-1]==='\n'? end-1 : lineEndIndex(value,end));
+  const segment = value.substring(blockStart, Math.max(blockEnd, blockStart));
+  const indentStr = ' '.repeat(settings.indentWidth);
+  const lines = segment.split('\n');
+  let newLines, deltaStart=0, deltaEnd=0;
+
+  if(!shiftKey){
+    newLines = lines.map(l=>indentStr+l);
+    deltaStart = indentStr.length;
+    deltaEnd = indentStr.length*lines.length;
+  } else {
+    newLines = lines.map((l,idx)=>{
+      let removed = 0;
+      while(removed < indentStr.length && l[removed]===' ') removed++;
+      if(idx===0) deltaStart = -removed;
+      deltaEnd -= removed;
+      return l.slice(removed);
+    });
+  }
+  const newSegment = newLines.join('\n');
+  ta.value = value.substring(0, blockStart) + newSegment + value.substring(blockEnd);
+  ta.selectionStart = Math.max(blockStart, start + deltaStart);
+  ta.selectionEnd = Math.max(ta.selectionStart, end + deltaEnd);
+  dispatchInput(ta);
+}
+
+/* ------------------------------------------------------------------ *
+ * 7. ツールバー動作（Markdown記法の挿入）
+ * ------------------------------------------------------------------ */
+function wrapSelection(ta, prefix, suffix){
+  suffix = suffix===undefined ? prefix : suffix;
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const value = ta.value;
+  const selected = value.substring(start,end);
+  const newText = prefix + selected + suffix;
+  ta.setSelectionRange(start,end);
+  const ok = document.execCommand && document.execCommand('insertText', false, newText);
+  if(!ok){
+    ta.value = value.substring(0,start) + newText + value.substring(end);
+    dispatchInput(ta);
+  }
+  if(selected){
+    ta.selectionStart = start + prefix.length; ta.selectionEnd = start + prefix.length + selected.length;
+  } else {
+    ta.selectionStart = ta.selectionEnd = start + prefix.length;
+  }
+  ta.focus();
+}
+
+function prefixLines(ta, prefixFn){
+  const value = ta.value;
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const blockStart = lineStartIndex(value, start);
+  const blockEnd = end===start ? lineEndIndex(value,end) : (value[end-1]==='\n'? end-1 : lineEndIndex(value,end));
+  const segment = value.substring(blockStart, Math.max(blockEnd, blockStart));
+  const lines = segment.split('\n');
+  const out = lines.map((l,idx)=>prefixFn(l, idx)).join('\n');
+  ta.value = value.substring(0,blockStart) + out + value.substring(blockEnd);
+  ta.selectionStart = blockStart; ta.selectionEnd = blockStart + out.length;
+  dispatchInput(ta); ta.focus();
+}
+
+/* 行の先頭が「箇条書き / 番号付き / チェックリスト」のどれに該当するかを解析する。
+   ul/ol/check ボタンのトグル動作（付いていれば外す・付いていなければ付ける）に使う。
+   判定順序は check → ul → ol。"- [ ] " は "- " にもマッチしてしまうため、
+   先にチェックリストとして判定しないと ul と誤認してしまう点に注意。 */
+function parseListLine(line){
+  const indentMatch = line.match(/^(\s*)/);
+  const indent = indentMatch[1];
+  const body = line.slice(indent.length);
+  let m;
+  if((m = body.match(/^[-*+]\s\[[ xX]\]\s?(.*)$/))) return {type:'check', indent, rest:m[1]};
+  if((m = body.match(/^[-*+]\s?(.*)$/)))            return {type:'ul',    indent, rest:m[1]};
+  if((m = body.match(/^\d+[.)]\s?(.*)$/)))           return {type:'ol',    indent, rest:m[1]};
+  return {type:null, indent, rest:body};
+}
+
+const TOOLBAR_ACTIONS = {
+  bold: ta=>wrapSelection(ta,'**'),
+  italic: ta=>wrapSelection(ta,'*'),
+  strike: ta=>wrapSelection(ta,'~~'),
+  h1: ta=>prefixLines(ta,l=>/^#\s/.test(l)?l:'# '+l.replace(/^#+\s*/,'')),
+  h2: ta=>prefixLines(ta,l=>'## '+l.replace(/^#+\s*/,'')),
+  h3: ta=>prefixLines(ta,l=>'### '+l.replace(/^#+\s*/,'')),
+  // 箇条書き：既に箇条書きなら外して標準文に戻す。番号付き/チェックからは箇条書きへ変換。
+  ul: ta=>prefixLines(ta,l=>{
+    const p = parseListLine(l);
+    if(p.type==='ul') return p.indent + p.rest;      // トグルオフ（標準文に戻す）
+    return p.indent + '- ' + p.rest;                  // トグルオン（or 他形式から変換）
+  }),
+  // 番号付きリスト：既に番号付きなら外す。連番は選択範囲内での行番号(idx+1)で振り直す。
+  ol: ta=>prefixLines(ta,(l,idx)=>{
+    const p = parseListLine(l);
+    if(p.type==='ol') return p.indent + p.rest;       // トグルオフ
+    return p.indent + (idx+1) + '. ' + p.rest;         // トグルオン
+  }),
+  // チェックリスト：既にチェックリストなら外す。
+  check: ta=>prefixLines(ta,l=>{
+    const p = parseListLine(l);
+    if(p.type==='check') return p.indent + p.rest;    // トグルオフ
+    return p.indent + '- [ ] ' + p.rest;               // トグルオン
+  }),
+  quote: ta=>prefixLines(ta,l=>/^\s*>\s/.test(l)?l:'> '+l),
+  code: ta=>wrapSelection(ta,'`'),
+  codeblock: ta=>{
+    const start = ta.selectionStart, end = ta.selectionEnd;
+    const selected = ta.value.substring(start,end) || 'コードをここに';
+    wrapSelectionRaw(ta, '```\n'+selected+'\n```');
+  },
+  link: ta=>{
+    const start = ta.selectionStart, end = ta.selectionEnd;
+    const label = ta.value.substring(start,end) || 'リンクテキスト';
+    wrapSelectionRaw(ta, `[${label}](https://)`);
+  },
+  image: ta=>{ wrapSelectionRaw(ta, '![代替テキスト](画像のURL)'); },
+  hr: ta=>{ insertAtLineEnd(ta, '\n---\n'); },
+  table: ta=>{ insertAtLineEnd(ta, '\n| 見出し1 | 見出し2 |\n| --- | --- |\n| セル1 | セル2 |\n'); },
+  indent: ta=>handleTabKey(ta,false),
+  outdent: ta=>handleTabKey(ta,true),
+};
+
+function wrapSelectionRaw(ta, text){
+  const start = ta.selectionStart, end = ta.selectionEnd;
+  const ok = document.execCommand && document.execCommand('insertText', false, text);
+  if(!ok){
+    ta.value = ta.value.substring(0,start) + text + ta.value.substring(end);
+    dispatchInput(ta);
+  }
+  ta.focus();
+}
+function insertAtLineEnd(ta, text){
+  const end = ta.selectionEnd;
+  ta.selectionStart = ta.selectionEnd = end;
+  wrapSelectionRaw(ta, text);
+}
+
+/* ------------------------------------------------------------------ *
+ * 8. プラグインAPI
+ * ------------------------------------------------------------------ */
+const pluginRegistry = [];
+window.MDEditor = {
+  registerPlugin(plugin){
+    if(!plugin || typeof plugin.init !== 'function'){
+      logPlugin('❌ registerPluginにはinit(api)関数が必要です'); return;
+    }
+    pluginRegistry.push(plugin);
+    try{
+      plugin.init(window.MDEditor);
+      logPlugin(`✅ プラグイン「${plugin.name||'無名'}」を初期化しました`);
+    }catch(e){
+      logPlugin(`❌ プラグイン「${plugin.name||'無名'}」でエラー: ${e.message}`);
+    }
+  },
+  getActiveTab(){ return getActiveTab(); },
+  getActiveEditor(){ return document.getElementById('editorTextarea'); },
+  getContent(){ const t = getActiveTab(); return t ? t.content : ''; },
+  setContent(text){
+    const t = getActiveTab(); if(!t) return;
+    t.content = text; t.dirty = true;
+    const ta = document.getElementById('editorTextarea');
+    if(ta) ta.value = text;
+    renderPreviewFor(t); renderTabs(); renderStatus();
+  },
+  insertAtCursor(text){
+    const ta = document.getElementById('editorTextarea');
+    if(ta) wrapSelectionRaw(ta, text);
+  },
+  addToolbarButton({id, label, title, onClick}){
+    if(!id || !onClick) return;
+    TOOLBAR_ACTIONS[id] = onClick;
+    if(!(id in settings.toolbar)) settings.toolbar[id] = true;
+    DEFAULT_TOOLBAR.push({id,label:label||id,title:title||id,on:true});
+    renderFormatbar(); renderSettingsToolbarList();
+  },
+  on(event, cb){
+    if(!eventListeners[event]) eventListeners[event] = [];
+    eventListeners[event].push(cb);
+  }
+};
+const eventListeners = {};
+function fireEvent(event, payload){
+  (eventListeners[event]||[]).forEach(cb=>{ try{ cb(payload); }catch(e){ logPlugin(`❌ イベント${event}のハンドラでエラー: ${e.message}`); } });
+}
+function logPlugin(msg){
+  const el = document.getElementById('pluginLog');
+  if(el) el.value += (el.value?'\n':'') + msg;
+}
+
+document.getElementById('btnLoadPlugin').addEventListener('click', ()=>document.getElementById('pluginInputHidden').click());
+document.getElementById('pluginInputHidden').addEventListener('change', async (e)=>{
+  const f = e.target.files[0]; e.target.value='';
+  if(!f) return;
+  const code = await f.text();
+  try{
+    new Function('MDEditor', code)(window.MDEditor);
+    logPlugin(`📥 「${f.name}」を読み込みました`);
+  }catch(err){
+    logPlugin(`❌ 「${f.name}」の読み込みに失敗: ${err.message}`);
+  }
+});
+
+document.getElementById('btnDemoPlugin').addEventListener('click', ()=>{
+  window.MDEditor.registerPlugin({
+    name:'目次自動生成 (TOC)',
+    init(api){
+      api.addToolbarButton({
+        id:'toc', label:'📑 目次', title:'見出しから目次を生成して先頭に挿入',
+        onClick(ta){
+          const lines = ta.value.split('\n');
+          const toc = lines
+            .map(l=>l.match(/^(#{1,3})\s+(.*)$/))
+            .filter(Boolean)
+            .map(m=>`${'  '.repeat(m[1].length-1)}- ${m[2]}`)
+            .join('\n');
+          if(!toc){ alert('見出し（#, ##, ###）が見つかりませんでした。'); return; }
+          const t = api.getActiveTab();
+          api.setContent(`## 目次\n${toc}\n\n${t.content}`);
+        }
+      });
+    }
+  });
+});
+
+document.getElementById('btnShowPluginHelp').addEventListener('click', ()=>{
+  document.getElementById('helpText').textContent =
+`// プラグインの作り方（.js ファイルを「プラグイン読込」で読み込みます）
+// このファイル内で window.MDEditor.registerPlugin(...) を呼び出してください。
+
+MDEditor.registerPlugin({
+  name: "サンプルプラグイン",
+  init(api){
+    // ツールバーにボタンを追加
+    api.addToolbarButton({
+      id: "myPlugin1",
+      label: "🔧",
+      title: "サンプル動作",
+      onClick(textarea){
+        api.insertAtCursor("プラグインから挿入されたテキスト");
+      }
+    });
+
+    // 保存時など各種イベントを購読
+    api.on("save", (tab) => console.log("保存されました:", tab.name));
+    api.on("content-change", (tab) => console.log("編集中:", tab.name));
+
+    // 現在の内容を取得・変更
+    // api.getContent();
+    // api.setContent("新しい本文");
+  }
+});
+
+利用可能なAPI:
+  api.getActiveTab()        現在のタブ情報を取得
+  api.getActiveEditor()     <textarea> 要素を取得
+  api.getContent()/setContent(text)
+  api.insertAtCursor(text)
+  api.addToolbarButton({id,label,title,onClick})
+  api.on(event, callback)   event: 'save' | 'content-change' | 'tab-open' | 'tab-close'`;
+  document.getElementById('helpModal').classList.add('show');
+});
+document.getElementById('btnCloseHelp').addEventListener('click', ()=>document.getElementById('helpModal').classList.remove('show'));
+
+/* ------------------------------------------------------------------ *
+ * 9. 描画
+ * ------------------------------------------------------------------ */
+function renderAll(){
+  renderTabs();
+  renderFormatbar();
+  renderMain();
+  renderStatus();
+}
+
+function renderTabs(){
+  const bar = document.getElementById('tabbar');
+  bar.querySelectorAll('.tab').forEach(el=>el.remove());
+  tabs.forEach(t=>{
+    const el = document.createElement('div');
+    el.className = 'tab' + (t.id===activeTabId?' active':'') + (t.dirty?' dirty':'');
+    el.innerHTML = `<span class="dot"></span><span class="fsa">${t.hasFSA?'🔗':''}</span><span class="name"></span><span class="close" title="閉じる">✕</span>`;
+    el.querySelector('.name').textContent = t.name;
+    el.addEventListener('click', (e)=>{ if(!e.target.classList.contains('close')) switchTab(t.id); });
+    el.querySelector('.close').addEventListener('click', (e)=>{ e.stopPropagation(); closeTab(t.id); });
+    bar.appendChild(el);
+  });
+}
+
+function renderFormatbar(){
+  const bar = document.getElementById('formatbar');
+  bar.innerHTML = '';
+  DEFAULT_TOOLBAR.forEach(b=>{
+    if(!settings.toolbar[b.id]) return;
+    const btn = document.createElement('button');
+    btn.className = 'icon-btn';
+    btn.textContent = b.label;
+    btn.title = b.title;
+    btn.addEventListener('click', ()=>{
+      const ta = document.getElementById('editorTextarea');
+      if(!ta) return;
+      (TOOLBAR_ACTIONS[b.id]||function(){})(ta);
+    });
+    bar.appendChild(btn);
+  });
+}
+
+function renderMain(){
+  const main = document.getElementById('main');
+  main.innerHTML = '';
+  if(!tabs.length){
+    const empty = document.getElementById('emptyState') || buildEmptyState();
+    main.appendChild(empty);
+    return;
+  }
+  tabs.forEach(t=>{
+    const wrap = document.createElement('div');
+    wrap.className = 'pane-wrap' + (t.id===activeTabId?' active':'');
+    wrap.dataset.tabId = t.id;
+
+    const editorPane = document.createElement('div');
+    editorPane.className = 'editor-pane';
+    const ta = document.createElement('textarea');
+    ta.id = t.id===activeTabId ? 'editorTextarea' : undefined;
+    ta.value = t.content;
+    ta.spellcheck = false;
+    ta.addEventListener('input', ()=>{
+      t.content = ta.value; t.dirty = true;
+      renderPreviewFor(t); renderStatus(); renderTabs();
+      fireEvent('content-change', t);
+      persistSessionDebounced();
+    });
+    ta.addEventListener('keydown', (e)=>{
+      if(e.key==='Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey){
+        if(handleEnterKey(ta)) e.preventDefault();
+      } else if(e.key==='Tab'){
+        e.preventDefault();
+        handleTabKey(ta, e.shiftKey);
+      } else if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){
+        e.preventDefault();
+        manualSaveOrDownload(getActiveTab());
+      } else if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='b'){
+        e.preventDefault(); TOOLBAR_ACTIONS.bold(ta);
+      } else if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='i'){
+        e.preventDefault(); TOOLBAR_ACTIONS.italic(ta);
+      }
+    });
+    ta.addEventListener('click', renderStatus);
+    ta.addEventListener('keyup', renderStatus);
+    editorPane.appendChild(ta);
+
+    const divider = document.createElement('div');
+    divider.className = 'divider';
+    let dragging = false;
+    divider.addEventListener('mousedown', ()=>{ dragging = true; document.body.style.cursor='col-resize'; });
+    window.addEventListener('mouseup', ()=>{ dragging=false; document.body.style.cursor=''; });
+    window.addEventListener('mousemove', (e)=>{
+      if(!dragging) return;
+      const rect = wrap.getBoundingClientRect();
+      let ratio = (e.clientX - rect.left) / rect.width;
+      ratio = Math.min(0.85, Math.max(0.15, ratio));
+      settings.splitRatio = ratio;
+      applySplitRatio(wrap);
+      saveJSON('mdeditor_settings', settings);
+    });
+
+    const preview = document.createElement('div');
+    preview.className = 'preview-pane';
+    preview.id = 'preview_'+t.id;
+    preview.innerHTML = renderMarkdown(t.content);
+
+    /* ---- 同時スクロール（分割表示時のみ） ----
+       編集側とプレビュー側は行数・高さが一致しないため、行番号ではなく
+       「スクロール可能な範囲に対する割合（0〜1）」を揃える方式で同期する。
+       双方に scroll イベントを張ると、片方を動かすともう片方も動き、
+       それがまた scroll イベントを発火して…と無限ループになるため、
+       syncSource で「今どちら発の同期処理中か」を記録してブロックする。 */
+    let syncSource = null; // 'editor' | 'preview' | null
+    function scrollRatioOf(el){
+      const max = el.scrollHeight - el.clientHeight;
+      return max <= 0 ? 0 : el.scrollTop / max;
+    }
+    function applyScrollRatio(el, ratio){
+      const max = el.scrollHeight - el.clientHeight;
+      el.scrollTop = max * ratio;
+    }
+    ta.addEventListener('scroll', ()=>{
+      if(settings.viewMode !== 'split') return; // 分割表示以外では同期しない
+      if(syncSource === 'preview') return;       // プレビュー発の同期中は無視（ループ防止）
+      syncSource = 'editor';
+      applyScrollRatio(preview, scrollRatioOf(ta));
+      requestAnimationFrame(()=>{ syncSource = null; });
+    });
+    preview.addEventListener('scroll', ()=>{
+      if(settings.viewMode !== 'split') return;
+      if(syncSource === 'editor') return;
+      syncSource = 'preview';
+      applyScrollRatio(ta, scrollRatioOf(preview));
+      requestAnimationFrame(()=>{ syncSource = null; });
+    });
+
+    wrap.appendChild(editorPane);
+    wrap.appendChild(divider);
+    wrap.appendChild(preview);
+    main.appendChild(wrap);
+
+    applyViewMode(wrap);
+    applySplitRatio(wrap);
+    requestAnimationFrame(()=>{ ta.scrollTop = t.scrollTop || 0; });
+  });
+}
+
+function buildEmptyState(){
+  const el = document.createElement('div');
+  el.id = 'emptyState';
+  el.innerHTML = `<div>ファイルをここにドラッグ&amp;ドロップするか、「開く」または「新規」で始めてください。</div>
+    <div style="display:flex;gap:10px;">
+      <button id="emptyOpenBtn">📂 ファイルを開く</button>
+      <button id="emptyNewBtn">➕ 新規ファイル</button>
+    </div>`;
+  return el;
+}
+
+function applyViewMode(wrap){
+  const editorPane = wrap.querySelector('.editor-pane');
+  const preview = wrap.querySelector('.preview-pane');
+  const divider = wrap.querySelector('.divider');
+  if(settings.viewMode==='edit'){ preview.style.display='none'; divider.style.display='none'; editorPane.style.flex='1'; }
+  else if(settings.viewMode==='preview'){ editorPane.style.display='none'; divider.style.display='none'; preview.style.flex='1'; }
+  else { editorPane.style.display='flex'; preview.style.display='block'; divider.style.display='block'; }
+}
+function applySplitRatio(wrap){
+  if(settings.viewMode!=='split') return;
+  const editorPane = wrap.querySelector('.editor-pane');
+  const preview = wrap.querySelector('.preview-pane');
+  editorPane.style.flex = `${settings.splitRatio} 1 0`;
+  preview.style.flex = `${1-settings.splitRatio} 1 0`;
+}
+
+function renderPreviewFor(t){
+  const p = document.getElementById('preview_'+t.id);
+  if(p) p.innerHTML = renderMarkdown(t.content);
+}
+
+function renderStatus(){
+  const t = getActiveTab();
+  const statusEl = document.getElementById('saveStatus');
+  if(!t){
+    document.getElementById('stCount').textContent = '0 文字 / 0 語 / 0 行';
+    document.getElementById('stCursor').textContent = '';
+    document.getElementById('stAutosave').textContent = '';
+    statusEl.textContent = '-'; statusEl.className=''; return;
+  }
+  const chars = t.content.length;
+  const words = (t.content.match(/[^\s]+/g)||[]).length;
+  const lines = t.content.split('\n').length;
+  document.getElementById('stCount').textContent = `${chars} 文字 / ${words} 語 / ${lines} 行`;
+
+  const ta = document.getElementById('editorTextarea');
+  if(ta){
+    const before = ta.value.substring(0, ta.selectionStart);
+    const ln = before.split('\n').length;
+    const col = before.length - before.lastIndexOf('\n');
+    document.getElementById('stCursor').textContent = `行 ${ln}, 列 ${col}`;
+  }
+
+  document.getElementById('stAutosave').textContent =
+    t.lastSavedAt ? `最終保存: ${new Date(t.lastSavedAt).toLocaleTimeString('ja-JP')}` : '未保存';
+
+  if(t.dirty){
+    statusEl.textContent = t.hasFSA ? '● 変更あり（自動保存待ち・ディスク書込）' : '● 変更あり（自動保存はブラウザ内一時保存のみ）';
+    statusEl.className = 'dirty';
+  } else {
+    statusEl.textContent = t.hasFSA ? '✔ 保存済み（ディスクに書込済み）' : '✔ 一時保存済み（要ダウンロード保存）';
+    statusEl.className = 'saved';
+  }
+}
+
+function renderSettingsToolbarList(){
+  const el = document.getElementById('toolbarPrefsList');
+  el.innerHTML = '';
+  DEFAULT_TOOLBAR.forEach(b=>{
+    const label = document.createElement('label');
+    const cb = document.createElement('input');
+    cb.type = 'checkbox';
+    cb.checked = !!settings.toolbar[b.id];
+    cb.addEventListener('change', ()=>{
+      settings.toolbar[b.id] = cb.checked;
+      saveJSON('mdeditor_settings', settings);
+      renderFormatbar();
+    });
+    label.appendChild(cb);
+    label.appendChild(document.createTextNode(b.title));
+    el.appendChild(label);
+  });
+}
+
+function focusEditor(){
+  requestAnimationFrame(()=>{
+    const ta = document.getElementById('editorTextarea');
+    if(ta) ta.focus();
+  });
+}
+
+let sessionDebounce = null;
+function persistSessionDebounced(){
+  if(sessionDebounce) clearTimeout(sessionDebounce);
+  sessionDebounce = setTimeout(persistSession, 800);
+}
+
+/* ------------------------------------------------------------------ *
+ * 10. イベント結線
+ * ------------------------------------------------------------------ */
+document.getElementById('btnOpen').addEventListener('click', openViaPicker);
+document.getElementById('btnNew').addEventListener('click', ()=>newTab());
+document.getElementById('btnSaveNow').addEventListener('click', ()=>manualSaveOrDownload(getActiveTab()));
+document.getElementById('newTabBtn').addEventListener('click', ()=>newTab());
+
+document.addEventListener('click', (e)=>{
+  if(e.target.id==='emptyOpenBtn') openViaPicker();
+  if(e.target.id==='emptyNewBtn') newTab();
+});
+
+document.getElementById('btnSettings').addEventListener('click', ()=>{
+  document.getElementById('prefIndentWidth').value = settings.indentWidth;
+  document.getElementById('prefAutosaveSec').value = settings.autosaveSec;
+  renderSettingsToolbarList();
+  document.getElementById('settingsModal').classList.add('show');
+});
+document.getElementById('btnCloseSettings').addEventListener('click', ()=>{
+  document.getElementById('settingsModal').classList.remove('show');
+});
+document.getElementById('prefIndentWidth').addEventListener('change', (e)=>{
+  settings.indentWidth = Math.max(1, Math.min(8, parseInt(e.target.value,10)||2));
+  saveJSON('mdeditor_settings', settings);
+});
+document.getElementById('prefAutosaveSec').addEventListener('change', (e)=>{
+  settings.autosaveSec = Math.max(2, Math.min(120, parseInt(e.target.value,10)||5));
+  saveJSON('mdeditor_settings', settings);
+  scheduleAutosaveTimer();
+});
+
+document.querySelectorAll('.vmBtn').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    settings.viewMode = btn.dataset.mode;
+    saveJSON('mdeditor_settings', settings);
+    document.querySelectorAll('.vmBtn').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    document.querySelectorAll('.pane-wrap').forEach(applyViewMode);
+    document.querySelectorAll('.pane-wrap').forEach(applySplitRatio);
+  });
+});
+(function initViewModeButtons(){
+  document.querySelectorAll('.vmBtn').forEach(b=>{
+    b.classList.toggle('active', b.dataset.mode===settings.viewMode);
+  });
+})();
+
+// ドラッグ&ドロップ（ウィンドウ全体）
+let dragCounter = 0;
+window.addEventListener('dragenter', (e)=>{
+  e.preventDefault(); dragCounter++;
+  document.getElementById('dropOverlay').classList.add('show');
+});
+window.addEventListener('dragover', (e)=>e.preventDefault());
+window.addEventListener('dragleave', (e)=>{
+  dragCounter = Math.max(0, dragCounter-1);
+  if(dragCounter===0) document.getElementById('dropOverlay').classList.remove('show');
+});
+window.addEventListener('drop', async (e)=>{
+  e.preventDefault();
+  dragCounter = 0;
+  document.getElementById('dropOverlay').classList.remove('show');
+  await handleDropItems(e.dataTransfer);
+});
+
+// 離脱前の警告（未保存の変更がある場合）
+window.addEventListener('beforeunload', (e)=>{
+  if(tabs.some(t=>t.dirty)){
+    e.preventDefault(); e.returnValue = '';
+  }
+});
+
+// Ctrl+S をブラウザのデフォルト（ページ保存）から奪う
+window.addEventListener('keydown', (e)=>{
+  if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==='s'){
+    e.preventDefault();
+  }
+});
+
+/* ------------------------------------------------------------------ *
+ * 11. 起動
+ * ------------------------------------------------------------------ */
+(function init(){
+  const restored = restoreSession();
+  if(restored){
+    tabs.forEach(t=>{ t.dirty = t.dirty; }); // 復元直後の状態を維持
+  }
+  renderAll();
+  scheduleAutosaveTimer();
+  if(!hasFSAApi){
+    logPlugin('ℹ️ このブラウザは File System Access API 未対応のため、自動保存はブラウザ内の一時保存のみです。保存はCtrl+S（ダウンロード）で行ってください（Firefoxはこの方式になります）。');
+  }
+})();
+
+})();
+</script>
+</body>
+</html>
