@@ -1,0 +1,950 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ピーク割れの正体と正しい測定方法 完全ガイド</title>
+<style>
+  :root{
+    --bg:#0d1117; --bg2:#151b23; --card:#1a212b; --line:#2a3441;
+    --text:#dbe2ea; --sub:#9aa7b5; --cyan:#5ad4ff; --amber:#ffb454;
+    --green:#5ee6a0; --yellow:#f4e04d; --red:#ff7a7a; --purple:#c792ea;
+    --pink:#ff9ecf; --blue2:#7aa2ff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Hiragino Sans","Yu Gothic",-apple-system,sans-serif;
+    line-height:1.9; margin:0; padding:0 0 80px 0;
+  }
+  .wrap{max-width:940px; margin:0 auto; padding:28px 20px;}
+  header.top{
+    background:linear-gradient(160deg,#101820,#182230);
+    border-bottom:1px solid var(--line); padding:36px 20px 30px;
+  }
+  header.top h1{
+    font-size:1.55em; margin:0 0 10px; color:var(--cyan);
+    letter-spacing:.02em;
+  }
+  header.top p{color:var(--sub); margin:4px 0;}
+  header.top p.tagline{color:var(--amber); font-size:.98em; margin-top:10px;}
+  nav.toc{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:18px 22px; margin:22px 0;
+  }
+  nav.toc h2{font-size:1em; color:var(--amber); margin:0 0 10px;}
+  nav.toc ol{margin:0; padding-left:1.4em;}
+  nav.toc a{color:var(--text); text-decoration:none; border-bottom:1px dotted var(--sub);}
+  nav.toc a:hover{color:var(--cyan);}
+  section{margin:48px 0;}
+  h2.sec{
+    font-size:1.28em; color:var(--cyan); border-left:4px solid var(--cyan);
+    padding:5px 0 5px 14px; margin:0 0 18px;
+  }
+  h3.sub{font-size:1.08em; color:var(--amber); margin:30px 0 12px;}
+  h4.subsub{font-size:1em; color:var(--purple); margin:22px 0 8px;}
+  p{margin:13px 0;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:18px 20px; margin:16px 0;
+  }
+  .card.amber{border-left:4px solid var(--amber);}
+  .card.green{border-left:4px solid var(--green);}
+  .card.red{border-left:4px solid var(--red);}
+  .card.cyan{border-left:4px solid var(--cyan);}
+  .card.purple{border-left:4px solid var(--purple);}
+  .badge{
+    display:inline-block; font-size:.78em; padding:2px 9px; border-radius:20px;
+    margin-left:6px; white-space:nowrap;
+  }
+  .b-ok{background:#123d2a; color:var(--green); border:1px solid #1f6b47;}
+  .b-est{background:#403a10; color:var(--yellow); border:1px solid #7a6a1a;}
+  .b-check{background:#3d1a1a; color:var(--red); border:1px solid #7a2a2a;}
+  ruby rt{color:var(--sub); font-size:.62em;}
+  .hl-cyan{color:var(--cyan); font-weight:600;}
+  .hl-amber{color:var(--amber); font-weight:600;}
+  .hl-green{color:var(--green); font-weight:600;}
+  .hl-red{color:var(--red); font-weight:600;}
+  .hl-purple{color:var(--purple); font-weight:600;}
+  .hl-blue2{color:var(--blue2); font-weight:600;}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:.92em;}
+  th,td{border:1px solid var(--line); padding:9px 11px; text-align:left;}
+  th{background:#1e2733; color:var(--amber);}
+  td.num{font-family:"SF Mono",Consolas,monospace; color:var(--cyan);}
+  .formula{
+    font-family:"SF Mono",Consolas,monospace; background:#0f151d; border:1px solid var(--line);
+    border-radius:6px; padding:10px 14px; color:var(--green); margin:10px 0; overflow-x:auto;
+    white-space:pre;
+  }
+  .tbl-wrap{position:relative;}
+  .copybtn{
+    background:#1e2733; color:var(--cyan); border:1px solid var(--line); border-radius:6px;
+    padding:5px 12px; font-size:.82em; cursor:pointer; margin:6px 0 2px;
+  }
+  .copybtn:hover{background:#28323f;}
+  .copybtn.copied{color:var(--green); border-color:var(--green);}
+  svg{display:block; margin:18px auto; max-width:100%;}
+  .step-list{padding-left:1.3em;}
+  .step-list li{margin:10px 0;}
+  .note-box{
+    background:#151b23; border:1px dashed var(--sub); border-radius:8px;
+    padding:14px 18px; margin:14px 0; font-size:.94em; color:var(--sub);
+  }
+  .flow-svg-caption{text-align:center; color:var(--sub); font-size:.85em; margin-top:-6px;}
+  code{background:#1e2733; padding:1px 6px; border-radius:4px; color:var(--cyan); font-size:.92em;}
+  hr.sep{border:none; border-top:1px solid var(--line); margin:38px 0;}
+  .kv{display:grid; grid-template-columns:170px 1fr; gap:6px 14px; margin:10px 0;}
+  .kv div:nth-child(odd){color:var(--sub);}
+  footer.end{
+    text-align:center; color:var(--sub); font-size:.85em; margin-top:60px;
+    border-top:1px solid var(--line); padding-top:20px;
+  }
+  /* ---- 追加コンポーネント ---- */
+  .legend{display:flex; flex-wrap:wrap; gap:10px; margin:14px 0;}
+  .legend .item{
+    background:var(--bg2); border:1px solid var(--line); border-radius:8px;
+    padding:8px 14px; font-size:.88em; flex:1; min-width:220px;
+  }
+  .photogrid{display:grid; grid-template-columns:repeat(2,1fr); gap:14px; margin:18px 0;}
+  @media (max-width:600px){.photogrid{grid-template-columns:1fr;}}
+  .photocard{background:var(--bg2); border:1px solid var(--line); border-radius:10px; overflow:hidden;}
+  .photocard img{width:100%; display:block; background:#000;}
+  .photocard .cap{padding:9px 12px; font-size:.86em; color:var(--sub);}
+  .photocard .cap b{color:var(--text);}
+  .step-badge{
+    display:inline-flex; align-items:center; justify-content:center;
+    width:30px; height:30px; border-radius:50%; background:var(--cyan); color:#04222c;
+    font-weight:700; margin-right:10px; flex:none; font-size:.95em;
+  }
+  .step-head{display:flex; align-items:center; margin:0 0 8px;}
+  .step-head h3{margin:0; font-size:1.05em; color:var(--amber);}
+  .path-compare{display:grid; grid-template-columns:1fr 1fr; gap:16px; margin:16px 0;}
+  @media (max-width:680px){.path-compare{grid-template-columns:1fr;}}
+  .path-col{background:var(--bg2); border:1px solid var(--line); border-radius:10px; padding:16px 18px;}
+  .path-col h4{margin:0 0 8px; font-size:.98em;}
+  .path-col.a h4{color:var(--purple);}
+  .path-col.b h4{color:var(--cyan);}
+  .checklist{list-style:none; padding-left:0; margin:14px 0;}
+  .checklist li{
+    display:flex; align-items:flex-start; gap:10px; margin:12px 0;
+    padding:10px 14px; background:var(--bg2); border:1px solid var(--line); border-radius:8px;
+  }
+  .checklist input[type=checkbox]{width:18px; height:18px; margin-top:3px; accent-color:var(--green); flex:none;}
+  .why-box{
+    border-left:3px dotted var(--purple); padding:6px 0 6px 14px; margin:10px 0 10px 4px;
+    color:var(--sub); font-size:.93em;
+  }
+  .why-box b{color:var(--purple);}
+  .mistake{
+    display:grid; grid-template-columns:28px 1fr; gap:10px; align-items:start;
+    background:#22131a; border:1px solid #5a2233; border-radius:8px; padding:12px 14px; margin:12px 0;
+  }
+  .mistake .x{color:var(--red); font-size:1.2em; font-weight:800;}
+  .refitem{margin:10px 0; padding:12px 14px; background:var(--bg2); border:1px solid var(--line); border-radius:8px; font-size:.92em;}
+  .refitem a{color:var(--cyan);}
+  .refitem .src{color:var(--sub); font-size:.85em;}
+  .scalechip{
+    display:inline-block; margin-top:26px; font-size:.8em; color:var(--sub);
+    border:1px solid var(--line); border-radius:20px; padding:4px 12px;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap" style="padding:0;">
+    <h1>🎯 ピーク<ruby>割<rt>わ</rt></ruby>れの<ruby>正体<rt>しょうたい</rt></ruby>と<ruby>正<rt>ただ</rt></ruby>しい<ruby>測定方法<rt>そくていほうほう</rt></ruby> 完全ガイド</h1>
+    <p>ブレーキパッド<ruby>面内<rt>めんない</rt></ruby><ruby>振動<rt>しんどう</rt></ruby>測定｜<ruby>縮退<rt>しゅくたい</rt></ruby>モード（そっくり<ruby>双子<rt>ふたご</rt></ruby>モード）の正しい見分け方</p>
+    <p class="tagline">小学生でもわかるように、ゼロから・手取り足取り説明します。これさえ読めば、手順を忘れても最初からやり直せます。</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<div class="card cyan">
+<p style="margin:0 0 10px;"><b>🚦 このガイドの読み方（色のルール）</b></p>
+<div class="legend">
+  <div class="item">🟢 <b>緑</b>＝力学的・実験的にほぼ確実な話</div>
+  <div class="item">🟡 <b>黄</b>＝おおむね正しいが条件つき、または見積もり・具体例</div>
+  <div class="item">🔴 <b>赤</b>＝注意が必要、または信頼度が低い方法</div>
+</div>
+<p style="margin:8px 0 0; color:var(--sub); font-size:.92em;">数字の例（Hzの値など）は、話をイメージしやすくするための<span class="hl-amber">仮の数字</span>です。あなたの実際の測定値ではありませんので、そのまま論文やレポートには使わないでください。</p>
+</div>
+
+<nav class="toc">
+  <h2>📖 目次（読みたいところへジャンプできます）</h2>
+  <ol>
+    <li><a href="#p0">この相談を3行で／写真で確認</a></li>
+    <li><a href="#p1">そもそも「山（ピーク）」って何？超入門</a></li>
+    <li><a href="#p2">なぜ棒の場所を変えると山が1本に見えたり2本に見えたりするのか</a></li>
+    <li><a href="#p3">上司のやり方の何が問題なのか</a></li>
+    <li><a href="#p4">あなたの直感はどこまで正しいか（半値幅法の限界）</a></li>
+    <li><a href="#p5">★本題：正しい測定方法（手順書）</a></li>
+    <li><a href="#p6">結果の信頼度 比較表</a></li>
+    <li><a href="#p7">よくある間違い・注意点 総まとめ</a></li>
+    <li><a href="#p8">現場で使えるチェックリスト</a></li>
+    <li><a href="#p9">出典・参考文献（一次情報）</a></li>
+  </ol>
+</nav>
+
+<section id="p0">
+<h2 class="sec">🗣️ この相談を3行で／写真で確認</h2>
+
+<p>まず、今回あなたが相談してくれた内容を、うんと短くまとめます。専門用語はあとで一つずつ、ゆっくり説明しますので、今は「へぇ、そういう話か」くらいの気持ちで読んでください。</p>
+
+<div class="card amber">
+<ol style="margin:0; padding-left:1.3em;">
+<li style="margin:8px 0;">あなたは、ブレーキパッドを<span class="hl-amber"><ruby>面内<rt>めんない</rt></ruby>方向</span>（パッドの厚みではなく、横に広がる面に沿った方向）に揺らして、揺れがどれくらい早くおさまるか（<ruby>損失係数<rt>そんしつけいすう</rt></ruby>）を調べようとした。</li>
+<li style="margin:8px 0;">棒（スティンガー）をパッドの<b>真ん中</b>に固定して揺らしたら（下の写真②）、本来1つのはずの「山（ピーク）」が<span class="hl-red">2つに割れて</span>しまった。</li>
+<li style="margin:8px 0;">上司は、棒を<b>右</b>（写真③）や<b>左</b>（写真④）にずらしていき、「山がぴったり1つに重なって見える場所」を探して、そこで損失係数を計算していた。あなたは「それは違うのでは？」と感じた。</li>
+</ol>
+</div>
+
+<p>実際にナレッジに置かれていた4枚の写真を、そのまま並べておきます。この後の説明は、すべてこの4枚を思い浮かべながら読み進めてください。</p>
+
+<div class="photogrid">
+  <div class="photocard">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/wAARCAGIAvQDACIAAREBAhEB/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMAAAERAhEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAor551D9ojVrLU7u0XQbJlgmeMMZXyQpIz+lVf+GlNY/wChfsf+/wA9AH0hRXzf/wANKax/0L9j/wB/no/4aU1j/oX7H/v89AH0hRXzf/w0prH/AEL9j/3+ej/hpTWP+hfsf+/z0AfSFFfN/wDw0prH/Qv2P/f56P8AhpTWP+hfsf8Av89AH0hRXzf/AMNKax/0L9j/AN/no/4aU1j/AKF+x/7/AD0AfSFFfN//AA0prH/Qv2P/AH+ej/hpTWP+hfsf+/z0AfSFFfN//DSmsf8AQv2P/f56P+GlNY/6F+x/7/PQB9IUV83/APDSmsf9C/Y/9/no/wCGlNY/6F+x/wC/z0AfSFFfN/8Aw0prH/Qv2P8A3+ej/hpTWP8AoX7H/v8APQB9IUV83/8ADSmsf9C/Y/8Af56P+GlNY/6F+x/7/PQB9IUV83/8NKax/wBC/Y/9/no/4aU1j/oX7H/v89AH0hRXzf8A8NKax/0L9j/3+ej/AIaU1j/oX7H/AL/PQB9IUV83/wDDSmsf9C/Y/wDf56P+GlNY/wChfsf+/wA9AH0hRXzf/wANKax/0L9j/wB/no/4aU1j/oX7H/v89AH0hRXzf/w0prH/AEL9j/3+ej/hpTWP+hfsf+/z0AfSFFfN/wDw0prH/Qv2P/f56P8AhpTWP+hfsf8Av89AH0hRXzf/AMNKax/0L9j/AN/no/4aU1j/AKF+x/7/AD0AfSFFfN//AA0prH/Qv2P/AH+ej/hpTWP+hfsf+/z0AfSFFfN//DSmsf8AQv2P/f56P+GlNY/6F+x/7/PQB9IUV83/APDSmsf9C/Y/9/no/wCGlNY/6F+x/wC/z0AfSFFfN/8Aw0prH/Qv2P8A3+ej/hpTWP8AoX7H/v8APQB9IUV83/8ADSmsf9C/Y/8Af56P+GlNY/6F+x/7/PQB9IUV83/8NKax/wBC/Y/9/no/4aU1j/oX7H/v89AH0hRXzf8A8NKax/0L9j/3+ej/AIaU1j/oX7H/AL/PQB9IUV83/wDDSmsf9C/Y/wDf56P+GlNY/wChfsf+/wA9AH0hRXzf/wANKax/0L9j/wB/no/4aU1j/oX7H/v89AH0hRXzf/w0prH/AEL9j/3+ej/hpTWP+hfsf+/z0AfSFFfN/wDw0prH/Qv2P/f56P8AhpTWP+hfsf8Av89AH0hRXzf/AMNKax/0L9j/AN/no/4aU1j/AKF+x/7/AD0AfSFFfN//AA0prH/Qv2P/AH+ej/hpTWP+hfsf+/z0AfSFFfN//DSmsf8AQv2P/f56P+GlNY/6F+x/7/PQB9IUV83/APDSmsf9C/Y/9/no/wCGlNY/6F+x/wC/z0AfSFFfN/8Aw0prH/Qv2P8A3+ej/hpTWP8AoX7H/v8APQB9IUV83/8ADSmsf9C/Y/8Af56P+GlNY/6F+x/7/PQB9IUV83/8NKax/wBC/Y/9/no/4aU1j/oX7H/v89AH0hRXzf8A8NKax/0L9j/3+ej/AIaU1j/oX7H/AL/PQB9IUV83/wDDSmsf9C/Y/wDf56774W/FK98f6nqFrdabb2i2sKyK0TsxYlsYOaAPUqKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD4Q13/kYdT/6+5f8A0M1n1oa7/wAjDqf/AF9y/wDoZrPoAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAr2/9mz/kYtc/69E/9DrxCvb/ANmz/kYtc/69E/8AQ6APpCiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA+ENd/wCRh1P/AK+5f/QzWfX1nc/AvwVd3U1zLDemSZ2kbFyQMk5Pao/+FA+B/wDnhff+BR/woA+UKK+r/wDhQPgf/nhff+BR/wAKP+FA+B/+eF9/4FH/AAoA+UKK+r/+FA+B/wDnhff+BR/wo/4UD4H/AOeF9/4FH/CgD5Qor6v/AOFA+B/+eF9/4FH/AAo/4UD4H/54X3/gUf8ACgD5Qor6v/4UD4H/AOeF9/4FH/Cj/hQPgf8A54X3/gUf8KAPlCivq/8A4UD4H/54X3/gUf8ACj/hQPgf/nhff+BR/wAKAPlCivq//hQPgf8A54X3/gUf8KP+FA+B/wDnhff+BR/woA+UKK+r/wDhQPgf/nhff+BR/wAKP+FA+B/+eF9/4FH/AAoA+UKK+r/+FA+B/wDnhff+BR/wo/4UD4H/AOeF9/4FH/CgD5Qor6v/AOFA+B/+eF9/4FH/AAo/4UD4H/54X3/gUf8ACgD5Qor6v/4UD4H/AOeF9/4FH/Cj/hQPgf8A54X3/gUf8KAPlCivq/8A4UD4H/54X3/gUf8ACj/hQPgf/nhff+BR/wAKAPlCivq//hQPgf8A54X3/gUf8KP+FA+B/wDnhff+BR/woA+UKK+r/wDhQPgf/nhff+BR/wAKP+FA+B/+eF9/4FH/AAoA+UKK+r/+FA+B/wDnhff+BR/wo/4UD4H/AOeF9/4FH/CgD5Qor6v/AOFA+B/+eF9/4FH/AAo/4UD4H/54X3/gUf8ACgD5Qor6v/4UD4H/AOeF9/4FH/Cj/hQPgf8A54X3/gUf8KAPlCivq/8A4UD4H/54X3/gUf8ACj/hQPgf/nhff+BR/wAKAPlCivq//hQPgf8A54X3/gUf8KP+FA+B/wDnhff+BR/woA+UKK+r/wDhQPgf/nhff+BR/wAKP+FA+B/+eF9/4FH/AAoA+UKK+r/+FA+B/wDnhff+BR/wo/4UD4H/AOeF9/4FH/CgD5Qor6v/AOFA+B/+eF9/4FH/AAo/4UD4H/54X3/gUf8ACgD5Qor6v/4UD4H/AOeF9/4FH/Cj/hQPgf8A54X3/gUf8KAPlCivq/8A4UD4H/54X3/gUf8ACj/hQPgf/nhff+BR/wAKAPlCivq//hQPgf8A54X3/gUf8KP+FA+B/wDnhff+BR/woA+UKK+r/wDhQPgf/nhff+BR/wAKP+FA+B/+eF9/4FH/AAoA+UKK+r/+FA+B/wDnhff+BR/wo/4UD4H/AOeF9/4FH/CgD5Qor6v/AOFA+B/+eF9/4FH/AAo/4UD4H/54X3/gUf8ACgD5Qor6v/4UD4H/AOeF9/4FH/Cj/hQPgf8A54X3/gUf8KAPlCivq/8A4UD4H/54X3/gUf8ACj/hQPgf/nhff+BR/wAKAPlCivq//hQPgf8A54X3/gUf8KP+FA+B/wDnhff+BR/woA+UKK+r/wDhQPgf/nhff+BR/wAKP+FA+B/+eF9/4FH/AAoA+UKK+r/+FA+B/wDnhff+BR/wo/4UD4H/AOeF9/4FH/CgD5Qor6v/AOFA+B/+eF9/4FH/AAo/4UD4H/54X3/gUf8ACgD5Qor6v/4UD4H/AOeF9/4FH/Cj/hQPgf8A54X3/gUf8KAPlCivq/8A4UD4H/54X3/gUf8ACj/hQPgf/nhff+BR/wAKAPlCvb/2bP8AkYtc/wCvRP8A0OvQP+FA+B/+eF9/4FH/AArovCPw50DwTdXNzo0dwklwgjk82YuMA54oA66iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD/9k=" alt="測定対象のブレーキパッド（元）">
+    <div class="cap"><b>① moto.jpg</b>：測定対象のブレーキパッド本体</div>
+  </div>
+  <div class="photocard">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/wAARCAGIAvQDACIAAREBAhEB/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMAAAERAhEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA+cPHPxk8XaD431fS7Ga0FrazmOMPbhjjA6muf/wCF++OP+fix/wDAUf41z/xU/wCSoeIf+vs/yFcfQB6h/wAL98cf8/Fj/wCAo/xo/wCF++OP+fix/wDAUf415fRQB6h/wv3xx/z8WP8A4Cj/ABr6i0u4e60myuZceZNAkjYGBkqCa+Da+79B/wCRe0z/AK9Iv/QBQBoUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQB8YfFT/kqHiH/r7P8AIVx9dh8VP+SoeIf+vs/yFcfQAUUUUAFfd+g/8i9pn/XpF/6AK+EK+79B/wCRe0z/AK9Iv/QBQBoUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRXzzqH7RGrWWp3doug2TLBM8YYyvkhSRn9Kq/8NKax/wBC/Y/9/noA+kKK+b/+GlNY/wChfsf+/wA9H/DSmsf9C/Y/9/noA+kKK+b/APhpTWP+hfsf+/z0f8NKax/0L9j/AN/noA+kKK+b/wDhpTWP+hfsf+/z0f8ADSmsf9C/Y/8Af56APpCivm//AIaU1j/oX7H/AL/PR/w0prH/AEL9j/3+egD6Qor5v/4aU1j/AKF+x/7/AD0f8NKax/0L9j/3+egD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BRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAH//Z" alt="中央に棒を固定した状態">
+    <div class="cap"><b>② noka.jpg</b>：<span class="hl-red">中央</span>に棒を固定（上司の最初の測定・山が割れた）</div>
+  </div>
+  <div class="photocard">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/wAARCAGIAvQDACIAAREBAhEB/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMAAAERAhEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKimmjghkmlYJHGpZmPQADJNcp/wtTwN/0M1j/wB9H/CgDsKK4/8A4Wp4G/6Gax/76P8AhR/wtTwN/wBDNY/99H/CgDsKK4//AIWp4G/6Gax/76P+FXtI8c+GNevxY6VrNrd3RUsIoyc4HU9KAOiooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigDP17/kXtT/AOvSX/0A18IV9369/wAi9qf/AF6S/wDoBr4QoAKKKKACvUPgD/yVCH/r0m/kK8vr1D4A/wDJUIf+vSb+QoA+r6KKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAz9e/wCRe1P/AK9Jf/QDXwhX3fr3/Ivan/16S/8AoBr4QoAKKKKACvUPgD/yVCH/AK9Jv5CvL69Q+AP/ACVCH/r0m/kKAPq+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKK+edQ/aI1ay1O7tF0GyZYJnjDGV8kKSM/pVX/AIaU1j/oX7H/AL/PQB9IUV83/wDDSmsf9C/Y/wDf56P+GlNY/wChfsf+/wA9AH0hRXzf/wANKax/0L9j/wB/no/4aU1j/oX7H/v89AH0hRXzf/w0prH/AEL9j/3+ej/hpTWP+hfsf+/z0AfSFFfN/wDw0prH/Qv2P/f56P8AhpTWP+hfsf8Av89AH0hRXzf/AMNK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ooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA//9k=" alt="右側に棒を固定した状態">
+    <div class="cap"><b>③ migi.jpg</b>：<span class="hl-amber">右側</span>に棒を固定（山が重なる場所を探索中）</div>
+  </div>
+  <div class="photocard">
+    <img src="data:image/jpeg;base64,/9j/4AAQSkZJRgABAgAAAQABAAD/wAARCAGIAvQDACIAAREBAhEB/9sAQwAIBgYHBgUIBwcHCQkICgwUDQwLCwwZEhMPFB0aHx4dGhwcICQuJyAiLCMcHCg3KSwwMTQ0NB8nOT04MjwuMzQy/9sAQwEJCQkMCwwYDQ0YMiEcITIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIyMjIy/8QAHwAAAQUBAQEBAQEAAAAAAAAAAAECAwQFBgcICQoL/8QAtRAAAgEDAwIEAwUFBAQAAAF9AQIDAAQRBRIhMUEGE1FhByJxFDKBkaEII0KxwRVS0fAkM2JyggkKFhcYGRolJicoKSo0NTY3ODk6Q0RFRkdISUpTVFVWV1hZWmNkZWZnaGlqc3R1dnd4eXqDhIWGh4iJipKTlJWWl5iZmqKjpKWmp6ipqrKztLW2t7i5usLDxMXGx8jJytLT1NXW19jZ2uHi4+Tl5ufo6erx8vP09fb3+Pn6/8QAHwEAAwEBAQEBAQEBAQAAAAAAAAECAwQFBgcICQoL/8QAtREAAgECBAQDBAcFBAQAAQJ3AAECAxEEBSExBhJBUQdhcRMiMoEIFEKRobHBCSMzUvAVYnLRChYkNOEl8RcYGRomJygpKjU2Nzg5OkNERUZHSElKU1RVVldYWVpjZGVmZ2hpanN0dXZ3eHl6goOEhYaHiImKkpOUlZaXmJmaoqOkpaanqKmqsrO0tba3uLm6wsPExcbHyMnK0tPU1dbX2Nna4uPk5ebn6Onq8vP09fb3+Pn6/9oADAMAAAERAhEAPwD3+iiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigDz/AOIHxSsvh/fWdrdabcXbXURkVonVQoBxg5rkP+Gk9H/6F++/7/JXPftJ/wDIxaH/ANej/wDodeIUAfSH/DSej/8AQv33/f5KP+Gk9H/6F++/7/JXzfRQB9If8NJ6P/0L99/3+Sj/AIaT0f8A6F++/wC/yV830UAfe1lcLe2FvdKpVZ4lkCnqAwzj9as1n6D/AMi9pn/XpF/6AK0KACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooA+b/2k/8AkYtD/wCvR/8A0OvEK9v/AGk/+Ri0P/r0f/0OvEKACiiigAooooA+79B/5F7TP+vSL/0AVoVn6D/yL2mf9ekX/oArQoAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAor551D9ojVrLU7u0XQbJlgmeMMZXyQpIz+lVf+GlNY/wChfsf+/wA9AH0hRXzf/wANKax/0L9j/wB/no/4aU1j/oX7H/v89AH0hRXzf/w0prH/AEL9j/3+ej/hpTWP+hfsf+/z0AfSFFfN/wDw0prH/Qv2P/f56P8AhpTWP+hfsf8Av89AH0hRXzf/AMNKax/0L9j/AN/no/4aU1j/AKF+x/7/AD0AfSFFfN//AA0prH/Qv2P/AH+ej/hpTWP+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BRRRQAUUUUAFFFFABRRRQAUUUUAFFFFAHzf+0n/yMWh/9ej/APodeIV9N/GT4c+IPG2r6Zc6NHbvHbwNHJ5swQ5LZrzT/hQXjj/n3sf/AAKH+FAHl9Feof8ACgvHH/PvY/8AgUP8KP8AhQXjj/n3sf8AwKH+FAHl9Feof8KC8cf8+9j/AOBQ/wAKP+FBeOP+fex/8Ch/hQB9P6D/AMi9pn/XpF/6AK0KpaXbva6TZW0uPMhgSNsHIyFANXaACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigAooooAKKKKACiiigD//2Q==" alt="左側に棒を固定した状態">
+    <div class="cap"><b>④ hida.jpg</b>：<span class="hl-amber">左側</span>に棒を固定（山が重なる場所を探索中）</div>
+  </div>
+</div>
+
+<p>質問は、大きく分けて3つでした。この3つに、このガイドの中でぜんぶ答えていきます。</p>
+
+<div class="kv">
+<div>質問①</div><div>正しい測定方法は？（<a href="#p5">→ 5章</a>）</div>
+<div>質問②</div><div>どこの損失係数を採用すべき？（<a href="#p5">→ 5-7節</a>）</div>
+<div>質問③</div><div>結果の信頼度は？（<a href="#p6">→ 6章</a>）</div>
+</div>
+</section>
+
+<section id="p1">
+<h2 class="sec">🔰 そもそも「山（ピーク）」って何？超入門</h2>
+
+<p>すでにご存じの内容も多いと思いますが、今回は<span class="hl-amber">小学生にも伝わるレベル</span>まで、いったん全部さかのぼって説明します。知っている部分は読み飛ばしてもらって大丈夫です。</p>
+
+<h3 class="sub">🌳 ブランコで考えてみる</h3>
+<p>ブランコを押すとき、<b>ちょうど良いタイミング</b>で押すと、少ない力でもどんどん高く揺れていきますよね。逆に、タイミングがバラバラだと、いくら押しても高くは揺れません。</p>
+
+<p>この「ちょうど良いタイミング（リズム）」のことを、機械の世界では<ruby>固有振動数<rt>こゆうしんどうすう</rt></ruby>（略して<ruby>固有値<rt>こゆうち</rt></ruby>）と呼びます。ブレーキパッドにも、実はこの「ちょうど良いリズム」がいくつも存在します。</p>
+
+<h3 class="sub">📈 グラフにするとこうなる</h3>
+<p>横軸に「揺らす速さ（<ruby>周波数<rt>しゅうはすう</rt></ruby>＝1秒間に何回揺らすか）」、縦軸に「どれだけ大きく揺れたか」をとってグラフを描くと、ちょうど良いリズムのところだけ、揺れがぐんと大きくなって<b>山</b>ができます。これが「ピーク」です。この山ができるグラフ全体のことを、<ruby>周波数応答関数<rt>しゅうはすうおうとうかんすう</rt></ruby>（<ruby>略<rt>りゃく</rt></ruby>して<b>FRF</b>）と呼びます。</p>
+
+<svg viewBox="0 0 640 220" width="100%">
+  <rect x="0" y="0" width="640" height="220" fill="#0f151d" rx="8"/>
+  <line x1="50" y1="180" x2="600" y2="180" stroke="#3a4553" stroke-width="1.5"/>
+  <line x1="50" y1="20" x2="50" y2="180" stroke="#3a4553" stroke-width="1.5"/>
+  <text x="555" y="200" fill="#9aa7b5" font-size="13">揺らす速さ</text>
+  <text x="12" y="25" fill="#9aa7b5" font-size="13">揺れの大きさ</text>
+  <path d="M 60 172 Q 220 172 300 35 Q 380 172 560 172" fill="none" stroke="#5ad4ff" stroke-width="3"/>
+  <line x1="300" y1="35" x2="300" y2="180" stroke="#ffb454" stroke-width="1" stroke-dasharray="4,4"/>
+  <text x="240" y="60" fill="#ffb454" font-size="13">これが「山＝ピーク」</text>
+  <text x="245" y="80" fill="#9aa7b5" font-size="12">＝ちょうど良いリズムの場所</text>
+</svg>
+<p class="flow-svg-caption">横軸が「揺らす速さ」、山のてっぺんが「一番揺れやすいリズム＝固有振動数」</p>
+
+<h3 class="sub">🍮 山の「幅」が語ること：損失係数</h3>
+<p>山が<b>細くとがっている</b>ほど、揺れがなかなかおさまらない（エネルギーが逃げにくい）ことを意味します。逆に<b>山がなだらかで幅広い</b>ほど、揺れがすぐおさまる（エネルギーが早く逃げる＝ブレーキ鳴きが起きにくい）ことを意味します。この「山の幅」を数値にしたものが<ruby>損失係数<rt>そんしつけいすう</rt></ruby>（記号：<code>η</code> エータ）です。だからこそ、山の形を正確に測ることがとても大事なのです。</p>
+
+<div class="note-box">💡 ここまでが「1つの山」の場合の話です。次の章から、いよいよ本題の「山が2つに割れる」現象に入っていきます。</div>
+</section>
+
+<section id="p2">
+<h2 class="sec">🕵️ なぜ棒の場所を変えると、山が1本に見えたり2本に見えたりするのか</h2>
+
+<h3 class="sub">👯 まずは「そっくり双子モード」の話から</h3>
+<p>もしブレーキパッドに穴が1つも無くて、完全に左右対称の長方形の板だったら――理論上、<b>周波数がまったく同じ、2つの違う揺れ方</b>が同時に起きることがあります。これを専門用語で<ruby>縮退<rt>しゅくたい</rt></ruby>モード、わかりやすく言うと「<span class="hl-purple">完全に同じ声のそっくり双子</span>」のような状態です。</p>
+
+<p>でも、あなたのパッドには穴が2つ空いていて、左右が完全な対称ではありません。だから双子は「まったく同じ」ではなく、<span class="hl-amber">周波数がほんの少しだけズレた、そっくりな双子（近接モード）</span>になります。これが、グラフに山が2つ、とても近い場所にできる理由です。</p>
+
+<div class="note-box">🟢 板（プレート）の振動を計算する理論では、対称な形に近いほど、こうした「そっくり双子」の振動が起きやすいことが分かっています（Leissa, NASA SP-160、板振動の古典的な文献より）。ブレーキパッドの穴による左右非対称さが、双子の周波数をわずかにズラす「原因」になっています。</div>
+
+<h3 class="sub">🙈 双子には、それぞれ「かくれんぼスポット」がある</h3>
+<p>ここが今回の話の一番大事なポイントです。専門用語では<ruby>節線<rt>せっせん</rt></ruby>（＝ある揺れ方をしているときに、<b>絶対に動かない線</b>）と呼びますが、まずはたとえ話で理解しましょう。</p>
+
+<div class="card purple">
+<p style="margin:0;"><b>🎪 たとえ話：トランポリンの上の双子の幽霊</b></p>
+<p>ブレーキパッドを、大きなトランポリンだと思ってください。その上に、双子の幽霊（モードA・モードB）が、それぞれ少しだけ違うリズムで飛び跳ねています。</p>
+<p>実は、それぞれの幽霊には「ここを指で押しても、僕には全然伝わらないよ」という<b>魔法の線（かくれんぼスポット＝節線）</b>があります。同じトランポリンの上にいるのに、2人の魔法の線は<b>ビミョーに違う場所</b>にあります（穴があって左右非対称だからです）。</p>
+</div>
+
+<p>もし、あなたが指で押す場所（棒を固定する場所）が、たまたま<b>幽霊Aの魔法の線の真上</b>だったら――幽霊Aはピクリとも反応しません。センサーには<b>幽霊Bの揺れしか映らない</b>ので、「あれ？山が1つしかない」と錯覚してしまいます。でも、幽霊Aは消えたわけではなく、<span class="hl-red">その場所からは「見えなくなった」だけ</span>なのです。</p>
+
+<h3 class="sub">📍 あなたのパッドの3つの写真で確認してみる</h3>
+<p>下の図は、パッド（イメージ図）に双子モードA・Bのかくれんぼスポット（節線）を重ねて描いたものです。実際の正確な位置ではなく、あくまで「こういう仕組みで山が消えたり現れたりする」というイメージ図（🟡例）として見てください。</p>
+
+<svg viewBox="0 0 640 380" width="100%">
+  <rect x="0" y="0" width="640" height="380" fill="#0f151d" rx="8"/>
+
+  <!-- pad -->
+  <rect x="100" y="70" width="440" height="150" rx="20" fill="#1a212b" stroke="#3a4553" stroke-width="2"/>
+  <circle cx="230" cy="145" r="14" fill="#0d1117" stroke="#3a4553" stroke-width="2"/>
+  <circle cx="410" cy="145" r="14" fill="#0d1117" stroke="#3a4553" stroke-width="2"/>
+  <text x="320" y="60" fill="#9aa7b5" font-size="13" text-anchor="middle">ブレーキパッド（イメージ）</text>
+  <text x="230" y="245" fill="#6b7684" font-size="11" text-anchor="middle">穴</text>
+  <text x="410" y="245" fill="#6b7684" font-size="11" text-anchor="middle">穴</text>
+
+  <!-- node line A (blue) -->
+  <line x1="276" y1="55" x2="276" y2="235" stroke="#7aa2ff" stroke-width="2.5" stroke-dasharray="6,4"/>
+  <text x="276" y="45" fill="#7aa2ff" font-size="12" text-anchor="middle">モードAの節線</text>
+
+  <!-- node line B (pink) -->
+  <line x1="364" y1="55" x2="364" y2="235" stroke="#ff9ecf" stroke-width="2.5" stroke-dasharray="6,4"/>
+  <text x="364" y="248" fill="#ff9ecf" font-size="12" text-anchor="middle">モードBの節線</text>
+
+  <!-- excitation points -->
+  <circle cx="190" cy="145" r="9" fill="#f4e04d" stroke="#0d1117" stroke-width="2"/>
+  <text x="190" y="115" fill="#f4e04d" font-size="13" text-anchor="middle" font-weight="700">④ 左（hida.jpg）</text>
+
+  <circle cx="320" cy="145" r="9" fill="#f4e04d" stroke="#0d1117" stroke-width="2"/>
+  <text x="320" y="115" fill="#f4e04d" font-size="13" text-anchor="middle" font-weight="700">② 中央（noka.jpg）</text>
+
+  <circle cx="450" cy="145" r="9" fill="#f4e04d" stroke="#0d1117" stroke-width="2"/>
+  <text x="450" y="115" fill="#f4e04d" font-size="13" text-anchor="middle" font-weight="700">③ 右（migi.jpg）</text>
+
+  <!-- connecting lines to mini graphs -->
+  <line x1="190" y1="230" x2="130" y2="290" stroke="#6b7684" stroke-width="1"/>
+  <line x1="320" y1="230" x2="320" y2="290" stroke="#6b7684" stroke-width="1"/>
+  <line x1="450" y1="230" x2="510" y2="290" stroke="#6b7684" stroke-width="1"/>
+
+  <!-- mini graph LEFT: only mode B survives (A is near-node) -->
+  <g transform="translate(50,290)">
+    <rect x="0" y="0" width="160" height="80" fill="#151b23" stroke="#2a3441" rx="6"/>
+    <line x1="10" y1="65" x2="150" y2="65" stroke="#3a4553"/>
+    <path d="M15 62 Q75 62 85 20 Q95 62 155 62" fill="none" stroke="#ff9ecf" stroke-width="2.5"/>
+    <text x="80" y="76" fill="#ff9ecf" font-size="11" text-anchor="middle">Bだけ見える＝山1つに錯覚</text>
+  </g>
+
+  <!-- mini graph CENTER: both modes visible = split -->
+  <g transform="translate(240,290)">
+    <rect x="0" y="0" width="160" height="80" fill="#151b23" stroke="#2a3441" rx="6"/>
+    <line x1="10" y1="65" x2="150" y2="65" stroke="#3a4553"/>
+    <path d="M15 62 Q55 62 65 25 Q80 45 95 25 Q105 62 150 62" fill="none" stroke="#5ee6a0" stroke-width="2.5"/>
+    <text x="80" y="76" fill="#5ee6a0" font-size="11" text-anchor="middle">A・B両方見える＝正直な割れ山</text>
+  </g>
+
+  <!-- mini graph RIGHT: only mode A survives (B is near-node) -->
+  <g transform="translate(430,290)">
+    <rect x="0" y="0" width="160" height="80" fill="#151b23" stroke="#2a3441" rx="6"/>
+    <line x1="10" y1="65" x2="150" y2="65" stroke="#3a4553"/>
+    <path d="M15 62 Q75 62 85 20 Q95 62 155 62" fill="none" stroke="#7aa2ff" stroke-width="2.5"/>
+    <text x="80" y="76" fill="#7aa2ff" font-size="11" text-anchor="middle">Aだけ見える＝山1つに錯覚</text>
+  </g>
+</svg>
+<p class="flow-svg-caption">黄色い点＝棒を固定した場所。中央では両方の双子が元気に見える（正直な状態）が、左右にずれるとどちらかが「かくれんぼ」してしまう</p>
+
+<div class="card red">
+<p style="margin:0;"><b>😱 実はここに、もう1つ怖い落とし穴があります</b></p>
+<p style="margin:8px 0 0;">上の図をよく見てください。<b>左</b>で見つかる「1本の山」は<span class="hl-purple">モードB</span>の周波数、<b>右</b>で見つかる「1本の山」は<span class="hl-blue2">モードA</span>の周波数で、<span class="hl-red">実は別のモードを見ていた</span>可能性があります。上司が「山が重なった」と思っていた場所は、左右で<b>別モードの単独ピーク</b>を交互に見つけていただけかもしれない、ということです。</p>
+</div>
+</section>
+
+<section id="p3">
+<h2 class="sec">🙅 上司のやり方の何が問題なのか</h2>
+
+<p>「山が1本に重なる場所を探して、そこで計算する」というやり方には、4つの問題があります。1つずつ、かみ砕いて説明します。</p>
+
+<div class="card red">
+<h4 class="subsub" style="margin-top:0;">問題① 「山が重なった」は勘違い <span class="badge b-check">🔴 物理的な誤解</span></h4>
+<p>本当は、双子（モードA・B）が2人とも仲良く同時に山を作っているのが「正直な状態」です。「山が1本に見える」というのは、<b>片方が"かくれんぼ"していて見えていないだけ</b>で、2人が1人に合体したわけではありません。合体は物理的に起こりません。</p>
+</div>
+
+<div class="card red">
+<h4 class="subsub" style="margin-top:0;">問題② データの中身が信用できなくなる <span class="badge b-check">🔴 データの偏り</span></h4>
+<p>かくれんぼスポット（節線）の近くでは、そもそも信号（揺れの大きさ）がとても小さくなります。信号が小さいと、周りのノイズ（雑音）の影響を強く受けてしまい、コヒーレンス（信号がどれだけ信用できるかを表す0〜1の数字。詳しくは<a href="#p5-3">5-3節</a>）が下がります。つまり、一番デリケートな場所で、一番信用できないデータを取っていることになります。</p>
+</div>
+
+<div class="card red">
+<h4 class="subsub" style="margin-top:0;">問題③ 毎回同じ場所にならない <span class="badge b-check">🔴 再現性がない</span></h4>
+<p>「山がぴったり重なって見える場所」は、パッド1枚1枚のわずかな個体差や、棒の固定の仕方（締め付け具合など）によって、少しずつズレます。つまり、同じ手順で探しても、毎回微妙に違う場所を見つけてしまい、結果が安定しません。</p>
+</div>
+
+<div class="card red">
+<h4 class="subsub" style="margin-top:0;">問題④ 出てきた数字の意味が分からない <span class="badge b-check">🔴 結果の意味不明化</span></h4>
+<p>仮にその場所で計算できたとしても、その損失係数が「生き残った方のモード（AだけorBだけ）の値」なのか、「2つが少し混ざって歪んだ値」なのか、区別する方法がありません。何を測っているのか分からない数字になってしまいます。</p>
+</div>
+
+<div class="card amber">
+<p style="margin:0;"><b>📝 まとめると</b></p>
+<p style="margin:8px 0 0;">上司のやり方は、<span class="hl-amber">「山が1本だと計算（半値幅法）がラクだから」という測定側の都合を優先した簡便法</span>であり、パッドの物理的な振動そのものを正しく表してはいません。</p>
+</div>
+</section>
+
+<section id="p4">
+<h2 class="sec">💡 あなたの直感はどこまで正しいか（半値幅法の限界）</h2>
+
+<div class="card green">
+<p style="margin:0;"><b>🟢 まず結論：方向性は正しいです</b></p>
+<p style="margin:8px 0 0;">「山が重なる特別な場所を探すのではなく、割れて見えているところで、それぞれのモードを測るべき」というあなたの考え方は、モーダル解析の教科書的な王道です（Ewins <i>Modal Testing</i> など）。ただし、そのままだと<b>1つだけ足りない部分</b>があります。それが今からお話しする「計算方法」です。</p>
+</div>
+
+<h3 class="sub">📏 「半値幅法」って何？（定規で測るだけの方法）</h3>
+<p>おそらく、これまで使われていたのは<ruby>半値幅法<rt>はんちはばほう</rt></ruby>（-3dB法とも呼ばれます）という、とてもシンプルな計算方法です。手順はたったの3ステップです。</p>
+
+<ol class="step-list">
+<li>山の一番高いところ（てっぺん＝<ruby>共振<rt>きょうしん</rt></ruby>点）の高さを読む</li>
+<li>その高さの<b>0.707倍</b>（＝1/√2倍。ちょうど「半分のパワー」になる高さ）のところで、山の左右の"太さ"（周波数の幅）を測る</li>
+<li>その太さを、てっぺんの周波数で割り算する</li>
+</ol>
+
+<div class="formula">損失係数 η = Δf ÷ fn
+　Δf（デルタエフ）＝ 半値幅（山の"太さ"、f2－f1）
+　fn（エフエヌ）＝ てっぺんの周波数（共振周波数）</div>
+
+<h4 class="subsub">📋 Excelに貼り付けられる形（例）</h4>
+<div class="tbl-wrap">
+<table id="tbl-hpbw">
+<tr><th></th><th>A：内容</th><th>B：数値（仮の例）</th><th>C：セルの中身</th></tr>
+<tr><td>1</td><td>fn（ピーク周波数）</td><td class="num">3200</td><td class="num">3200</td></tr>
+<tr><td>2</td><td>f1（半値点・下側）</td><td class="num">3180</td><td class="num">3180</td></tr>
+<tr><td>3</td><td>f2（半値点・上側）</td><td class="num">3225</td><td class="num">3225</td></tr>
+<tr><td>4</td><td>Δf（半値幅）</td><td class="num">45</td><td class="num">=B3-B2</td></tr>
+<tr><td>5</td><td>η（損失係数）</td><td class="num">0.01406</td><td class="num">=B4/B1</td></tr>
+</table>
+</div>
+<button class="copybtn" onclick="copyTSV('tbl-hpbw', this)">📋 コピー（Excel貼り付け用）</button>
+
+<div class="note-box">🟡 B列は「仮に測ったらこうなった」という説明用の例の数値です。実測値ではありません。B1・B2・B3にあなたの実測値を入れれば、B4とB5が自動で計算されます。</div>
+
+<h3 class="sub">⚠️ なぜ山が2つ近いと、この方法が壊れるのか</h3>
+<p>半値幅法は、「山が1つだけ、まわりに誰もいない、孤立した状態」を前提にした計算式です。もう片方の山が近くにあると、そのお隣の山の"すそ野（裾）"が、測ろうとしている山に重なってきて、0.707倍の高さで測る"太さ"がゆがんでしまいます。</p>
+
+<svg viewBox="0 0 640 260" width="100%">
+  <rect x="0" y="0" width="640" height="260" fill="#0f151d" rx="8"/>
+
+  <!-- LEFT: isolated peak, correct -->
+  <g>
+    <text x="150" y="25" fill="#5ee6a0" font-size="13" text-anchor="middle">① 孤立した山 → 半値幅法は正確</text>
+    <line x1="40" y1="200" x2="280" y2="200" stroke="#3a4553"/>
+    <path d="M45 195 Q150 195 160 40 Q170 195 275 195" fill="none" stroke="#5ee6a0" stroke-width="2.5"/>
+    <line x1="60" y1="130" x2="260" y2="130" stroke="#ffb454" stroke-width="1" stroke-dasharray="4,3"/>
+    <text x="265" y="126" fill="#ffb454" font-size="10">0.707倍の高さ</text>
+    <line x1="143" y1="130" x2="143" y2="200" stroke="#f4e04d" stroke-width="1.5"/>
+    <line x1="177" y1="130" x2="177" y2="200" stroke="#f4e04d" stroke-width="1.5"/>
+    <text x="160" y="215" fill="#f4e04d" font-size="11" text-anchor="middle">この幅 Δf は正確に測れる</text>
+  </g>
+
+  <!-- RIGHT: two close peaks, distorted -->
+  <g transform="translate(320,0)">
+    <text x="150" y="25" fill="#ff7a7a" font-size="13" text-anchor="middle">② 山が2つ近い → 半値幅法はゆがむ</text>
+    <line x1="40" y1="200" x2="280" y2="200" stroke="#3a4553"/>
+    <path d="M45 195 Q120 195 135 50 Q150 130 165 50 Q180 195 275 195" fill="none" stroke="#ff7a7a" stroke-width="2.5"/>
+    <line x1="60" y1="130" x2="260" y2="130" stroke="#ffb454" stroke-width="1" stroke-dasharray="4,3"/>
+    <text x="265" y="126" fill="#ffb454" font-size="10">0.707倍の高さ</text>
+    <line x1="103" y1="130" x2="103" y2="200" stroke="#f4e04d" stroke-width="1.5" stroke-dasharray="2,2"/>
+    <line x1="197" y1="130" x2="197" y2="200" stroke="#f4e04d" stroke-width="1.5" stroke-dasharray="2,2"/>
+    <text x="150" y="215" fill="#f4e04d" font-size="11" text-anchor="middle">この幅は2山の合成でゆがむ</text>
+  </g>
+</svg>
+<p class="flow-svg-caption">右側は、隣の山の裾が重なることで「太さ」の測り方そのものが崩れてしまうイメージ</p>
+
+<div class="card cyan">
+<p style="margin:0;"><b>🔬 学術的にも裏付けあり</b></p>
+<p style="margin:8px 0 0; font-size:.95em;">2つのモードが近いと、半値幅法による<ruby>減衰<rt>げんすい</rt></ruby>（損失係数）の見積もりが<span class="hl-cyan">実際より大きく（過大に）ズレる</span>ことは、複数の学術論文で確認されています。ある研究では「2自由度系での誤差は、1自由度（山が1つだけ）の場合よりずっと大きくなることがあり、周波数がかなり離れていても誤差が残る」と報告されています。</p>
+</div>
+
+<div class="card amber">
+<p style="margin:0;"><b>🎯 まとめ</b></p>
+<p style="margin:8px 0 0;">「割れたところでそれぞれ測る」という<b>方向性はOK</b>です。しかし「測り方（計算方法）」が半値幅法のままだと、精度という点では、実は上司のやり方とそこまで変わらない結果になってしまいます。次の章で、正しい測り方を手順ごとに説明します。</p>
+</div>
+</section>
+
+<section id="p5">
+<h2 class="sec">★ 本題：正しい測定方法（手順書）</h2>
+
+<p>お待たせしました。ここからが今回の一番の本題です。<span class="hl-cyan">「なぜそうするのか（成り行き）」</span>と<span class="hl-amber">「具体的にどうやるか」</span>をセットで、実際の作業順序どおりに説明します。</p>
+
+<svg viewBox="0 0 640 460" width="100%">
+  <rect x="0" y="0" width="640" height="460" fill="#0f151d" rx="8"/>
+  <!-- flow steps -->
+  <g font-family="Hiragino Sans, sans-serif">
+  <!-- step boxes -->
+  <rect x="40" y="15" width="560" height="52" rx="10" fill="#182230" stroke="#5ad4ff" stroke-width="1.5"/>
+  <text x="60" y="47" fill="#5ad4ff" font-size="14" font-weight="700">STEP1</text>
+  <text x="130" y="47" fill="#dbe2ea" font-size="13">加振点を最低3〜4か所、用意する（1点測定をやめる）</text>
+
+  <line x1="320" y1="67" x2="320" y2="82" stroke="#3a4553" stroke-width="2"/>
+
+  <rect x="40" y="82" width="560" height="52" rx="10" fill="#182230" stroke="#ffb454" stroke-width="1.5"/>
+  <text x="60" y="114" fill="#ffb454" font-size="14" font-weight="700">STEP2</text>
+  <text x="130" y="114" fill="#dbe2ea" font-size="13">山が割れて見えても、消さずに全データを保存する</text>
+
+  <line x1="320" y1="134" x2="320" y2="149" stroke="#3a4553" stroke-width="2"/>
+
+  <rect x="40" y="149" width="560" height="52" rx="10" fill="#182230" stroke="#5ee6a0" stroke-width="1.5"/>
+  <text x="60" y="181" fill="#5ee6a0" font-size="14" font-weight="700">STEP3</text>
+  <text x="130" y="181" fill="#dbe2ea" font-size="13">コヒーレンス関数で、その場で信頼度をチェックする</text>
+
+  <line x1="320" y1="201" x2="320" y2="216" stroke="#3a4553" stroke-width="2"/>
+
+  <rect x="40" y="216" width="560" height="52" rx="10" fill="#182230" stroke="#c792ea" stroke-width="1.5"/>
+  <text x="60" y="248" fill="#c792ea" font-size="14" font-weight="700">STEP4</text>
+  <text x="130" y="248" fill="#dbe2ea" font-size="13">CMIFで「本当に2つのモードがあるか」数学的に確認</text>
+
+  <line x1="320" y1="268" x2="320" y2="283" stroke="#3a4553" stroke-width="2"/>
+
+  <rect x="40" y="283" width="560" height="52" rx="10" fill="#182230" stroke="#ff9ecf" stroke-width="1.5"/>
+  <text x="60" y="315" fill="#ff9ecf" font-size="14" font-weight="700">STEP5</text>
+  <text x="130" y="315" fill="#dbe2ea" font-size="13">半値幅法をやめ、多モード同時カーブフィットで分離する</text>
+
+  <line x1="320" y1="335" x2="320" y2="350" stroke="#3a4553" stroke-width="2"/>
+
+  <rect x="40" y="350" width="560" height="52" rx="10" fill="#182230" stroke="#7aa2ff" stroke-width="1.5"/>
+  <text x="60" y="382" fill="#7aa2ff" font-size="14" font-weight="700">STEP6</text>
+  <text x="130" y="382" fill="#dbe2ea" font-size="13">複数点の結果を突き合わせて、ばらつきを確認する</text>
+
+  <line x1="320" y1="402" x2="320" y2="417" stroke="#3a4553" stroke-width="2"/>
+
+  <rect x="40" y="417" width="560" height="38" rx="10" fill="#1a3d2a" stroke="#5ee6a0" stroke-width="1.5"/>
+  <text x="60" y="441" fill="#5ee6a0" font-size="14" font-weight="700">STEP7</text>
+  <text x="130" y="441" fill="#dbe2ea" font-size="13">採用する損失係数を決める（完了）</text>
+  </g>
+</svg>
+<p class="flow-svg-caption">この7ステップを、上から順番に説明していきます</p>
+
+<hr class="sep">
+
+<div class="step-head"><span class="step-badge">1</span><h3>加振点を最低3〜4か所、用意する</h3></div>
+
+<div class="why-box"><b>なぜ？</b>　双子（モードA・B）それぞれの「かくれんぼスポット（節線）」は、違う場所にあります。もし加振点が1か所だけだと、その点がたまたまどちらかの節線に近い場合、そのモードを永久に見逃してしまう危険があるからです。専門的には「参照点（加振点）の応答パターンが、モードごとに違う（線形独立である）必要がある」と言われます（Dewesoft社の技術解説より）。</div>
+
+<h4 class="subsub">📍 何か所？どこに置く？</h4>
+<p>目安は<b>最低3〜4か所</b>です。ポイントは、対称の軸（今回で言えば、パッドの左右の中心線）の<b>真上を避ける</b>ことと、なるべく<b>お互い離れた場所</b>（端・角・対角線上など）を選ぶことです。対称の軸の真上は、多くのモードにとって節線になりやすい"危険地帯"だからです。</p>
+
+<svg viewBox="0 0 640 260" width="100%">
+  <rect x="0" y="0" width="640" height="260" fill="#0f151d" rx="8"/>
+  <rect x="100" y="60" width="440" height="150" rx="20" fill="#1a212b" stroke="#3a4553" stroke-width="2"/>
+  <circle cx="230" cy="135" r="14" fill="#0d1117" stroke="#3a4553" stroke-width="2"/>
+  <circle cx="410" cy="135" r="14" fill="#0d1117" stroke="#3a4553" stroke-width="2"/>
+  <line x1="320" y1="45" x2="320" y2="225" stroke="#ff7a7a" stroke-width="1.5" stroke-dasharray="3,5"/>
+  <text x="320" y="235" fill="#ff7a7a" font-size="11" text-anchor="middle">対称の軸（避ける）</text>
+
+  <circle cx="150" cy="90" r="8" fill="#5ee6a0" stroke="#0d1117" stroke-width="2"/>
+  <text x="150" y="78" fill="#5ee6a0" font-size="11" text-anchor="middle">① 左上角</text>
+
+  <circle cx="490" cy="90" r="8" fill="#5ee6a0" stroke="#0d1117" stroke-width="2"/>
+  <text x="490" y="78" fill="#5ee6a0" font-size="11" text-anchor="middle">② 右上角</text>
+
+  <circle cx="150" cy="180" r="8" fill="#5ee6a0" stroke="#0d1117" stroke-width="2"/>
+  <text x="150" y="200" fill="#5ee6a0" font-size="11" text-anchor="middle">③ 左下角</text>
+
+  <circle cx="490" cy="180" r="8" fill="#5ee6a0" stroke="#0d1117" stroke-width="2"/>
+  <text x="490" y="200" fill="#5ee6a0" font-size="11" text-anchor="middle">④ 右下角</text>
+
+  <circle cx="320" cy="135" r="8" fill="#5ad4ff" stroke="#0d1117" stroke-width="2"/>
+  <text x="320" y="150" fill="#5ad4ff" font-size="11" text-anchor="middle">⑤ 中央(参考)</text>
+</svg>
+<p class="flow-svg-caption">🟡 例：対称軸を避けた4隅＋中央の計5点。実際はパッドの形・穴の位置に応じて微調整してください</p>
+
+<h4 class="subsub">🔧 あなたの機材で、具体的にどうやるか（2つの道）</h4>
+<p>加振器（シェーカー）が何台あるかによって、やり方が変わります。どちらも正しいやり方ですので、今お使いの機材に合わせて選んでください。</p>
+
+<div class="path-compare">
+  <div class="path-col a">
+    <h4>🅰️ 加振器が複数ある場合（本当のMIMO）</h4>
+    <p style="font-size:.92em;">複数の加振器を<b>同時に</b>鳴らして、一発で測定する方法です。あなたのPolytec PSVソフトのマニュアルには、専用の章（第8章「Multiple Reference Analysis (MIMO)」）が用意されています。</p>
+    <p style="font-size:.9em; color:var(--sub);">具体的な手順：</p>
+    <ol class="step-list" style="font-size:.9em;">
+      <li>各加振器にフォースセル（力センサー）を付け、その信号をPSVの「参照（Reference）」チャンネルに割り当てる</li>
+      <li>Acquisition Settings画面のGeneratorページで「Multiple Channels」にチェックを入れる</li>
+      <li>信号の種類は<span class="hl-cyan">Burst Random（バースト・ランダム）＋矩形窓（Rectangle）</span>の組み合わせが推奨されています（マニュアル8-2ページより）</li>
+      <li>平均回数は「<b>参照点の数M ＋ 2回以上</b>」が最低条件（例：M=3なら5回以上）</li>
+      <li>「Principal Component Analysis (MIMO)」にチェックを入れてスキャン開始</li>
+      <li>加振器どうしの相関（コヒーレンス）が0に近いか確認する（近くなければ加振器の位置を調整）</li>
+    </ol>
+    <p style="font-size:.85em; color:var(--sub);">出典：あなたのプロジェクト内 <code>Polytec_PSV_Software_Ver_9_1.pdf</code> 第8章</p>
+  </div>
+  <div class="path-col b">
+    <h4>🅱️ 加振器が1台だけの場合（今のあなたの状況）</h4>
+    <p style="font-size:.92em;">1台の加振器（棒）を<b>順番に</b>動かして、複数回に分けて測定する方法です。PSV-400はスキャン型なので、これがそのまま得意技になります。</p>
+    <p style="font-size:.9em; color:var(--sub);">具体的な手順：</p>
+    <ol class="step-list" style="font-size:.9em;">
+      <li>応答側（PSV-400でスキャンする点の並び＝グリッド）は<b>毎回まったく同じ</b>にする</li>
+      <li>棒を①の位置に固定し、パッド全体をフルスキャン→データ保存</li>
+      <li>棒を②の位置に固定し直し、<b>同じグリッド</b>を再度フルスキャン→別名で保存</li>
+      <li>③④…と、決めた加振点の数だけ繰り返す</li>
+      <li>「入力と出力は入れ替えても同じ（相反定理）」という性質を使い、複数回のスキャン結果をME&#39;scopeVESなどで1つの多参照データとしてまとめる</li>
+    </ol>
+    <p style="font-size:.85em; color:var(--sub);">PSVマニュアルにも「スキャンで複数のMISO測定を組み合わせてMIMOデータセットにできる」と明記されています（8-3ページ）</p>
+  </div>
+</div>
+
+<table>
+<tr><th>比較</th><th>🅰️ 複数加振器・同時</th><th>🅱️ 1加振器・順番</th></tr>
+<tr><td>必要な機材</td><td class="num">加振器を追加購入</td><td class="num">今のままでOK</td></tr>
+<tr><td>測定時間</td><td class="num">短い（一発）</td><td class="num">長い（点の数だけ繰り返し）</td></tr>
+<tr><td>途中で条件が変わる心配</td><td class="num">少ない</td><td class="num">スキャン間で環境が変わるとズレる可能性</td></tr>
+<tr><td>今すぐ始められるか</td><td class="num">🔴 要・追加投資</td><td class="num">🟢 すぐ始められる</td></tr>
+</table>
+
+<div class="note-box">💡 迷ったら、まずは<b>🅱️（1加振器・順番）</b>で始めるのがおすすめです。追加の機材投資が不要で、今日から始められます。将来的に精度をさらに上げたくなったら🅰️を検討してください。</div>
+
+<div class="step-head"><span class="step-badge">2</span><h3>山が割れて見えても、消さずに全データを保存する</h3></div>
+
+<div class="why-box"><b>なぜ？</b>　山が2つに割れて見えているデータこそ、「双子A・Bが両方ちゃんと生きている」という一番貴重な証拠です。「きれいな1本の山じゃないから」と測り直したり消したりすると、一番大事な情報を自分の手で捨てることになります。</div>
+
+<h4 class="subsub">🗂️ 具体的な保存の仕方（例）</h4>
+<p>あとで迷わないように、ファイル名に「どこを加振したか」を必ず入れておきましょう。</p>
+<div class="formula">例：
+　pad01_corner-UL_20260727.set　　← 左上角(Upper-Left)
+　pad01_corner-UR_20260727.set　　← 右上角(Upper-Right)
+　pad01_corner-LL_20260727.set　　← 左下角(Lower-Left)
+　pad01_corner-LR_20260727.set　　← 右下角(Lower-Right)
+　pad01_center_20260727.set　　　← 中央（参考用）</div>
+<div class="note-box">💡 割れて見えるデータをExcelやグラフに残すときも、「割れているのが異常」ではなく「割れているのが正常な状態」という前提でメモを残しておくと、あとで自分や周りの人が混乱しません。</div>
+
+<hr class="sep">
+
+<div class="step-head" id="p5-3"><span class="step-badge">3</span><h3>コヒーレンス関数で、その場で信頼度をチェックする</h3></div>
+
+<div class="why-box"><b>なぜ？</b>　節線（かくれんぼスポット）の近くでは信号がとても小さくなり、まわりのノイズに埋もれやすくなります。コヒーレンスは「今、測っているデータがどれくらい信用できるか」をリアルタイムで教えてくれる、いわば"信号の体温計"です。</div>
+
+<h4 class="subsub">🌡️ コヒーレンスってどんな数字？</h4>
+<p>0〜1の数字で表され、<b>1に近いほど信用できる</b>、<b>0に近いほどノイズだらけで信用できない</b>という意味です。</p>
+<div class="formula">γ²(f) ＝ ｜Gxy(f)｜² ÷ ( Gxx(f) × Gyy(f) )
+　Gxy＝入力(棒の力)と出力(揺れ)の相関の強さ
+　Gxx＝入力自身のパワー　　Gyy＝出力自身のパワー</div>
+<p>専門的な現場の目安として、<span class="hl-green">共振点（山のてっぺん）ではコヒーレンス0.9以上</span>が「良いFRF」の条件とされています（計測器メーカーDewesoft社の技術解説より）。節線の近くではこの数字がガクッと落ちるので、<b>山がきれいに見えても、コヒーレンスが低ければそのデータは使わない</b>、というルールを徹底してください。</p>
+
+<h4 class="subsub">🖥️ あなたの機材での具体的な確認方法</h4>
+<div class="path-compare">
+  <div class="path-col a">
+    <h4>Polytec PSV-400 の場合</h4>
+    <p style="font-size:.92em;">ソフトの中に「Frequency response and coherence」という専用の計算機能があり、測定と同時にコヒーレンスが自動計算されます（マニュアル 3.4節）。複数加振点のデータを組み合わせる場合は、点ごとに<b>Virtual Coherence（仮想コヒーレンス）</b>と<b>Multiple Coherence（複合コヒーレンス）</b>という2種類の信号が出てくるので、これを確認します。</p>
+  </div>
+  <div class="path-col b">
+    <h4>RION SA-01A4 の場合</h4>
+    <p style="font-size:.92em;">メニューバーの<code>［解析設定］→［FFT解析設定］</code>から、コヒーレンス関数を計算する／しないを設定できます（ハードウェア/ソフトウェアマニュアル 84ページ）。オンにしておけば、伝達関数（FRF）と一緒にコヒーレンスのグラフも表示されます。</p>
+  </div>
+</div>
+
+<div class="note-box">🟢 ちなみに：あなたが今使っているPSV-400にCoherence Optimizer（コヒーレンス最適化）という機能が搭載されている場合、レーザーの反射が弱い点を自動的に検知して調整し、コヒーレンスを最大化してくれます（マニュアル記載）。搭載の有無は装置の仕様欄で確認してください。</div>
+
+<hr class="sep">
+
+<div class="step-head"><span class="step-badge">4</span><h3>CMIF（複数モード判定関数）で「本当に2つのモードがあるか」数学的に確認する</h3></div>
+
+<div class="why-box"><b>なぜ？</b>　ここまでは「見た目」で2つの山を判断してきましたが、それが本当に2つの別々のモードなのか、それとも測定ノイズがたまたま山を歪ませているだけなのか、<b>数学的に裏付けを取る</b>ためのステップです。任意ですが、やっておくと自信を持って先に進めます。</div>
+
+<h4 class="subsub">🧮 CMIFってどんな仕組み？</h4>
+<p>CMIF（<ruby>複素<rt>ふくそ</rt></ruby>モード<ruby>指標<rt>しひょう</rt></ruby>関数）は、STEP1で集めた「複数の加振点のデータ」を数学的に処理（<ruby>特異値分解<rt>とくいちぶんかい</rt></ruby>という計算）して、その周波数に「本当は何個のモードが隠れているか」を教えてくれる道具です。</p>
+<p>やり方はシンプルです。CMIFのグラフを描くと、複数の曲線が出てきます。<b>1本の曲線しか山を作らなければモードは1つ</b>、<span class="hl-purple">2本の曲線が同時に山を作れば、そこには本当に2つの別々のモードがある</span>、と判定できます（学術文献 Shih et al. 他、多数の研究で確認されている手法です）。</p>
+
+<svg viewBox="0 0 640 200" width="100%">
+  <rect x="0" y="0" width="640" height="200" fill="#0f151d" rx="8"/>
+  <line x1="50" y1="170" x2="600" y2="170" stroke="#3a4553"/>
+  <text x="560" y="188" fill="#9aa7b5" font-size="12">周波数</text>
+  <path d="M60 165 Q280 165 300 30 Q320 165 560 165" fill="none" stroke="#5ad4ff" stroke-width="2.5"/>
+  <path d="M60 168 Q285 168 305 55 Q325 168 560 168" fill="none" stroke="#ff9ecf" stroke-width="2.5"/>
+  <text x="150" y="25" fill="#dbe2ea" font-size="12">2本の曲線が同時に山→本当に2つのモード</text>
+  <text x="450" y="145" fill="#5ad4ff" font-size="11">CMIF 曲線1</text>
+  <text x="450" y="160" fill="#ff9ecf" font-size="11">CMIF 曲線2</text>
+</svg>
+<p class="flow-svg-caption">2本の曲線が同時に頭を出す＝「片方はノイズでは？」という疑いを晴らせる</p>
+
+<div class="card amber">
+<p style="margin:0;"><b>🟡 正直な注意点</b></p>
+<p style="margin:8px 0 0;">CMIFの計算には複数点のFRFを行列として扱う特異値分解が必要で、<span class="hl-amber">Excel単体で本格的に組むのはかなり大変</span>です。ME&#39;scopeVESなど、お使いのモーダル解析ソフトに機能があればそちらを使うのが現実的です。どうしてもExcelでやりたい場合は、将来Pythonへ移行する際に scipy の特異値分解（SVD）機能を使うのがおすすめです（すでにお持ちの環境に numpy・scipy が入っています）。</p>
+</div>
+
+<hr class="sep">
+
+<div class="step-head"><span class="step-badge">5</span><h3>半値幅法をやめ、多モード同時カーブフィット（RFP／PolyMAX）で分離する</h3></div>
+
+<div class="why-box"><b>なぜ？</b>　STEP4までで「2つのモードが確かにある」と確認できました。ここからは、その重なった2つの山を、1つの数式（伝達関数モデル）として<b>同時に</b>フィットさせることで、重なりによる歪みを補正しながら、モードA・モードBそれぞれの周波数と損失係数を計算します。</div>
+
+<p>この計算方法自体（RFP法という手法をExcelで組む具体的な数式）は、<span class="hl-cyan">すでにお渡しした専用ガイド</span>で詳しく説明済みです。ここで重複して説明するとかえって分かりにくくなるため、計算の中身はそちらを参照してください。</p>
+
+<div class="card cyan">
+<p style="margin:0;"><b>📎 参照先</b></p>
+<p style="margin:8px 0 0;"><code>カーブフィット_窓関数_Excel解析ガイド.html</code></p>
+<div class="kv" style="margin-top:6px;">
+<div>第4部</div><div>ハンマリング×Excelで「疑似ポリリファレンス」カーブフィットを組む</div>
+<div>4-8節</div><div>本物の「複数参照（多点加振）」への拡張方法 ← 今回はまさにここが該当します</div>
+</div>
+</div>
+
+<p>今回の話とのつながりを一言で言うと：<span class="hl-amber">STEP1で複数点のデータを用意したのは、まさにこの「4-8節：複数参照への拡張」を実行するための材料集めだった</span>、ということです。</p>
+
+<hr class="sep">
+
+<div class="step-head"><span class="step-badge">6</span><h3>複数点の結果を突き合わせて、ばらつきを確認する</h3></div>
+
+<div class="why-box"><b>なぜ？</b>　損失係数は、本来「その構造物（パッド）そのものが持つ性質」であって、どこを叩いたかによって変わるはずのない値です。正しく分離計算できていれば、加振点が違っても（信号が弱すぎる点を除けば）近い値になるはずです。ばらつきが大きい場合は、モードの分離が不十分・ノイズが多い、というサインです。</div>
+
+<h4 class="subsub">📋 Excelでのクロスチェック表（コピーして使えます）</h4>
+<div class="tbl-wrap">
+<table id="tbl-crosscheck">
+<tr><th></th><th>A：加振点</th><th>B：モードAの損失係数 η</th><th>C：セルの中身</th></tr>
+<tr><td>1</td><td>左上角</td><td class="num">0.0142</td><td class="num">0.0142</td></tr>
+<tr><td>2</td><td>右上角</td><td class="num">0.0138</td><td class="num">0.0138</td></tr>
+<tr><td>3</td><td>左下角</td><td class="num">0.0151</td><td class="num">0.0151</td></tr>
+<tr><td>4</td><td>右下角</td><td class="num">0.0145</td><td class="num">0.0145</td></tr>
+<tr><td>5</td><td>平均</td><td class="num">0.0144</td><td class="num">=AVERAGE(B1:B4)</td></tr>
+<tr><td>6</td><td>標準偏差</td><td class="num">0.00054</td><td class="num">=STDEV.S(B1:B4)</td></tr>
+<tr><td>7</td><td>ばらつき率(%)</td><td class="num">3.8%</td><td class="num">=B6/B5*100</td></tr>
+</table>
+</div>
+<button class="copybtn" onclick="copyTSV('tbl-crosscheck', this)">📋 コピー（Excel貼り付け用）</button>
+<div class="note-box">🟡 B列は仮の例の数値です。実測値を入れてください。C列の数式をそのままB列に置き換えて使えます。</div>
+
+<div class="card purple">
+<p style="margin:0;"><b>🚦 ばらつき率の目安（🟡経験則・現場判断の参考値）</b></p>
+<div class="kv" style="margin-top:8px;">
+<div>〜5%程度</div><div>🟢 良好。分離できていると考えてよい</div>
+<div>5〜15%程度</div><div>🟡 やや大きい。節線に近い点が混ざっていないか確認</div>
+<div>15%以上</div><div>🔴 要注意。カーブフィットの分離がうまくいっていない可能性</div>
+</div>
+</div>
+
+<hr class="sep">
+
+<div class="step-head"><span class="step-badge">7</span><h3>採用する損失係数を決める</h3></div>
+
+<div class="card green">
+<p style="margin:0;"><b>🟢 結論</b></p>
+<p style="margin:8px 0 0;">「見かけ上、山が1本にまとまる特別な1点」を選ぶのではなく、<span class="hl-green">信号がしっかり出ている（節線から遠い）複数の点で、多モード同時カーブフィットを使って求めた値</span>を採用してください。</p>
+</div>
+
+<ul class="step-list">
+<li>複数点の結果が近い値に収束していることをSTEP6で確認した上で、その<b>平均値</b>、または最も条件の良い1点の代表値を使うのが正しい考え方です。</li>
+<li>どうしても1点だけを選ぶ必要がある場合は、<b>コヒーレンスが最も高く（＝節線から最も遠く）</b>、かつ<b>両モードの信号がバランス良く出ている点</b>（例：対角や端）を選んでください。</li>
+</ul>
+</section>
+
+<section id="p6">
+<h2 class="sec">📊 結果の信頼度 比較表</h2>
+
+<p>ここまでに出てきたすべての方法を、信頼度の高さで並べておきます。</p>
+
+<div class="tbl-wrap">
+<table id="tbl-reliability">
+<tr><th>方法</th><th>信頼度</th><th>理由</th></tr>
+<tr>
+  <td>上司の方法<br><span style="color:var(--sub); font-size:.85em;">（重なる点を探して半値幅法）</span></td>
+  <td class="num">🔴 低い</td>
+  <td>片方のモードを人為的に見えなくしているだけ。物理的な根拠がなく、再現性も低い</td>
+</tr>
+<tr>
+  <td>あなたの案そのまま<br><span style="color:var(--sub); font-size:.85em;">（割れた所で測る＋半値幅法）</span></td>
+  <td class="num">🟡 中程度</td>
+  <td>方向性は正しいが、近接モードでは半値幅法自体の精度が足りない</td>
+</tr>
+<tr>
+  <td>1点＋多モード同時カーブフィット</td>
+  <td class="num">🟡 中〜高</td>
+  <td>計算方法は正しいが、1点だけだと万一その点が節線に近い場合のリスクが残る</td>
+</tr>
+<tr>
+  <td class="hl-green">STEP1〜7の全部<br><span style="color:var(--sub); font-size:.85em;">（複数点＋コヒーレンス＋CMIF＋多モード同時カーブフィット＋クロスチェック）</span></td>
+  <td class="num">🟢 高い</td>
+  <td>物理的に正しく、複数点でのクロスチェックもでき、数学的な裏付け（CMIF）もある</td>
+</tr>
+</table>
+</div>
+<button class="copybtn" onclick="copyTSV('tbl-reliability', this)">📋 コピー（Excel貼り付け用）</button>
+
+<div class="note-box">🟡 「時間や設備の制約でSTEP4（CMIF）は省略する」といった判断も現実的にはあり得ます。その場合でも、STEP1（複数点）・STEP3（コヒーレンス確認）・STEP5（多モード同時カーブフィット）・STEP6（クロスチェック）の4つは、精度を保つための最低ラインとして省略しないことをおすすめします。</div>
+</section>
+
+<section id="p7">
+<h2 class="sec">⚠️ よくある間違い・注意点 総まとめ</h2>
+
+<p>これまでの内容をふまえて、現場でやってしまいがちな間違いを1つのリストにまとめました。測定前に、ぜひ一度目を通してください。</p>
+
+<div class="mistake">
+  <div class="x">✕</div>
+  <div><b>対称の軸の真上に加振点を置いてしまう</b><br>パッドの左右中心線は、多くのモードにとって節線（かくれんぼスポット）になりやすい"危険地帯"です。せっかく複数点で測っても、そのうちの1点がここに乗っていると、その点の情報はあまり役に立ちません。</div>
+</div>
+
+<div class="mistake">
+  <div class="x">✕</div>
+  <div><b>山が割れたデータを「失敗」と思って測り直す・消す</b><br>割れて見える状態こそが物理的に正しい状態です。きれいな1本の山を追い求めて位置をずらす行為自体が、モードを1つ見えなくする行為だと覚えておいてください。</div>
+</div>
+
+<div class="mistake">
+  <div class="x">✕</div>
+  <div><b>コヒーレンスを見ずに、山の形だけで信頼してしまう</b><br>見た目がきれいな山でも、コヒーレンスが低ければノイズの影響を強く受けている可能性があります。特に節線付近は要注意です。共振点で0.9以上を目安にしてください。</div>
+</div>
+
+<div class="mistake">
+  <div class="x">✕</div>
+  <div><b>近接モードに、半値幅法をそのまま使ってしまう</b><br>半値幅法は「孤立した1つの山」専用の簡易計算です。双子モードに使うと、隣の山の裾の影響で損失係数が実際より大きく（または小さく）出てしまいます。</div>
+</div>
+
+<div class="mistake">
+  <div class="x">✕</div>
+  <div><b>加振点ごとに、応答側の測定グリッドを変えてしまう</b><br>複数点のデータをあとで1つにまとめる（多参照化する）には、応答側のスキャン点の並びが毎回同じである必要があります。グリッドがバラバラだと、あとで比較・合成ができません。</div>
+</div>
+
+<div class="mistake">
+  <div class="x">✕</div>
+  <div><b>棒（スティンガー）の締め付け具合が毎回変わってしまう</b><br>固定条件（締め付けトルクなど）が測定のたびに変わると、同じ場所で測っても結果が微妙にズレて、再現性が落ちます。できるだけ毎回同じ力で固定する工夫をしてください。</div>
+</div>
+
+<div class="mistake">
+  <div class="x">✕</div>
+  <div><b>MIMO測定で、平均回数が足りない</b><br>複数の参照（加振）チャンネルを使う場合、平均回数は「参照点の数＋2回」以上が最低条件です（Polytec PSVマニュアルより）。これより少ないと、計算そのものが数学的に不安定になります。</div>
+</div>
+
+<div class="mistake">
+  <div class="x">✕</div>
+  <div><b>1点だけの損失係数を「これが正解」と思い込む</b><br>損失係数はパッド自体が持つ性質であり、測る場所によって変わるはずのない値です。複数点で近い値になっていることを確認してから採用してください。1点だけの値には、その点特有の誤差が混ざっている可能性があります。</div>
+</div>
+</section>
+
+<section id="p8">
+<h2 class="sec">✅ 現場で使えるチェックリスト</h2>
+
+<p>測定当日、このページだけ開いておけば手順を思い出せるように、実行順のチェックリストにしました。ブラウザ上でチェックを入れることもできます（ページを閉じるとチェック状態は保存されません）。</p>
+
+<h3 class="sub">🧰 準備段階</h3>
+<ul class="checklist">
+<li><input type="checkbox"><span>加振点を最低3〜4か所、パッドの対称軸を避けて決めた（STEP1）</span></li>
+<li><input type="checkbox"><span>応答側（PSV-400のスキャン点グリッド）を、全ての加振点で共通の配置に固定した</span></li>
+<li><input type="checkbox"><span>複数の加振器を同時に使う場合、フォースセルを参照チャンネルに正しく割り当てた</span></li>
+<li><input type="checkbox"><span>信号の種類を確認した（複数加振点を組み合わせる場合はBurst Random＋矩形窓が推奨）</span></li>
+<li><input type="checkbox"><span>平均回数を「参照点の数＋2回」以上に設定した（MIMOの場合）</span></li>
+<li><input type="checkbox"><span>ファイル名のルール（加振点の場所が分かる名前）を決めた（STEP2）</span></li>
+</ul>
+
+<h3 class="sub">📡 測定中</h3>
+<ul class="checklist">
+<li><input type="checkbox"><span>1か所目の加振点を固定し、パッド全体をフルスキャンした</span></li>
+<li><input type="checkbox"><span>山が割れて見えても、消さず・測り直さず、そのまま保存した（STEP2）</span></li>
+<li><input type="checkbox"><span>コヒーレンス関数を表示し、共振点で0.9以上あることを確認した（STEP3）</span></li>
+<li><input type="checkbox"><span>コヒーレンスが低い点があれば、その点はメモを残し、別の点を追加検討した</span></li>
+<li><input type="checkbox"><span>2か所目・3か所目…と、同じグリッドで繰り返しスキャンした</span></li>
+<li><input type="checkbox"><span>各測定のファイル名に加振点の場所を記録した</span></li>
+</ul>
+
+<h3 class="sub">🧮 解析段階</h3>
+<ul class="checklist">
+<li><input type="checkbox"><span>（可能であれば）CMIFで「本当に2つのモードがあるか」を確認した（STEP4）</span></li>
+<li><input type="checkbox"><span>半値幅法ではなく、多モード同時カーブフィット（RFP/PolyMAX）で分離計算した（STEP5）</span></li>
+<li><input type="checkbox"><span>複数点の損失係数を並べて、平均・標準偏差・ばらつき率を計算した（STEP6）</span></li>
+<li><input type="checkbox"><span>ばらつき率が概ね5%程度以内に収まっていることを確認した</span></li>
+<li><input type="checkbox"><span>ばらつきが大きい場合、節線に近い点が混ざっていないか見直した</span></li>
+<li><input type="checkbox"><span>採用する損失係数を、平均値または最良点の代表値として決定した（STEP7）</span></li>
+</ul>
+
+<div class="note-box">💡 全部を毎回完璧にこなす必要はありません。特にSTEP4（CMIF）は時間や環境次第で省略しても構いませんが、STEP1・2・3・5・6は精度を守るための最低ラインとしておすすめします。</div>
+</section>
+
+<section id="p9">
+<h2 class="sec">📚 出典・参考文献（一次情報）</h2>
+
+<p>このガイドの技術的な内容の裏付けとして使った情報源です。数字や手順の根拠を自分で確認したいときに使ってください。</p>
+
+<div class="refitem">
+<b>① コヒーレンス関数・共振点での目安値（0.9以上）、節線付近での低下</b><br>
+<span class="src">Dewesoft, "Measuring Frequency Response Function (FRF)"</span><br>
+<a href="https://dewesoft.com/blog/measuring-frequency-response-function" target="_blank">https://dewesoft.com/blog/measuring-frequency-response-function</a>
+</div>
+
+<div class="refitem">
+<b>② 近接モード（縮退モード）には複数参照点が必要な理由</b><br>
+<span class="src">Dewesoft, "What is Modal Analysis: The Ultimate Guide"</span><br>
+<a href="https://dewesoft.com/blog/what-is-modal-analysis" target="_blank">https://dewesoft.com/blog/what-is-modal-analysis</a>
+</div>
+
+<div class="refitem">
+<b>③ コヒーレンス関数の基礎解説</b><br>
+<span class="src">Crystal Instruments, "The Coherence Function - A Brief Review"</span><br>
+<a href="https://www.crystalinstruments.com/blog/2015/1/12/the-coherence-function-a-brief-review" target="_blank">https://www.crystalinstruments.com/blog/2015/1/12/the-coherence-function-a-brief-review</a>
+</div>
+
+<div class="refitem">
+<b>④ 複数参照（マルチリファレンス）モーダル試験の実務・複合コヒーレンス</b><br>
+<span class="src">Brüel &amp; Kjær, Application Note "Modal Analysis using Multi-reference..."（bo0505）</span><br>
+<a href="https://www.bksv.com/-/media/literature/Application-Note/bo0505.ashx" target="_blank">https://www.bksv.com/-/media/literature/Application-Note/bo0505.ashx</a>
+</div>
+
+<div class="refitem">
+<b>⑤ 近接モード分離のための複数加振点・シェーカー配置の考え方</b><br>
+<span class="src">The Modal Shop, "Answering Your Modal Testing FAQs"</span><br>
+<a href="https://www.modalshop.com/vibration-test/learn/modal-testing-faq" target="_blank">https://www.modalshop.com/vibration-test/learn/modal-testing-faq</a>
+</div>
+
+<div class="refitem">
+<b>⑥ 多モード同時カーブフィット（PolyMAX法）の原著論文</b><br>
+<span class="src">Peeters, B. et al. (2004) "The PolyMAX Frequency-Domain Method: A New Standard for Modal Parameter Estimation?", <i>Shock and Vibration</i>, Hindawi/Wiley</span><br>
+<a href="https://www.hindawi.com/journals/sv/2004/523692/" target="_blank">https://www.hindawi.com/journals/sv/2004/523692/</a>
+</div>
+
+<div class="refitem">
+<b>⑦ CMIF（複素モード指標関数）の仕組み</b><br>
+<span class="src">Structural Vibration Solutions, "Complex Mode Indicator Function"（ARTeMIS Modal Help）</span><br>
+<a href="https://www.svibs.com/resources/ARTeMIS_Modal_Help_v7/Complex%20Modal%20Indicator%20Function.html" target="_blank">https://www.svibs.com/resources/ARTeMIS_Modal_Help_v7/Complex%20Modal%20Indicator%20Function.html</a>
+</div>
+
+<div class="refitem">
+<b>⑧ 近接モードにおける半値幅法の過大評価誤差</b><br>
+<span class="src">"Estimation error of the half-power bandwidth method in identifying damping for multi-DOF systems", <i>Structural Dynamics and Earthquake Engineering</i>誌</span><br>
+<a href="https://www.sciencedirect.com/science/article/abs/pii/S0267726112000528" target="_blank">https://www.sciencedirect.com/science/article/abs/pii/S0267726112000528</a>
+</div>
+
+<div class="refitem">
+<b>⑨ あなたのプロジェクト内資料（一次情報・社内マニュアル）</b><br>
+<span class="src">
+・Polytec_PSV_Software_Ver_9_1.pdf － 第8章「Multiple Reference Analysis (MIMO)」／3.4節「Calculation of Frequency Response and Coherence」<br>
+・SA-01_SA-01A2_SA-01A4_Manual_Software_32873.pdf － 84ページ「FFT解析設定」（コヒーレンス関数の計算設定）
+</span>
+</div>
+
+<div class="note-box">🟢 このほか、板振動の理論的背景（縮退モードが生じやすい条件）は Leissa, <i>Vibration of Plates</i>（NASA SP-160）、多モード同時カーブフィットの基礎は Ewins, <i>Modal Testing: Theory, Practice and Application</i> に基づいています。これらは以前の会話で確認済みの、あなたの手元にある定番文献です。</div>
+</section>
+
+<footer class="end">
+  <p>このファイルはあなたの相談内容と、Polytec PSVソフトウェアマニュアル（プロジェクト内・一次情報）、および学術文献・業界一次情報をもとに作成しました。</p>
+  <p>次に進みたくなったら「多モード同時カーブフィットの実装（Excel）」は既存の <code>カーブフィット_窓関数_Excel解析ガイド.html</code>（第4部・4-8節）と合わせて使ってください。</p>
+</footer>
+
+</div>
+
+<script>
+function copyTSV(id, btn){
+  var wrap = btn.closest('.tbl-wrap') || btn.parentElement;
+  var table = wrap.querySelector('table');
+  if(!table){ table = document.getElementById(id); }
+  var rows = table.querySelectorAll('tr');
+  var lines = [];
+  rows.forEach(function(r){
+    var cells = r.querySelectorAll('th,td');
+    var vals = [];
+    cells.forEach(function(c){ vals.push(c.textContent.trim()); });
+    lines.push(vals.join('\t'));
+  });
+  var text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(function(){
+    btn.classList.add('copied');
+    var orig = btn.textContent;
+    btn.textContent = '✅ コピーしました';
+    setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
+  }).catch(function(){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✅ コピーしました';
+    setTimeout(function(){ btn.textContent = '📋 コピー'; }, 1600);
+  });
+}
+</script>
+
+</body>
+</html>
