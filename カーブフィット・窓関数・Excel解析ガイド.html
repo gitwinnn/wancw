@@ -1,0 +1,567 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カーブフィット・窓関数・Excel解析 完全ガイド</title>
+<style>
+  :root{
+    --bg:#0d1117; --bg2:#151b23; --card:#1a212b; --line:#2a3441;
+    --text:#dbe2ea; --sub:#9aa7b5; --cyan:#5ad4ff; --amber:#ffb454;
+    --green:#5ee6a0; --yellow:#f4e04d; --red:#ff7a7a; --purple:#c792ea;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Hiragino Sans","Yu Gothic",-apple-system,sans-serif;
+    line-height:1.85; margin:0; padding:0 0 80px 0;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:28px 20px;}
+  header.top{
+    background:linear-gradient(160deg,#101820,#182230);
+    border-bottom:1px solid var(--line); padding:36px 20px 30px;
+  }
+  header.top h1{
+    font-size:1.5em; margin:0 0 8px; color:var(--cyan);
+    letter-spacing:.02em;
+  }
+  header.top p{color:var(--sub); margin:4px 0;}
+  nav.toc{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:18px 22px; margin:22px 0;
+  }
+  nav.toc h2{font-size:1em; color:var(--amber); margin:0 0 10px;}
+  nav.toc ol{margin:0; padding-left:1.4em;}
+  nav.toc a{color:var(--text); text-decoration:none; border-bottom:1px dotted var(--sub);}
+  nav.toc a:hover{color:var(--cyan);}
+  section{margin:44px 0;}
+  h2.sec{
+    font-size:1.25em; color:var(--cyan); border-left:4px solid var(--cyan);
+    padding:4px 0 4px 14px; margin:0 0 18px;
+  }
+  h3.sub{font-size:1.05em; color:var(--amber); margin:28px 0 10px;}
+  h4.subsub{font-size:.98em; color:var(--purple); margin:20px 0 8px;}
+  p{margin:12px 0;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:18px 20px; margin:16px 0;
+  }
+  .card.amber{border-left:4px solid var(--amber);}
+  .card.green{border-left:4px solid var(--green);}
+  .card.red{border-left:4px solid var(--red);}
+  .card.cyan{border-left:4px solid var(--cyan);}
+  .badge{
+    display:inline-block; font-size:.78em; padding:2px 9px; border-radius:20px;
+    margin-left:6px; white-space:nowrap;
+  }
+  .b-ok{background:#123d2a; color:var(--green); border:1px solid #1f6b47;}
+  .b-est{background:#403a10; color:var(--yellow); border:1px solid #7a6a1a;}
+  .b-check{background:#3d1a1a; color:var(--red); border:1px solid #7a2a2a;}
+  ruby rt{color:var(--sub); font-size:.62em;}
+  .hl-cyan{color:var(--cyan); font-weight:600;}
+  .hl-amber{color:var(--amber); font-weight:600;}
+  .hl-green{color:var(--green); font-weight:600;}
+  .hl-red{color:var(--red); font-weight:600;}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:.92em;}
+  th,td{border:1px solid var(--line); padding:8px 10px; text-align:left;}
+  th{background:#1e2733; color:var(--amber);}
+  td.num{font-family:"SF Mono",Consolas,monospace; color:var(--cyan);}
+  .formula{
+    font-family:"SF Mono",Consolas,monospace; background:#0f151d; border:1px solid var(--line);
+    border-radius:6px; padding:10px 14px; color:var(--green); margin:10px 0; overflow-x:auto;
+  }
+  .tbl-wrap{position:relative;}
+  .copybtn{
+    background:#1e2733; color:var(--cyan); border:1px solid var(--line); border-radius:6px;
+    padding:5px 12px; font-size:.82em; cursor:pointer; margin:6px 0 2px;
+  }
+  .copybtn:hover{background:#28323f;}
+  .copybtn.copied{color:var(--green); border-color:var(--green);}
+  svg{display:block; margin:18px auto; max-width:100%;}
+  .step-list{padding-left:1.3em;}
+  .step-list li{margin:10px 0;}
+  .note-box{
+    background:#151b23; border:1px dashed var(--sub); border-radius:8px;
+    padding:14px 18px; margin:14px 0; font-size:.94em; color:var(--sub);
+  }
+  .flow-svg-caption{text-align:center; color:var(--sub); font-size:.85em; margin-top:-6px;}
+  code{background:#1e2733; padding:1px 6px; border-radius:4px; color:var(--cyan); font-size:.92em;}
+  hr.sep{border:none; border-top:1px solid var(--line); margin:36px 0;}
+  .kv{display:grid; grid-template-columns:170px 1fr; gap:6px 14px; margin:10px 0;}
+  .kv div:nth-child(odd){color:var(--sub);}
+  footer.end{
+    text-align:center; color:var(--sub); font-size:.85em; margin-top:60px;
+    border-top:1px solid var(--line); padding-top:20px;
+  }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap" style="padding:0;">
+    <h1>🔬 カーブフィット・窓関数判別・Excel解析 完全ガイド</h1>
+    <p>ブレーキパッド EMA（実験モーダル解析）｜ハンマリング × Excel 疑似ポリリファレンス実装</p>
+    <p>これだけ読めば、手順を忘れても最初からやり直せます。</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h2>📖 目次</h2>
+  <ol>
+    <li><a href="#p1">カーブフィットとは何か（総復習・図解版）</a></li>
+    <li><a href="#p2">窓関数が「要る／要らない」の見分け方（あなたの機材向け）</a></li>
+    <li><a href="#p3">窓が要らない場合の「測定時間（ブロック長）」の決め方</a></li>
+    <li><a href="#p4">ハンマリング×Excelで「疑似ポリリファレンス」カーブフィットを組む</a></li>
+    <li><a href="#p5">注意点・よくあるミス 総まとめ</a></li>
+    <li><a href="#p6">出典・参考文献</a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<section id="p1">
+<h2 class="sec">第1部｜カーブフィット<ruby>法<rt>ほう</rt></ruby>とは何か</h2>
+
+<p>先にひとことで言い切ります。</p>
+
+<div class="card cyan">
+<p style="font-size:1.05em;"><span class="hl-cyan">測定した点々（ガタガタしたデータ）に、物理的に正しいはずの「なめらかな数式の線」を当てはめて、その数式から本当の値（<ruby>固有振動数<rt>こゆうしんどうすう</rt></ruby>・<ruby>減衰<rt>げんすい</rt></ruby>など）を逆算する作業</span>のことです。</p>
+</div>
+
+<h3 class="sub">🌊 たとえ話：バネと重りの実験</h3>
+<p>バネに重りをぶら下げて手を離すと、揺れはだんだん小さくなります。1秒後10cm、2秒後6cm……という具合です。理論上はなめらかに減っていくはずですが、実測すると誤差（ノイズ）が混ざって点がガタつきます。そこで「一番よく合う、なめらかな理論の線」を計算で探すのが<span class="hl-amber">カーブフィット</span>です。</p>
+
+<svg viewBox="0 0 640 220" width="100%">
+  <rect x="0" y="0" width="640" height="220" fill="#0f151d" rx="8"/>
+  <line x1="50" y1="180" x2="600" y2="180" stroke="#3a4553" stroke-width="1.5"/>
+  <line x1="50" y1="20" x2="50" y2="180" stroke="#3a4553" stroke-width="1.5"/>
+  <text x="580" y="198" fill="#9aa7b5" font-size="12">周波数</text>
+  <text x="15" y="30" fill="#9aa7b5" font-size="12">振幅</text>
+  <!-- theoretical smooth curve (peak) -->
+  <path d="M 60 170 Q 220 170 300 40 Q 380 170 560 170" fill="none" stroke="#5ad4ff" stroke-width="2.5"/>
+  <!-- noisy measured points -->
+  <g fill="#ffb454">
+    <circle cx="90" cy="165" r="4"/><circle cx="140" cy="160" r="4"/>
+    <circle cx="190" cy="140" r="4"/><circle cx="230" cy="100" r="4"/>
+    <circle cx="265" cy="70" r="4"/><circle cx="300" cy="45" r="4"/>
+    <circle cx="335" cy="72" r="4"/><circle cx="370" cy="105" r="4"/>
+    <circle cx="410" cy="145" r="4"/><circle cx="460" cy="162" r="4"/>
+    <circle cx="520" cy="168" r="4"/>
+  </g>
+  <text x="230" y="205" fill="#ffb454" font-size="12">● 実測データ点（ノイズでガタつく）</text>
+  <text x="230" y="20" fill="#5ad4ff" font-size="12">── 当てはめた理論曲線（カーブフィット結果）</text>
+</svg>
+<p class="flow-svg-caption">オレンジの点＝実測、水色の線＝計算で当てはめた「本当はこの形のはず」という数式</p>
+
+<h3 class="sub">🎯 あなたの測定（FRF）での意味</h3>
+<p>ハンマーで叩いて作る周波数<ruby>応答<rt>おうとう</rt></ruby>関数（FRF）の「山」も、物理法則から決まった数式の形になるはずです。カーブフィットで山の形に数式を当てはめれば、ノイズに惑わされず正確に固有振動数と損失係数を取り出せます。</p>
+
+<h3 class="sub">⚠️ なぜ半値幅法だけでは足りないのか</h3>
+<p>半値幅法は「定規で山の幅を測るだけ」の一番シンプルなカーブフィットです。<span class="hl-green">山が1つだけ、きれいに孤立している時</span>は十分な精度が出ます。しかし、あなたのブレーキパッドは穴で対称性が崩れて<span class="hl-red">縮退<ruby>しゅくたい</ruby><ruby>双子<rt>ふたご</rt></ruby>モード（2つの山が重なって1つに見える）</span>が出やすく、この場合は定規（半値幅法）では答えが大きくズレます。</p>
+
+<svg viewBox="0 0 640 200" width="100%">
+  <rect x="0" y="0" width="640" height="200" fill="#0f151d" rx="8"/>
+  <line x1="50" y1="160" x2="600" y2="160" stroke="#3a4553" stroke-width="1.5"/>
+  <text x="150" y="30" fill="#9aa7b5" font-size="13">① 見た目：山は1つ</text>
+  <path d="M 60 150 Q 200 150 280 30 Q 360 150 500 150" fill="none" stroke="#ff7a7a" stroke-width="2.5"/>
+  <text x="150" y="185" fill="#ff7a7a" font-size="12">半値幅法 → 実は2つの山の合成、答えがズレる</text>
+</svg>
+<svg viewBox="0 0 640 200" width="100%">
+  <rect x="0" y="0" width="640" height="200" fill="#0f151d" rx="8"/>
+  <line x1="50" y1="160" x2="600" y2="160" stroke="#3a4553" stroke-width="1.5"/>
+  <text x="120" y="30" fill="#9aa7b5" font-size="13">② カーブフィット後：2つの山に分離</text>
+  <path d="M 60 150 Q 190 150 250 55 Q 300 150 350 55 Q 410 150 540 150" fill="none" stroke="#5ee6a0" stroke-width="2.5"/>
+  <text x="200" y="70" fill="#5ee6a0" font-size="11">モードA</text>
+  <text x="330" y="70" fill="#5ee6a0" font-size="11">モードB</text>
+  <text x="130" y="185" fill="#5ee6a0" font-size="12">MDOFカーブフィット（RFP/PolyMAX等）→ 正しく2つに分離</text>
+</svg>
+
+<h3 class="sub">📊 手法の一覧（もう一度整理）</h3>
+<table>
+<tr><th>レベル</th><th>手法</th><th>できること</th><th>あなたの場面</th></tr>
+<tr><td>簡単</td><td>半値幅法</td><td>定規で山の幅を測る</td><td>孤立した1本の山だけ</td></tr>
+<tr><td>やや高度</td><td>サークルフィット</td><td>コンパスで円を当てはめる</td><td>1つの山を精密に測りたい</td></tr>
+<tr><td>高度</td><td class="hl-amber">MDOFカーブフィット（RFP等）</td><td>重なった山を数式ごと分離</td><td class="hl-green">双子モード分離（本命）</td></tr>
+<tr><td>最強</td><td>MIMO＋ポリリファレンス</td><td>複数加振点のデータを1つの数式にまとめる</td><td>対称構造の縮退モード決定打</td></tr>
+</table>
+
+<div class="note-box">💡 原理のイメージ：バネ・重り系の揺れ方は物理法則から「必ずこの形の数式になる」と決まっています。その数式の中の“つまみ”（固有振動数・減衰・大きさ）を、実測データに一番合うようコンピュータで自動調整するのがカーブフィットの正体です。</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p2">
+<h2 class="sec">第2部｜窓関数が「要る・要らない」の見分け方</h2>
+
+<p>結論から言うと、判定基準はただ1つです。</p>
+
+<div class="card amber">
+<p style="font-size:1.05em;"><span class="hl-amber">記録した1コマ（フレーム）の中で、たたいた後の揺れの波形が「終わりまでにほぼゼロまで減衰しているか」だけを見ます。</span></p>
+</div>
+
+<svg viewBox="0 0 640 230" width="100%">
+  <rect x="0" y="0" width="640" height="230" fill="#0f151d" rx="8"/>
+  <text x="60" y="24" fill="#5ee6a0" font-size="13">◎ 窓が要らない例：フレーム内で減衰しきっている</text>
+  <line x1="50" y1="70" x2="600" y2="70" stroke="#3a4553"/>
+  <path d="M 50 70 C 70 20, 90 120, 110 70 S 150 40, 170 70 S 210 55, 230 70 S 260 65, 280 70 L 600 70" fill="none" stroke="#5ee6a0" stroke-width="2"/>
+  <line x1="600" y1="30" x2="600" y2="110" stroke="#5ee6a0" stroke-dasharray="3,3"/>
+  <text x="540" y="120" fill="#5ee6a0" font-size="11">フレーム終端＝ほぼ0</text>
+
+  <text x="60" y="150" fill="#ff7a7a" font-size="13">✕ 窓が必要な例：終端でまだ揺れが残っている</text>
+  <line x1="50" y1="195" x2="600" y2="195" stroke="#3a4553"/>
+  <path d="M 50 195 C 70 145, 90 245, 110 195 S 150 155, 170 195 S 210 160, 230 195 S 270 165, 290 195 S 330 170, 350 195 S 390 175, 410 195 S 450 180, 470 195 S 510 183, 530 195 S 570 185, 600 195" fill="none" stroke="#ff7a7a" stroke-width="2"/>
+  <line x1="600" y1="155" x2="600" y2="235" stroke="#ff7a7a" stroke-dasharray="3,3"/>
+  <text x="510" y="150" fill="#ff7a7a" font-size="11">まだ揺れが残る＝段差発生</text>
+</svg>
+
+<h3 class="sub">🔎 なぜ「終端の段差」がダメなのか</h3>
+<p>FFTは切り取った1コマが無限にループすると仮定します。終わりと始まりに段差（不連続点）があると、そこにニセの高周波成分（漏れ＝リーケージ）が発生し、山の形がなまって<span class="hl-red">損失係数（減衰）を過大評価</span>してしまいます。だから「終端がゼロになっているか」が唯一のチェックポイントです。</p>
+
+<h3 class="sub">🛠 あなたの RION SA-01A4 での確認手順</h3>
+<ol class="step-list">
+  <li>解析モードを<strong>FFT解析</strong>にし、ハンマリング測定を1回行う。</li>
+  <li>画面の「全時間データ」または時間波形表示で、<strong>応答（振動）チャンネルの波形</strong>を目視。</li>
+  <li>フレーム（記録時間の1コマ）の<strong>終端付近</strong>で、波の振幅がノイズの床（フロア）に埋もれているかを確認する。</li>
+  <li>埋もれていれば → <span class="hl-green">窓＝「無し」（方形窓）でOK</span>。何も足さなくて良い、一番正確。</li>
+  <li>まだ波が見えていれば → <span class="hl-red">「フォース・指数」窓が必要</span>（基準チャンネル＝ハンマー側にフォース窓、応答側に指数窓）。</li>
+</ol>
+
+<div class="card green">
+<h4 class="subsub" style="margin-top:0;">🟢 補足：ハンマー（力）信号側は常に「フォース窓」でOK</h4>
+<p>ハンマーで叩いた力の信号は、当たった瞬間以降は物理的に本当にゼロです（叩いていないから）。なのでフォース窓（打撃の前後だけを残し、あとは強制的にゼロにする窓）をかけても、データを歪めることにはなりません。これは応答側の指数窓（本当は減衰していないのに人工的に減衰させる）とは性質が違うので、区別して考えてください。 <span class="badge b-ok">🟢検証済み</span></p>
+</div>
+
+<h3 class="sub">📐 判定を数値で裏付ける（目安の計算式）</h3>
+<p>軽い減衰の系（バネ・重り系）の揺れは、指数関数的に小さくなります。目標の減衰量（例：-60dB＝1000分の1）まで減衰するのにかかる時間 <em>t</em> は、次の式で見積もれます。</p>
+
+<div class="formula">t = ln(1/r) / (π・fn・η)　　※ r＝目標振幅比（例：-60dB なら r=0.001）</div>
+<p>dB表記で言うなら：</p>
+<div class="formula">t = (dB × ln(10) / 20) / (π・fn・η)</div>
+
+<h4 class="subsub">🧮 Excelでの貼り付け例</h4>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-decay', this)">📋 このセルをコピー（貼り付け用）</button>
+<table>
+<tr><th>セル</th><th>入力/式</th><th>意味（例）</th></tr>
+<tr><td>A1</td><td class="num">3500</td><td>予想される固有振動数 fn [Hz]</td></tr>
+<tr><td>A2</td><td class="num">0.008</td><td>予想される損失係数 η（前回の粗い推定値でOK）</td></tr>
+<tr><td>A3</td><td class="num">60</td><td>目標の減衰量 [dB]（-60dB＝十分にゼロ扱い）</td></tr>
+<tr><td>B1</td><td class="num">=(A3*LN(10)/20)/(PI()*A1*A2)</td><td>必要な減衰時間 t [秒]（例 約0.0785秒）</td></tr>
+</table>
+</div>
+<p class="note-box">η（損失係数）はこれから測ろうとしている値そのものなので、最初は前回の粗い測定や文献値（ブレーキパッド摩擦材なら η≈0.005〜0.02 程度が目安）を仮入力してください。仮の値で計算した t より測定フレームが十分長ければ、多少ズレていても問題ありません。 <span class="badge b-est">🟡推定</span></p>
+
+<h3 class="sub">📋 RION SA-01A4 の仕様（一次情報：ハードウェアマニュアル）</h3>
+<table>
+<tr><th>項目</th><th>内容</th></tr>
+<tr><td>FFT解析長（データ点数）</td><td>2<sup>N</sup> 点（N=6〜15、つまり 64〜32768点）</td></tr>
+<tr><td>サンプリング周波数</td><td>20kHzレンジ以下：解析周波数レンジ × 2.56／40kHzレンジ：× 2.4</td></tr>
+<tr><td>窓関数の種類</td><td>無し（方形）／ハニング／フォース・指数／指数・指数／フラットトップ</td></tr>
+<tr><td>オーバーラップ</td><td>2kHzレンジ以下で最大93.75%まで選択可</td></tr>
+</table>
+<p style="font-size:.88em; color:var(--sub);">出典：SA-01/SA-01A2/SA-01A4 ハードウェアマニュアル（プロジェクトの添付PDF）。 <span class="badge b-ok">🟢検証済み</span></p>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p3">
+<h2 class="sec">第3部｜窓が要らない場合の「測定時間（ブロック長）」の決め方</h2>
+
+<p>窓を使わずに済ませたい時は、「たたいた後の揺れが記録時間内にちゃんとゼロまで収まる」ように、記録時間 <em>T</em>（＝ブロック長 N 点 ÷ サンプリング周波数 fs）を決めます。</p>
+
+<h3 class="sub">🔗 うれしい副産物：分解能もついでに良くなる</h3>
+<p>記録時間 <em>T</em> を長くすると、周波数分解能 Δf（＝ 1/T、正確には fs/N）も同時に細かくなります。つまり<span class="hl-green">「窓なしにするために記録を長くする」ことは、「双子モードを見分けやすくする」こととも一致します</span>。デメリットとぶつからない、珍しい“両取り”ができる場面です。</p>
+
+<div class="formula">Δf = fs / N　　（N＝FFTの解析点数、fs＝サンプリング周波数）</div>
+<div class="formula">T = N / fs　　（この T が、揺れが収まるのに必要な時間より長ければ窓は不要）</div>
+
+<h3 class="sub">🧮 手順（手取り足取り）</h3>
+<ol class="step-list">
+  <li>第2部の式で「窓なしに必要な最低記録時間 t」を計算する（例：0.0785秒）。</li>
+  <li>RIONの「解析周波数」レンジを決める（例：20kHzレンジ → fs=20000×2.56=51200Hz）。</li>
+  <li>解析点数 N（64〜32768）を、<code>T=N/fs が t より少し余裕を持って大きくなる</code>ように選ぶ。</li>
+  <li>選んだ N と fs から Δf を計算し、モード同士の間隔（例：40Hz差の双子）に対して十分細かいか確認する（目安：Δf はモード間隔の1/5以下が望ましい）。</li>
+  <li>「ウインド」設定を<strong>「無し」</strong>にする。</li>
+</ol>
+
+<h4 class="subsub">🧮 Excelでの貼り付け例（ブロック長の決定）</h4>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-block', this)">📋 コピー（貼り付け用）</button>
+<table>
+<tr><th>セル</th><th>入力/式</th><th>意味（例）</th></tr>
+<tr><td>A1</td><td class="num">20000</td><td>解析周波数レンジ [Hz]（RION設定値）</td></tr>
+<tr><td>A2</td><td class="num">=A1*2.56</td><td>サンプリング周波数 fs [Hz]（例 51200）</td></tr>
+<tr><td>A3</td><td class="num">0.0785</td><td>必要な最低記録時間 t [秒]（第2部B1セルから）</td></tr>
+<tr><td>A4</td><td class="num">=A2*A3</td><td>必要な最低点数（例 4019点）</td></tr>
+<tr><td>A5</td><td class="num">=2^ROUNDUP(LOG(A4,2),0)</td><td>実際に選ぶ N（2の累乗に切り上げ、例 8192点）</td></tr>
+<tr><td>A6</td><td class="num">=A5/A2</td><td>実際の記録時間 T [秒]（例 0.16秒、余裕あり）</td></tr>
+<tr><td>A7</td><td class="num">=A2/A5</td><td>周波数分解能 Δf [Hz]（例 6.25Hz）</td></tr>
+</table>
+</div>
+
+<h3 class="sub">📊 目安の早見表（fn=3500Hz 帯での例）</h3>
+<table>
+<tr><th>損失係数 η</th><th>必要な最低記録時間 t</th><th>N=8192(T=0.16s)で足りるか</th></tr>
+<tr><td class="num">0.020</td><td class="num">約0.031秒</td><td class="hl-green">✓ 十分</td></tr>
+<tr><td class="num">0.008</td><td class="num">約0.079秒</td><td class="hl-green">✓ 十分</td></tr>
+<tr><td class="num">0.004</td><td class="num">約0.157秒</td><td class="hl-red">✕ 不足（N=32768等に増やす）</td></tr>
+</table>
+<p class="note-box">摩擦材入りブレーキパッドの損失係数は η≈0.005〜0.02 程度が多く報告されており、この帯なら RION の最大点数（32768点）まで使わなくても窓なし測定が十分狙えます。ただし実際の η は測ってみないと分からないため、<span class="badge b-est">🟡推定</span> の位置づけです。まず粗い測定（短いブロック＋窓あり）で η のアタリをつけてから、本番の窓なし測定条件を決めるのが安全です。</p>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p4">
+<h2 class="sec">第4部｜ハンマリング×Excelで「疑似ポリリファレンス」カーブフィットを組む</h2>
+
+<div class="card red">
+<h4 class="subsub" style="margin-top:0;">🔴 最初に正直な前提をお伝えします</h4>
+<p>本物の「MIMO＋ポリリファレンス（PolyMAX等）」は、<strong>複数の加振点（参照点）のデータを、行列の多項式固有値問題という高度な数値計算で同時に解く</strong>手法です。この“行列の多項式を固有値分解する”部分は、Excelの標準機能（関数だけ）では原理的に組めません（対応する組み込み関数が無いため）。 <span class="badge b-check">🔴要確認・原理的な限界</span></p>
+<p>そこでこのガイドでは、<span class="hl-amber">数学的な考え方は本物のポリリファレンス法と同じ「有理多項式カーブフィット（RFP法）」を、Excelの標準機能（MMULT・MINVERSE・Solver）だけで組める形にした実装</span>を提供します。まず1つの加振点（ハンマー1点）のデータで双子モードをきれいに分離できることを、実際に数値検証した上でご案内します。複数加振点への拡張方法は4-8節で説明します。</p>
+</div>
+
+<h3 class="sub">4-1｜全体の考え方（噛み砕いた版）</h3>
+<p>FRF（周波数応答関数）H(ω) を、「分子の多項式 ÷ 分母の多項式」という形の数式でまるごと表現します。</p>
+<div class="formula">H(ω) = [ b0 + b1(jω) + b2(jω)² + b3(jω)³ ] / [ a0 + a1(jω) + a2(jω)² + a3(jω)³ + (jω)⁴ ]</div>
+<p>分母を4次にするのがポイントです。分母の式を「＝0」と置いた方程式（特性方程式）の根（解）が、ちょうど<span class="hl-green">2つのモード（双子）の固有振動数と減衰</span>に対応します。4次方程式は根が4つ出て、複素共役のペアが2組＝モードが2つ、というわけです。</p>
+<p>b（分子）と a（分母、最高次の係数は1に固定）は未知数ですが、実はこの式は<span class="hl-cyan">見かけによらず「1次方程式（線形）」に変形できます</span>。これが数値的に解ける理由です。</p>
+
+<h3 class="sub">4-2｜準備するデータ</h3>
+<ul>
+  <li>調べたい双子モードの<strong>周波数帯を含むFRFデータ</strong>（RIONまたはPSVからエクスポート）：周波数 f [Hz]、実部 Re(H)、虚部 Im(H) の3列。</li>
+  <li>点数の目安：20〜80点程度（帯域の中に2つの山がきちんと収まっていること）。</li>
+</ul>
+
+<h3 class="sub">4-3｜Excelシート構成（列ごとの計算式）</h3>
+<p>まず基準周波数（帯域の中心くらいでOK）を決めて、周波数を「正規化（normalization：単位のない扱いやすい数字に変換すること）」します。これをやらないと数値が大きすぎたり小さすぎたりして、Excelの計算誤差が無視できないほど大きくなることを数値実験で確認しています（生の周波数のまま計算すると、双子の分離に失敗します）。 <span class="badge b-ok">🟢検証済み（Python二重計算で確認）</span></p>
+
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-sheet1', this)">📋 シート構成をコピー</button>
+<table>
+<tr><th>列</th><th>内容</th><th>式（2行目の例、以下同じ行番号でコピー）</th></tr>
+<tr><td>A</td><td>周波数 f [Hz]</td><td>（測定データを貼り付け）</td></tr>
+<tr><td>B</td><td>Re(H)</td><td>（測定データを貼り付け）</td></tr>
+<tr><td>C</td><td>Im(H)</td><td>（測定データを貼り付け）</td></tr>
+<tr><td>E1</td><td>基準周波数 fref [Hz]</td><td class="num">3500</td></tr>
+<tr><td>F1</td><td>ωref [rad/s]</td><td class="num">=2*PI()*E1</td></tr>
+<tr><td>D</td><td>正規化角周波数 Ω</td><td class="num">=2*PI()*A2/$F$1</td></tr>
+</table>
+</div>
+
+<h4 class="subsub">実部の方程式（各周波数点ごとに1行）</h4>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-realrow', this)">📋 実部の行（列F〜M・列N）をコピー</button>
+<table>
+<tr><th>列</th><th>意味</th><th>式（例：2行目）</th></tr>
+<tr><td>G</td><td>b0の係数</td><td class="num">=1</td></tr>
+<tr><td>H</td><td>b1の係数</td><td class="num">=0</td></tr>
+<tr><td>I</td><td>b2の係数</td><td class="num">=-D2^2</td></tr>
+<tr><td>J</td><td>b3の係数</td><td class="num">=0</td></tr>
+<tr><td>K</td><td>a0の係数</td><td class="num">=-B2</td></tr>
+<tr><td>L</td><td>a1の係数</td><td class="num">=D2*C2</td></tr>
+<tr><td>M</td><td>a2の係数</td><td class="num">=D2^2*B2</td></tr>
+<tr><td>N</td><td>a3の係数</td><td class="num">=-D2^3*C2</td></tr>
+<tr><td>O</td><td>右辺(RHS)</td><td class="num">=D2^4*B2</td></tr>
+</table>
+</div>
+
+<h4 class="subsub">虚部の方程式（実部の下に、同じ点数だけ続けて並べる）</h4>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-imagrow', this)">📋 虚部の行をコピー</button>
+<table>
+<tr><th>列</th><th>意味</th><th>式（例）</th></tr>
+<tr><td>G</td><td>b0の係数</td><td class="num">=0</td></tr>
+<tr><td>H</td><td>b1の係数</td><td class="num">=D2</td></tr>
+<tr><td>I</td><td>b2の係数</td><td class="num">=0</td></tr>
+<tr><td>J</td><td>b3の係数</td><td class="num">=-D2^3</td></tr>
+<tr><td>K</td><td>a0の係数</td><td class="num">=-C2</td></tr>
+<tr><td>L</td><td>a1の係数</td><td class="num">=-D2*B2</td></tr>
+<tr><td>M</td><td>a2の係数</td><td class="num">=D2^2*C2</td></tr>
+<tr><td>N</td><td>a3の係数</td><td class="num">=D2^3*B2</td></tr>
+<tr><td>O</td><td>右辺(RHS)</td><td class="num">=D2^4*C2</td></tr>
+</table>
+</div>
+<p class="note-box">実部の行を測定点の数だけ（例：21点なら21行）作り、その真下に同じ形で虚部の行を21行続けて並べます。合計42行が「連立方程式」になります。列G〜Nの8列が未知数[b0,b1,b2,b3,a0,a1,a2,a3]の係数、列Oが右辺です。</p>
+
+<h3 class="sub">4-4｜連立方程式を解く（MMULT・MINVERSE）</h3>
+<p>G〜N列（42行×8列）を行列 <strong>A</strong>、O列（42行×1列）を <strong>c</strong> として、最小二乗法（誤差の二乗が一番小さくなる解）で解きます。式はこの3つだけです。</p>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-solve', this)">📋 解法の数式をコピー</button>
+<table>
+<tr><th>セル範囲</th><th>式</th><th>意味</th></tr>
+<tr><td>Q1:X8（8×8）</td><td class="num">=MMULT(TRANSPOSE(G2:N43),G2:N43)</td><td>AᵀA（配列数式・Ctrl+Shift+Enter、Excel365ならそのままEnterでOK）</td></tr>
+<tr><td>Q10:X17（8×8）</td><td class="num">=MINVERSE(Q1:X8)</td><td>(AᵀA)⁻¹</td></tr>
+<tr><td>Q20:Q27（8×1）</td><td class="num">=MMULT(TRANSPOSE(G2:N43),O2:O43)</td><td>Aᵀc</td></tr>
+<tr><td>Q30:Q37（8×1）</td><td class="num">=MMULT(Q10:X17,Q20:Q27)</td><td>答え＝[b0,b1,b2,b3,a0,a1,a2,a3]</td></tr>
+</table>
+</div>
+<p style="font-size:.88em; color:var(--sub);">※ 範囲は例です。実際の点数（行数）に合わせて G2:N43 の部分を書き換えてください（点数×2 行分）。</p>
+
+<h3 class="sub">4-5｜分母の方程式を解いて「2つのモード」に分ける（Excel Solver）</h3>
+<p>Q30:Q37 で求めた a0,a1,a2,a3（a4は1固定）を使い、分母の4次方程式を「2つの2次方程式の掛け算」に分解します。</p>
+<div class="formula">s⁴ + a3・s³ + a2・s² + a1・s + a0 = (s² + p1・s + q1)(s² + p2・s + q2)</div>
+<p>展開して係数を比べると、4つの式が出てきます。</p>
+<div class="formula">p1+p2 = a3　／　q1+q2+p1p2 = a2　／　p1q2+p2q1 = a1　／　q1q2 = a0</div>
+
+<h4 class="subsub">Excel Solverの使い方（手取り足取り）</h4>
+<ol class="step-list">
+  <li><strong>［データ］タブ → ［ソルバー］</strong>が無ければ、［ファイル］→［オプション］→［アドイン］→ 下部の「管理：Excel アドイン」→［設定］→「ソルバー アドイン」にチェック → OK（一度だけでOK、以後ずっと使えます）。</li>
+  <li>セルに未知数 p1,q1,p2,q2 の仮の値（初期値）を入れる。初期値は、グラフを見て「だいたいこの辺に山がある」という周波数から作ります（下のExcel式参照）。</li>
+  <li>別のセルに「4つの式の左辺−右辺」を計算し、その2乗の合計（残差）を出すセルを作る。</li>
+  <li>［データ］→［ソルバー］を開き、目的セル＝残差の合計セル、目標値＝<strong>0（最小値）</strong>、変数セル＝p1,q1,p2,q2 の4セルを指定。</li>
+  <li>解決方法は「<strong>GRG非線形</strong>」を選び、［解決］をクリック。残差がほぼ0まで下がれば成功。</li>
+</ol>
+
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-solverinit', this)">📋 初期値づくりの式をコピー</button>
+<table>
+<tr><th>セル</th><th>式</th><th>意味</th></tr>
+<tr><td>S1</td><td class="num">3480</td><td>1つ目の山の周波数の見た目の予想 [Hz]</td></tr>
+<tr><td>S2</td><td class="num">3520</td><td>2つ目の山の周波数の見た目の予想 [Hz]</td></tr>
+<tr><td>S3</td><td class="num">0.007</td><td>損失係数の粗い予想（第2部と同じ値でOK）</td></tr>
+<tr><td>T1(p1初期値)</td><td class="num">=S3*(2*PI()*S1)/$F$1</td><td></td></tr>
+<tr><td>T2(q1初期値)</td><td class="num">=((2*PI()*S1)/$F$1)^2</td><td></td></tr>
+<tr><td>T3(p2初期値)</td><td class="num">=S3*(2*PI()*S2)/$F$1</td><td></td></tr>
+<tr><td>T4(q2初期値)</td><td class="num">=((2*PI()*S2)/$F$1)^2</td><td></td></tr>
+<tr><td>U1(残差)</td><td class="num">=(T1+T3-Q33)^2+(T2+T4+T1*T3-Q32)^2+(T1*T4+T3*T2-Q31)^2+(T2*T4-Q30)^2</td><td>Solverの目的セル（最小化）</td></tr>
+</table>
+</div>
+<p style="font-size:.88em; color:var(--sub);">※ Q30〜Q33 は4-4で求めた a0,a1,a2,a3 のセル番地に読み替えてください（Q30=a0, Q31=a1, Q32=a2, Q33=a3 の想定）。</p>
+
+<h3 class="sub">4-6｜固有振動数・損失係数への変換</h3>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-convert', this)">📋 変換式をコピー</button>
+<table>
+<tr><th>セル</th><th>式</th><th>意味</th></tr>
+<tr><td>V1</td><td class="num">=SQRT(T2)</td><td>モードAの正規化固有角周波数</td></tr>
+<tr><td>V2</td><td class="num">=T1/(2*V1)</td><td>モードAの減衰比 ζ</td></tr>
+<tr><td>V3</td><td class="num">=(V1*$F$1)/(2*PI())</td><td>モードAの固有振動数 fn [Hz]</td></tr>
+<tr><td>V4</td><td class="num">=2*V2</td><td>モードAの損失係数 η</td></tr>
+<tr><td>W1〜W4</td><td>（同様にT3,T4から計算）</td><td>モードBの fn・η</td></tr>
+</table>
+</div>
+
+<h3 class="sub">4-7｜検算用サンプルデータ（動作確認用）</h3>
+<p>下のデータをA2:C22に貼り付けて、上の手順通りに計算すると、<span class="hl-green">モードA＝約3480.0Hz／η≈0.00600、モードB＝約3520.0Hz／η≈0.00800</span> に近い値が出れば、シートが正しく組めています（実際にPythonで二重計算し検証済みの数値です）。 <span class="badge b-ok">🟢検証済み</span></p>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-sampledata', this)">📋 検算用データをコピー（f, Re, Im）</button>
+<table id="sampledata-table" style="font-size:.85em;">
+<tr><th>f [Hz]</th><th>Re(H)</th><th>Im(H)</th></tr>
+<tr><td class="num">3400.0</td><td class="num">0.000051</td><td class="num">0.003010</td></tr>
+<tr><td class="num">3410.0</td><td class="num">0.000093</td><td class="num">0.003391</td></tr>
+<tr><td class="num">3420.0</td><td class="num">0.000162</td><td class="num">0.003876</td></tr>
+<tr><td class="num">3430.0</td><td class="num">0.000280</td><td class="num">0.004516</td></tr>
+<tr><td class="num">3440.0</td><td class="num">0.000512</td><td class="num">0.005463</td></tr>
+<tr><td class="num">3450.0</td><td class="num">0.001016</td><td class="num">0.006854</td></tr>
+<tr><td class="num">3460.0</td><td class="num">0.002362</td><td class="num">0.009080</td></tr>
+<tr><td class="num">3470.0</td><td class="num">0.006939</td><td class="num">0.012171</td></tr>
+<tr><td class="num">3480.0</td><td class="num">0.016968</td><td class="num">0.007099</td></tr>
+<tr><td class="num">3490.0</td><td class="num">0.012733</td><td class="num">-0.002205</td></tr>
+<tr><td class="num">3500.0</td><td class="num">0.009201</td><td class="num">-0.001806</td></tr>
+<tr><td class="num">3510.0</td><td class="num">0.010162</td><td class="num">-0.001520</td></tr>
+<tr><td class="num">3520.0</td><td class="num">0.011108</td><td class="num">-0.005744</td></tr>
+<tr><td class="num">3530.0</td><td class="num">0.006478</td><td class="num">-0.008669</td></tr>
+<tr><td class="num">3540.0</td><td class="num">0.003142</td><td class="num">-0.007475</td></tr>
+<tr><td class="num">3550.0</td><td class="num">0.001759</td><td class="num">-0.006056</td></tr>
+<tr><td class="num">3560.0</td><td class="num">0.001128</td><td class="num">-0.005000</td></tr>
+<tr><td class="num">3570.0</td><td class="num">0.000797</td><td class="num">-0.004246</td></tr>
+<tr><td class="num">3580.0</td><td class="num">0.000602</td><td class="num">-0.003688</td></tr>
+<tr><td class="num">3590.0</td><td class="num">0.000478</td><td class="num">-0.003267</td></tr>
+<tr><td class="num">3600.0</td><td class="num">0.000393</td><td class="num">-0.002933</td></tr>
+</table>
+</div>
+
+<h3 class="sub">4-8｜本物の「複数参照（多点加振）」への拡張方法</h3>
+<p>ハンマーで<strong>複数の場所</strong>を順番に叩けば（例：角①と角②の2箇所、応答は同じ1点で固定）、相反性（そうはんせい／reciprocity：H<sub>ij</sub>=H<sub>ji</sub>という物理法則）を使って、実質的に2つの参照点を持つデータセットが作れます。これは実務でも使われる、シェーカーを2台用意しなくても済む現実的なMIMO化のやり方です。</p>
+<p>Excel上での拡張は次のようになります。</p>
+<ul>
+  <li>分母（a0〜a3）の列は<strong>2つの参照データで共通</strong>のまま使う。</li>
+  <li>分子（b0〜b3）は参照点ごとに<strong>別々に</strong>用意する（参照2用にb0'〜b3'の列を追加）。</li>
+  <li>行列の列数が 4(参照1のb) + 4(参照2のb) + 4(共通のa) = 12列に増える。行数は参照1と参照2のデータを縦に積み増しした分（点数×2×2）になる。</li>
+  <li>4-4・4-5の手順はそのまま（MMULT・MINVERSE・Solverの範囲を広げるだけ）で成立します。</li>
+</ul>
+<div class="card amber">
+<p><strong>正直な限界</strong>：参照点が3つ以上になったり、モードが3つ以上重なる複雑なケースになると、Excelの行列サイズ・Solverの収束の手間が急激に増え、実務としては非効率になります。その規模になったら、Python（scipy／numpyは既にお使いのLinux Mint環境で動きます）に切り替える方が速く確実です。<span class="badge b-est">🟡推定（規模の目安、要はお使いになってからの感触次第）</span></p>
+</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p5">
+<h2 class="sec">第5部｜注意点・よくあるミス 総まとめ</h2>
+<ul class="step-list">
+  <li><span class="hl-red">正規化を忘れる</span>：周波数をそのままHz単位で計算に使うと、数値が大きすぎて誤差で答えがズレる。必ず基準周波数で割って正規化すること。</li>
+  <li><span class="hl-red">帯域の選び方が広すぎる／狭すぎる</span>：2つの山がちゃんと収まる範囲で、余計な他のモードを含めない帯域を選ぶ。</li>
+  <li><span class="hl-red">Solverの初期値が山からかけ離れている</span>：グラフを見て「だいたいこの辺」という初期値を必ず入れる。ゼロや適当な値からだと収束しないことがある。</li>
+  <li><span class="hl-red">ハンマー信号にフォース窓をかけ忘れる</span>：ハンマー側は常にフォース窓（または窓無しでも打撃前後を十分ゼロ区間にする）にする。</li>
+  <li><span class="hl-red">応答が終端で減衰しきっていないのに窓無しにする</span>：第2部・第3部の手順で必ず確認してから決める。</li>
+  <li><span class="hl-red">2度打ち・叩き損じたデータを混ぜる</span>：カーブフィットの前に、時間波形で2度打ちが無いか目視チェック。</li>
+</ul>
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p6">
+<h2 class="sec">第6部｜出典・参考文献</h2>
+<ul class="step-list" style="font-size:.92em;">
+  <li>SA-01/SA-01A2/SA-01A4 ハードウェアマニュアル（プロジェクト添付PDF）－ FFT解析長・サンプリング周波数・窓関数の仕様</li>
+  <li>SA-01 ソフトウェアマニュアル（プロジェクト添付PDF）－ ウインド設定（フォース・指数等）の操作手順</li>
+  <li>Richardson, M.H. &amp; Formenti, D.L., "Parameter Estimation from Frequency Response Measurements using Rational Fraction Polynomials" (1982) － RFP法の原典</li>
+  <li>本ガイドの数式・Excel手順は、Python（NumPy）による二重計算で数値検証を行っています。</li>
+</ul>
+<div class="card red">
+<p><span class="badge b-check">🔴要確認</span> PSV 9.0 Acquisition本体にCMIF・ポリリファレンス・カーブフィットが標準搭載されているかは、公式マニュアル該当ページでの一次確認がまだできていません。搭載されていれば、本ガイドのExcel実装よりもソフト内で完結する方が速く確実です。</p>
+</div>
+</section>
+
+</div>
+
+<footer class="end">
+  <p>このファイルだけで、最初から最後まで再現できるように作られています。</p>
+</footer>
+
+<script>
+function copyTSV(id, btn){
+  // find nearest table within the same wrapper and copy its contents as TSV
+  var wrap = btn.closest('.tbl-wrap') || btn.parentElement;
+  var table = wrap.querySelector('table');
+  if(!table){ table = document.getElementById('sampledata-table'); }
+  var rows = table.querySelectorAll('tr');
+  var lines = [];
+  rows.forEach(function(r){
+    var cells = r.querySelectorAll('th,td');
+    var vals = [];
+    cells.forEach(function(c){ vals.push(c.textContent.trim()); });
+    lines.push(vals.join('\t'));
+  });
+  var text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(function(){
+    btn.classList.add('copied');
+    var orig = btn.textContent;
+    btn.textContent = '✅ コピーしました';
+    setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
+  }).catch(function(){
+    // fallback for older browsers
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✅ コピーしました';
+    setTimeout(function(){ btn.textContent = '📋 コピー'; }, 1600);
+  });
+}
+</script>
+
+</body>
+</html>

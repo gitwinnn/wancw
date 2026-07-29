@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>5つの窓、何が違うの？ ― RION SA-01のウインド設定 手取り足取りガイド</title>
+<style>
+  :root{
+    --bg:#0a0e16;
+    --panel:#0f1524;
+    --panel2:#131a2c;
+    --line:#232b40;
+    --text:#dbe2f0;
+    --sub:#8b96b3;
+    --amber:#ffb454;
+    --cyan:#4fd6e8;
+    --green:#7ee29a;
+    --red:#ff6b6b;
+    --violet:#c39bff;
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Hiragino Sans","Yu Gothic",-apple-system,sans-serif;
+    line-height:1.85;
+    padding:0 0 80px 0;
+  }
+  ruby rt{ font-size:0.55em; color:var(--sub); }
+  .wrap{ max-width:920px; margin:0 auto; padding:0 20px; }
+  header.hero{
+    background:
+      radial-gradient(ellipse at 20% -10%, rgba(79,214,232,0.14), transparent 55%),
+      radial-gradient(ellipse at 90% 0%, rgba(255,180,84,0.10), transparent 50%),
+      linear-gradient(180deg,#0d1220,#0a0e16 70%);
+    border-bottom:1px solid var(--line);
+    padding:56px 20px 40px;
+  }
+  .eyebrow{
+    color:var(--amber); font-size:0.8em; letter-spacing:0.15em;
+    font-family:"SFMono-Regular",Consolas,monospace;
+  }
+  h1{
+    font-size:1.9em; margin:0.4em 0 0.3em; color:#fff;
+    line-height:1.4;
+  }
+  .lead{ color:var(--sub); font-size:0.98em; max-width:640px; }
+  h2{
+    color:var(--cyan); font-size:1.35em; margin-top:3em;
+    border-left:4px solid var(--cyan); padding-left:0.5em;
+  }
+  h3{ color:var(--amber); font-size:1.1em; margin-top:2em; }
+  .badge{
+    display:inline-block; font-size:0.72em; padding:2px 9px; border-radius:20px;
+    font-family:monospace; margin-left:6px; vertical-align:middle;
+  }
+  .b-ok{ background:rgba(126,226,154,0.15); color:var(--green); border:1px solid rgba(126,226,154,0.4);}
+  .b-est{ background:rgba(255,180,84,0.15); color:var(--amber); border:1px solid rgba(255,180,84,0.4);}
+  .b-check{ background:rgba(255,107,107,0.15); color:var(--red); border:1px solid rgba(255,107,107,0.4);}
+  .card{
+    background:var(--panel); border:1px solid var(--line); border-radius:14px;
+    padding:22px 24px; margin:22px 0;
+  }
+  .card.amber{ border-color:rgba(255,180,84,0.35); }
+  .card.cyan{ border-color:rgba(79,214,232,0.35); }
+  canvas{ width:100%; height:auto; background:#070a12; border-radius:8px; border:1px solid var(--line); display:block; }
+  .capt{ font-size:0.82em; color:var(--sub); margin-top:6px; }
+  table{ width:100%; border-collapse:collapse; font-size:0.92em; margin:18px 0; }
+  th,td{ border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top; }
+  th{ background:var(--panel2); color:var(--cyan); }
+  tr:nth-child(even) td{ background:rgba(255,255,255,0.02); }
+  .tag{
+    display:inline-block; font-size:0.78em; padding:2px 10px; border-radius:6px; margin:2px 4px 2px 0;
+  }
+  .tag.good{ background:rgba(126,226,154,0.15); color:var(--green); }
+  .tag.bad{ background:rgba(255,107,107,0.15); color:var(--red); }
+  code, .mono{ font-family:"SFMono-Regular",Consolas,monospace; font-size:0.92em; }
+  .formula-box{
+    background:#070a12; border:1px solid var(--line); border-radius:10px;
+    padding:14px 16px; margin:12px 0; overflow-x:auto;
+  }
+  .formula-box table{ margin:0; font-size:0.88em; }
+  .formula-box th{ background:#0d1424; }
+  .copybtn{
+    background:var(--panel2); color:var(--cyan); border:1px solid var(--cyan);
+    border-radius:6px; padding:4px 10px; font-size:0.78em; cursor:pointer; font-family:monospace;
+  }
+  .copybtn:hover{ background:rgba(79,214,232,0.15); }
+  .step{
+    display:flex; gap:14px; margin:14px 0; align-items:flex-start;
+  }
+  .stepnum{
+    flex:0 0 30px; height:30px; border-radius:50%; background:var(--panel2);
+    color:var(--amber); border:1px solid var(--amber);
+    display:flex; align-items:center; justify-content:center; font-family:monospace; font-size:0.85em;
+  }
+  .miss{
+    border-left:3px solid var(--red); background:rgba(255,107,107,0.06);
+    padding:10px 14px; margin:10px 0; border-radius:0 8px 8px 0;
+  }
+  .warn{
+    border-left:3px solid var(--amber); background:rgba(255,180,84,0.06);
+    padding:10px 14px; margin:10px 0; border-radius:0 8px 8px 0;
+  }
+  .quote{
+    border-left:3px solid var(--sub); padding:10px 14px; margin:10px 0;
+    color:var(--sub); font-size:0.9em; background:rgba(255,255,255,0.02);
+  }
+  a{ color:var(--cyan); }
+  .grid2{ display:grid; grid-template-columns:1fr 1fr; gap:16px; }
+  @media (max-width:700px){ .grid2{ grid-template-columns:1fr; } }
+  footer{ text-align:center; color:var(--sub); font-size:0.8em; margin-top:60px; }
+  .scale{ text-align:center; font-size:0.78em; color:var(--sub); margin-top:10px; }
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="eyebrow">RION SA-01A4 ／ ハンマリング測定 保存版ガイド</div>
+    <h1>5つの窓、何が違うの？<br>― <ruby>無<rt>な</rt></ruby>し・ハニング・<ruby>指数<rt>しすう</rt></ruby>・<ruby>指数<rt>しすう</rt></ruby>・フラットトップ・フォース・<ruby>指数<rt>しすう</rt></ruby> ―</h1>
+    <p class="lead">
+      このファイル1枚を読めば、RION SA-01A4の「ウインド」設定画面に並ぶ5つの選択肢が、
+      それぞれ「何をしているのか」「いつ選ぶべきか」「あなたのブレーキパッド測定にどう影響するか」が、
+      忘れていても必ず思い出せるようになっています。
+    </p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<h2>0. まず結論だけ（30秒で）</h2>
+<div class="card cyan">
+  <p>あなたがハンマー（インパクトハンマー）で叩いて、ブレーキパッドの応答をRION SA-01A4とレーザーで取るときは：</p>
+  <p style="font-size:1.15em; color:var(--amber); text-align:center; margin:14px 0;">
+    基本は <span class="mono" style="color:#fff;">フォース・指数</span> 窓を使う
+  </p>
+  <p>これは「叩いた瞬間の力波形」には<b>フォース窓</b>を、「叩かれた後に鳴っている応答波形」には<b>指数窓</b>を、
+  それぞれ別々にかける、ハンマリング専用の組み合わせです。ただし後述のとおり、指数窓は測定した減衰（<ruby>損失<rt>そんしつ</rt></ruby>係数）を実際より大きく見せてしまう副作用があるので、
+  「本当は窓なし（無し）が一番正確」という原則も併せて覚えてください。</p>
+</div>
+
+<h2>1. そもそも「窓」って何？（小学生向けの説明）</h2>
+
+<div class="card">
+<p>
+ハンマーでパッドをコン！と叩くと、パッドは「ビーン…」と鳴って、だんだん音（振動）が小さくなっていきます。
+測定器（RION SA-01A4）は、この「ビーン…」という音を<b>決まった長さの時間だけ</b>録音します。
+たとえば「0.5秒間だけ録音する」と決めたとします。
+</p>
+
+<div class="step">
+  <div class="stepnum">①</div>
+  <div>
+  もし0.5秒より前に音が完全に鳴りやんでいたら → 問題なし。録音の最後はきれいに「無音（ゼロ）」になっています。
+  </div>
+</div>
+<div class="step">
+  <div class="stepnum">②</div>
+  <div>
+  でも、もし0.5秒経ってもまだ「ビーーン」と鳴り続けていたら → 録音は<b>音が鳴っている途中でブツッと切れます</b>。
+  </div>
+</div>
+
+<p>
+このとき、FFT（<ruby>周波数<rt>しゅうはすう</rt></ruby>解析をする計算方法）は、実はある勘違いをしています。
+FFTは「この0.5秒の録音が、同じ波形のまま永遠にコピー＆ペーストで繰り返されている」と思い込んで計算するのです。
+</p>
+
+<canvas id="cv-leak" width="900" height="320"></canvas>
+<p class="capt">
+図：上＝音が0.5秒より前に鳴りやんだ理想的な例（つなぎ目もなめらか）。下＝鳴っている途中で切れた例。
+切れ目でガクッと段差ができ、これが永遠に繰り返されると「プツッ、プツッ、プツッ…」というニセの雑音が生まれます。
+</p>
+
+<p>
+この「ブツッ」という<b>ニセの段差</b>のせいで、本当は無いはずの周波数にまでエネルギーが漏れ出して見えてしまいます。
+これを<b><ruby>スペクトル<rt>スペクトル</rt></ruby>漏<ruby>漏<rt>も</rt></ruby>れ（リーケージ）</b>と呼びます。
+</p>
+
+<p>
+「<ruby>窓<rt>まど</rt></ruby><ruby>関数<rt>かんすう</rt></ruby>」は、この段差を消すための道具です。
+録音した波形の<b>両端（または片端）をなだらかに0へ着地させる</b>ことで、段差＝ニセの雑音を防ぎます。
+ちょうど、飛行機が着陸するときに急ブレーキではなく、ふわっと減速して着地するイメージです。
+</p>
+</div>
+
+<div class="warn">
+<b>覚えておくべきトレードオフ：</b><br>
+窓をかけて段差を消すと漏れは減りますが、その代わりに「本物の波形の形」も一緒に少し変えてしまいます。
+特に減衰（どれだけ早く鳴りやむか）の情報が、窓によって水増しされたり削られたりします。
+「漏れを消す」と「波形をそのまま保つ」は<b>両立しない</b>――これが窓選びで一番大事な考え方です。
+</div>
+
+<h2>2. RION SA-01A4の5つの窓 ― 1つずつ手取り足取り</h2>
+<p>
+公式マニュアル（<span class="mono">SA-01_SA-01A2_SA-01A4_Manual_Software</span>、入力設定＞ウインド、78ページ）に載っている定義をベースに、
+実際の波形の形と、あなたの測定での意味を説明します。<span class="badge b-ok">一次情報：RION公式マニュアル</span>
+</p>
+
+<!-- 1. 無し -->
+<div class="card">
+<h3>① 無し（方形窓／矩形窓<ruby>矩形<rt>くけい</rt></ruby>）</h3>
+<canvas id="cv-none" width="900" height="220"></canvas>
+<p class="capt">図：録音した波形に、何も手を加えません。最初から最後まで「そのまま」100%の高さです。</p>
+
+<p><b>何をしているか：</b>何もしません。録音データをそのまま使います。「方形窓」と呼ばれるのは、
+グラフに描くと窓の形が四角（高さ1のまま横一直線）に見えるからです。</p>
+
+<table>
+<tr><th>使うべき場面</th><td>叩いた音が、録音時間の終わりまでに<b>完全に鳴りやんでいる</b>とき（ブロック長を十分長く取れているとき）</td></tr>
+<tr><th>メリット</th><td><span class="tag good">波形を一切いじらないので、振幅も減衰も最も正確</span></td></tr>
+<tr><th>デメリット</th><td><span class="tag bad">録音終了時にまだ鳴っていると、段差が発生して漏れが盛大に出る</span></td></tr>
+<tr><th>ブレーキパッド測定での意味</th><td>理想はこれ。もし使えるなら、記録時間（フレーム長）を伸ばして「無し」を使うのが一番正確な損失係数を得る近道</td></tr>
+</table>
+</div>
+
+<!-- 2. ハニング -->
+<div class="card">
+<h3>② ハニング窓</h3>
+<canvas id="cv-hann" width="900" height="220"></canvas>
+<p class="capt">図：両端をなめらかな曲線（コサインカーブ）で0まで落とします。真ん中が一番高く、両端がゼロになる、なだらかな山型です。</p>
+
+<p><b>何をしているか：</b>録音の始まりと終わりを、両方ともなめらかに0へ着地させます。
+数式は <span class="mono">w(n) = 0.5 − 0.5×cos(2πn/(N−1))</span> という、コサイン（波の形）を使った式です。</p>
+
+<table>
+<tr><th>使うべき場面</th><td>ハンマーの単発衝撃ではなく、<b>ホワイトノイズや連続的な振動</b>など、ずっと続く信号を測るとき</td></tr>
+<tr><th>メリット</th><td><span class="tag good">連続信号の漏れをバランスよく抑える、最も一般的な万能窓</span></td></tr>
+<tr><th>デメリット</th><td><span class="tag bad">ハンマーで叩いた「まだ鳴っている途中の波形」に使うと、後半を勝手に削ってしまい、減衰が実際より大きく（速く鳴りやんだように）見える</span></td></tr>
+<tr><th>ブレーキパッド測定での意味</th><td><b>ハンマリングにはあまり向きません。</b>あなたが使うのはハンマー（過渡衝撃）なので、基本は次の「フォース・指数」を使います</td></tr>
+</table>
+</div>
+
+<!-- 3. 指数・指数 -->
+<div class="card">
+<h3>③ 指数・指数窓（指数窓）</h3>
+<canvas id="cv-expexp" width="900" height="220"></canvas>
+<p class="capt">図：始まりは1（そのまま）、そこから右へいくにつれて、なめらかにゆるやかにゼロへ減っていきます（指数関数的に減衰）。</p>
+
+<p><b>何をしているか：</b>マニュアルの定義では「基準チャンネルとそれ以外のチャンネルの<b>両方</b>に、指数窓をかける」設定です。
+つまり、力（ハンマー）側の信号にも、応答（レーザーや加速度計）側の信号にも、同じ指数窓をかけます。
+式は <span class="mono">w(n) = exp(−n/τ)</span>（τ＝どれだけゆっくり減衰させるかを決める時定数）。</p>
+
+<table>
+<tr><th>使うべき場面</th><td>力信号自体もある程度の長さがある（単発のカツンではなく、ある程度続く）加振で、応答も鳴り続ける場合</td></tr>
+<tr><th>メリット</th><td><span class="tag good">録音終了時に強制的にゼロへ落とせるので、漏れを確実に防げる</span></td></tr>
+<tr><th>デメリット</th><td><span class="tag bad">力信号側にも減衰をかけてしまうため、インパクトハンマーの「一瞬だけ力がかかる」波形の形を歪める</span></td></tr>
+<tr><th>ブレーキパッド測定での意味</th><td>ハンマーの力波形は「一瞬だけ高くてすぐゼロに戻る」パルスなので、これに指数窓をかけると不要な変形になります。ハンマリングでは次の「フォース・指数」の方が理にかなっています</td></tr>
+</table>
+</div>
+
+<!-- 4. フラットトップ -->
+<div class="card">
+<h3>④ フラットトップ窓</h3>
+<canvas id="cv-flattop" width="900" height="220"></canvas>
+<p class="capt">図：真ん中あたりが平ら（フラット）に近い、丸くて幅の広い山型です。裾も丁寧に0へ落ちます。</p>
+
+<p><b>何をしているか：</b>「ピークの高さ（振幅）を、可能な限り正確に測る」ことに特化した窓です。
+その代償として、山の幅（周波数の分解能）はかなり太くなります。</p>
+
+<table>
+<tr><th>公式の用途（RIONマニュアル明記）</th><td><ruby>床衝撃音<rt>ゆかしょうげきおん</rt></ruby>測定に用いる窓、と明記されています <span class="badge b-ok">公式マニュアル記載</span></td></tr>
+<tr><th>メリット</th><td><span class="tag good">単一の正弦波の振幅レベルを±0.1dB程度の高精度で読み取れる（校正・レベル確認向き）</span></td></tr>
+<tr><th>デメリット</th><td><span class="tag bad">山の幅が広いので、近い周波数の2つのモードがあるとくっついて見分けがつかなくなる</span></td></tr>
+<tr><th>ブレーキパッド測定での意味</th><td>床衝撃音（建物の遮音性能）測定という、あなたの目的とは別の用途向けの窓です。あなたの縮退モード（近接ダブレット）の分離には<b>逆効果</b>なので、通常は選びません</td></tr>
+</table>
+</div>
+
+<!-- 5. フォース・指数 -->
+<div class="card amber">
+<h3>⑤ フォース・指数窓（あなたが主に使うべき窓）</h3>
+<canvas id="cv-force" width="900" height="280"></canvas>
+<p class="capt">
+図：上＝力チャンネル（ハンマー）にかかる「フォース窓」。叩いた瞬間の短い区間だけ生かし、それ以外はゼロにする「ゲート」です。
+下＝応答チャンネル（レーザー／加速度計）にかかる「指数窓」。鳴っている波形をなめらかにゼロへ減衰させます。
+</p>
+
+<p><b>何をしているか：</b>マニュアルの定義そのままに言うと、
+「<b>基準チャンネル（ハンマーの力信号）にはフォース窓</b>を、<b>それ以外のチャンネル（応答信号）には指数窓</b>を、それぞれ別々に」かけます。
+つまり②や③とは違い、<b>2種類の窓を、力と応答で使い分ける</b>のがこの設定の特徴です。</p>
+
+<div class="step">
+  <div class="stepnum">力側</div>
+  <div>
+  フォース窓＝「打撃の瞬間だけ生かして、あとはゼロにする」窓。ハンマーは叩いた直後にすぐ離れるので、
+  本当に力がかかっているのは録音の最初のごく短い時間（数ミリ秒）だけです。それ以降はセンサーのノイズや、
+  ダブルヒット（2度打ち）の余計な信号が混ざりやすいので、思い切ってゼロにしてしまいます。
+  </div>
+</div>
+<div class="step">
+  <div class="stepnum">応答側</div>
+  <div>
+  指数窓＝③と同じ、なめらかにゼロへ減衰させる窓。パッドの「ビーン…」という鳴りが録音の終わりまでに
+  収まりきらない場合の保険として使います。
+  </div>
+</div>
+
+<table>
+<tr><th>使うべき場面</th><td>インパクトハンマーによる測定全般。RIONマニュアルの注記どおり、通常のFFTモードでは選べず、<b>FFT&1/Nオクターブ分析モードでのみ選択可能</b> <span class="badge b-ok">公式マニュアル記載</span></td></tr>
+<tr><th>メリット</th><td><span class="tag good">力波形のノイズ・2度打ちの尾を除去でき、応答側の漏れも防げる、ハンマリングに最適化された組み合わせ</span></td></tr>
+<tr><th>デメリット</th><td><span class="tag bad">指数窓が応答側にかかる分だけ、測定される減衰（損失係数）が実際より大きく出る（水増しされる）</span></td></tr>
+<tr><th>ブレーキパッド測定での意味</th><td>基本これを使ってOK。ただし損失係数（減衰）の絶対値を精密に出したいときは、後述の補正式を使うか、
+可能なら記録時間を伸ばして「無し」で測り直す方が正確です</td></tr>
+</table>
+</div>
+
+<div class="quote">
+📖 RION公式マニュアル原文（該当箇所の要約）：「フォース・指数」は基準チャンネルにフォース窓、それ以外のチャンネルに指数窓を使用する。
+「指数・指数」は基準チャンネルとそれ以外のチャンネルに、それぞれ指数窓を使用する。「フラットトップ」は床衝撃音測定に用いる窓である。
+「フォース・指数」はFFT&1/Nオクターブ分析モード選択時のみ選択可能で、通常のFFTモードでは選べない。
+</div>
+
+<h2>3. ②③⑤の違いが分かりにくい人向け：一覧比較</h2>
+<table>
+<tr>
+  <th>窓の名前</th>
+  <th>力チャンネル（ハンマー）</th>
+  <th>応答チャンネル（レーザー等）</th>
+  <th>向いている信号</th>
+</tr>
+<tr>
+  <td class="mono">無し</td>
+  <td>そのまま</td>
+  <td>そのまま</td>
+  <td>録音時間内に完全に鳴りやむ理想的な場合</td>
+</tr>
+<tr>
+  <td class="mono">ハニング</td>
+  <td>両端0へなだらか</td>
+  <td>両端0へなだらか</td>
+  <td>ホワイトノイズなど連続信号</td>
+</tr>
+<tr>
+  <td class="mono" style="color:var(--violet)">指数・指数</td>
+  <td>指数減衰をかける</td>
+  <td>指数減衰をかける</td>
+  <td>力・応答ともに長く続く加振（シェーカーの連続加振など）</td>
+</tr>
+<tr>
+  <td class="mono">フラットトップ</td>
+  <td>両端0へ（幅広）</td>
+  <td>両端0へ（幅広）</td>
+  <td>単一周波数の振幅レベルを正確に読みたいとき（床衝撃音など）</td>
+</tr>
+<tr style="background:rgba(255,180,84,0.06);">
+  <td class="mono" style="color:var(--amber)">フォース・指数</td>
+  <td><b>フォース窓</b>（打撃だけ残す）</td>
+  <td><b>指数窓</b>（減衰させる）</td>
+  <td><b>インパクトハンマー測定（あなたのケース）</b></td>
+</tr>
+</table>
+
+<h2>4. エクセルで窓の形を計算する（貼り付け用）</h2>
+<p>
+コヒーレンスの確認などで、窓の形を自分の目で確かめたいときのために、エクセルにそのまま貼れる式をまとめました。
+<span class="mono">N</span> はフレームのサンプル点数（例：2048点なら N=2048）、<span class="mono">n</span> は 0 から N−1 までの通し番号です。
+</p>
+
+<div class="formula-box">
+<table>
+<tr><th>セル</th><th>入力するもの</th><th>式・値</th></tr>
+<tr><td>A1</td><td>フレーム点数 N</td><td class="mono">2048</td></tr>
+<tr><td>A2</td><td>通し番号 n（0スタート）</td><td class="mono">0, 1, 2, … （オートフィル）</td></tr>
+<tr><td>B2</td><td>無し（矩形窓）の値</td><td class="mono">=1</td></tr>
+<tr><td>C2</td><td>ハニング窓の値</td><td class="mono">=0.5-0.5*COS(2*PI()*A2/($A$1-1))</td></tr>
+<tr><td>D2</td><td>指数窓の値（τ=D1で設定）</td><td class="mono">=EXP(-A2/$D$1)</td></tr>
+</table>
+</div>
+<p class="capt">B2・C2・D2を下へオートフィルすればN行分の窓形状が得られます。グラフ化して波形にかけ算すれば、窓をかけた後の形が確認できます。</p>
+
+<h3>指数窓の時定数τを「終端で何dB落とすか」から逆算する</h3>
+<div class="formula-box">
+<table>
+<tr><th>セル</th><th>入力するもの</th><th>式・値（例）</th></tr>
+<tr><td>D1</td><td>フレーム終端での減衰量の目標 [dB]（RIONの「指数ウィンド設定」と同じ考え方）</td><td class="mono">40</td></tr>
+<tr><td>D2</td><td>終端での残存比率 r</td><td class="mono">=10^(-D1/20)</td></tr>
+<tr><td>D3</td><td>時定数 τ [サンプル数]</td><td class="mono">=-A1/LN(D2)</td></tr>
+</table>
+</div>
+<p class="capt">
+例：N=2048点、終端で−40dB（約1%まで減衰）まで落としたい場合、τ ≈ 445サンプルになります。
+RION SA-01A4の「フォースウィンド設定」「指数ウィンド設定」（78ページ）で、この考え方に近い数値を直接入力できます。
+</p>
+
+<h3>指数窓による損失係数（減衰）の水増し分を補正する</h3>
+<div class="card warn" style="margin-top:0;">
+<p>指数窓は応答波形に人工的な減衰を追加します。追加される減衰比 ζ<sub>窓</sub> は、時定数τとサンプリング周波数f<sub>s</sub>から近似的に求められます。</p>
+</div>
+<div class="formula-box">
+<table>
+<tr><th>セル</th><th>入力するもの</th><th>式・値（例）</th></tr>
+<tr><td>E1</td><td>サンプリング周波数 fs [Hz]</td><td class="mono">51200</td></tr>
+<tr><td>E2</td><td>時定数 τ [秒]（D3[サンプル] ÷ E1）</td><td class="mono">=D3/E1</td></tr>
+<tr><td>E3</td><td>窓が追加する減衰比 ζ窓</td><td class="mono">=1/(2*PI()*E4*E2)</td></tr>
+<tr><td>E4</td><td>対象の固有振動数 fₙ [Hz]</td><td class="mono">2500</td></tr>
+<tr><td>E5</td><td>測定された減衰比 ζ測定（半値幅法などで算出）</td><td class="mono">0.0044</td></tr>
+<tr><td>E6</td><td>補正後の真の減衰比 ζ真</td><td class="mono">=E5-E3</td></tr>
+</table>
+</div>
+<p class="capt">
+E3の式は「窓なしで測るべきところ、指数窓τ秒の減衰を追加してしまった分」を、周波数ごとに見積もる近似式です。
+<span class="badge b-est">推定・要検証</span> 正確な係数はASTM E756や、お使いのRION/PSVソフトのマニュアルで自動補正機能の有無を確認してください。
+可能であれば、この補正に頼らず「記録時間を伸ばして窓なしで測る」方が確実です。
+</p>
+
+<h2>5. よくあるミス</h2>
+<div class="miss"><b>ミス①：</b>ハンマリングで「無し」のまま、鳴りが録音時間内に収まっていないのに使ってしまう → 盛大な漏れが発生し、ピークが左右になまる。</div>
+<div class="miss"><b>ミス②：</b>「指数・指数」と「フォース・指数」を混同する → 前者は力側にも減衰をかけてしまい、ハンマーのパルス波形を歪める。ハンマリングは基本「フォース・指数」。</div>
+<div class="miss"><b>ミス③：</b>指数窓をかけたまま、補正なしで損失係数（減衰）を報告してしまう → 実際より大きい（危険側に安全だが不正確な）減衰値になる。</div>
+<div class="miss"><b>ミス④：</b>フラットトップを「振幅が正確そうだから」という理由でモード分離用途に使ってしまう → 山が太いので、縮退した双子モードがさらに分離しにくくなる。</div>
+<div class="miss"><b>ミス⑤：</b>「フォース・指数」を通常のFFT解析モードで選ぼうとして選べず戸惑う → RIONの仕様上、FFT&1/Nオクターブ分析モードでのみ選択可能。</div>
+
+<h2>6. 確信度メモ</h2>
+<p>
+<span class="badge b-ok">高（一次情報あり）</span> 5つの窓の定義・用途・選択可能モードの制約：RION SA-01A4公式マニュアル（入力設定＞ウインド、機能ボタン＞ウインド、77〜79ページおよび39〜40ページ）に明記。<br>
+<span class="badge b-ok">高（一般理論）</span> 窓関数の原理（漏れ、トレードオフ）、指数窓が減衰を水増しする効果：モーダル解析の標準的知見（Crystal Instruments、B&K Application Note等、過去の会話で確認済み）。<br>
+<span class="badge b-est">中（要検証）</span> エクセル式の減衰補正（E3セル）は近似式であり、RION SA-01A4自体に自動補正機能が搭載されているかどうかは、ハードウエア編マニュアルまたはRION社への確認が望ましい箇所です。
+</p>
+
+</div>
+
+<footer>会話の規模：中（RION公式マニュアルの確認＋図解HTML1件の生成。厳密値は Settings › Usage で確認）</footer>
+
+<script>
+function drawGrid(ctx,w,h,pad){
+  ctx.strokeStyle="#1a2135";
+  ctx.lineWidth=1;
+  for(let i=0;i<=8;i++){
+    let x=pad+ (w-2*pad)*i/8;
+    ctx.beginPath(); ctx.moveTo(x,pad); ctx.lineTo(x,h-pad); ctx.stroke();
+  }
+  for(let j=0;j<=4;j++){
+    let y=pad+(h-2*pad)*j/4;
+    ctx.beginPath(); ctx.moveTo(pad,y); ctx.lineTo(w-pad,y); ctx.stroke();
+  }
+  ctx.strokeStyle="#2c3550";
+  ctx.strokeRect(pad,pad,w-2*pad,h-2*pad);
+}
+
+function plotSeries(ctx,w,h,pad,series,color,fill){
+  const N=series.length;
+  ctx.beginPath();
+  for(let i=0;i<N;i++){
+    const x=pad+(w-2*pad)*i/(N-1);
+    const y=(h-pad)-(h-2*pad)*series[i];
+    if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+  }
+  if(fill){
+    const x0=pad+(w-2*pad);
+    ctx.lineTo(x0,h-pad);
+    ctx.lineTo(pad,h-pad);
+    ctx.closePath();
+    ctx.fillStyle=color+"22";
+    ctx.fill();
+  }
+  ctx.strokeStyle=color;
+  ctx.lineWidth=2.4;
+  ctx.stroke();
+}
+
+function label(ctx,text,x,y,color){
+  ctx.fillStyle=color;
+  ctx.font="13px monospace";
+  ctx.fillText(text,x,y);
+}
+
+// ---- leakage illustration ----
+(function(){
+  const cv=document.getElementById("cv-leak");
+  const ctx=cv.getContext("2d");
+  const w=cv.width,h=cv.height,pad=36;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle="#070a12"; ctx.fillRect(0,0,w,h);
+
+  // top half: decays to zero within frame
+  const N=300;
+  const ok=[]; const bad=[];
+  for(let i=0;i<N;i++){
+    const t=i/N;
+    ok.push(Math.exp(-8*t)*Math.cos(2*Math.PI*10*t));
+    bad.push(Math.exp(-1.6*t)*Math.cos(2*Math.PI*10*t));
+  }
+  // normalize into [0,1] display windows: top uses rows 0..h/2, bottom h/2..h
+  function drawHalf(series,yTop,yBot,color,title){
+    ctx.save();
+    ctx.beginPath();
+    ctx.rect(pad,yTop,w-2*pad,yBot-yTop);
+    ctx.clip();
+    ctx.strokeStyle="#1a2135";
+    for(let i=0;i<=8;i++){
+      let x=pad+(w-2*pad)*i/8;
+      ctx.beginPath(); ctx.moveTo(x,yTop); ctx.lineTo(x,yBot); ctx.stroke();
+    }
+    const mid=(yTop+yBot)/2;
+    ctx.beginPath(); ctx.moveTo(pad,mid); ctx.lineTo(w-pad,mid); ctx.strokeStyle="#2c3550"; ctx.stroke();
+    ctx.beginPath();
+    for(let i=0;i<series.length;i++){
+      const x=pad+(w-2*pad)*i/(series.length-1);
+      const y=mid - series[i]*(yBot-yTop)*0.42;
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    ctx.strokeStyle=color; ctx.lineWidth=2.2; ctx.stroke();
+    ctx.restore();
+    ctx.strokeStyle="#2c3550"; ctx.strokeRect(pad,yTop,w-2*pad,yBot-yTop);
+    label(ctx,title,pad+6,yTop+16,color);
+  }
+  const midY=h/2;
+  drawHalf(ok,10,midY-6,"#7ee29a","OK：フレーム内で0まで鳴りやむ");
+  drawHalf(bad,midY+6,h-10,"#ff6b6b","NG：鳴っている途中でブツッと切れる");
+
+  // red marker at cut point for bad
+  const cutX = w-pad;
+  ctx.beginPath();
+  ctx.moveTo(cutX, midY+10);
+  ctx.lineTo(cutX, h-14);
+  ctx.strokeStyle="#ff6b6b";
+  ctx.setLineDash([4,3]);
+  ctx.lineWidth=1.5;
+  ctx.stroke();
+  ctx.setLineDash([]);
+})();
+
+// ---- window functions ----
+function rectWin(N){ const a=[]; for(let n=0;n<N;n++) a.push(1); return a; }
+function hannWin(N){ const a=[]; for(let n=0;n<N;n++) a.push(0.5-0.5*Math.cos(2*Math.PI*n/(N-1))); return a; }
+function expWin(N,tau){ const a=[]; for(let n=0;n<N;n++) a.push(Math.exp(-n/tau)); return a; }
+function flattop(N){
+  const a0=0.21557895,a1=0.41663158,a2=0.277263158,a3=0.083578947,a4=0.006947368;
+  const a=[];
+  for(let n=0;n<N;n++){
+    const x=2*Math.PI*n/(N-1);
+    a.push(a0 - a1*Math.cos(x) + a2*Math.cos(2*x) - a3*Math.cos(3*x) + a4*Math.cos(4*x));
+  }
+  // normalize so max = 1 for display
+  const m=Math.max(...a);
+  return a.map(v=>v/m);
+}
+function forceGate(N,frac){ const a=[]; const cut=Math.floor(N*frac); for(let n=0;n<N;n++) a.push(n<cut?1:0); return a; }
+
+function simpleCanvas(id,series,color,title){
+  const cv=document.getElementById(id);
+  const ctx=cv.getContext("2d");
+  const w=cv.width,h=cv.height,pad=36;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle="#070a12"; ctx.fillRect(0,0,w,h);
+  drawGrid(ctx,w,h,pad);
+  plotSeries(ctx,w,h,pad,series,color,true);
+  label(ctx,title,pad+6,pad+18,color);
+}
+
+simpleCanvas("cv-none", rectWin(200), "#4fd6e8", "無し（矩形窓）：ずっと高さ1");
+simpleCanvas("cv-hann", hannWin(200), "#4fd6e8", "ハニング窓：山型、両端0");
+simpleCanvas("cv-expexp", expWin(200,45), "#c39bff", "指数窓：右肩下がりでゼロへ");
+simpleCanvas("cv-flattop", flattop(200), "#7ee29a", "フラットトップ窓：平らな頂上＋広い裾");
+
+// force + exponential combined (two stacked panels)
+(function(){
+  const cv=document.getElementById("cv-force");
+  const ctx=cv.getContext("2d");
+  const w=cv.width,h=cv.height,pad=36;
+  ctx.clearRect(0,0,w,h);
+  ctx.fillStyle="#070a12"; ctx.fillRect(0,0,w,h);
+  const halfH=h/2;
+
+  function panel(series,yTop,yBot,color,title){
+    ctx.save();
+    ctx.beginPath(); ctx.rect(pad,yTop,w-2*pad,yBot-yTop); ctx.clip();
+    ctx.strokeStyle="#1a2135";
+    for(let i=0;i<=8;i++){
+      let x=pad+(w-2*pad)*i/8;
+      ctx.beginPath(); ctx.moveTo(x,yTop); ctx.lineTo(x,yBot); ctx.stroke();
+    }
+    ctx.beginPath();
+    for(let i=0;i<series.length;i++){
+      const x=pad+(w-2*pad)*i/(series.length-1);
+      const y=(yBot-6) - series[i]*(yBot-yTop-16);
+      if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y);
+    }
+    const x0=pad+(w-2*pad);
+    ctx.lineTo(x0,yBot-6); ctx.lineTo(pad,yBot-6); ctx.closePath();
+    ctx.fillStyle=color+"22"; ctx.fill();
+    ctx.strokeStyle=color; ctx.lineWidth=2.2; ctx.stroke();
+    ctx.restore();
+    ctx.strokeStyle="#2c3550"; ctx.strokeRect(pad,yTop,w-2*pad,yBot-yTop);
+    label(ctx,title,pad+6,yTop+16,color);
+  }
+  panel(forceGate(200,0.08), 10, halfH-6, "#ffb454", "力チャンネル：フォース窓（打撃直後だけ残す）");
+  panel(expWin(200,45), halfH+6, h-10, "#4fd6e8", "応答チャンネル：指数窓（なめらかに減衰）");
+})();
+</script>
+
+</body>
+</html>
