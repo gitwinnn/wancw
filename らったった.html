@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>作業記録DB＋Markdownメモ 統合ツール Ver1.9.00</title>
+<title>記録台帳＋Markdownメモ 統合ツール Ver1.9.10</title>
 
 <!-- ============================================================
      起動時ファイル名チェック  (Ver1.0 / 2026-08 追加)
@@ -634,7 +634,15 @@ margin:0; background:var(--bg); color:var(--ink);
 #app-db .mdbody h2{font-size:14px}
 #app-db .mdbody ul,#app-db .mdbody ol{margin:.3em 0; padding-left:20px}
 #app-db .mdbody li{margin:.1em 0}
-#app-db .mdbody li.task-item{list-style:none; margin-left:-18px}
+/* Ver1.9.10 修正: チェックリストが左にはみ出して切れないようにする。
+   （ul.task-list の padding と li.task-item の負マージンが二重にかかっていた） */
+#app-db .mdbody ul.task-list{list-style:none; padding-left:2px; margin-left:0}
+#app-db .mdbody ul.task-list ul{padding-left:18px}
+#app-db .mdbody li.task-item{list-style:none; margin-left:0; display:flex; align-items:flex-start; gap:6px}
+#app-db .mdbody li.task-item > input[type=checkbox]{
+    flex:0 0 auto; width:14px; height:14px; min-width:14px; margin:3px 0 0;
+    cursor:pointer; accent-color:var(--accent);
+  }
 #app-db .mdbody code{background:var(--code-bg); padding:1px 4px; border-radius:3px;
     font-family:ui-monospace,Consolas,Menlo,monospace; font-size:11.5px}
 #app-db .mdbody pre{background:var(--code-bg); padding:8px 10px; border-radius:6px;
@@ -1175,7 +1183,14 @@ background:var(--bg-0);
 #app-md .preview-pane img{max-width:100%;border-radius:4px;}
 #app-md .preview-pane ul,
 #app-md .preview-pane ol{padding-left:26px;}
-#app-md .preview-pane li.task-item{list-style:none;margin-left:-20px;}
+/* Ver1.9.10 修正: チェックリストの左はみ出しを解消 */
+#app-md .preview-pane ul.task-list{list-style:none;padding-left:2px;margin-left:0;}
+#app-md .preview-pane ul.task-list ul{padding-left:22px;}
+#app-md .preview-pane li.task-item{list-style:none;margin-left:0;display:flex;align-items:flex-start;gap:8px;}
+#app-md .preview-pane li.task-item > input[type=checkbox]{
+    flex:0 0 auto;width:15px;height:15px;min-width:15px;margin:4px 0 0;
+    cursor:pointer;accent-color:var(--accent,#4c8dff);
+  }
 #app-md .preview-pane hr{border:none;border-top:1px solid var(--border);margin:18px 0;}
 /* ---------- status bar ---------- */
 #app-md #statusbar{
@@ -1401,7 +1416,7 @@ body.wdt-bigtap #app-md .tab{ padding:0 14px; }
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 作業記録＋Markdownメモ 統合ツール <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.9.00</span></span>
+  <span class="msTitle">🗂 記録台帳＋Markdownメモ 統合ツール <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.9.10</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -1411,8 +1426,8 @@ body.wdt-bigtap #app-md .tab{ padding:0 14px; }
 <div id="appBody" class="mode-db">
 <div id="app-db">
 
-<h1>作業記録 ＋ 測定データ目録（WASM版）</h1>
-<p class="lead">SQLite（WebAssembly）をこのHTMLに埋め込んだ、1ファイル完結・オフラインのツール。項目（テーブル）や列は自由に追加・編集・削除でき、ダークモード・自動保存・元に戻す／やり直す・CSV/TXT書き出しに対応しています。<b>Ver1.4.00</b>から、日付はカレンダー・時刻は時計から選べるようになり、予定表として「いま進行中の予定」に色を付けられます。
+<h1>📇 記録台帳</h1>
+<p class="lead">作業記録・測定データ目録にかぎらず、<b>好きな項目（テーブル）を自分で作って何でも記録できる台帳</b>です。SQLite（WebAssembly）をこのHTMLに埋め込んだ、1ファイル完結・オフラインのツール。項目（テーブル）や列は自由に追加・編集・削除でき、ダークモード・自動保存・元に戻す／やり直す・CSV/TXT書き出しに対応しています。<b>Ver1.4.00</b>から、日付はカレンダー・時刻は時計から選べるようになり、予定表として「いま進行中の予定」に色を付けられます。
 <b>Ver1.5.00</b>では「⚙ 設定」が付き、ショートカットキーの変更・ヘッダーの大きさ・アドオン（スマホ表示の修正など）を選べます。列はドラッグで並べ替えでき、検索キーワードはグループ＋ランクでお気に入り登録できます。</p>
 <p class="lead" style="margin:-6px 0 14px">
   <button class="ghost small" onclick="toggleAllSections(false)">▲ 全セクションを折りたたむ</button>
@@ -1449,7 +1464,7 @@ body.wdt-bigtap #app-md .tab{ padding:0 14px; }
 </details>
 
 <details class="card" id="secInputForm" open style="padding-bottom:0">
-  <summary><h2 style="display:inline-flex">✏️ 作業記録・測定データ目録を入力</h2></summary>
+  <summary><h2 style="display:inline-flex">✏️ 新規登録</h2></summary>
   <div class="tabbar" id="tabBar" style="margin-top:8px"></div>
   <div class="card" id="formCard" style="border-top-left-radius:0; margin:0 0 14px"></div>
 </details>
@@ -1525,7 +1540,7 @@ body.wdt-bigtap #app-md .tab{ padding:0 14px; }
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
-      <p><strong>入力欄をMarkdownメモで書く（Ver1.3.00）：</strong>「✏️ 作業記録・測定データ目録を入力」の長文欄（内容・知識・条件メモ・備考など）には「📝 メモで開く」「👁 プレビュー」が付いています。<strong>まだ「＋ 登録する」を押していない状態でも</strong>、Markdownメモの広い画面で書けます。書いた文字は少し間をおいて自動で入力欄へ戻り、入力欄に直接打った文字もメモ側へ戻ります（往復で同期します）。メモ画面からはEscキー、または左上の「⬅ DB管理に戻る」で戻れます。「＋ 登録する」を押すと、入力欄・連携中のメモの両方が空になり、内容は下の表に入ります。</p>
+      <p><strong>入力欄をMarkdownメモで書く（Ver1.3.00）：</strong>「✏️ 新規登録」の長文欄（内容・知識・条件メモ・備考など）には「📝 メモで開く」「👁 プレビュー」が付いています。<strong>まだ「＋ 登録する」を押していない状態でも</strong>、Markdownメモの広い画面で書けます。書いた文字は少し間をおいて自動で入力欄へ戻り、入力欄に直接打った文字もメモ側へ戻ります（往復で同期します）。メモ画面からはEscキー、または左上の「⬅ DB管理に戻る」で戻れます。「＋ 登録する」を押すと、入力欄・連携中のメモの両方が空になり、内容は下の表に入ります。</p>
       <p><strong>入力途中の内容の扱い：</strong>入力途中の文字は、項目（テーブル）のタブを切り替えて戻ってきても消えません。ただしこれはブラウザのメモリ上だけの保持なので、<strong>ページを閉じたり再読み込みすると入力途中の欄は白紙に戻ります</strong>（登録済みのデータは自動保存されるので消えません）。長い文章を書くときは、こまめに「＋ 登録する」で確定してください。</p>
       <p><strong>元に戻す／やり直す：</strong>編集・削除・列の追加削除などの操作前の状態を最大40件まで記憶します。ツールバーの「↶ 元に戻す」「↷ やり直す」、またはCtrl+Z／Ctrl+Yで操作できます（ブラウザを閉じると履歴は消えます。自動保存されるのは常に最新の状態です）。</p>
       <p><strong>⚙ 設定（Ver1.5.00）：</strong>画面右上（またはツールバー）の「⚙ 設定」から、5つのタブで調整できます。
@@ -3121,6 +3136,69 @@ window.WorkDB = {
       setStatus('Markdownメモの内容を「' + this.getColumnLabel(table, col) + '」に反映しました。', 'ok');
       return true;
     }catch(e){ return false; }
+  },
+
+  /* ==========================================================
+     Ver1.9.10 追加：DB画面用アドオンのための「窓口」
+     ----------------------------------------------------------
+     db / metaTables などは let で宣言してあるため window から
+     直接は見えない。外部の .js アドオンがデータを読み書きできる
+     ように、ここに安全な入口だけを用意しておく。
+     ========================================================== */
+
+  /* ---- 読み取り ---- */
+  getTables(){
+    return metaTables.map(t => ({
+      key:t.key, label:t.label, icon:t.icon, order_no:t.order_no, order_by:t.order_by
+    }));
+  },
+  getColumns(tableKey){
+    return (metaColumnsByTable[tableKey] || []).map(c => ({
+      col_name:c.col_name, label:c.label, col_type:c.col_type,
+      in_form:c.in_form, editable:c.editable, order_no:c.order_no
+    }));
+  },
+  getCurrentTable(){ return currentTable; },
+  getLastResult(){
+    return {
+      cols: lastCols.slice(),
+      rows: lastRows.map(r => Array.isArray(r) ? r.slice() : r),
+      query: lastQuery ? {caption:lastQuery.caption, table:lastQuery.table} : null
+    };
+  },
+
+  /* ---- SQL：読み取り専用 ---- */
+  select(sql, params){
+    if(!db) throw new Error('データベースがまだ開いていません。');
+    const first = (String(sql == null ? '' : sql).match(/[A-Za-z]+/) || [''])[0].toUpperCase();
+    if(first !== 'SELECT' && first !== 'WITH' && first !== 'PRAGMA'){
+      throw new Error('select() で使えるのは SELECT / WITH / PRAGMA だけです。書き換えは run() を使ってください。');
+    }
+    const st = db.prepare(sql);
+    try{
+      if(params) st.bind(params);
+      const out = [];
+      while(st.step()) out.push(st.getAsObject());
+      return out;
+    }finally{ try{ st.free(); }catch(e){} }
+  },
+
+  /* ---- SQL：書き換え（「元に戻す」の履歴を積んでから実行し、自動保存も予約する） ---- */
+  run(sql, params){
+    if(!db) throw new Error('データベースがまだ開いていません。');
+    pushHistory();
+    db.run(sql, params || []);
+    scheduleAutosave();
+    return true;
+  },
+
+  /* ---- 画面操作 ---- */
+  openTable(key){ if(metaTables.some(t => t.key === key)) openTab(key); },
+  refresh(){ try{ rerenderCurrent(); }catch(e){} },
+  toast(msg, kind){ setStatus(String(msg == null ? '' : msg), kind || 'ok'); },
+  isDark(){
+    const el = document.getElementById('app-db');
+    return !!(el && el.getAttribute('data-theme') === 'dark');
   }
 };
 
@@ -5484,7 +5562,8 @@ function renderMarkdown(src){
     }
 
     // チェックリスト
-    if((m = line.match(/^(\s*)[-*+]\s\[([ xX])\]\s+(.*)$/))){
+    /* Ver1.9.10: 末尾を \s+ → \s* にして「- [ ]」だけの空チェック行も拾う */
+    if((m = line.match(/^(\s*)[-*+]\s+\[([ xX])\]\s*(.*)$/))){
       const indent = m[1].length;
       const checked = m[2].toLowerCase()==='x';
       while(listStack.length && listStack[listStack.length-1].indent > indent) { out.push(listStack.pop().type==='ul'?'</ul>':'</ol>'); }
@@ -7326,11 +7405,44 @@ var ADDONS = [
     desc:'ボタンの当たり判定と文字を大きくします。スマホや、手袋をしたままの操作に向きます。パソコンでは1画面に入る情報が減ります。',
     detail:['ボタンの上下左右の余白を拡大','ボタン文字を 13px → 14px に','表の「削除」ボタンも大きく'] },
   { id:'quickbar', kind:'bool', name:'🎯 右下のクイックボタンを常に出す',
-    desc:'画面の右下に「一番上へ／DB／メモ／設定」の丸ボタンを出します。ヘッダーを「表示しない」にしたときは、この設定に関係なく自動で出ます（迷子にならないための逃げ道）。',
-    detail:['右下に4つの丸ボタンを固定表示','スクロールしても常に同じ位置'] },
+    desc:'画面の右下に「🔍 探す／☰ メニュー／▲ 一番上へ／🗄 DB／📝 メモ／⚙ 設定」の丸ボタンを出します。'
+       + 'ヘッダーを「表示しない」にしたときは、この設定に関係なく自動で出ます（迷子にならないための逃げ道）。'
+       + 'Ver1.9.10からは、これがONで出ているあいだ左下のクイックボタンは自動で消えるので、同じボタンが二重に出ることはありません。',
+    detail:[
+      '右下に6つの丸ボタンを固定表示（🔍 探す／☰ メニュー／▲ 一番上へ／🗄 DB／📝 メモ／⚙ 設定）',
+      'スクロールしても常に同じ位置',
+      '出ているあいだは左下のクイックボタンを自動で隠す（重複防止）'
+    ] },
   { id:'autofocus', kind:'bool', name:'⌨ DB画面に入ったら検索欄にカーソル',
     desc:'「作業記録DB」に切り替えたとき、自動でキーワード欄にカーソルを置きます。検索中心の使い方をする人向けです。',
-    detail:['setAppMode(\'db\') のたびにキーワード欄へ focus','スマホでは勝手にキーボードが出てしまうため、自動的に無効になります'] }
+    detail:['setAppMode(\'db\') のたびにキーワード欄へ focus','スマホでは勝手にキーボードが出てしまうため、自動的に無効になります'] },
+  { id:'stickyhead', kind:'bool', name:'📌 セクションの見出しを画面の上に貼り付ける',
+    desc:'「🗂 項目管理」「✏️ 新規登録」「🔎 検索・表示・編集」の見出しが、下へスクロールしても画面の一番上に残ります。'
+       + '見出しの右端に小さなボタン（☰ 🔍 💾 ▼ ▲）が付くので、表の途中からでも保存や開閉ができます。'
+       + '長い表を見ているときに「いまどのセクションか」が分からなくなるのを防ぎます。OFFにすると普通に流れて消えます。',
+    detail:[
+      '見出しを position:sticky で画面上端に固定',
+      '見出しの右端に「メニュー／探す／上書き保存／全部開く／全部閉じる」を追加',
+      'OFFにすると見出しは固定されず、追加ボタンも押せますが一緒にスクロールします'
+    ] },
+  { id:'oneopen', kind:'bool', name:'📖 セクションは1つだけ開く（アコーディオン）',
+    desc:'どれか1つのセクションを開くと、ほかのセクションが自動で閉じます。'
+       + '画面の縦がとても短くなるので、ノートPCの狭い画面や、表を大きく見たいときに向きます。'
+       + '入力しながら検索結果を見比べたい人はOFFのままにしてください。',
+    detail:[
+      'セクションを開いたとき、ほかの details を閉じる',
+      '「全部開く」を押したときだけは、この動きを一時的に止める',
+      '開いたセクションの先頭まで自動でスクロール'
+    ] },
+  { id:'cmdrank', kind:'bool', name:'⭐ よく使うコマンドを Ctrl+K の先頭に出す',
+    desc:'コマンドパレット（Ctrl+K）を開いた直後、これまで多く使ったコマンドを「よく使う」として上に6件並べます。'
+       + '使うほど自分専用の並びに育ちます。回数の記録はこのブラウザの中だけに残ります。'
+       + '消したいときは Ctrl+K で「よく使うの記録を消す」を選んでください。',
+    detail:[
+      'コマンドを実行するたびに回数を数えて localStorage に保存',
+      '何も打っていないときだけ「よく使う」を先頭に表示',
+      '文字を打ち始めると、普通の絞り込みに切り替わる'
+    ] }
 ];
 
 /* ---------- 既定の設定 ---------- */
@@ -7343,7 +7455,8 @@ function defaults(){
     mdFont     : 14.5,
     keepHistory: true,
     shortcuts  : {},
-    addons     : { mobilefix:'auto', bigtap:false, quickbar:false, autofocus:false }
+    addons     : { mobilefix:'auto', bigtap:false, quickbar:false, autofocus:false,
+                   stickyhead:true, oneopen:false, cmdrank:true }
   };
 }
 var st = defaults();
@@ -7443,6 +7556,10 @@ function applyAll(){
   document.body.classList.toggle('wdt-mobfix',   mobFixOn());
   document.body.classList.toggle('wdt-bigtap',   !!st.addons.bigtap);
   document.body.classList.toggle('wdt-quickbar', !!st.addons.quickbar);
+  /* Ver1.9.10 追加分（クラスが付いていないとき＝有効、という向きに注意） */
+  document.body.classList.toggle('wdt-nosticky',  !st.addons.stickyhead);
+  document.body.classList.toggle('wdt-oneopen',   !!st.addons.oneopen);
+  document.body.classList.toggle('wdt-nocmdrank', !st.addons.cmdrank);
   relocateViewMode(mobFixOn());
   applyDynStyle();
 }
@@ -9300,8 +9417,10 @@ function addStyle(){
       '#app-db table.grid td{overflow:hidden}' +
       '#app-db table.grid td.mdcell .mdbody{overflow-wrap:anywhere}' +
       '#app-db .mdbody li.task-item>input[type=checkbox],' +
-      '#app-md .preview-pane li.task-item>input[type=checkbox]{cursor:pointer;width:auto;margin-right:6px}' +
-      '#app-db .mdbody ul.task-list,#app-md .preview-pane ul.task-list{list-style:none;padding-left:4px}';
+      '#app-md .preview-pane li.task-item>input[type=checkbox]{cursor:pointer}';
+      /* Ver1.9.10: ここにあった padding-left:4px は、本体CSSの負マージンと
+         二重にかかってチェックボックスが左に切れる原因だったため削除。
+         レイアウトは <style> 側（#app-db .mdbody ul.task-list ほか）に集約した。 */
   document.head.appendChild(s);
 }
 
@@ -9404,6 +9523,1511 @@ window.RTT19 = {
   resetWidths: resetWidths,
   toggleHardBreaks: toggleHardBreaks,
   fingerprint: function(){ return currentFp; }
+};
+
+})();
+
+</script>
+
+<!-- ============================================================
+     Ver1.9.10 追加ブロック（RTT20）
+     コマンドパレット / ハンバーガーメニュー / 見出しの貼り付け /
+     DB画面用アドオンの読み込み
+     ============================================================ -->
+<script data-rtt-fp="1">
+/* ============================================================
+   Ver1.9.10 追加ブロック（RTT20）
+   ・C コマンドパレット（Ctrl+K）
+   ・E ハンバーガーメニュー（左からスライド）
+   ・G セクション見出しの貼り付け（sticky）
+   ・DB画面用アドオン（.jsファイル）の読み込み
+   このブロックだけを消せば、Ver1.9.00 と同じ動きに戻ります。
+   ============================================================ */
+(function(){
+'use strict';
+
+/* ------------------------------------------------------------
+   0. 小さな道具
+   ------------------------------------------------------------ */
+function $(sel, root){ return (root || document).querySelector(sel); }
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function lsGet(k, d){ try{ var v = localStorage.getItem(k); return v === null ? d : v; }catch(e){ return d; } }
+function lsSet(k, v){ try{ localStorage.setItem(k, v); }catch(e){} }
+function el(tag, attrs, html){
+  var n = document.createElement(tag), k;
+  if(attrs){ for(k in attrs){ if(Object.prototype.hasOwnProperty.call(attrs, k)) n.setAttribute(k, attrs[k]); } }
+  if(html != null) n.innerHTML = html;
+  return n;
+}
+/* ---- 呼び出し語（別名）・非表示・使用回数の保存 ---- */
+var K_ALIAS = 'rtt20_alias_v1';   /* {コマンドid: '追加の言葉'} */
+var K_HIDE  = 'rtt20_hidden_v1';  /* [隠すコマンドid] */
+var K_USE   = 'rtt20_usage_v1';   /* {コマンドid: 使った回数} */
+
+function jGet(key, def){
+  var raw = lsGet(key, null);
+  if(raw === null) return def;
+  try{ var v = JSON.parse(raw); return (v == null) ? def : v; }catch(e){ return def; }
+}
+function jSet(key, val){ lsSet(key, JSON.stringify(val)); }
+function aliasMap(){ var m = jGet(K_ALIAS, {}); return (m && typeof m === 'object' && !Array.isArray(m)) ? m : {}; }
+function hiddenList(){ var a = jGet(K_HIDE, []); return Array.isArray(a) ? a : []; }
+function usageMap(){ var m = jGet(K_USE, {}); return (m && typeof m === 'object' && !Array.isArray(m)) ? m : {}; }
+function bumpUsage(id){
+  if(!id) return;
+  var m = usageMap();
+  m[id] = (m[id] || 0) + 1;
+  jSet(K_USE, m);
+}
+function bodyHas(cls){ try{ return document.body.classList.contains(cls); }catch(e){ return false; } }
+
+function isDbMode(){ return window.currentAppMode !== 'md'; }
+function toDb(){
+  if(!isDbMode() && typeof window.setAppMode === 'function'){ window.setAppMode('db'); }
+}
+function say(msg, kind){
+  try{ if(typeof window.setStatus === 'function') window.setStatus(msg, kind || 'ok'); }catch(e){}
+}
+
+/* ------------------------------------------------------------
+   1. 見た目（CSS）
+   ------------------------------------------------------------ */
+var CSS = [
+/* ---- G：セクション見出しを画面の上に貼り付ける ---- */
+'#app-db details.card > summary{position:sticky; top:0; z-index:30; background:var(--panel);}',
+'#app-db details.card[open] > summary{box-shadow:0 3px 8px rgba(0,0,0,.16);}',
+'body.wdt-nosticky #app-db details.card > summary{position:static; box-shadow:none;}',
+'#app-db[data-theme="dark"] details.card[open] > summary{box-shadow:0 3px 10px rgba(0,0,0,.45);}',
+'#app-db details.card > summary .rtt20-acts{float:right; display:inline-flex; gap:4px; align-items:center; margin-left:12px;}',
+'#app-db details.card > summary .rtt20-acts button{padding:1px 8px; font-size:11px; line-height:1.75; border-radius:5px;',
+'  background:var(--panel); color:var(--sub); border:1px solid var(--line2); font-weight:600; cursor:pointer; font-family:inherit;}',
+'#app-db details.card > summary .rtt20-acts button:hover{background:var(--head); color:var(--accent2); border-color:var(--line);}',
+
+/* ---- 共通のダーク配色（#app-db の外に出す部品なので色は固定） ---- */
+'.rtt20-scrim{position:fixed; inset:0; background:rgba(8,10,14,.55); z-index:1900; opacity:0; pointer-events:none; transition:opacity .16s;}',
+'.rtt20-scrim.on{opacity:1; pointer-events:auto;}',
+
+/* ---- E：左からスライドするメニュー ---- */
+'#rtt20Drawer{position:fixed; left:0; top:0; bottom:0; width:296px; max-width:86vw; z-index:1950;',
+'  background:#1b1e24; border-right:1px solid #3d4046; color:#e6e9ef; display:flex; flex-direction:column;',
+'  transform:translateX(-101%); transition:transform .18s ease; box-shadow:4px 0 22px rgba(0,0,0,.5);',
+'  font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic UI",Meiryo,system-ui,sans-serif; font-size:13px;}',
+'#rtt20Drawer.on{transform:translateX(0);}',
+'#rtt20Drawer .dHead{display:flex; align-items:center; gap:8px; padding:10px 12px; background:#20242c; border-bottom:1px solid #3d4046; font-weight:700;}',
+'#rtt20Drawer .dHead .sp{flex:1;}',
+'#rtt20Drawer .dHead button{width:28px; height:28px; padding:0; border-radius:6px; background:#2a2d32; border:1px solid #3d4046; color:#cfd4dc; cursor:pointer; font-family:inherit; font-size:14px;}',
+'#rtt20Drawer .dHead button:hover{background:#33363c; color:#fff;}',
+'#rtt20Drawer .dFind{padding:9px 12px; border-bottom:1px solid #2b2f37;}',
+'#rtt20Drawer .dFind button{width:100%; text-align:left; padding:8px 10px; border-radius:7px; cursor:pointer;',
+'  background:#12141a; border:1px solid #3d4046; color:#9aa4b2; font-family:inherit; font-size:12.5px;}',
+'#rtt20Drawer .dFind button:hover{border-color:#4c8dff; color:#e6e9ef;}',
+'#rtt20Drawer .dBody{flex:1 1 auto; min-height:0; overflow:auto; padding:6px 0 18px;}',
+'#rtt20Drawer .dGrp{padding:11px 12px 3px; color:#6f757e; font-size:11px; font-weight:700; letter-spacing:.04em;}',
+'#rtt20Drawer .dItem{display:flex; align-items:center; gap:8px; width:100%; text-align:left;',
+'  padding:7px 12px; background:none; border:0; color:#cfd4dc; cursor:pointer; font-family:inherit; font-size:13px;}',
+'#rtt20Drawer .dItem:hover{background:#262a31; color:#fff;}',
+'#rtt20Drawer .dItem .ic{width:18px; text-align:center; flex:0 0 auto;}',
+'#rtt20Drawer .dItem .tx{flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}',
+'#rtt20Drawer .dItem .kb{color:#6f757e; font-size:11px; flex:0 0 auto;}',
+'#rtt20Drawer .dRow{display:flex; align-items:center; gap:4px; padding:3px 10px 3px 12px;}',
+'#rtt20Drawer .dRow .nm{flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; color:#cfd4dc;}',
+'#rtt20Drawer .dRow button{padding:3px 8px; border-radius:5px; background:#2a2d32; border:1px solid #3d4046; color:#a8adb5; cursor:pointer; font-family:inherit; font-size:11px;}',
+'#rtt20Drawer .dRow button:hover{background:#33363c; color:#fff; border-color:#4c8dff;}',
+'#rtt20Drawer .dNone{padding:6px 12px; color:#6f757e; font-size:12px;}',
+
+/* ---- 左下の丸ボタン（右下の既存クイックボタンとぶつからないように左へ） ---- */
+'#rtt20Fab{position:fixed; left:12px; bottom:12px; z-index:1500; display:flex; flex-direction:column; gap:7px;}',
+'#rtt20Fab button{width:42px; height:42px; border-radius:50%; padding:0; cursor:pointer; font-size:17px; font-family:inherit;',
+'  border:1px solid #3f77df; background:#2f6fdb; color:#fff; box-shadow:0 2px 9px rgba(0,0,0,.45);}',
+'#rtt20Fab button:hover{background:#3f80ee;}',
+'#rtt20Fab button.gh{background:#2a2d32; border-color:#3d4046; color:#cfd4dc;}',
+'#rtt20Fab button.gh:hover{background:#33363c; color:#fff;}',
+'#rtt20Fab.hide{display:none;}',
+
+/* ---- C：コマンドパレット ---- */
+'#rtt20Pal{position:fixed; inset:0; z-index:2100; display:none; align-items:flex-start; justify-content:center;',
+'  background:rgba(8,10,14,.58); padding:11vh 14px 14px;',
+'  font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic UI",Meiryo,system-ui,sans-serif;}',
+'#rtt20Pal.on{display:flex;}',
+'#rtt20Pal .box{width:100%; max-width:660px; max-height:74vh; display:flex; flex-direction:column;',
+'  background:#1b1e24; border:1px solid #3d4046; border-radius:12px; box-shadow:0 18px 60px rgba(0,0,0,.6); overflow:hidden;}',
+'#rtt20Pal .box > input{width:100%; box-sizing:border-box; padding:14px 16px; font-size:15px; font-family:inherit;',
+'  background:#12141a; border:0; border-bottom:1px solid #2b2f37; color:#e6e9ef; outline:none;}',
+'#rtt20Pal .box > input::placeholder{color:#6f757e;}',
+'#rtt20Pal .list{flex:1 1 auto; min-height:0; overflow:auto; padding:6px 0 8px;}',
+'#rtt20Pal .gl{padding:9px 16px 3px; color:#6f757e; font-size:11px; font-weight:700; letter-spacing:.04em;}',
+'#rtt20Pal .it{display:flex; align-items:center; gap:10px; padding:8px 16px; cursor:pointer; color:#cfd4dc; font-size:13.5px;}',
+'#rtt20Pal .it .ic{width:20px; text-align:center; flex:0 0 auto;}',
+'#rtt20Pal .it .tx{flex:1 1 auto; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}',
+'#rtt20Pal .it .hn{color:#6f757e; font-size:11.5px; flex:0 0 auto;}',
+'#rtt20Pal .it.sel{background:#2f6fdb; color:#fff;}',
+'#rtt20Pal .it.sel .hn{color:#dbe6ff;}',
+'#rtt20Pal .none{padding:22px 16px; color:#6f757e; font-size:13px; text-align:center;}',
+'#rtt20Pal .foot{padding:7px 16px; border-top:1px solid #2b2f37; color:#6f757e; font-size:11.5px; background:#20242c;}',
+
+/* ---- アドオン管理の窓 ---- */
+'#rtt20Adm{position:fixed; inset:0; z-index:2050; display:none; align-items:center; justify-content:center;',
+'  background:rgba(8,10,14,.6); padding:16px;',
+'  font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic UI",Meiryo,system-ui,sans-serif;}',
+'#rtt20Adm.on{display:flex;}',
+'#rtt20Adm .box{width:100%; max-width:760px; max-height:88vh; display:flex; flex-direction:column; color:#e6e9ef;',
+'  background:#1b1e24; border:1px solid #3d4046; border-radius:12px; box-shadow:0 18px 60px rgba(0,0,0,.6); overflow:hidden; font-size:13px;}',
+'#rtt20Adm .hd{display:flex; align-items:center; gap:8px; padding:12px 16px; background:#20242c; border-bottom:1px solid #3d4046; font-weight:700; font-size:14px;}',
+'#rtt20Adm .hd .sp{flex:1;}',
+'#rtt20Adm .bd{flex:1 1 auto; min-height:0; overflow:auto; padding:14px 16px;}',
+'#rtt20Adm button{padding:6px 12px; border-radius:7px; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600;',
+'  background:#2a2d32; border:1px solid #3d4046; color:#cfd4dc;}',
+'#rtt20Adm button:hover{background:#33363c; color:#fff;}',
+'#rtt20Adm button.pri{background:#2f6fdb; border-color:#3f77df; color:#fff;}',
+'#rtt20Adm button.pri:hover{background:#3f80ee;}',
+'#rtt20Adm button.dg{color:#ff8a80; border-color:#5a3030;}',
+'#rtt20Adm .bar{display:flex; gap:8px; flex-wrap:wrap; margin-bottom:12px;}',
+'#rtt20Adm .row{display:flex; align-items:center; gap:8px; padding:9px 11px; margin-bottom:8px;',
+'  background:#20242c; border:1px solid #2b2f37; border-radius:8px; flex-wrap:wrap;}',
+'#rtt20Adm .row .nm{font-weight:700; flex:1 1 180px; overflow:hidden; text-overflow:ellipsis;}',
+'#rtt20Adm .row .st{font-size:11.5px; color:#6f757e;}',
+'#rtt20Adm .row.off{opacity:.55;}',
+'#rtt20Adm .hint{color:#9aa4b2; font-size:12px; line-height:1.75; margin:0 0 12px;}',
+'#rtt20Adm .warn{color:#ffc46b; background:#2b2417; border:1px solid #4a3b1c; border-radius:8px; padding:9px 12px; margin:0 0 12px; font-size:12px; line-height:1.7;}',
+'#rtt20Adm textarea{width:100%; box-sizing:border-box; min-height:110px; resize:vertical; margin-top:10px;',
+'  background:#12141a; border:1px solid #2b2f37; border-radius:8px; color:#9aa4b2; padding:9px 11px;',
+'  font-family:ui-monospace,Consolas,Menlo,monospace; font-size:11.5px; line-height:1.6;}',
+'#rtt20Adm .none{color:#6f757e; padding:10px 2px;}',
+
+/* ---- 呼び出し語（別名）の設定 ---- */
+'#rtt20Ali{position:fixed; inset:0; z-index:2150; display:none; align-items:center; justify-content:center;',
+'  background:rgba(8,10,14,.6); padding:16px;',
+'  font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic UI",Meiryo,system-ui,sans-serif;}',
+'#rtt20Ali.on{display:flex;}',
+'#rtt20Ali .box{width:100%; max-width:820px; max-height:88vh; display:flex; flex-direction:column; color:#e6e9ef;',
+'  background:#1b1e24; border:1px solid #3d4046; border-radius:12px; box-shadow:0 18px 60px rgba(0,0,0,.6); overflow:hidden; font-size:13px;}',
+'#rtt20Ali .hd{display:flex; align-items:center; gap:8px; padding:12px 16px; background:#20242c; border-bottom:1px solid #3d4046; font-weight:700; font-size:14px;}',
+'#rtt20Ali .hd .sp{flex:1;}',
+'#rtt20Ali .bd{flex:1 1 auto; min-height:0; overflow:auto; padding:12px 16px 18px;}',
+'#rtt20Ali button{padding:6px 12px; border-radius:7px; cursor:pointer; font-family:inherit; font-size:12.5px; font-weight:600;',
+'  background:#2a2d32; border:1px solid #3d4046; color:#cfd4dc;}',
+'#rtt20Ali button:hover{background:#33363c; color:#fff;}',
+'#rtt20Ali button.dg{color:#ff8a80; border-color:#5a3030;}',
+'#rtt20Ali .hint{color:#9aa4b2; font-size:12px; line-height:1.8; margin:0 0 10px;}',
+'#rtt20Ali .filt{width:100%; box-sizing:border-box; padding:9px 12px; margin:0 0 12px; font-size:13.5px; font-family:inherit;',
+'  background:#12141a; border:1px solid #3d4046; border-radius:8px; color:#e6e9ef; outline:none;}',
+'#rtt20Ali .filt:focus{border-color:#4c8dff;}',
+'#rtt20Ali .gl{padding:12px 2px 5px; color:#6f757e; font-size:11px; font-weight:700; letter-spacing:.04em;}',
+'#rtt20Ali .arow{display:flex; align-items:center; gap:9px; padding:7px 10px; margin-bottom:5px;',
+'  background:#20242c; border:1px solid #2b2f37; border-radius:8px; flex-wrap:wrap;}',
+'#rtt20Ali .arow.off{opacity:.5;}',
+'#rtt20Ali .arow .ic{width:18px; text-align:center; flex:0 0 auto;}',
+'#rtt20Ali .arow .nm{flex:1 1 190px; min-width:130px; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;}',
+'#rtt20Ali .arow input[type=text]{flex:2 1 230px; min-width:150px; box-sizing:border-box; padding:5px 9px;',
+'  background:#12141a; border:1px solid #3d4046; border-radius:6px; color:#e6e9ef; font-family:inherit; font-size:12.5px; outline:none;}',
+'#rtt20Ali .arow input[type=text]:focus{border-color:#4c8dff;}',
+'#rtt20Ali .arow label{display:inline-flex; align-items:center; gap:4px; color:#9aa4b2; font-size:11.5px; flex:0 0 auto; cursor:pointer;}',
+'#rtt20Ali .arow .std{color:#6f757e; font-size:11px; flex:0 0 auto;}',
+'#rtt20Ali .none{color:#6f757e; padding:14px 2px;}',
+
+/* ---- ヘッダー内の ☰ ボタン ---- */
+'#modeSwitcher #rtt20Burger{padding:7px 11px; font-size:15px; line-height:1;}',
+'#appShell.hdr-small #modeSwitcher #rtt20Burger{padding:3px 8px; font-size:13px;}',
+
+/* ---- 狭い画面 ---- */
+'@media (max-width:640px){ #rtt20Fab button{width:38px; height:38px; font-size:15px;} }'
+].join('\n');
+
+function addStyle(){
+  var s = document.createElement('style');
+  s.id = 'rtt20-style';
+  s.setAttribute('data-rtt-skip', '1');   /* 自己点検（指紋）の計算からは外す */
+  s.textContent = CSS;
+  document.head.appendChild(s);
+}
+
+/* ------------------------------------------------------------
+   2. セクションへ飛ぶ／開く
+   ------------------------------------------------------------ */
+var SECTIONS = [
+  {id:'secTableManager', icon:'\uD83D\uDDC2', label:'項目（テーブル）管理'},
+  {id:'secInputForm',    icon:'\u270F\uFE0F', label:'新規登録'},
+  {id:'secSearch',       icon:'\uD83D\uDD0E', label:'検索・表示・編集', focus:'#q_kw'}
+];
+
+function gotoSection(id, focusSel){
+  toDb();
+  var target = document.getElementById(id);
+  if(!target) return;
+  if(target.tagName === 'DETAILS') target.open = true;
+  setTimeout(function(){
+    try{ target.scrollIntoView({block:'start', behavior:'smooth'}); }
+    catch(e){ try{ target.scrollIntoView(true); }catch(e2){} }
+    if(focusSel){
+      setTimeout(function(){
+        var f = document.querySelector(focusSel);
+        if(f){ try{ f.focus(); }catch(e){} }
+      }, 300);
+    }
+  }, 40);
+}
+
+/* すべてのセクションを開く／閉じる（本体の関数があればそれを使う） */
+function allSections(open){
+  toDb();
+  oneOpenGuard = true;                      /* 「1つだけ開く」と喧嘩しないように */
+  try{
+    if(typeof window.toggleAllSections === 'function'){ window.toggleAllSections(open); }
+    else{
+      var ds = document.querySelectorAll('#app-db details.card'), i;
+      for(i = 0; i < ds.length; i++){ ds[i].open = open; }
+    }
+  }finally{
+    setTimeout(function(){ oneOpenGuard = false; }, 80);
+  }
+}
+
+/* 見出しの右側に小さな操作ボタンを付ける（貼り付いた見出しから直接押せる） */
+function decorateSummaries(){
+  var i, sec, sum, box;
+  for(i = 0; i < SECTIONS.length; i++){
+    sec = document.getElementById(SECTIONS[i].id);
+    if(!sec) continue;
+    sum = null;
+    try{ sum = sec.querySelector(':scope > summary'); }catch(e){ sum = null; }
+    if(!sum){                                   /* :scope が使えないとき用 */
+      var kids = sec.children, ki;
+      for(ki = 0; ki < kids.length; ki++){
+        if(kids[ki].tagName === 'SUMMARY'){ sum = kids[ki]; break; }
+      }
+    }
+    if(!sum || sum.querySelector('.rtt20-acts')) continue;
+    box = el('div', {'class':'rtt20-acts'});
+    box.appendChild(mkSumBtn('\u2630', 'メニューを開く', openDrawer));
+    box.appendChild(mkSumBtn('\uD83D\uDD0D', 'コマンドを探す（Ctrl+K）', function(){ openPalette(''); }));
+    box.appendChild(mkSumBtn('\uD83D\uDCBE', '上書き保存', function(){
+      if(typeof window.saveDbOverwrite === 'function') window.saveDbOverwrite();
+    }));
+    box.appendChild(mkSumBtn('\u25BC', 'すべてのセクションを開く', function(){ allSections(true); }));
+    box.appendChild(mkSumBtn('\u25B2', 'すべてのセクションを閉じる', function(){ allSections(false); }));
+    sum.insertBefore(box, sum.firstChild);
+  }
+}
+function mkSumBtn(text, title, fn){
+  var b = el('button', {type:'button', title:title});
+  b.textContent = text;
+  b.addEventListener('click', function(e){
+    e.preventDefault();      /* summary のクリック＝開閉を止める */
+    e.stopPropagation();
+    try{ fn(); }catch(err){}
+  });
+  return b;
+}
+
+/* ------------------------------------------------------------
+   3. コマンドの一覧を組み立てる
+   ------------------------------------------------------------
+   kw には「ひらがな・ローマ字」も入れておく。
+   日本語入力に切り替えなくても hozon / hyouji などで探せる。 */
+
+var addonCmds = [];   /* アドオンが足したコマンド {id,owner,group,icon,label,hint,run} */
+
+function call(name, args){
+  return function(){
+    if(typeof window[name] === 'function'){
+      try{ window[name].apply(null, args || []); }catch(e){ say('実行できませんでした: ' + e.message, 'err'); }
+    }else{
+      say('この機能はこの版にはありません（' + name + '）', 'err');
+    }
+  };
+}
+
+function buildCommands(showHidden){
+  var out = [], i, t, tables = [];
+
+  /* --- 画面の切り替え --- */
+  out.push({id:'mode.db', group:'画面', icon:'\uD83D\uDDC4', label:'作業記録DB（記録台帳）を開く', hint:'Ctrl+Alt+D',
+            kw:'db kirokudaicho daicho 台帳 でーたべーす', run:function(){ toDb(); }});
+  out.push({id:'mode.md', group:'画面', icon:'\uD83D\uDCDD', label:'Markdownメモを開く', hint:'Ctrl+Alt+M',
+            kw:'md memo memo markdown めも', run:function(){ if(typeof window.setAppMode === 'function') window.setAppMode('md'); }});
+  out.push({id:'app.settings', group:'画面', icon:'\u2699', label:'設定を開く', hint:'Ctrl+,',
+            kw:'settei setting config せってい', run:function(){ if(window.WDT && WDT.openSettings) WDT.openSettings(); }});
+
+  /* --- セクションへ飛ぶ --- */
+  for(i = 0; i < SECTIONS.length; i++){
+    (function(s){
+      out.push({id:'sec.' + s.id, group:'セクションへ移動', icon:s.icon, label:s.label + ' へ移動',
+                kw:'section idou jump ' + s.id,
+                run:function(){ gotoSection(s.id, s.focus); }});
+    })(SECTIONS[i]);
+  }
+  out.push({id:'sec.help', group:'セクションへ移動', icon:'\uD83D\uDCE6', label:'このツールの持ち運び方・使い方',
+            kw:'help tsukaikata つかいかた ヘルプ',
+            run:function(){
+              toDb();
+              var cards = document.querySelectorAll('#app-db > .card');
+              var last = cards.length ? cards[cards.length - 1] : null;
+              if(last){ try{ last.scrollIntoView({block:'start', behavior:'smooth'}); }catch(e){} }
+            }});
+
+  /* --- 項目（テーブル）ごと --- */
+  try{ if(window.WorkDB && WorkDB.getTables) tables = WorkDB.getTables() || []; }catch(e){ tables = []; }
+  for(i = 0; i < tables.length; i++){
+    (function(tb){
+      var ic = tb.icon || '\uD83D\uDCC4';
+      out.push({id:'tbl.in.' + tb.key, group:'項目（テーブル）', icon:ic, label:tb.label + ' に新規登録', hint:'入力欄へ',
+                kw:'nyuryoku touroku ' + tb.key + ' にゅうりょく とうろく',
+                run:function(){
+                  toDb();
+                  try{ if(window.WorkDB && WorkDB.openTable) WorkDB.openTable(tb.key); }catch(e){}
+                  gotoSection('secInputForm');
+                }});
+      out.push({id:'tbl.all.' + tb.key, group:'項目（テーブル）', icon:ic, label:tb.label + ' を全件表示', hint:'表へ',
+                kw:'zenken hyouji ' + tb.key + ' ぜんけん ひょうじ いちらん',
+                run:function(){
+                  toDb();
+                  try{ if(window.WorkDB && WorkDB.openTable) WorkDB.openTable(tb.key); }catch(e){}
+                  if(typeof window.showAll === 'function'){ try{ window.showAll(tb.key); }catch(e){} }
+                  gotoSection('secSearch');
+                }});
+    })(tables[i]);
+  }
+
+  /* --- よく使う操作 --- */
+  out.push({id:'db.save', group:'操作', icon:'\uD83D\uDCBE', label:'上書き保存', hint:'元のファイルへ',
+            kw:'hozon save uwagaki ほぞん うわがき', run:call('saveDbOverwrite')});
+  out.push({id:'db.saveAs', group:'操作', icon:'\uD83D\uDCBE', label:'名前を付けて保存', hint:'Ctrl+Shift+S',
+            kw:'hozon save namae ほぞん なまえ', run:call('saveDbAs')});
+  out.push({id:'db.open', group:'操作', icon:'\uD83D\uDCC2', label:'DBファイルを開く',
+            kw:'hiraku open file ひらく', run:call('openDbPicker')});
+  out.push({id:'db.undo', group:'操作', icon:'\u21B6', label:'元に戻す', hint:'Ctrl+Z',
+            kw:'undo modosu もどす', run:call('undo')});
+  out.push({id:'db.redo', group:'操作', icon:'\u21B7', label:'やり直す', hint:'Ctrl+Y',
+            kw:'redo yarinaosu やりなおす', run:call('redo')});
+  out.push({id:'sec.openAll', group:'操作', icon:'\u25BC', label:'すべてのセクションを開く',
+            kw:'zenbu hiraku ひらく ぜんぶ', run:function(){ allSections(true); }});
+  out.push({id:'sec.closeAll', group:'操作', icon:'\u25B2', label:'すべてのセクションを折りたたむ',
+            kw:'zenbu tojiru とじる ぜんぶ', run:function(){ allSections(false); }});
+  out.push({id:'db.theme', group:'操作', icon:'\uD83C\uDF19', label:'ダーク／ライトを切り替え',
+            kw:'dark light theme いろ てーま', run:call('toggleTheme')});
+  out.push({id:'db.tags', group:'操作', icon:'\uD83C\uDFF7', label:'タグの管理',
+            kw:'tag tagu たぐ', run:function(){
+              toDb();
+              if(typeof window.openTagManager === 'function'){
+                var t = null;
+                try{ t = window.WorkDB && WorkDB.getCurrentTable ? WorkDB.getCurrentTable() : null; }catch(e){}
+                try{ window.openTagManager(t, ''); }catch(e){ say('タグの管理を開けませんでした', 'err'); }
+              }
+            }});
+  out.push({id:'db.cols', group:'操作', icon:'\u2699', label:'表示する列を選ぶ',
+            kw:'retsu column hyouji れつ', run:function(){ gotoSection('secSearch'); setTimeout(call('toggleColPanel'), 380); }});
+  out.push({id:'db.csv', group:'操作', icon:'\u21E9', label:'CSVで書き出す',
+            kw:'csv export kakidashi かきだし', run:call('exportCsv')});
+  out.push({id:'db.txt', group:'操作', icon:'\u21E9', label:'TXTで書き出す',
+            kw:'txt export kakidashi かきだし', run:call('exportTxt')});
+  out.push({id:'db.mdcell', group:'操作', icon:'\uD83D\uDCDD', label:'長文列のMarkdown表示を切り替え',
+            kw:'markdown md hyouji ちょうぶん', run:call('toggleGridMarkdown')});
+  out.push({id:'db.colwidth', group:'操作', icon:'\u2194', label:'表の列幅をリセット',
+            kw:'haba width reset はば', run:function(){ if(window.RTT19 && RTT19.resetWidths) RTT19.resetWidths(); }});
+  out.push({id:'db.selfcheck', group:'操作', icon:'\uD83D\uDD12', label:'自己点検（ファイルが書き換えられていないか）',
+            kw:'check tenken sha256 てんけん', run:function(){ if(window.RTT19 && RTT19.panel) RTT19.panel(); }});
+
+  /* --- アドオン --- */
+  out.push({id:'addon.manage', group:'アドオン', icon:'\uD83E\uDDE9', label:'DB画面のアドオンを管理する',
+            kw:'addon plugin js adoon あどおん', run:openAdmin});
+  for(i = 0; i < addonCmds.length; i++){
+    out.push({id:'ax.' + (addonCmds[i].owner || '') + '.' + (addonCmds[i].id || i),
+              group:'アドオン', icon:addonCmds[i].icon || '\uD83E\uDDE9',
+              label:addonCmds[i].label, hint:addonCmds[i].hint || addonCmds[i].owner,
+              kw:'addon ' + (addonCmds[i].owner || ''), run:addonCmds[i].run});
+  }
+
+  /* --- 設定 --- */
+  out.push({id:'set.alias', group:'設定', icon:'\uD83D\uDD24', label:'呼び出し語（別名）を設定する', hint:'Ctrl+E',
+            kw:'alias betsumei yobidashi よびだしご べつめい ことば setting',
+            run:function(){ openAlias(''); }});
+  out.push({id:'set.usagereset', group:'設定', icon:'\u267B', label:'「よく使う」の記録を消す',
+            kw:'reset usage yokutsukau きろく けす',
+            run:function(){
+              if(confirm('「よく使う」に出す順番のもとになる使用回数を消しますか？')){
+                jSet(K_USE, {}); say('使用回数の記録を消しました。', 'ok');
+              }
+            }});
+
+  /* --- ここで「呼び出し語」と「非表示」を反映する --- */
+  var al = aliasMap(), hid = hiddenList(), res = [], c;
+  for(i = 0; i < out.length; i++){
+    c = out[i];
+    if(!c.id) c.id = 'cmd.' + i;
+    c.userkw = al[c.id] || '';
+    if(!showHidden && hid.indexOf(c.id) >= 0) continue;
+    res.push(c);
+  }
+  return res;
+}
+
+/* ------------------------------------------------------------
+   4. コマンドパレット（Ctrl+K）
+   ------------------------------------------------------------ */
+var palEl = null, palInput = null, palList = null;
+var palItems = [], palSel = 0, palAll = [];
+
+function buildPalette(){
+  if(palEl) return;
+  palEl = el('div', {id:'rtt20Pal'});
+  palEl.innerHTML =
+      '<div class="box">'
+    +   '<input type="text" id="rtt20PalIn" placeholder="\u5165\u529B\u3057\u3066\u7d5e\u308a\u8fbc\u307f\uff08\u4f8b\uff1a\u4fdd\u5b58 / hozon / \u691c\u7d22\uff09" autocomplete="off" spellcheck="false">'
+    +   '<div class="list" id="rtt20PalList"></div>'
+    +   '<div class="foot">\u2191\u2193 \u9078\u3076\u3000Enter \u5b9f\u884c\u3000Ctrl+E \u547c\u3073\u51fa\u3057\u8a9e\u3092\u8a2d\u5b9a\u3000Esc \u9589\u3058\u308b</div>'
+    + '</div>';
+  document.body.appendChild(palEl);
+  palInput = $('#rtt20PalIn', palEl);
+  palList  = $('#rtt20PalList', palEl);
+
+  palEl.addEventListener('mousedown', function(e){ if(e.target === palEl) closePalette(); });
+  palInput.addEventListener('input', function(){ palSel = 0; renderPalette(); });
+  palInput.addEventListener('keydown', onPalKey);
+  palList.addEventListener('click', function(e){
+    var n = e.target;
+    while(n && n !== palList && !(n.classList && n.classList.contains('it'))) n = n.parentNode;
+    if(n && n !== palList){
+      var idx = parseInt(n.getAttribute('data-i'), 10);
+      if(!isNaN(idx)) runPalItem(idx);
+    }
+  });
+  palList.addEventListener('mousemove', function(e){
+    var n = e.target;
+    while(n && n !== palList && !(n.classList && n.classList.contains('it'))) n = n.parentNode;
+    if(n && n !== palList){
+      var idx = parseInt(n.getAttribute('data-i'), 10);
+      if(!isNaN(idx) && idx !== palSel){ palSel = idx; markSel(); }
+    }
+  });
+}
+
+function onPalKey(e){
+  if(e.key === 'Escape'){ e.preventDefault(); closePalette(); return; }
+  /* Ctrl+E：いま選んでいるコマンドの「呼び出し語」を設定する */
+  if((e.ctrlKey || e.metaKey) && (e.key === 'e' || e.key === 'E')){
+    e.preventDefault();
+    var cur = palItems[palSel];
+    var word = cur ? cur.label : palInput.value;
+    closePalette();
+    setTimeout(function(){ openAlias(word); }, 40);
+    return;
+  }
+  if(e.key === 'ArrowDown' || (e.key === 'n' && e.ctrlKey)){
+    e.preventDefault(); if(palItems.length){ palSel = (palSel + 1) % palItems.length; markSel(true); } return;
+  }
+  if(e.key === 'ArrowUp' || (e.key === 'p' && e.ctrlKey)){
+    e.preventDefault(); if(palItems.length){ palSel = (palSel - 1 + palItems.length) % palItems.length; markSel(true); } return;
+  }
+  if(e.key === 'Enter'){ e.preventDefault(); runPalItem(palSel); return; }
+}
+
+function normalize(s){
+  return String(s == null ? '' : s).toLowerCase().replace(/\s+/g, '');
+}
+
+function renderPalette(){
+  var q = normalize(palInput.value);
+  var terms = q ? String(palInput.value).toLowerCase().split(/\s+/).filter(Boolean) : [];
+  var i, c, hay, ok, j;
+
+  palItems = [];
+  for(i = 0; i < palAll.length; i++){
+    c = palAll[i];
+    hay = normalize(c.label + ' ' + c.group + ' ' + (c.kw || '') + ' ' + (c.userkw || '') + ' ' + (c.hint || ''));
+    ok = true;
+    for(j = 0; j < terms.length; j++){
+      if(hay.indexOf(normalize(terms[j])) === -1){ ok = false; break; }
+    }
+    if(ok) palItems.push(c);
+  }
+
+  /* 何も当たらなければ「その言葉でDBを検索」を出す */
+  if(!palItems.length && palInput.value.trim()){
+    var word = palInput.value.trim();
+    palItems.push({
+      group:'検索', icon:'\uD83D\uDD0E', label:'「' + word + '」で記録を検索する', hint:'Enter',
+      run:function(){
+        gotoSection('secSearch');
+        setTimeout(function(){
+          var kw = document.getElementById('q_kw');
+          if(kw){ kw.value = word; if(typeof window.runSearch === 'function') window.runSearch(); }
+        }, 360);
+      }
+    });
+  }
+
+  /* 何も打っていないときは「よく使う」を先頭に出す（設定でOFFにできる） */
+  if(!terms.length && !bodyHas('wdt-nocmdrank') && palItems.length){
+    var use = usageMap();
+    var rank = palItems.filter(function(x){ return (use[x.id] || 0) > 0; });
+    rank.sort(function(a, b){ return (use[b.id] || 0) - (use[a.id] || 0); });
+    rank = rank.slice(0, 6).map(function(x){
+      var d = Object.create(x);
+      d.group = '\u3088\u304f\u4f7f\u3046';
+      d.hint  = (use[x.id] || 0) + '\u56de';
+      return d;
+    });
+    if(rank.length) palItems = rank.concat(palItems);
+  }
+
+  if(!palItems.length){
+    palList.innerHTML = '<div class="none">\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f</div>';
+    return;
+  }
+  if(palSel >= palItems.length) palSel = 0;
+
+  var html = '', lastGrp = null;
+  for(i = 0; i < palItems.length; i++){
+    c = palItems[i];
+    if(c.group !== lastGrp){ html += '<div class="gl">' + esc(c.group) + '</div>'; lastGrp = c.group; }
+    html += '<div class="it' + (i === palSel ? ' sel' : '') + '" data-i="' + i + '">'
+          +   '<span class="ic">' + esc(c.icon || '\u2022') + '</span>'
+          +   '<span class="tx">' + esc(c.label) + '</span>'
+          +   (c.hint ? '<span class="hn">' + esc(c.hint) + '</span>' : '')
+          + '</div>';
+  }
+  palList.innerHTML = html;
+}
+
+function markSel(scroll){
+  var nodes = palList.querySelectorAll('.it'), i;
+  for(i = 0; i < nodes.length; i++){
+    if(i === palSel){
+      nodes[i].classList.add('sel');
+      if(scroll){ try{ nodes[i].scrollIntoView({block:'nearest'}); }catch(e){} }
+    }else{
+      nodes[i].classList.remove('sel');
+    }
+  }
+}
+
+function runPalItem(i){
+  var c = palItems[i];
+  if(!c) return;
+  try{ bumpUsage(c.id); }catch(e){}
+  closePalette();
+  setTimeout(function(){
+    try{ c.run(); }catch(e){ say('実行できませんでした: ' + e.message, 'err'); }
+  }, 10);
+}
+
+function openPalette(preset){
+  buildPalette();
+  palAll = buildCommands();
+  palSel = 0;
+  palInput.value = preset || '';
+  palEl.classList.add('on');
+  renderPalette();
+  setTimeout(function(){ try{ palInput.focus(); palInput.select(); }catch(e){} }, 20);
+}
+function closePalette(){
+  if(palEl) palEl.classList.remove('on');
+}
+function palOpened(){ return !!(palEl && palEl.classList.contains('on')); }
+
+/* ------------------------------------------------------------
+   5. ハンバーガーメニュー（左からスライド）
+   ------------------------------------------------------------ */
+var drawer = null, scrim = null;
+
+function buildDrawer(){
+  if(drawer) return;
+  scrim = el('div', {'class':'rtt20-scrim', id:'rtt20Scrim'});
+  scrim.addEventListener('click', closeDrawer);
+  document.body.appendChild(scrim);
+
+  drawer = el('aside', {id:'rtt20Drawer'});
+  drawer.innerHTML =
+      '<div class="dHead"><span>\u2630 \u30e1\u30cb\u30e5\u30fc</span><span class="sp"></span>'
+    +   '<button type="button" id="rtt20DClose" title="\u9589\u3058\u308b">\u2715</button></div>'
+    + '<div class="dFind"><button type="button" id="rtt20DFind">\uD83D\uDD0D \u30b3\u30de\u30f3\u30c9\u3092\u63a2\u3059\u3000<span style="float:right">Ctrl+K</span></button></div>'
+    + '<div class="dBody" id="rtt20DBody"></div>';
+  document.body.appendChild(drawer);
+
+  $('#rtt20DClose', drawer).addEventListener('click', closeDrawer);
+  $('#rtt20DFind', drawer).addEventListener('click', function(){ closeDrawer(); setTimeout(function(){ openPalette(''); }, 60); });
+}
+
+function drawerItem(icon, label, kb, fn, keepOpen){
+  var b = el('button', {type:'button', 'class':'dItem'});
+  b.innerHTML = '<span class="ic">' + esc(icon) + '</span><span class="tx">' + esc(label) + '</span>'
+              + (kb ? '<span class="kb">' + esc(kb) + '</span>' : '');
+  b.addEventListener('click', function(){
+    if(!keepOpen) closeDrawer();
+    setTimeout(function(){ try{ fn(); }catch(e){ say('実行できませんでした: ' + e.message, 'err'); } }, keepOpen ? 0 : 60);
+  });
+  return b;
+}
+function drawerGroup(title){ return el('div', {'class':'dGrp'}, esc(title)); }
+
+function renderDrawer(){
+  var body = $('#rtt20DBody', drawer);
+  if(!body) return;
+  body.innerHTML = '';
+  var i, tables = [];
+
+  body.appendChild(drawerGroup('画面'));
+  body.appendChild(drawerItem('\uD83D\uDDC4', '作業記録DB（記録台帳）', 'Ctrl+Alt+D', function(){ toDb(); }));
+  body.appendChild(drawerItem('\uD83D\uDCDD', 'Markdownメモ', 'Ctrl+Alt+M', function(){ if(typeof window.setAppMode === 'function') window.setAppMode('md'); }));
+  body.appendChild(drawerItem('\u2699', '設定', 'Ctrl+,', function(){ if(window.WDT && WDT.openSettings) WDT.openSettings(); }));
+
+  body.appendChild(drawerGroup('セクションへ移動'));
+  for(i = 0; i < SECTIONS.length; i++){
+    (function(s){
+      body.appendChild(drawerItem(s.icon, s.label, '', function(){ gotoSection(s.id, s.focus); }));
+    })(SECTIONS[i]);
+  }
+
+  try{ if(window.WorkDB && WorkDB.getTables) tables = WorkDB.getTables() || []; }catch(e){ tables = []; }
+  body.appendChild(drawerGroup('項目（テーブル）'));
+  if(!tables.length){
+    body.appendChild(el('div', {'class':'dNone'}, '（まだ読み込まれていません）'));
+  }else{
+    for(i = 0; i < tables.length; i++){
+      (function(tb){
+        var row = el('div', {'class':'dRow'});
+        row.innerHTML = '<span class="ic" style="width:18px;text-align:center">' + esc(tb.icon || '\uD83D\uDCC4') + '</span>'
+                      + '<span class="nm">' + esc(tb.label) + '</span>';
+        var b1 = el('button', {type:'button', title:'この項目に新規登録する'}, '\u270F\uFE0F \u5165\u529B');
+        var b2 = el('button', {type:'button', title:'この項目を全件表示する'}, '\uD83D\uDCCB \u5168\u4ef6');
+        b1.addEventListener('click', function(){
+          closeDrawer();
+          setTimeout(function(){
+            try{ if(window.WorkDB && WorkDB.openTable) WorkDB.openTable(tb.key); }catch(e){}
+            gotoSection('secInputForm');
+          }, 60);
+        });
+        b2.addEventListener('click', function(){
+          closeDrawer();
+          setTimeout(function(){
+            try{ if(window.WorkDB && WorkDB.openTable) WorkDB.openTable(tb.key); }catch(e){}
+            if(typeof window.showAll === 'function'){ try{ window.showAll(tb.key); }catch(e){} }
+            gotoSection('secSearch');
+          }, 60);
+        });
+        row.appendChild(b1); row.appendChild(b2);
+        body.appendChild(row);
+      })(tables[i]);
+    }
+  }
+
+  body.appendChild(drawerGroup('操作'));
+  body.appendChild(drawerItem('\uD83D\uDCBE', '上書き保存', '', call('saveDbOverwrite')));
+  body.appendChild(drawerItem('\uD83D\uDCBE', '名前を付けて保存', 'Ctrl+Shift+S', call('saveDbAs')));
+  body.appendChild(drawerItem('\uD83D\uDCC2', 'DBファイルを開く', '', call('openDbPicker')));
+  body.appendChild(drawerItem('\u21B6', '元に戻す', 'Ctrl+Z', call('undo')));
+  body.appendChild(drawerItem('\u21B7', 'やり直す', 'Ctrl+Y', call('redo')));
+  body.appendChild(drawerItem('\u25BC', 'すべてのセクションを開く', '', function(){ allSections(true); }, true));
+  body.appendChild(drawerItem('\u25B2', 'すべてのセクションを閉じる', '', function(){ allSections(false); }, true));
+  body.appendChild(drawerItem('\uD83C\uDF19', 'ダーク／ライト切り替え', '', call('toggleTheme'), true));
+  body.appendChild(drawerItem('\u21E9', 'CSVで書き出す', '', call('exportCsv')));
+  body.appendChild(drawerItem('\u21E9', 'TXTで書き出す', '', call('exportTxt')));
+
+  body.appendChild(drawerGroup('アドオン'));
+  body.appendChild(drawerItem('\uD83E\uDDE9', 'DB画面のアドオンを管理', '', openAdmin));
+  body.appendChild(drawerItem('\uD83D\uDD24', '呼び出し語（別名）の設定', 'Ctrl+E', function(){ openAlias(''); }));
+  if(!addonMenus.length){
+    body.appendChild(el('div', {'class':'dNone'}, '（アドオンが足したメニューはここに出ます）'));
+  }else{
+    for(i = 0; i < addonMenus.length; i++){
+      (function(m){
+        body.appendChild(drawerItem(m.icon || '\uD83E\uDDE9', m.label, '', m.onClick));
+      })(addonMenus[i]);
+    }
+  }
+}
+
+function openDrawer(){
+  buildDrawer();
+  renderDrawer();
+  drawer.classList.add('on');
+  scrim.classList.add('on');
+}
+function closeDrawer(){
+  if(drawer){ drawer.classList.remove('on'); }
+  if(scrim){ scrim.classList.remove('on'); }
+}
+function drawerOpened(){ return !!(drawer && drawer.classList.contains('on')); }
+
+/* ------------------------------------------------------------
+   6. ヘッダーの ☰ ボタン ＋ 左下の丸ボタン
+   ------------------------------------------------------------ */
+function addBurger(){
+  var ms = document.getElementById('modeSwitcher');
+  if(!ms || document.getElementById('rtt20Burger')) return;
+  var b = el('button', {type:'button', id:'rtt20Burger', title:'メニューを開く'});
+  b.textContent = '\u2630';
+  b.addEventListener('click', openDrawer);
+  ms.insertBefore(b, ms.firstChild);
+}
+
+function addFab(){
+  if(document.getElementById('rtt20Fab')) return;
+  var box = el('div', {id:'rtt20Fab'});
+  var b1 = el('button', {type:'button', title:'コマンドを探す（Ctrl+K）'}); b1.textContent = '\uD83D\uDD0D';
+  var b2 = el('button', {type:'button', 'class':'gh', title:'メニューを開く'}); b2.textContent = '\u2630';
+  var b3 = el('button', {type:'button', 'class':'gh', title:'一番上へ戻る'}); b3.textContent = '\u25B2';
+  b1.addEventListener('click', function(){ openPalette(''); });
+  b2.addEventListener('click', openDrawer);
+  b3.addEventListener('click', function(){
+    var a = document.getElementById('app-db');
+    if(a){ try{ a.scrollTo({top:0, behavior:'smooth'}); }catch(e){ a.scrollTop = 0; } }
+  });
+  box.appendChild(b1); box.appendChild(b2); box.appendChild(b3);
+  document.body.appendChild(box);
+
+  /* Markdownメモの画面と、右下クイックボタンが出ているときは隠す
+     （同じ役目のボタンが二重に出ないようにするため） */
+  function sync(){
+    box.classList.toggle('hide', !isDbMode() || miniLauncherVisible());
+  }
+  sync();
+  setInterval(sync, 700);
+}
+
+/* ------------------------------------------------------------
+   7. DB画面用アドオン（.jsファイル1個）
+   ------------------------------------------------------------ */
+var STORE_KEY  = 'workdb_addons_v1';
+var addonBtns  = [];   /* {owner, id} ツールバーに足したボタン */
+var addonMenus = [];   /* {owner, id, icon, label, onClick} */
+var listeners  = {};   /* イベント名 -> [ {owner, cb} ] */
+var admLogText = '';
+var loadingOwner = null;
+
+function loadStore(){
+  var raw = lsGet(STORE_KEY, '[]'), arr;
+  try{ arr = JSON.parse(raw); }catch(e){ arr = []; }
+  if(!Array.isArray(arr)) arr = [];
+  return arr.filter(function(x){ return x && typeof x.name === 'string' && typeof x.code === 'string'; })
+            .map(function(x){ return {name:x.name, code:x.code, enabled:(x.enabled !== false)}; });
+}
+function saveStore(arr){ lsSet(STORE_KEY, JSON.stringify(arr)); }
+
+function admLog(msg){
+  var stamp = new Date().toTimeString().slice(0, 8);
+  admLogText += (admLogText ? '\n' : '') + '[' + stamp + '] ' + msg;
+  var ta = document.getElementById('rtt20AdmLog');
+  if(ta){ ta.value = admLogText; ta.scrollTop = ta.scrollHeight; }
+}
+
+function fire(ev, payload){
+  var arr = listeners[ev] || [], i;
+  for(i = 0; i < arr.length; i++){
+    try{ arr[i].cb(payload); }catch(e){ admLog('\u274C ' + arr[i].owner + ' のイベント処理でエラー: ' + e.message); }
+  }
+}
+
+/* 本体の関数を包んで、アドオンにイベントを配る */
+function hook(name, ev){
+  var orig = window[name];
+  if(typeof orig !== 'function' || orig.__rtt20) return;
+  var wrapped = function(){
+    var r = orig.apply(this, arguments);
+    try{ fire(ev, {args:Array.prototype.slice.call(arguments)}); }catch(e){}
+    return r;
+  };
+  wrapped.__rtt20 = 1;
+  window[name] = wrapped;
+}
+
+/* アドオンに渡す道具箱 */
+function makeApi(name){
+  var api = Object.create(window.WorkDB || {});
+  api.addonName = name;
+
+  api.addToolbarButton = function(opt){
+    if(!opt || !opt.label || typeof opt.onClick !== 'function') return false;
+    var bar = document.querySelector('#app-db .toolbar');
+    if(!bar) return false;
+    var id = 'rtt20ab_' + (opt.id || (name + '_' + addonBtns.length)).replace(/[^A-Za-z0-9_]/g, '_');
+    var old = document.getElementById(id);
+    if(old && old.parentNode) old.parentNode.removeChild(old);
+    var b = el('button', {type:'button', id:id, 'class':'ghost', title:opt.title || opt.label});
+    b.textContent = opt.label;
+    b.addEventListener('click', function(){
+      try{ opt.onClick(); }catch(e){ say('アドオンでエラー: ' + e.message, 'err'); admLog('\u274C ' + name + ': ' + e.message); }
+    });
+    bar.appendChild(b);
+    addonBtns.push({owner:name, id:id});
+    return true;
+  };
+
+  api.addCommand = function(opt){
+    if(!opt || !opt.label || typeof opt.run !== 'function') return false;
+    addonCmds.push({
+      id:opt.id || (name + '_' + addonCmds.length), owner:name,
+      icon:opt.icon || '\uD83E\uDDE9', label:opt.label, hint:opt.hint || '',
+      run:function(){
+        try{ opt.run(); }catch(e){ say('アドオンでエラー: ' + e.message, 'err'); admLog('\u274C ' + name + ': ' + e.message); }
+      }
+    });
+    return true;
+  };
+
+  api.addMenuItem = function(opt){
+    if(!opt || !opt.label || typeof opt.onClick !== 'function') return false;
+    addonMenus.push({
+      owner:name, icon:opt.icon || '\uD83E\uDDE9', label:opt.label,
+      onClick:function(){
+        try{ opt.onClick(); }catch(e){ say('アドオンでエラー: ' + e.message, 'err'); admLog('\u274C ' + name + ': ' + e.message); }
+      }
+    });
+    return true;
+  };
+
+  api.on = function(ev, cb){
+    if(!ev || typeof cb !== 'function') return false;
+    if(!listeners[ev]) listeners[ev] = [];
+    listeners[ev].push({owner:name, cb:cb});
+    return true;
+  };
+
+  api.showText = function(title, text){ showTextBox(title, text); };
+  api.download = function(fname, text){
+    if(typeof window.downloadTextFile === 'function') window.downloadTextFile(fname, text);
+  };
+  api.log = function(msg){ admLog('[' + name + '] ' + msg); };
+
+  return api;
+}
+
+function runAddon(name, code){
+  loadingOwner = name;
+  try{
+    /* eslint-disable no-new-func */
+    (new Function('WorkDB', code))(makeApi(name));
+    admLog('\uD83D\uDCE5 「' + name + '」を読み込みました');
+    return true;
+  }catch(err){
+    admLog('\u274C 「' + name + '」の読み込みに失敗: ' + err.message);
+    return false;
+  }finally{
+    loadingOwner = null;
+  }
+}
+
+/* そのアドオンが足したものを全部片付ける */
+function unloadAddon(name){
+  var i, n = 0, b;
+  for(i = addonBtns.length - 1; i >= 0; i--){
+    if(addonBtns[i].owner === name){
+      b = document.getElementById(addonBtns[i].id);
+      if(b && b.parentNode) b.parentNode.removeChild(b);
+      addonBtns.splice(i, 1); n++;
+    }
+  }
+  for(i = addonCmds.length - 1; i >= 0; i--){ if(addonCmds[i].owner === name){ addonCmds.splice(i, 1); n++; } }
+  for(i = addonMenus.length - 1; i >= 0; i--){ if(addonMenus[i].owner === name){ addonMenus.splice(i, 1); n++; } }
+  var k, arr;
+  for(k in listeners){
+    if(!Object.prototype.hasOwnProperty.call(listeners, k)) continue;
+    arr = listeners[k];
+    for(i = arr.length - 1; i >= 0; i--){ if(arr[i].owner === name){ arr.splice(i, 1); n++; } }
+  }
+  return n;
+}
+
+function bootAddons(){
+  var arr = loadStore(), i, on = 0;
+  for(i = 0; i < arr.length; i++){
+    if(arr[i].enabled){ runAddon(arr[i].name, arr[i].code); on++; }
+  }
+  if(arr.length) admLog('\u2705 保存済みアドオン ' + arr.length + ' 件のうち ' + on + ' 件を実行しました');
+}
+
+/* ------------------------------------------------------------
+   8. 結果を見せるだけの小さな窓
+   ------------------------------------------------------------ */
+function showTextBox(title, text){
+  var back = el('div', {'class':'rtt20-scrim on'});
+  back.setAttribute('style', 'z-index:2200;display:flex;align-items:center;justify-content:center;padding:16px');
+  var box = el('div');
+  box.setAttribute('style',
+    'width:100%;max-width:680px;max-height:82vh;display:flex;flex-direction:column;'
+  + 'background:#1b1e24;border:1px solid #3d4046;border-radius:12px;color:#e6e9ef;overflow:hidden;'
+  + 'font-family:"Segoe UI","Yu Gothic UI",Meiryo,system-ui,sans-serif;font-size:13px;');
+  box.innerHTML =
+      '<div style="padding:12px 16px;background:#20242c;border-bottom:1px solid #3d4046;font-weight:700">' + esc(title) + '</div>'
+    + '<pre style="flex:1;min-height:0;overflow:auto;margin:0;padding:14px 16px;white-space:pre-wrap;'
+    +   'font-family:ui-monospace,Consolas,Menlo,monospace;font-size:12.5px;line-height:1.7">' + esc(text) + '</pre>'
+    + '<div style="padding:10px 16px;border-top:1px solid #2b2f37;text-align:right">'
+    +   '<button type="button" style="padding:7px 16px;border-radius:7px;background:#2f6fdb;border:1px solid #3f77df;'
+    +   'color:#fff;cursor:pointer;font-family:inherit;font-size:13px;font-weight:600">\u9589\u3058\u308b</button></div>';
+  back.appendChild(box);
+  document.body.appendChild(back);
+  function bye(){ if(back.parentNode) back.parentNode.removeChild(back); }
+  box.querySelector('button').addEventListener('click', bye);
+  back.addEventListener('click', function(e){ if(e.target === back) bye(); });
+}
+
+/* ------------------------------------------------------------
+   9. アドオン管理の窓
+   ------------------------------------------------------------ */
+var admEl = null;
+
+function buildAdmin(){
+  if(admEl) return;
+  admEl = el('div', {id:'rtt20Adm'});
+  admEl.innerHTML =
+      '<div class="box">'
+    +   '<div class="hd"><span>\uD83E\uDDE9 DB\u753b\u9762\u306e\u30a2\u30c9\u30aa\u30f3</span><span class="sp"></span>'
+    +     '<button type="button" id="rtt20AdmClose">\u2715 \u9589\u3058\u308b</button></div>'
+    +   '<div class="bd">'
+    +     '<div class="warn">\u26A0 \u30a2\u30c9\u30aa\u30f3\u306f\u300c.js \u30d5\u30a1\u30a4\u30eb\u306e\u4e2d\u8eab\u3092\u305d\u306e\u307e\u307e\u5b9f\u884c\u3059\u308b\u300d\u4ed5\u7d44\u307f\u3067\u3059\u3002'
+    +       '\u81ea\u5206\u3067\u66f8\u3044\u305f\u3082\u306e\u30fb\u4e2d\u8eab\u3092\u8aad\u3093\u3067\u7d0d\u5f97\u3057\u305f\u3082\u306e\u3060\u3051\u3092\u5165\u308c\u3066\u304f\u3060\u3055\u3044\u3002</div>'
+    +     '<p class="hint">\u8aad\u307f\u8fbc\u3093\u3060\u30a2\u30c9\u30aa\u30f3\u306f\u3053\u306e\u30d6\u30e9\u30a6\u30b6\u306b\u4fdd\u5b58\u3055\u308c\u3001\u6b21\u56de\u8d77\u52d5\u6642\u306b\u81ea\u52d5\u3067\u5b9f\u884c\u3055\u308c\u307e\u3059\uff08DB\u30d5\u30a1\u30a4\u30eb\u306e\u4e2d\u306b\u306f\u5165\u308a\u307e\u305b\u3093\uff09\u3002</p>'
+    +     '<div class="bar">'
+    +       '<button type="button" class="pri" id="rtt20AdmLoad">\uD83D\uDCE5 \u30a2\u30c9\u30aa\u30f3(.js)\u3092\u8aad\u307f\u8fbc\u3080</button>'
+    +       '<button type="button" id="rtt20AdmSample">\uD83D\uDCC4 \u30b5\u30f3\u30d7\u30eb\u3092\u4fdd\u5b58</button>'
+    +       '<button type="button" id="rtt20AdmHelp">\uD83D\uDCD8 \u4f5c\u308a\u65b9</button>'
+    +       '<button type="button" id="rtt20AdmReload">\uD83D\uDD04 \u5168\u90e8\u8aad\u307f\u76f4\u3059</button>'
+    +     '</div>'
+    +     '<div id="rtt20AdmList"></div>'
+    +     '<div style="margin-top:14px;color:#6f757e;font-size:11.5px;font-weight:700">\u8aad\u307f\u8fbc\u307f\u30ed\u30b0</div>'
+    +     '<textarea id="rtt20AdmLog" readonly placeholder="\u3053\u3053\u306b\u7d50\u679c\u304c\u51fa\u307e\u3059"></textarea>'
+    +   '</div>'
+    + '</div>';
+  document.body.appendChild(admEl);
+
+  $('#rtt20AdmClose', admEl).addEventListener('click', closeAdmin);
+  admEl.addEventListener('mousedown', function(e){ if(e.target === admEl) closeAdmin(); });
+  $('#rtt20AdmLoad', admEl).addEventListener('click', pickAddonFile);
+  $('#rtt20AdmSample', admEl).addEventListener('click', saveSamples);
+  $('#rtt20AdmHelp', admEl).addEventListener('click', function(){ showTextBox('\uD83D\uDCD8 DB\u753b\u9762\u306e\u30a2\u30c9\u30aa\u30f3\u306e\u4f5c\u308a\u65b9', ADDON_HELP); });
+  $('#rtt20AdmReload', admEl).addEventListener('click', function(){
+    var arr = loadStore(), i;
+    for(i = 0; i < arr.length; i++) unloadAddon(arr[i].name);
+    bootAddons();
+    renderAdmin();
+  });
+}
+
+function renderAdmin(){
+  var host = document.getElementById('rtt20AdmList');
+  if(!host) return;
+  var arr = loadStore(), i;
+  if(!arr.length){
+    host.innerHTML = '<div class="none">\uff08\u307e\u3060\u30a2\u30c9\u30aa\u30f3\u306f\u3042\u308a\u307e\u305b\u3093\uff09</div>';
+    return;
+  }
+  host.innerHTML = '';
+  for(i = 0; i < arr.length; i++){
+    (function(p, idx){
+      var row = el('div', {'class':'row' + (p.enabled ? '' : ' off')});
+      row.innerHTML = '<span class="nm">' + esc(p.name) + '</span>'
+                    + '<span class="st">' + (p.enabled ? '\u6709\u52b9' : '\u505c\u6b62\u4e2d') + ' \u30fb ' + p.code.length + ' \u6587\u5b57</span>';
+
+      var bOn = el('button', {type:'button'}, p.enabled ? '\u23F8 \u505c\u6b62' : '\u25B6 \u6709\u52b9');
+      bOn.addEventListener('click', function(){
+        var a = loadStore();
+        a[idx].enabled = !a[idx].enabled;
+        saveStore(a);
+        unloadAddon(a[idx].name);
+        if(a[idx].enabled) runAddon(a[idx].name, a[idx].code);
+        else admLog('\u23F8 「' + a[idx].name + '」を停止しました');
+        renderAdmin();
+      });
+
+      var bRe = el('button', {type:'button', title:'もう一度実行する'}, '\uD83D\uDD04 \u518d\u5b9f\u884c');
+      bRe.addEventListener('click', function(){
+        unloadAddon(p.name);
+        if(p.enabled) runAddon(p.name, p.code);
+        renderAdmin();
+      });
+
+      var bCode = el('button', {type:'button'}, '\uD83D\uDC41 \u4e2d\u8eab');
+      bCode.addEventListener('click', function(){ showTextBox(p.name, p.code); });
+
+      var bDel = el('button', {type:'button', 'class':'dg'}, '\uD83D\uDDD1 \u524a\u9664');
+      bDel.addEventListener('click', function(){
+        if(!confirm('アドオン「' + p.name + '」を削除しますか？\n（足されたボタンやコマンドもすぐ外れます）')) return;
+        unloadAddon(p.name);
+        var a = loadStore();
+        a.splice(idx, 1);
+        saveStore(a);
+        admLog('\uD83D\uDDD1 「' + p.name + '」を削除しました');
+        renderAdmin();
+      });
+
+      row.appendChild(bOn); row.appendChild(bRe); row.appendChild(bCode); row.appendChild(bDel);
+      host.appendChild(row);
+    })(arr[i], i);
+  }
+}
+
+function pickAddonFile(){
+  var inp = el('input', {type:'file', accept:'.js,.txt', multiple:'multiple'});
+  inp.style.display = 'none';
+  document.body.appendChild(inp);
+  inp.addEventListener('change', function(){
+    var files = Array.prototype.slice.call(inp.files || []), i;
+    for(i = 0; i < files.length; i++){
+      (function(f){
+        var fr = new FileReader();
+        fr.onload = function(){
+          var code = String(fr.result || '');
+          var arr = loadStore(), j, found = -1;
+          for(j = 0; j < arr.length; j++){ if(arr[j].name === f.name){ found = j; break; } }
+          if(found >= 0){ arr[found] = {name:f.name, code:code, enabled:true}; }
+          else{ arr.push({name:f.name, code:code, enabled:true}); }
+          saveStore(arr);
+          unloadAddon(f.name);
+          runAddon(f.name, code);
+          renderAdmin();
+        };
+        fr.onerror = function(){ admLog('\u274C ' + f.name + ' を読めませんでした'); };
+        fr.readAsText(f, 'utf-8');
+      })(files[i]);
+    }
+    setTimeout(function(){ if(inp.parentNode) inp.parentNode.removeChild(inp); }, 1500);
+  });
+  inp.click();
+}
+
+function saveSamples(){
+  var names = Object.keys(SAMPLES), i;
+  for(i = 0; i < names.length; i++){
+    (function(nm, k){
+      setTimeout(function(){
+        if(typeof window.downloadTextFile === 'function') window.downloadTextFile(nm, SAMPLES[nm]);
+      }, k * 400);
+    })(names[i], i);
+  }
+  admLog('\uD83D\uDCBE サンプルを ' + names.length + ' 件書き出しました（ダウンロードフォルダを見てください）');
+}
+
+function openAdmin(){
+  buildAdmin();
+  renderAdmin();
+  var ta = document.getElementById('rtt20AdmLog');
+  if(ta) ta.value = admLogText;
+  admEl.classList.add('on');
+}
+function closeAdmin(){ if(admEl) admEl.classList.remove('on'); }
+function adminOpened(){ return !!(admEl && admEl.classList.contains('on')); }
+
+/* ------------------------------------------------------------
+   10. サンプルアドオンと説明
+   ------------------------------------------------------------ */
+var SAMPLES = {};
+
+SAMPLES['db_addon_月別件数.js'] = [
+'/* ==========================================================',
+'   DB画面用サンプルアドオン ①  月ごとの件数を数える',
+'   ----------------------------------------------------------',
+'   いま開いている項目（テーブル）の日付の列を見て、',
+'   「2026-08 : 12件」のように月ごとの件数を出します。',
+'   使い方: ☰ メニュー > アドオン > 「アドオン(.js)を読み込む」',
+'   ========================================================== */',
+'',
+'function countByMonth(){',
+'  var t = WorkDB.getCurrentTable();',
+'  if(!t){ WorkDB.toast("先に項目（テーブル）を選んでください", "err"); return; }',
+'',
+'  // 日付・日時の列を探す',
+'  var cols = WorkDB.getColumns(t), dcol = null, i;',
+'  for(i = 0; i < cols.length; i++){',
+'    if(cols[i].col_type === "date" || cols[i].col_type === "datetime"){ dcol = cols[i]; break; }',
+'  }',
+'  if(!dcol){ WorkDB.toast("日付の列が見つかりませんでした", "err"); return; }',
+'',
+'  var sql = "SELECT substr(" + dcol.col_name + ",1,7) AS m, COUNT(*) AS n FROM " + t',
+'          + " WHERE " + dcol.col_name + " IS NOT NULL AND " + dcol.col_name + " <> \'\'"',
+'          + " GROUP BY m ORDER BY m DESC";',
+'',
+'  var rows = WorkDB.select(sql);',
+'  if(!rows.length){ WorkDB.toast("データがありませんでした", "err"); return; }',
+'',
+'  var total = 0, out = [];',
+'  out.push("項目: " + t + "　／　日付の列: " + dcol.label);',
+'  out.push("");',
+'  for(i = 0; i < rows.length; i++){',
+'    total += rows[i].n;',
+'    out.push(rows[i].m + "   " + String(rows[i].n).padStart(5, " ") + " 件   "',
+'             + new Array(Math.min(rows[i].n, 40) + 1).join("|"));',
+'  }',
+'  out.push("");',
+'  out.push("合計 " + total + " 件");',
+'  WorkDB.showText("月ごとの件数", out.join("\\n"));',
+'}',
+'',
+'/* ツールバーにボタンを足す */',
+'WorkDB.addToolbarButton({',
+'  id: "monthly",',
+'  label: "月別件数",',
+'  title: "この項目の件数を月ごとに数える",',
+'  onClick: countByMonth',
+'});',
+'',
+'/* コマンドパレット（Ctrl+K）にも出す */',
+'WorkDB.addCommand({',
+'  id: "monthly",',
+'  icon: "\\uD83D\\uDCCA",',
+'  label: "月ごとの件数を数える",',
+'  run: countByMonth',
+'});',
+''
+].join('\n');
+
+SAMPLES['db_addon_結果をコピー用に表示.js'] = [
+'/* ==========================================================',
+'   DB画面用サンプルアドオン ②  検索結果をタブ区切りで出す',
+'   ----------------------------------------------------------',
+'   いま表の中に出ている検索結果を、Excelにそのまま貼れる',
+'   タブ区切りの文字にして表示します。',
+'   ========================================================== */',
+'',
+'function resultAsTsv(){',
+'  var r = WorkDB.getLastResult();',
+'  if(!r || !r.cols || !r.cols.length){',
+'    WorkDB.toast("先に検索か全件表示をしてください", "err"); return;',
+'  }',
+'  var lines = [], i, j, row, cells;',
+'  lines.push(r.cols.join("\\t"));',
+'  for(i = 0; i < r.rows.length; i++){',
+'    row = r.rows[i]; cells = [];',
+'    for(j = 0; j < row.length; j++){',
+'      cells.push(String(row[j] == null ? "" : row[j]).replace(/[\\r\\n\\t]+/g, " "));',
+'    }',
+'    lines.push(cells.join("\\t"));',
+'  }',
+'  WorkDB.showText("検索結果（タブ区切り・" + r.rows.length + "件）", lines.join("\\n"));',
+'}',
+'',
+'WorkDB.addToolbarButton({',
+'  id: "tsv",',
+'  label: "⇩ タブ区切り",',
+'  title: "いまの検索結果をExcelに貼れる形で表示する",',
+'  onClick: resultAsTsv',
+'});',
+'',
+'WorkDB.addCommand({',
+'  id: "tsv",',
+'  icon: "\\uD83D\\uDCCB",',
+'  label: "検索結果をタブ区切りで表示",',
+'  run: resultAsTsv',
+'});',
+''
+].join('\n');
+
+var ADDON_HELP = [
+'■ DB画面用アドオンとは',
+'　.js ファイル1個です。☰ メニュー >「DB画面のアドオンを管理」から',
+'　読み込むと、その中の JavaScript がその場で実行されます。',
+'　読み込んだコードはこのブラウザに保存され、次回起動時に自動で動きます。',
+'',
+'■ 使える道具（WorkDB という名前で渡されます）',
+'',
+'【画面に足す】',
+'  WorkDB.addToolbarButton({id, label, title, onClick})',
+'      ツールバー（上書き保存などが並ぶ行）にボタンを足す',
+'  WorkDB.addCommand({id, icon, label, hint, run})',
+'      コマンドパレット（Ctrl+K）に項目を足す',
+'  WorkDB.addMenuItem({icon, label, onClick})',
+'      ☰ メニューの「アドオン」欄に項目を足す',
+'',
+'【データを読む】',
+'  WorkDB.getTables()            項目（テーブル）の一覧',
+'  WorkDB.getColumns(tableKey)   その項目の列の一覧',
+'  WorkDB.getCurrentTable()      いま選ばれている項目のキー',
+'  WorkDB.getLastResult()        いま表に出ている検索結果 {cols, rows}',
+'  WorkDB.select(sql, params)    SELECT / WITH / PRAGMA だけ実行できる',
+'  WorkDB.getCellRaw(table, id, col)   長文セルの中身を読む',
+'',
+'【データを書く】',
+'  WorkDB.run(sql, params)       書き換え用。実行前に「元に戻す」履歴を積み、',
+'                                実行後に自動保存を予約します',
+'  WorkDB.updateCellRaw(table, id, col, value)  長文セルを書き換える',
+'',
+'【その他】',
+'  WorkDB.openTable(key)         項目を切り替える',
+'  WorkDB.refresh()              いまの表を描き直す',
+'  WorkDB.toast(msg, "ok"/"err") 右上の状態表示に文字を出す',
+'  WorkDB.showText(title, text)  結果を小さい窓に出す',
+'  WorkDB.download(name, text)   テキストファイルとして書き出す',
+'  WorkDB.isDark()               ダークモードかどうか',
+'  WorkDB.log(msg)               管理画面のログに書く',
+'  WorkDB.on(event, cb)          出来事を受け取る',
+'      event: "render"（表を描いた）／"search"（検索した）',
+'             "table-change"（項目を切り替えた）／"record-added"（登録した）',
+'',
+'■ 書くときの注意',
+'  ・アドオンの中に「＜/script＞」という並びの文字を書かない',
+'    （HTMLが途中で切れて、ツール全体が壊れます）',
+'  ・列名やテーブル名を文字列でSQLに混ぜるときは、必ず',
+'    getColumns() / getTables() で取れた名前だけを使う',
+'  ・WorkDB.run() で DROP や DELETE を書けば本当に消えます。',
+'    試すときは先に「名前を付けて保存」でバックアップを取ること',
+'  ・中身が読めないアドオンは読み込まないこと',
+'',
+'■ いちばん短い例',
+'',
+'  WorkDB.addToolbarButton({',
+'    label: "こんにちは",',
+'    onClick: function(){ WorkDB.toast("押されました"); }',
+'  });',
+''
+].join('\n');
+
+
+/* ------------------------------------------------------------
+   10-B. 呼び出し語（別名）の設定
+   ------------------------------------------------------------
+   Ctrl+K で探すときに使える言葉を、コマンドごとに自由に足せる。
+   例：「上書き保存」に  hozon ほぞん 保存 せーぶ  と書いておくと、
+       そのどれを打っても見つかるようになる。 */
+var aliEl = null, aliTimer = null;
+
+function buildAlias(){
+  if(aliEl) return;
+  aliEl = el('div', {id:'rtt20Ali'});
+  aliEl.innerHTML =
+      '<div class="box">'
+    +   '<div class="hd"><span>\uD83D\uDD24 \u547c\u3073\u51fa\u3057\u8a9e\u306e\u8a2d\u5b9a</span><span class="sp"></span>'
+    +     '<button type="button" id="rtt20AliReset" class="dg">\u3059\u3079\u3066\u65e2\u5b9a\u306b\u623b\u3059</button>'
+    +     '<button type="button" id="rtt20AliClose">\u2715 \u9589\u3058\u308b</button></div>'
+    +   '<div class="bd">'
+    +     '<p class="hint">Ctrl+K \u3067\u63a2\u3059\u3068\u304d\u306b\u4f7f\u3048\u308b\u8a00\u8449\u3092\u3001\u3053\u3053\u3067\u81ea\u7531\u306b\u8db3\u305b\u307e\u3059\u3002<br>'
+    +       '\u4f8b\uff1a\u300c\u4e0a\u66f8\u304d\u4fdd\u5b58\u300d\u306b <b>hozon \u307b\u305e\u3093 \u4fdd\u5b58 \u305b\u30fc\u3076</b> \u3068\u66f8\u3044\u3066\u304a\u304f\u3068\u3001'
+    +       '\u305d\u306e\u3069\u308c\u3092\u6253\u3063\u3066\u3082\u898b\u3064\u304b\u308a\u307e\u3059\uff08\u7a7a\u767d\u304b\u30ab\u30f3\u30de\u3067\u533a\u5207\u308a\u3001\u3044\u304f\u3064\u3067\u3082\u66f8\u3051\u307e\u3059\uff09\u3002<br>'
+    +       '\u300c\u8868\u793a\u300d\u306e\u30c1\u30a7\u30c3\u30af\u3092\u5916\u3059\u3068\u3001\u305d\u306e\u9805\u76ee\u306f Ctrl+K \u306e\u4e00\u89a7\u306b\u51fa\u306a\u304f\u306a\u308a\u307e\u3059\u3002</p>'
+    +     '<input type="text" class="filt" id="rtt20AliFilt" placeholder="\u7d5e\u308a\u8fbc\u307f\uff08\u4f8b\uff1a\u4fdd\u5b58\uff09" autocomplete="off" spellcheck="false">'
+    +     '<div id="rtt20AliList"></div>'
+    +   '</div>'
+    + '</div>';
+  document.body.appendChild(aliEl);
+
+  $('#rtt20AliClose', aliEl).addEventListener('click', closeAlias);
+  aliEl.addEventListener('mousedown', function(e){ if(e.target === aliEl) closeAlias(); });
+  $('#rtt20AliFilt', aliEl).addEventListener('input', function(){ renderAlias(this.value); });
+  $('#rtt20AliReset', aliEl).addEventListener('click', function(){
+    if(!confirm('呼び出し語と表示／非表示を、すべて最初の状態に戻しますか？')) return;
+    jSet(K_ALIAS, {}); jSet(K_HIDE, []);
+    renderAlias($('#rtt20AliFilt', aliEl).value);
+    say('呼び出し語を既定に戻しました。', 'ok');
+  });
+
+  /* 入力は少し待ってからまとめて保存する（打つたびに保存しない） */
+  $('#rtt20AliList', aliEl).addEventListener('input', function(e){
+    var t = e.target;
+    if(!t || t.tagName !== 'INPUT' || t.type !== 'text') return;
+    var id = t.getAttribute('data-id');
+    if(!id) return;
+    if(aliTimer) clearTimeout(aliTimer);
+    aliTimer = setTimeout(function(){
+      var m = aliasMap();
+      var v = String(t.value || '').trim();
+      if(v) m[id] = v; else delete m[id];
+      jSet(K_ALIAS, m);
+    }, 350);
+  });
+  $('#rtt20AliList', aliEl).addEventListener('change', function(e){
+    var t = e.target;
+    if(!t || t.tagName !== 'INPUT' || t.type !== 'checkbox') return;
+    var id = t.getAttribute('data-id');
+    if(!id) return;
+    var hid = hiddenList(), k = hid.indexOf(id);
+    if(t.checked){ if(k >= 0) hid.splice(k, 1); }
+    else{ if(k < 0) hid.push(id); }
+    jSet(K_HIDE, hid);
+    var row = t.parentNode;
+    while(row && !(row.classList && row.classList.contains('arow'))) row = row.parentNode;
+    if(row) row.classList.toggle('off', !t.checked);
+  });
+}
+
+function renderAlias(filter){
+  var host = document.getElementById('rtt20AliList');
+  if(!host) return;
+  var all = buildCommands(true);
+  var al = aliasMap(), hid = hiddenList();
+  var q = normalize(filter || ''), i, c, html = '', lastGrp = null, n = 0;
+
+  for(i = 0; i < all.length; i++){
+    c = all[i];
+    if(q && normalize(c.label + ' ' + c.group + ' ' + (c.kw || '') + ' ' + (al[c.id] || '')).indexOf(q) === -1) continue;
+    if(c.group !== lastGrp){ html += '<div class="gl">' + esc(c.group) + '</div>'; lastGrp = c.group; }
+    var on = hid.indexOf(c.id) < 0;
+    html += '<div class="arow' + (on ? '' : ' off') + '">'
+          +   '<span class="ic">' + esc(c.icon || '\u2022') + '</span>'
+          +   '<span class="nm">' + esc(c.label) + '</span>'
+          +   '<input type="text" data-id="' + esc(c.id) + '" value="' + esc(al[c.id] || '')
+          +     '" placeholder="\u4f8b\uff1a hozon \u307b\u305e\u3093 \u4fdd\u5b58" spellcheck="false" autocomplete="off">'
+          +   '<label><input type="checkbox" data-id="' + esc(c.id) + '"' + (on ? ' checked' : '') + '> \u8868\u793a</label>'
+          + '</div>';
+    n++;
+  }
+  host.innerHTML = n ? html : '<div class="none">\u898b\u3064\u304b\u308a\u307e\u305b\u3093\u3067\u3057\u305f</div>';
+}
+
+function openAlias(preset){
+  buildAlias();
+  var f = $('#rtt20AliFilt', aliEl);
+  if(f) f.value = preset || '';
+  renderAlias(preset || '');
+  aliEl.classList.add('on');
+  setTimeout(function(){ if(f){ try{ f.focus(); f.select(); }catch(e){} } }, 20);
+}
+function closeAlias(){ if(aliEl) aliEl.classList.remove('on'); }
+function aliasOpened(){ return !!(aliEl && aliEl.classList.contains('on')); }
+
+/* ------------------------------------------------------------
+   10-C. 右下クイックボタンとの合流／セクションの1つだけ開く
+   ------------------------------------------------------------ */
+
+/* 既存の右下クイックボタンに「探す」「メニュー」を足す。
+   これで、右下を出しているときは左下を消しても困らない。 */
+function upgradeMiniLauncher(){
+  var ml = document.getElementById('miniLauncher');
+  if(!ml || document.getElementById('rtt20MlFind')) return;
+  var b1 = el('button', {type:'button', id:'rtt20MlFind', title:'\u30b3\u30de\u30f3\u30c9\u3092\u63a2\u3059\uff08Ctrl+K\uff09'});
+  b1.textContent = '\uD83D\uDD0D';
+  var b2 = el('button', {type:'button', id:'rtt20MlMenu', 'class':'mlGhost', title:'\u30e1\u30cb\u30e5\u30fc\u3092\u958b\u304f'});
+  b2.textContent = '\u2630';
+  b1.addEventListener('click', function(){ openPalette(''); });
+  b2.addEventListener('click', openDrawer);
+  ml.insertBefore(b2, ml.firstChild);
+  ml.insertBefore(b1, ml.firstChild);
+}
+function miniLauncherVisible(){
+  var ml = document.getElementById('miniLauncher');
+  if(!ml) return false;
+  try{ return window.getComputedStyle(ml).display !== 'none'; }catch(e){ return false; }
+}
+
+/* セクションを1つだけ開く（アコーディオン）。設定でONにしたときだけ働く */
+var oneOpenGuard = false;
+function bindOneOpen(){
+  var ds = document.querySelectorAll('#app-db details.card'), i;
+  for(i = 0; i < ds.length; i++){
+    if(ds[i].__rtt20one) continue;
+    ds[i].__rtt20one = 1;
+    ds[i].addEventListener('toggle', function(){
+      if(!this.open || oneOpenGuard) return;
+      if(!bodyHas('wdt-oneopen')) return;
+      oneOpenGuard = true;
+      var all = document.querySelectorAll('#app-db details.card'), j;
+      for(j = 0; j < all.length; j++){ if(all[j] !== this) all[j].open = false; }
+      var me = this;
+      setTimeout(function(){
+        oneOpenGuard = false;
+        try{ me.scrollIntoView({block:'start', behavior:'smooth'}); }catch(e){}
+      }, 30);
+    });
+  }
+}
+
+/* ------------------------------------------------------------
+   11. キーの割り当て
+   ------------------------------------------------------------ */
+function bindKeys(){
+  document.addEventListener('keydown', function(e){
+    /* Esc：開いているものを閉じる */
+    if(e.key === 'Escape'){
+      if(palOpened()){ e.preventDefault(); e.stopPropagation(); closePalette(); return; }
+      if(aliasOpened()){ e.preventDefault(); e.stopPropagation(); closeAlias(); return; }
+      if(adminOpened()){ e.preventDefault(); e.stopPropagation(); closeAdmin(); return; }
+      if(drawerOpened()){ e.preventDefault(); e.stopPropagation(); closeDrawer(); return; }
+      return;
+    }
+    if(!(e.ctrlKey || e.metaKey)) return;
+
+    /* Ctrl+K：コマンドパレット */
+    if(!e.altKey && !e.shiftKey && (e.key === 'k' || e.key === 'K')){
+      e.preventDefault(); e.stopPropagation();
+      if(palOpened()) closePalette(); else openPalette('');
+      return;
+    }
+    /* Ctrl+Shift+P：同じもの（VS Code に慣れている人向け） */
+    if(!e.altKey && e.shiftKey && (e.key === 'p' || e.key === 'P')){
+      e.preventDefault(); e.stopPropagation();
+      openPalette('');
+      return;
+    }
+    /* Ctrl+Shift+M：メニュー */
+    if(!e.altKey && e.shiftKey && (e.key === 'm' || e.key === 'M')){
+      e.preventDefault(); e.stopPropagation();
+      if(drawerOpened()) closeDrawer(); else openDrawer();
+      return;
+    }
+  }, true);
+}
+
+/* ------------------------------------------------------------
+   12. 起動
+   ------------------------------------------------------------ */
+function waitFor(test, fn, tries){
+  var n = tries == null ? 120 : tries;
+  (function tick(){
+    var ok = false;
+    try{ ok = !!test(); }catch(e){ ok = false; }
+    if(ok){ try{ fn(); }catch(e){} return; }
+    if(n-- <= 0){ try{ fn(); }catch(e){} return; }
+    setTimeout(tick, 250);
+  })();
+}
+
+function start(){
+  try{ addStyle(); }catch(e){}
+  try{ addBurger(); }catch(e){}
+  try{ addFab(); }catch(e){}
+  try{ decorateSummaries(); }catch(e){}
+  try{ upgradeMiniLauncher(); }catch(e){}
+  try{ bindOneOpen(); }catch(e){}
+  try{ bindKeys(); }catch(e){}
+
+  /* 本体側の「全セクションを開く／閉じる」ボタンも、
+     「1つだけ開く」設定と喧嘩しないように包んでおく */
+  try{
+    var oTA = window.toggleAllSections;
+    if(typeof oTA === 'function' && !oTA.__rtt20g){
+      var wTA = function(){
+        oneOpenGuard = true;
+        var r = oTA.apply(this, arguments);
+        setTimeout(function(){ oneOpenGuard = false; }, 80);
+        return r;
+      };
+      wTA.__rtt20g = 1;
+      window.toggleAllSections = wTA;
+    }
+  }catch(e){}
+
+  /* アドオンへ出来事を配るための包み込み */
+  try{
+    hook('renderQuery', 'render');
+    hook('runSearch',   'search');
+    hook('openTab',     'table-change');
+    hook('addRecord',   'record-added');
+  }catch(e){}
+
+  /* 見出しの飾りは、あとから開いたときのために念のためもう一度 */
+  setTimeout(function(){ try{ decorateSummaries(); }catch(e){} }, 1500);
+
+  /* データベースの準備ができてからアドオンを動かす */
+  waitFor(function(){ return window.WorkDB && typeof WorkDB.isReady === 'function' && WorkDB.isReady(); },
+          function(){ try{ bootAddons(); }catch(e){} });
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', start);
+}else{
+  start();
+}
+
+/* 外から呼べるようにしておく（動作確認用） */
+window.RTT20 = {
+  palette : openPalette,
+  menu    : openDrawer,
+  addons  : openAdmin,
+  alias   : openAlias,
+  goto    : gotoSection,
+  commands: buildCommands,
+  version : '1.9.10'
 };
 
 })();
