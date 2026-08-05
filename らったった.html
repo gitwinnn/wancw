@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋Markdownメモ 統合ツール Ver1.9.10</title>
+<title>記録台帳＋MDメモ Ver1.10.00</title>
 
 <!-- ============================================================
      起動時ファイル名チェック  (Ver1.0 / 2026-08 追加)
@@ -1411,16 +1411,119 @@ body.wdt-bigtap #app-db button.mini{ padding:2px 8px; font-size:13px; }
 body.wdt-bigtap #app-db table.grid td.op button{ padding:6px 10px; font-size:12.5px; }
 body.wdt-bigtap #app-md button{ padding:9px 12px; font-size:14px; }
 body.wdt-bigtap #app-md .tab{ padding:0 14px; }
+
+/* ==========================================================
+   Ver1.10.00 追加分
+   ========================================================== */
+
+/* ---- 一番上のバーに並ぶ「項目（テーブル）切り替え」アイコン ---- */
+#modeSwitcher .msTblBar{
+  display:inline-flex; align-items:center; gap:4px; flex-wrap:nowrap;
+  max-width:52%; overflow-x:auto; overflow-y:hidden; padding:1px 0;
+}
+#modeSwitcher .msTblBar::-webkit-scrollbar{ height:5px; }
+#modeSwitcher .msTblBar::-webkit-scrollbar-thumb{ background:#3d4046; border-radius:3px; }
+#modeSwitcher .msTblBar button{
+  padding:4px 9px; font-size:14px; line-height:1.15; border-radius:6px; white-space:nowrap;
+}
+#modeSwitcher .msTblBar button.on{ background:#4c8dff; color:#fff; border-color:#3f77df; }
+#appShell.hdr-small #modeSwitcher .msTblBar{ max-width:46%; }
+#appShell.hdr-small #modeSwitcher .msTblBar button{ padding:2px 7px; font-size:13px; }
+
+/* ---- 「🔎 検索・表示・編集」の見出しの中 ---- */
+#app-db .secnow{
+  display:inline-flex; align-items:center; gap:5px; vertical-align:middle;
+  margin-left:14px; padding:1px 11px; border-radius:999px;
+  background:var(--chip); border:1px solid var(--line2);
+  color:var(--accent2); font-size:12.5px; font-weight:700; white-space:nowrap;
+}
+#app-db .sectbl{
+  float:right; display:inline-flex; align-items:center; gap:3px;
+  margin-left:10px; max-width:46%; overflow-x:auto; overflow-y:hidden;
+}
+#app-db .sectbl::-webkit-scrollbar{ height:5px; }
+#app-db .sectbl button{
+  padding:1px 8px; font-size:13px; line-height:1.75; border-radius:5px; font-weight:600;
+  background:var(--panel); color:var(--sub); border:1px solid var(--line2); cursor:pointer;
+  font-family:inherit;
+}
+#app-db .sectbl button:hover{ background:var(--head); color:var(--accent2); border-color:var(--line); }
+#app-db .sectbl button.on{ background:var(--accent); color:#fff; border-color:var(--accent2); }
+
+/* ---- 表のすぐ上のボタン列（新規登録など） ---- */
+#app-db .gridtools{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 7px; }
+#app-db .gridtools .hint{ font-size:11.5px; }
+
+/* ---- 操作列の「複製」ボタン ---- */
+#app-db button.dup{
+  background:var(--panel); color:var(--accent2); border:1px solid var(--line);
+  padding:3px 9px; font-size:12px; border-radius:6px; margin-right:5px;
+}
+#app-db button.dup:hover{ background:var(--chip); }
+
+/* ---- くわしい検索（AND / OR / NOT） ---- */
+#app-db .advpanel{
+  border:1px solid var(--line); border-radius:9px; background:var(--chip);
+  padding:11px 12px; margin:10px 0 4px;
+}
+#app-db .advpanel h4{
+  margin:0 0 6px; font-size:12.5px; color:var(--sub); font-weight:700;
+}
+#app-db .advpanel h4.sec2{ margin-top:12px; }
+#app-db .advcols{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:4px; }
+#app-db label.advchk{
+  display:inline-flex; align-items:center; gap:5px; margin:0; padding:3px 10px;
+  background:var(--panel); border:1px solid var(--line2); border-radius:999px;
+  font-size:12.5px; color:var(--ink); cursor:pointer; font-weight:600;
+}
+#app-db label.advchk input{ width:auto; margin:0; }
+#app-db label.advchk.on{ border-color:var(--accent); color:var(--accent); background:var(--editfocus); }
+#app-db .advrow{ display:flex; gap:7px; align-items:center; flex-wrap:wrap; margin-bottom:6px; }
+#app-db .advrow .no{ width:44px; color:var(--sub); font-size:11.5px; font-weight:700; flex:0 0 auto; }
+#app-db .advrow select{ width:auto; flex:0 0 auto; padding:5px 7px; font-size:12.5px; }
+#app-db .advrow input[type=text]{ flex:1 1 220px; min-width:150px; width:auto; }
+#app-db .advrow label{
+  margin:0; display:inline-flex; align-items:center; gap:4px;
+  font-size:12px; color:var(--ink); white-space:nowrap;
+}
+#app-db .advrow label input{ width:auto; margin:0; }
+#app-db .advacts{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:10px; }
+
+/* ---- タグで絞り込むポップアップ（お気に入りと同じ見た目） ---- */
+#tagFilterPop .tfrow{ display:flex; flex-wrap:wrap; gap:5px; margin:6px 0 2px; }
+#tagFilterPop label.tfchk{
+  display:inline-flex; align-items:center; gap:5px; margin:0; padding:3px 9px; cursor:pointer;
+  background:#22262d; border:1px solid #3d4046; border-radius:999px; font-size:12.5px; color:#e6e9ef;
+}
+#tagFilterPop label.tfchk.on{ border-color:#4c8dff; color:#9fd0ff; background:#1d2a3d; }
+#tagFilterPop label.tfchk input{ margin:0; }
+#tagFilterPop .tfnum{ color:#8b93a0; font-size:11px; }
+#tagFilterPop .tfacts{ display:flex; gap:6px; align-items:center; margin-top:9px; flex-wrap:wrap; }
+#tagFilterPop .tfmode{ display:flex; gap:6px; align-items:center; margin-bottom:2px; }
+
+/* ---- Markdownメモの ↶ ↷ ---- */
+#app-md #topbar button.mdundo{ padding:6px 9px; }
+
+/* ---- 画面が狭いとき ----
+   見出しの中の項目アイコンは、一番上のバーにも同じものが出ているので、
+   場所が足りないときは見出し側を消して、見出しの文字を優先する。 */
+@media (max-width:820px){
+  #app-db .sectbl{ display:none; }
+  #app-db .secnow{ margin-left:8px; font-size:11.5px; padding:1px 8px; }
+  #modeSwitcher .msTblBar{ max-width:100%; }
+}
+body.wdt-mobfix #app-db .sectbl{ display:none; }
 </style>
 </head>
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋Markdownメモ 統合ツール <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.9.10</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.10.00</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
   <span class="msSpacer"></span>
+  <span id="msTableBar" class="msTblBar" title="押すとその項目（テーブル）に切り替わります"></span>
   <span class="msHint">1ファイル完結・オフライン動作</span>
 </div>
 <div id="appBody" class="mode-db">
@@ -1471,7 +1574,7 @@ body.wdt-bigtap #app-md .tab{ padding:0 14px; }
 
 <!-- 検索＆表示 -->
 <details class="card" id="secSearch" open>
-  <summary><h2 style="display:inline-flex">🔎 検索・表示・編集</h2></summary>
+  <summary><span id="secSearchTabs" class="sectbl"></span><h2 style="display:inline-flex">🔎 検索・表示・編集</h2><span id="secSearchNow" class="secnow">－</span></summary>
   <div class="search-grid" style="margin-top:8px">
     <div>
       <label>対象の列</label>
@@ -1501,6 +1604,11 @@ body.wdt-bigtap #app-md .tab{ padding:0 14px; }
   </div>
   <div id="colPanel" class="colpanel" style="display:none"></div>
 
+  <div style="margin:8px 0 0">
+    <button class="ghost small" id="btnAdvToggle" onclick="toggleAdvSearch()" title="AND / OR / NOT を組み合わせて、最大5段まで条件を重ねられます">🧮 くわしい検索（AND/OR/NOT・最大5段）</button>
+  </div>
+  <div id="advPanel" class="advpanel" style="display:none"></div>
+
   <div class="meta">
     <span id="rcaption">　</span><span id="rcount"></span>
     <span style="flex:1"></span>
@@ -1515,6 +1623,11 @@ body.wdt-bigtap #app-md .tab{ padding:0 14px; }
     <span>終わったものは文字を薄く表示</span>
     <span>※30秒ごとに自動で見直します</span>
   </p>
+  <div class="gridtools">
+    <button class="small" onclick="gotoNewEntry()" title="「✏️ 新規登録」へ移動して、そのまま入力を始めます">＋ 新規登録（行を足す）</button>
+    <button class="ghost small" onclick="if(currentTable) showAll(currentTable)" title="絞り込みを解除して全件表示に戻します">↺ 全件に戻す</button>
+    <span class="hint">▶ タグのセルは <b>1回クリック＝編集</b> ／ <b>ダブルクリック＝そのタグで絞り込み</b>。行の <b>複製</b> は操作列から。</span>
+  </div>
   <div class="table-wrap"><div id="results"></div></div>
 
   <details>
@@ -1523,6 +1636,8 @@ body.wdt-bigtap #app-md .tab{ padding:0 14px; }
       <p>「正規表現で検索」をオフ＝普通の部分一致。オン＝正規表現。例:</p>
       <p><code>不具合|故障</code> … どちらかを含む／ <code>^H[0-9]</code> … 先頭がH＋数字／ <code>交換$</code> … 末尾が「交換」</p>
       <p class="hint">正規表現は全件を調べるため、件数が増えたら日付などで絞ると速くなります。</p>
+      <p class="hint">▶ 条件を組み合わせたいときは「🧮 くわしい検索」を使ってください。<b>AND（かつ）／OR（または）／NOT（含まない）</b>を最大5段まで重ねられます。</p>
+      <p class="hint">▶ ふつうの検索（正規表現オフ）では <code>%</code> と <code>_</code> がSQLiteの特別な文字として働きます。これらの文字そのものを探したいときは、正規表現をオンにしてください。</p>
     </div>
   </details>
 </details>
@@ -1555,6 +1670,16 @@ body.wdt-bigtap #app-md .tab{ padding:0 14px; }
       <p><strong>検索のお気に入りと履歴（Ver1.5.00）：</strong>「キーワード／正規表現」の見出しの右横に、グループのアイコンが並びます。アイコンを押すと、そのグループの登録が<b>ランクの高い順（★5→★1）</b>に出て、押すだけで検索できます。
       「★＋」で今の条件（キーワード・正規表現のON/OFF・対象の列）を登録、「🕘 履歴」で最近の検索を呼び戻せます（最新200件）。
       <b>お気に入り・グループ・履歴は work.sqlite の中に保存されます</b>ので、DBファイルを持ち運べば会社PCと自宅PCで同じものが使えます（設定のほうはブラウザごとなので、必要なら「💾 データ」タブからJSONで持ち運んでください）。</p>
+      <p><strong>Ver1.10.00 で増えたこと：</strong></p>
+      <ul style="margin:4px 0 10px; padding-left:22px; line-height:1.9">
+        <li><b>項目をアイコンで切り替え</b>…一番上のバーと「🔎 検索・表示・編集」の見出しに、登録してある項目のアイコンが並びます。押すとその項目に切り替わります。いま開いている項目はアイコンの色が変わり、見出しにも「📅 予定表」のように名前が出ます。アイコンは「🗂 項目（テーブル）管理」で決めたものがそのまま使われます。</li>
+        <li><b>行の複製</b>…表の「操作」の列に「複製」が付きました。押すと同じ内容の行がもう1つできます（IDは新しく、登録日時は今の時刻になります）。似た記録を少しだけ変えて登録したいときに使ってください。押し間違えたら「↶ 元に戻す」で消せます。</li>
+        <li><b>タグで絞り込む</b>…表のタグのセルを<b>ダブルクリック</b>すると、そのタグを持つ行だけを表示する画面が出ます。「どれか1つ（OR）」と「全部ある（AND）」を選べます。1回だけのクリックは今までどおりタグの編集です（ダブルクリックかどうかを見分けるため、編集画面が出るまで一瞬だけ間があきます）。</li>
+        <li><b>表のすぐ上に「＋ 新規登録」</b>…押すと「✏️ 新規登録」まで移動して、最初の入力欄にカーソルが入ります。「↺ 全件に戻す」も隣に置きました。</li>
+        <li><b>くわしい検索</b>…「🧮 くわしい検索」を押すと、条件を最大5段まで重ねられます。段ごとに <b>AND（かつ）／OR（または）／NOT（含まない）</b> と <b>正規表現</b> を選べ、調べる列も複数えらべます。かっこは使わず、上の段から順に「（1段目→2段目）→3段目」の形でつないでいきます。</li>
+        <li><b>メモの「元に戻す」を作り直しました</b>…Markdownメモの Ctrl+Z が効かないことがあった問題を直しました。ブラウザ任せをやめて、このツールが自分で履歴（タブごとに120回ぶん）を持つようにしています。ツールバーのボタン・Tab・Enterの操作は、まとめて1回で戻せます。上の「↶ ↷」ボタンからも使えます。<b>※ ブラウザを閉じると履歴は消えます（本文そのものは自動保存されます）。右クリックメニューの「元に戻す」はブラウザの機能なので連動しません。</b></li>
+        <li><b>ヘッダーが最初から小さめに</b>…名前を「🗂 記録台帳＋MDメモ」に短くし、空いた場所に項目アイコンを置きました。大きさは「⚙ 設定 ＞ 🖥 表示」で今までどおり変えられます。</li>
+      </ul>
       <p><strong>DB4Sとの連携：</strong>保存した <code>.sqlite</code> ファイルは、申請が通った後に DB Browser for SQLite（DB4S）でもそのまま開けます。CSVの一括取り込みや簡単なグラフ、SQLCipherでの暗号化など、このHTMLツールにない機能が必要なときはDB4Sを併用してください。同じファイルを行き来して使えます。</p>
     </div>
   </details>
@@ -1572,6 +1697,8 @@ body.wdt-bigtap #app-md .tab{ padding:0 14px; }
   <button id="btnOpen" title="ファイルを開く">📂 開く</button>
   <button id="btnNew" title="新規タブ">➕ 新規</button>
   <button id="btnSaveNow" title="今すぐ保存 (Ctrl+S)">💾 保存</button>
+  <button id="btnMdUndo" class="mdundo" title="元に戻す (Ctrl+Z)">↶</button>
+  <button id="btnMdRedo" class="mdundo" title="やり直す (Ctrl+Y)">↷</button>
   <div class="spacer"></div>
   <span id="saveStatus">-</span>
   <button id="btnSettings" title="Markdownメモ専用の設定">⚙️ メモの設定</button>
@@ -2282,6 +2409,7 @@ function renderTabs(){
     '<button class="tabbtn ' + (t.key === currentTable ? 'active' : '') + '" onclick="openTab(\'' + t.key + '\')">'
     + escapeHtml(t.icon || '') + ' ' + escapeHtml(t.label) + '</button>'
   ).join('');
+  try{ renderTableSwitcher(); }catch(e){}
 }
 function openTab(key){
   currentTable = key;
@@ -2289,6 +2417,11 @@ function openTab(key){
   renderForm(key);
   renderSearchColumnOptions(key);
   document.getElementById('colPanel').style.display = 'none';
+  // 項目が変わると列も変わるので、開いている「くわしい検索」は描き直す
+  try{
+    const ap = document.getElementById('advPanel');
+    if(ap && ap.style.display !== 'none') renderAdvPanel();
+  }catch(e){}
   showAll(key);
 }
 
@@ -2700,6 +2833,8 @@ function rerenderCurrent(){
 function renderQuery(sql, params, caption, tableKey){
   closePicker();
   currentTable = tableKey;
+  // いま見ている項目の表示（見出しのバッジ・アイコンの色）を合わせる
+  try{ renderTableSwitcher(); }catch(e){}
   let cols = [], rows = [];
   try{
     const stmt = db.prepare(sql); stmt.bind(params);
@@ -2777,7 +2912,9 @@ function renderQuery(sql, params, caption, tableKey){
         dotHtml = '<span class="rowdot"></span>';
       }
     }
-    html += '<tr' + rangeAttr + '><td class="op"><button class="del" data-id="' + escapeAttr(rid) + '">削除</button>' + dotHtml + '</td>';
+    html += '<tr' + rangeAttr + '><td class="op">'
+          + '<button class="dup" data-id="' + escapeAttr(rid) + '" title="この行と同じ内容でもう1行つくります（あとから書き換えられます）">複製</button>'
+          + '<button class="del" data-id="' + escapeAttr(rid) + '">削除</button>' + dotHtml + '</td>';
     r.forEach((cell, i) => {
       const cn = cols[i];
       if(visibility[cn] === false) return;
@@ -2794,7 +2931,7 @@ function renderQuery(sql, params, caption, tableKey){
         // タグ列：クリックすると選択画面が開く（直接打ち込みも選択画面の中でできる）
         const raw = (cell === null || cell === undefined) ? '' : String(cell);
         html += '<td class="tagcell" data-id="' + escapeAttr(rid) + '" data-col="' + escapeAttr(cn) +
-                '" data-val="' + escapeAttr(raw) + '" title="クリックしてタグを選びます">' +
+                '" data-val="' + escapeAttr(raw) + '" title="クリック＝タグを編集／ダブルクリック＝このタグで絞り込み">' +
                 tagChipsHtml(raw, tableKey, cn) + '</td>';
       }else if(cn !== 'id' && cn !== 'created_at' && m && m.editable && m.col_type === 'allday'){
         // 終日フラグ：クリックで ☑／☐ を切り替える
@@ -2823,6 +2960,444 @@ function renderQuery(sql, params, caption, tableKey){
   applyNowHighlight();
 }
 
+
+/* ==================================================================
+   Ver1.10.00  (A4) 項目（テーブル）切り替えアイコン と 現在地表示
+   ------------------------------------------------------------------
+   ・一番上のバーと「🔎 検索・表示・編集」の見出しの両方に、
+     いま登録されている項目のぶんだけアイコンボタンを自動で並べる。
+   ・いま開いている項目のボタンだけ色が変わり、
+     見出しには「📅 予定表」のように項目名も出る。
+   ・アイコンは「🗂 項目（テーブル）管理」で決めた文字をそのまま使う。
+     決めていない項目は 📄 で代用する。
+   ================================================================== */
+function tblIconOf(t){ return (t && t.icon) ? t.icon : '📄'; }
+
+/* 見出しの中のボタンは、押しても details（開閉）が動かないように止める。
+   イベントは箱そのものに1回だけ付ける（中身を描き直しても外れない）。 */
+function bindTableSwitcher(){
+  ['msTableBar', 'secSearchTabs'].forEach(id => {
+    const box = document.getElementById(id);
+    if(!box || box.dataset.bound === '1') return;
+    box.dataset.bound = '1';
+    box.addEventListener('click', e => {
+      const b = e.target.closest ? e.target.closest('button[data-tbl]') : null;
+      if(!b) return;
+      e.preventDefault(); e.stopPropagation();
+      const key = b.dataset.tbl;
+      if(!metaTables.some(t => t.key === key)) return;
+      const sec = document.getElementById('secSearch');
+      if(sec && !sec.open) sec.open = true;
+      openTab(key);
+    });
+  });
+}
+
+function renderTableSwitcher(){
+  bindTableSwitcher();
+  const html = metaTables.map(t =>
+    '<button type="button" class="' + (t.key === currentTable ? 'on' : '') +
+    '" data-tbl="' + escapeAttr(t.key) + '" title="' + escapeAttr(t.label) + ' に切り替える">' +
+    escapeHtml(tblIconOf(t)) + '</button>').join('');
+  ['msTableBar', 'secSearchTabs'].forEach(id => {
+    const box = document.getElementById(id);
+    if(box && box.innerHTML !== html) box.innerHTML = html;
+  });
+  updateSecNow();
+}
+
+function updateSecNow(){
+  const box = document.getElementById('secSearchNow');
+  if(!box) return;
+  const m = currentMeta();
+  box.textContent = m ? (tblIconOf(m) + ' ' + m.label) : '（項目がありません）';
+}
+
+/* ==================================================================
+   Ver1.10.00  (D1) 表のすぐ上の「＋ 新規登録」
+   ------------------------------------------------------------------
+   「✏️ 新規登録」のセクションを開いて、そこまでスクロールし、
+   最初の入力欄にカーソルを置く。
+   ================================================================== */
+function gotoNewEntry(){
+  const sec = document.getElementById('secInputForm');
+  if(!sec) return;
+  sec.open = true;
+  setTimeout(() => {
+    try{ sec.scrollIntoView({block:'start', behavior:'smooth'}); }
+    catch(e){ try{ sec.scrollIntoView(true); }catch(e2){} }
+    setTimeout(() => {
+      const card = document.getElementById('formCard');
+      if(!card) return;
+      const f = card.querySelector('input[type=text], textarea, input[type=checkbox]');
+      if(f){ try{ f.focus(); }catch(e){} }
+    }, 340);
+  }, 30);
+}
+
+/* ==================================================================
+   Ver1.10.00  (E1) このデータを複製
+   ------------------------------------------------------------------
+   ・押した行とまったく同じ内容の行をもう1つ作る。
+   ・ID は新しく振り直し、「登録日時」があれば今の時刻に入れ替える。
+   ・実行前に「元に戻す」履歴を積むので、Ctrl+Z で取り消せる。
+   ・作ったあとは表の上で直接書き換えて使う。
+   ================================================================== */
+function duplicateRow(id){
+  if(!db || !currentTable){ return; }
+  if(id === undefined || id === null || id === ''){ return; }
+  let obj = null;
+  try{
+    const st = db.prepare('SELECT * FROM ' + currentTable + ' WHERE id=?');
+    st.bind([id]);
+    if(st.step()) obj = st.getAsObject();
+    st.free();
+  }catch(e){ setStatus('複製に失敗: ' + e.message, 'err'); return; }
+  if(!obj){ setStatus('複製する行が見つかりませんでした。', 'err'); return; }
+
+  delete obj.id;
+  if(Object.prototype.hasOwnProperty.call(obj, 'created_at')) obj.created_at = nowStr();
+  // 列名は必ず実在するものだけを使う（おかしな名前はSQLに混ぜない）
+  const names = Object.keys(obj).filter(n => /^[A-Za-z_][A-Za-z0-9_]*$/.test(n));
+  if(!names.length){ setStatus('複製できる列がありません。', 'err'); return; }
+
+  try{
+    pushHistory();
+    db.run('INSERT INTO ' + currentTable + ' ('
+         + names.map(n => '"' + n + '"').join(',') + ') VALUES ('
+         + names.map(() => '?').join(',') + ')',
+      names.map(n => obj[n]));
+    // タグ列は「使った組み合わせ」としても覚えておく
+    (metaColumnsByTable[currentTable] || []).forEach(c => {
+      if(c.col_type === 'tags' && obj[c.col_name]) tagComboRecord(currentTable, c.col_name, String(obj[c.col_name]));
+    });
+    setStatus('1行を複製しました。表の中で直接書き換えてください（Ctrl+Zで取り消せます）。', 'ok');
+    scheduleAutosave();
+    rerenderCurrent();
+  }catch(e){ setStatus('複製に失敗: ' + e.message, 'err'); }
+}
+
+/* ==================================================================
+   Ver1.10.00  (C2) タグで絞り込む
+   ------------------------------------------------------------------
+   ・タグのセルを「ダブルクリック」すると出る。
+   ・見た目は「⭐ お気に入り」のポップアップと同じ作り（.wdtx-pop）。
+   ・「どれか1つ（OR）」と「全部そろっている（AND）」を選べる。
+   ・判定は文字列の部分一致ではなく、タグ1つ1つのぴったり一致。
+     （"ポンプ" を選んでも "ポンプ点検" だけの行は当たらない）
+   ================================================================== */
+const tagFilter = {col:'', mode:'or', sel:{}, el:null, bound:false};
+
+function tagFilterEl(){
+  if(tagFilter.el && tagFilter.el.isConnected) return tagFilter.el;
+  const p = document.createElement('div');
+  p.className = 'wdtx-pop';
+  p.id = 'tagFilterPop';
+  document.body.appendChild(p);
+  tagFilter.el = p;
+
+  p.addEventListener('change', e => {
+    const cb = e.target.closest ? e.target.closest('input[type=checkbox][data-tag]') : null;
+    if(!cb) return;
+    const k = cb.dataset.tag;
+    if(cb.checked) tagFilter.sel[k] = cb.dataset.disp || k;
+    else delete tagFilter.sel[k];
+    const lab = cb.closest('label');
+    if(lab) lab.classList.toggle('on', cb.checked);
+  });
+  p.addEventListener('click', e => {
+    const b = e.target.closest ? e.target.closest('button[data-act]') : null;
+    if(!b) return;
+    const a = b.dataset.act;
+    if(a === 'close'){ closeTagFilter(); return; }
+    if(a === 'and' || a === 'or'){ tagFilter.mode = a; renderTagFilter(); return; }
+    if(a === 'clear'){ tagFilter.sel = {}; renderTagFilter(); return; }
+    if(a === 'run'){ runTagFilter(); return; }
+    if(a === 'all'){ closeTagFilter(); if(currentTable) showAll(currentTable); return; }
+  });
+
+  if(!tagFilter.bound){
+    tagFilter.bound = true;
+    document.addEventListener('mousedown', e => {
+      if(!tagFilter.el || !tagFilter.el.classList.contains('show')) return;
+      if(tagFilter.el.contains(e.target)) return;
+      closeTagFilter();
+    });
+    document.addEventListener('keydown', e => {
+      if(e.key !== 'Escape') return;
+      if(tagFilter.el && tagFilter.el.classList.contains('show')) closeTagFilter();
+    });
+    window.addEventListener('resize', () => closeTagFilter());
+  }
+  return p;
+}
+function closeTagFilter(){ if(tagFilter.el) tagFilter.el.classList.remove('show'); }
+
+function openTagFilter(colName, presetTag, anchor){
+  if(!db || !currentTable || !colName) return;
+  const p = tagFilterEl();
+  if(tagFilter.col !== colName){ tagFilter.col = colName; tagFilter.sel = {}; }
+  const one = String(presetTag == null ? '' : presetTag).trim();
+  /* ダブルクリックしたタグがあるときは、そのタグ「だけ」を選んだ状態にする。
+     前に選んだものが残っていると、なぜ0件なのかが分からなくなるため。
+     （開いたあと、パネルの中でチェックを足していくことはできる） */
+  if(one){ tagFilter.sel = {}; tagFilter.sel[one.toLowerCase()] = one; }
+  renderTagFilter();
+  p.classList.add('show');
+  placeTagFilter(anchor);
+}
+function placeTagFilter(anchor){
+  const p = tagFilter.el;
+  if(!p) return;
+  const r = (anchor && anchor.getBoundingClientRect) ? anchor.getBoundingClientRect() : null;
+  const w = p.offsetWidth || 300, h = p.offsetHeight || 240;
+  let left = r ? r.left : Math.max(10, (window.innerWidth - w) / 2);
+  let top  = r ? (r.bottom + 6) : 80;
+  if(left + w > window.innerWidth - 8) left = Math.max(8, window.innerWidth - w - 8);
+  if(top + h > window.innerHeight - 8) top = Math.max(8, window.innerHeight - h - 8);
+  p.style.left = Math.round(left) + 'px';
+  p.style.top  = Math.round(top) + 'px';
+}
+function renderTagFilter(){
+  const p = tagFilterEl();
+  const col = tagFilter.col;
+  const m = (metaColumnsByTable[currentTable] || []).find(c => c.col_name === col);
+  const list = tagMasterList(currentTable, col);
+  const mode = tagFilter.mode;
+  let h = '<div class="ph"><b>🏷 ' + escapeHtml((m && m.label) || col) + ' で絞り込む</b>'
+        + '<button type="button" data-act="close" title="閉じる">✕</button></div>';
+  h += '<div class="tfmode">'
+     + '<button type="button" data-act="or" class="' + (mode === 'or' ? 'primary' : '') + '">どれか1つ（OR）</button>'
+     + '<button type="button" data-act="and" class="' + (mode === 'and' ? 'primary' : '') + '">全部ある（AND）</button>'
+     + '</div>';
+  if(!list.length){
+    h += '<div class="wdtx-empty">この列にはまだタグがありません。</div>';
+  }else{
+    h += '<div class="tfrow">' + list.map(x => {
+      const k = x.tag.toLowerCase();
+      const on = !!tagFilter.sel[k];
+      return '<label class="tfchk' + (on ? ' on' : '') + '">'
+           + '<input type="checkbox" data-tag="' + escapeAttr(k) + '" data-disp="' + escapeAttr(x.tag) + '"'
+           + (on ? ' checked' : '') + '>' + escapeHtml(x.tag)
+           + '<span class="tfnum">' + x.n + '</span></label>';
+    }).join('') + '</div>';
+  }
+  h += '<div class="tfacts">'
+     + '<button type="button" class="primary" data-act="run">この条件で絞り込む</button>'
+     + '<button type="button" data-act="clear">選択を全部外す</button>'
+     + '<button type="button" data-act="all">全件に戻す</button></div>';
+  p.innerHTML = h;
+}
+function runTagFilter(){
+  const col = tagFilter.col;
+  const keys = Object.keys(tagFilter.sel);
+  if(!keys.length){ setStatus('タグを1つ以上選んでください。', 'err'); return; }
+  if(!db || !currentTable){ return; }
+  const meta = currentMeta();
+  if(!meta) return;
+  if(!/^[A-Za-z_][A-Za-z0-9_]*$/.test(String(col))){ setStatus('この列は絞り込みに使えません。', 'err'); return; }
+
+  const ids = [];
+  try{
+    const st = db.prepare('SELECT id, "' + col + '" FROM ' + currentTable);
+    while(st.step()){
+      const r = st.get();
+      const have = {};
+      tagSplit(r[1]).forEach(t => { have[t.toLowerCase()] = 1; });
+      const hit = (tagFilter.mode === 'and')
+        ? keys.every(k => !!have[k])
+        : keys.some(k => !!have[k]);
+      if(hit) ids.push(Number(r[0]));
+    }
+    st.free();
+  }catch(e){ setStatus('絞り込みに失敗: ' + e.message, 'err'); return; }
+
+  const safe = ids.filter(n => isFinite(n));
+  const inList = safe.length ? safe.slice(0, 5000).join(',') : '-1';
+  let label = keys.map(k => tagFilter.sel[k]).join(tagFilter.mode === 'and' ? ' かつ ' : ' または ');
+  if(label.length > 60) label = label.slice(0, 60) + '…';
+  closeTagFilter();
+  renderQuery('SELECT * FROM ' + currentTable + ' WHERE id IN (' + inList + ') ORDER BY ' + meta.order_by + ' LIMIT 1000',
+              [], 'タグで絞り込み（' + label + '）', currentTable);
+}
+
+/* ==================================================================
+   Ver1.10.00  (H4) くわしい検索（AND / OR / NOT ・最大5段）
+   ------------------------------------------------------------------
+   ■ 考え方
+     ・「対象の列」は複数えらべる。1つの段の中では OR 扱い
+       ＝えらんだ列のどれかに入っていれば、その段は当たり。
+     ・段どうしは AND / OR で「上から順に」つないでいく。かっこは使わない。
+         例）1段目 AND 2段目 OR 3段目
+             → ((1段目 AND 2段目) OR 3段目) と同じ
+     ・段ごとに「NOT（含まない）」と「正規表現」を切り替えられる。
+     ・キーワードが空の段は、まるごと無視する。
+   ■ 注意
+     ・普通の検索（正規表現オフ）は部分一致。% と _ は SQLite の
+       ワイルドカードとしてはたらく（元からの仕様と同じ）。
+     ・空の欄も「含まない」の対象にできるよう COALESCE で空文字にそろえる。
+   ================================================================== */
+const ADV_MAX = 5;
+const advState = {};   /* 項目（テーブル）ごとに入力内容を覚えておく */
+
+function advDefault(){
+  const rows = [];
+  for(let i = 0; i < ADV_MAX; i++) rows.push({op:'and', not:false, kw:'', re:false});
+  return {cols:{}, rows:rows, allCols:true};
+}
+function advGet(){
+  const t = currentTable || '_';
+  if(!advState[t]) advState[t] = advDefault();
+  return advState[t];
+}
+function toggleAdvSearch(){
+  const p = document.getElementById('advPanel');
+  if(!p) return;
+  if(p.style.display === 'none' || p.style.display === ''){
+    renderAdvPanel();
+    p.style.display = 'block';
+  }else{
+    p.style.display = 'none';
+  }
+}
+function bindAdvPanel(){
+  const p = document.getElementById('advPanel');
+  if(!p || p.dataset.bound === '1') return;
+  p.dataset.bound = '1';
+
+  p.addEventListener('change', e => {
+    const t = e.target;
+    if(!t || !t.dataset) return;
+    const s = advGet();
+    if(t.dataset.adv === 'all'){ s.allCols = !!t.checked; renderAdvPanel(); return; }
+    if(t.dataset.advcol){
+      if(t.checked) s.cols[t.dataset.advcol] = 1; else delete s.cols[t.dataset.advcol];
+      const lab = t.closest('label'); if(lab) lab.classList.toggle('on', !!t.checked);
+      return;
+    }
+    const row = t.closest('.advrow');
+    if(!row) return;
+    const i = Number(row.dataset.i);
+    if(!(i >= 0 && i < ADV_MAX)) return;
+    if(t.dataset.adv === 'op')  s.rows[i].op  = (t.value === 'or') ? 'or' : 'and';
+    if(t.dataset.adv === 'not') s.rows[i].not = !!t.checked;
+    if(t.dataset.adv === 're')  s.rows[i].re  = !!t.checked;
+  });
+  p.addEventListener('input', e => {
+    const t = e.target;
+    if(!t || !t.dataset || t.dataset.adv !== 'kw') return;
+    const row = t.closest('.advrow');
+    if(!row) return;
+    const i = Number(row.dataset.i);
+    if(i >= 0 && i < ADV_MAX) advGet().rows[i].kw = t.value;
+  });
+  p.addEventListener('keydown', e => {
+    if(e.key !== 'Enter') return;
+    if(!e.target || !e.target.dataset || e.target.dataset.adv !== 'kw') return;
+    e.preventDefault();
+    runAdvSearch();
+  });
+  p.addEventListener('click', e => {
+    const b = e.target.closest ? e.target.closest('button[data-adv]') : null;
+    if(!b) return;
+    if(b.dataset.adv === 'run'){ runAdvSearch(); return; }
+    if(b.dataset.adv === 'clear'){ advState[currentTable || '_'] = advDefault(); renderAdvPanel(); return; }
+  });
+}
+function renderAdvPanel(){
+  const p = document.getElementById('advPanel');
+  if(!p) return;
+  bindAdvPanel();
+  const s = advGet();
+  const cols = currentCols();
+
+  let h = '<h4>① どの列を調べますか（1つの段の中では「どれかの列に入っていれば当たり」）</h4>';
+  h += '<div class="advcols">'
+     + '<label class="advchk' + (s.allCols ? ' on' : '') + '"><input type="checkbox" data-adv="all"'
+     + (s.allCols ? ' checked' : '') + '>すべての列</label>'
+     + cols.map(c => {
+         const on = !!s.cols[c.col_name];
+         return '<label class="advchk' + (on ? ' on' : '') + '"><input type="checkbox" data-advcol="'
+              + escapeAttr(c.col_name) + '"' + (on ? ' checked' : '') + (s.allCols ? ' disabled' : '')
+              + '>' + escapeHtml(c.label) + '</label>';
+       }).join('')
+     + '</div>';
+
+  h += '<h4 class="sec2">② 条件（上から順に組み合わせます。キーワードが空の段は無視されます）</h4>';
+  for(let i = 0; i < ADV_MAX; i++){
+    const r = s.rows[i];
+    h += '<div class="advrow" data-i="' + i + '">';
+    h += '<span class="no">' + (i + 1) + '段目</span>';
+    if(i === 0){
+      h += '<span style="width:92px;flex:0 0 auto"></span>';
+    }else{
+      h += '<select data-adv="op" title="1つ上の結果とどうつなぐか">'
+         + '<option value="and"' + (r.op === 'and' ? ' selected' : '') + '>かつ (AND)</option>'
+         + '<option value="or"'  + (r.op === 'or'  ? ' selected' : '') + '>または (OR)</option>'
+         + '</select>';
+    }
+    h += '<label title="この条件に当てはまる行を除きます"><input type="checkbox" data-adv="not"'
+       + (r.not ? ' checked' : '') + '>NOT</label>';
+    h += '<input type="text" data-adv="kw" value="' + escapeAttr(r.kw)
+       + '" placeholder="キーワード（空欄ならこの段は無視）">';
+    h += '<label title="正規表現で調べます"><input type="checkbox" data-adv="re"'
+       + (r.re ? ' checked' : '') + '>正規表現</label>';
+    h += '</div>';
+  }
+
+  h += '<div class="advacts">'
+     + '<button type="button" data-adv="run">🔎 この条件で検索</button>'
+     + '<button type="button" class="ghost small" data-adv="clear">条件を全部消す</button>'
+     + '<span class="hint">かっこは使いません。上の段から順に「（1段目 → 2段目）→ 3段目」の順でつなぎます。</span>'
+     + '</div>';
+  p.innerHTML = h;
+}
+function runAdvSearch(){
+  if(!db || !currentTable){ setStatus('先に項目（テーブル）を開いてください。', 'err'); return; }
+  const meta = currentMeta();
+  if(!meta) return;
+  const s = advGet();
+
+  const all = currentCols().map(c => c.col_name).filter(n => /^[A-Za-z_][A-Za-z0-9_]*$/.test(n));
+  let target = s.allCols ? all.slice() : all.filter(n => !!s.cols[n]);
+  if(!target.length) target = all.slice();
+  if(!target.length){ setStatus('この項目には検索できる列がありません。', 'err'); return; }
+
+  const used = [];
+  for(let i = 0; i < ADV_MAX; i++){
+    const r = s.rows[i];
+    if(!r || !String(r.kw).trim()) continue;
+    if(r.re){
+      try{ new RegExp(r.kw); }
+      catch(err){ setStatus((i + 1) + '段目の正規表現が正しくありません: ' + err.message, 'err'); return; }
+    }
+    used.push(r);
+  }
+  if(!used.length){ setStatus('キーワードを1つ以上入れてください。', 'err'); return; }
+  if(used.some(r => r.re)) ensureRegexp();
+
+  const params = [];
+  let where = '';
+  used.forEach((r, n) => {
+    const one = '(' + target.map(cn => {
+      params.push(r.re ? r.kw : ('%' + r.kw + '%'));
+      return 'COALESCE("' + cn + '",\'\') ' + (r.re ? 'REGEXP' : 'LIKE') + ' ?';
+    }).join(' OR ') + ')';
+    const pred = r.not ? ('NOT ' + one) : one;
+    where = (n === 0) ? pred : ('(' + where + ' ' + (r.op === 'or' ? 'OR' : 'AND') + ' ' + pred + ')');
+  });
+
+  let cap = used.map((r, n) =>
+      (n ? (r.op === 'or' ? ' または ' : ' かつ ') : '')
+    + (r.not ? '≠' : '') + r.kw + (r.re ? '(正規)' : '')).join('');
+  if(cap.length > 70) cap = cap.slice(0, 70) + '…';
+  const colCap = s.allCols ? 'すべての列' : (target.length + '列');
+
+  renderQuery('SELECT * FROM ' + currentTable + ' WHERE ' + where
+            + ' ORDER BY ' + meta.order_by + ' LIMIT 1000',
+    params, 'くわしい検索（' + meta.label + '／' + colCap + '：' + cap + '）', currentTable);
+}
+
 // ====== 表の上で直接 編集／削除 ======
 function attachGridEditing(){
   const box = document.getElementById('results');
@@ -2834,11 +3409,31 @@ function attachGridEditing(){
     if(td.classList.contains('dtedit')) openPickerForCell(td);
   });
 
-  // タグのセル：クリックで選択画面を開く（Ver1.7.00）
+  /* タグのセル（Ver1.7.00 → Ver1.10.00 で2種類に分けた）
+       ・1回クリック   … タグを編集する画面を開く（従来どおり）
+       ・ダブルクリック … そのタグで表を絞り込む画面を開く
+     ダブルクリックは必ず「1回目のクリック」の後に来るので、
+     1回目の処理を 240ミリ秒だけ待ってから実行する。
+     待っている間に2回目が来たら、1回目は取り消す。 */
+  let tagClickTimer = null;
   box.addEventListener('click', e => {
     const td = e.target.closest('td.tagcell');
     if(!td) return;
-    openTagPickerForCell(td);
+    if(tagClickTimer){ clearTimeout(tagClickTimer); tagClickTimer = null; }
+    tagClickTimer = setTimeout(() => {
+      tagClickTimer = null;
+      if(td.isConnected) openTagPickerForCell(td);
+    }, 240);
+  });
+  box.addEventListener('dblclick', e => {
+    const td = e.target.closest('td.tagcell');
+    if(!td) return;
+    if(tagClickTimer){ clearTimeout(tagClickTimer); tagClickTimer = null; }
+    e.preventDefault();
+    /* ダブルクリックすると文字が選ばれて青くなるので、それを消しておく */
+    try{ const sel = window.getSelection(); if(sel) sel.removeAllRanges(); }catch(err){}
+    const chip = e.target.closest('.tchip');
+    openTagFilter(td.dataset.col, chip ? chip.textContent.trim() : '', chip || td);
   });
 
   // 終日フラグのセル：クリックで ☑／☐ を切り替えて保存する
@@ -2891,6 +3486,13 @@ function attachGridEditing(){
       if(td.contains(document.activeElement)) return;
       leaveMdCellEdit(td, true);
     }, 0);
+  });
+
+  // 操作列の「複製」（Ver1.10.00）
+  box.addEventListener('click', e => {
+    const b = e.target.closest('button.dup');
+    if(!b) return;
+    duplicateRow(b.dataset.id);
   });
 
   box.addEventListener('click', e => {
@@ -5664,6 +6266,7 @@ function closeTab(id){
     try{ window.updateFormLinkBadge(closedFormLink.table, closedFormLink.col); }catch(e){}
   }
   try{ localStorage.removeItem('mdeditor_backup_'+id); }catch(e){}
+  mduForget(id);                       // Ver1.10.00: 元に戻す履歴も一緒に捨てる
   if(activeTabId === id){
     activeTabId = tabs.length ? tabs[Math.max(0, idx-1)].id : null;
   }
@@ -6037,6 +6640,153 @@ function insertText(ta, text){
 
 function dispatchInput(ta){ ta.dispatchEvent(new Event('input', {bubbles:true})); }
 
+/* ==================================================================
+   Ver1.10.00  Markdownメモ専用の「元に戻す／やり直す」
+   ------------------------------------------------------------------
+   ■ なぜ自前で持つのか
+     これまでは document.execCommand('insertText') に頼って、ブラウザが
+     もともと持っている Ctrl+Z を効かせていた。ところが execCommand は
+     すでに非推奨で、環境によっては失敗する。失敗すると
+     「ta.value を直接書き換える」道に落ちるため、そこでブラウザ側の
+     履歴が切れてしまい、以降 Ctrl+Z が効かなくなっていた。
+     そこで、作業記録DB側と同じ考え方で、自分で履歴を持つことにした。
+
+   ■ しくみ
+     ・タブごとに「本文＋カーソル位置」のスナップショットを配列で持つ。
+     ・キー入力は、手が止まってから 600ミリ秒でひとまとまりにする
+       （1文字ずつ戻ると使いものにならないため）。
+     ・ツールバー・Tab・Enter などの「まとまった書き換え」は、
+       その前後で必ず区切って1回分にする。
+     ・記憶数はタブごとに 120 件まで。それを超えると古いものから捨てる。
+
+   ■ 注意
+     ・ブラウザを閉じると履歴は消える（本文そのものは自動保存される）。
+     ・右クリックメニューの「元に戻す」はブラウザ側の機能なので、
+       こちらの履歴とは連動しない。Ctrl+Z か ↶ ボタンを使うこと。
+   ================================================================== */
+const MDU_LIMIT = 120;   /* 1タブあたりの記憶数 */
+const MDU_GAP   = 600;   /* 何ミリ秒 手が止まったら1区切りにするか */
+const mduMap = {};       /* タブID -> {undo:[], redo:[], base, timer, busy} */
+
+function mduTaOf(t){
+  return (t && t.id === activeTabId) ? document.getElementById('editorTextarea') : null;
+}
+function mduSnap(t){
+  const text = t ? String(t.content == null ? '' : t.content) : '';
+  const ta = mduTaOf(t);
+  /* 表示中のタブなら実際のカーソル位置、そうでなければ末尾を覚えておく */
+  return {
+    text: text,
+    s: ta ? ta.selectionStart : text.length,
+    e: ta ? ta.selectionEnd   : text.length
+  };
+}
+function mduState(t){
+  if(!t) return null;
+  let st = mduMap[t.id];
+  if(!st) st = mduMap[t.id] = {undo:[], redo:[], base:mduSnap(t), timer:null, busy:false};
+  return st;
+}
+/* 保留中の変更を「1回分」として確定する */
+function mduCommit(t){
+  const st = mduState(t);
+  if(!st || st.busy) return;
+  if(st.timer){ clearTimeout(st.timer); st.timer = null; }
+  const cur = mduSnap(t);
+  if(st.base.text === cur.text){ st.base = cur; return; }   /* 中身が同じなら区切らない */
+  st.undo.push(st.base);
+  if(st.undo.length > MDU_LIMIT) st.undo.shift();
+  st.redo.length = 0;                                        /* 新しく打ったらやり直しは消える */
+  st.base = cur;
+}
+/* 文字が入るたびに呼ぶ。手が止まったら自動で1区切りにする */
+function mduTouch(t){
+  const st = mduState(t);
+  if(!st || st.busy) return;
+  if(st.timer) clearTimeout(st.timer);
+  st.timer = setTimeout(function(){ st.timer = null; mduCommit(t); }, MDU_GAP);
+}
+/* ツールバー・Tab・Enter など「まとまった書き換え」を包む。
+   前で1区切り、後ろでもう1区切りにして、1回のCtrl+Zで戻せるようにする。 */
+function mduRun(fn){
+  const t = getActiveTab();
+  if(!t){ try{ fn(); }catch(e){} return; }
+  mduCommit(t);
+  try{ fn(); }
+  finally{ setTimeout(function(){ mduCommit(t); }, 0); }
+}
+function mduApply(t, snap){
+  const st = mduState(t);
+  st.busy = true;
+  try{
+    t.content = snap.text; t.dirty = true;
+    const ta = mduTaOf(t);
+    if(ta){
+      ta.value = snap.text;
+      try{ ta.setSelectionRange(snap.s, snap.e); }catch(e){}
+      try{ ta.focus(); }catch(e){}
+    }
+    renderPreviewFor(t); renderStatus(); mdeRenderTabs();
+    fireEvent('content-change', t);
+    persistSessionDebounced();
+    if(t.dbLink) scheduleDbCellSync(t);   /* 連携中のセルにも戻した内容を反映する */
+  }finally{ st.busy = false; }
+  st.base = mduSnap(t);
+}
+let mduFlashTimer = null;
+function mduFlash(msg){
+  const el = document.getElementById('stAutosave');
+  if(!el) return;
+  el.textContent = msg;
+  if(mduFlashTimer) clearTimeout(mduFlashTimer);
+  mduFlashTimer = setTimeout(function(){ mduFlashTimer = null; renderStatus(); }, 1500);
+}
+function mdUndo(){
+  const t = getActiveTab();
+  if(!t) return;
+  mduCommit(t);
+  const st = mduState(t);
+  if(!st.undo.length){ mduFlash('これ以上は戻せません'); return; }
+  st.redo.push(mduSnap(t));
+  if(st.redo.length > MDU_LIMIT) st.redo.shift();
+  mduApply(t, st.undo.pop());
+  mduFlash('↶ 元に戻しました（残り ' + st.undo.length + ' 回）');
+}
+function mdRedo(){
+  const t = getActiveTab();
+  if(!t) return;
+  mduCommit(t);
+  const st = mduState(t);
+  if(!st.redo.length){ mduFlash('やり直せる操作はありません'); return; }
+  st.undo.push(mduSnap(t));
+  if(st.undo.length > MDU_LIMIT) st.undo.shift();
+  mduApply(t, st.redo.pop());
+  mduFlash('↷ やり直しました（残り ' + st.redo.length + ' 回）');
+}
+function mduForget(id){ if(mduMap[id]) delete mduMap[id]; }
+
+/* 入力していない間は、いまのカーソル位置を控え続ける。
+   こうしておくと「元に戻す」を押したとき、
+   打ち始めた場所にカーソルが返ってくる。
+   （控えているのは st.base だけ。積んだ履歴には手を触れない） */
+function mduMark(t, ta){
+  const st = mduMap[t.id];
+  if(!st || st.busy || st.timer) return;   /* 入力の途中なら触らない */
+  if(!ta || t.id !== activeTabId) return;
+  st.base.s = ta.selectionStart;
+  st.base.e = ta.selectionEnd;
+}
+function mduWatchCaret(t, ta){
+  const mark = function(){ mduMark(t, ta); };
+  /* keydown は「文字が入る前」に来るので、打ち始めの位置をここで押さえられる。
+     capture（true）にして、本来のキー処理より先に走らせる。 */
+  ta.addEventListener('keydown', mark, true);
+  ta.addEventListener('paste',   mark, true);
+  ta.addEventListener('cut',     mark, true);
+  ta.addEventListener('mouseup', mark);
+  ta.addEventListener('focus',   mark);
+}
+
 /* 字下げ／字上げ。
 
    【Ver1.6.00 で直した不具合】
@@ -6363,6 +7113,15 @@ window.MDEditor = {
     document.querySelectorAll('.pane-wrap').forEach(applySplitRatio);
   },
   saveActive(){ const t = getActiveTab(); if(t) manualSaveOrDownload(t); },
+  /* Ver1.10.00: 自前の「元に戻す／やり直す」。アドオンからも呼べる。 */
+  undo(){ mdUndo(); },
+  redo(){ mdRedo(); },
+  undoDepth(){
+    const t = getActiveTab();
+    if(!t) return {undo:0, redo:0};
+    const st = mduState(t);
+    return {undo:st.undo.length, redo:st.redo.length};
+  },
   openSettingsModal(){ document.getElementById('btnSettings').click(); },
   rerender(){ renderAll(); },
 
@@ -6375,14 +7134,16 @@ window.MDEditor = {
   },
   setContent(text){
     const t = getActiveTab(); if(!t) return;
+    mduCommit(t);                       // Ver1.10.00: 書き換える前の状態を履歴に残す
     t.content = text; t.dirty = true;
     const ta = document.getElementById('editorTextarea');
     if(ta) ta.value = text;
     renderPreviewFor(t); mdeRenderTabs(); renderStatus();
+    setTimeout(()=>{ mduCommit(t); }, 0);
   },
   insertAtCursor(text){
     const ta = document.getElementById('editorTextarea');
-    if(ta) wrapSelectionRaw(ta, text);
+    if(ta) mduRun(()=>wrapSelectionRaw(ta, text));
   },
   addToolbarButton({id, label, title, onClick}){
     if(!id || !onClick) return;
@@ -6819,6 +7580,8 @@ const ADDON_HELP_TEXT = String.raw`■ アドオンとは
                                             | 'tab-open' | 'tab-close'
   api.getViewMode() / setViewMode('split'|'edit'|'preview')
   api.saveActive()                   いまのタブを保存
+  api.undo() / api.redo()            元に戻す／やり直す（Ver1.10.00）
+  api.undoDepth()                    あと何回戻せるか {undo:n, redo:n}
   api.rerender()                     画面を描き直す
   api.renderMarkdown(src)            Markdown を HTML 文字列に変換
 
@@ -6903,7 +7666,8 @@ function renderFormatbar(){
     btn.addEventListener('click', ()=>{
       const ta = document.getElementById('editorTextarea');
       if(!ta) return;
-      (TOOLBAR_ACTIONS[b.id]||function(){})(ta);
+      // Ver1.10.00: ボタン1回の書き換えを、Ctrl+Z 1回で戻せるようにまとめる
+      mduRun(()=>{ (TOOLBAR_ACTIONS[b.id]||function(){})(ta); });
     });
     bar.appendChild(btn);
   });
@@ -6918,6 +7682,8 @@ function wdtHit(e, id){
   if(id === 'md.save')   return c && k === 's';
   if(id === 'md.bold')   return c && k === 'b';
   if(id === 'md.italic') return c && k === 'i';
+  if(id === 'md.undo')   return c && !e.shiftKey && k === 'z';
+  if(id === 'md.redo')   return c && (k === 'y' || (e.shiftKey && k === 'z'));
   return false;
 }
 
@@ -6940,26 +7706,38 @@ function renderMain(){
     ta.id = t.id===activeTabId ? 'editorTextarea' : undefined;
     ta.value = t.content;
     ta.spellcheck = false;
+    /* Ver1.10.00: 「元に戻す」の起点を、1文字も打たれていない今のうちに押さえておく。
+       （最初の入力のあとで作ると、書き換わった後の本文が起点になってしまう） */
+    mduState(t);
+    mduWatchCaret(t, ta);
     ta.addEventListener('input', ()=>{
       t.content = ta.value; t.dirty = true;
+      mduTouch(t);                          // Ver1.10.00: 自前の「元に戻す」履歴へ
       renderPreviewFor(t); renderStatus(); mdeRenderTabs();
       fireEvent('content-change', t);
       persistSessionDebounced();
       if(t.dbLink) scheduleDbCellSync(t);   // 作業記録DBのセルへ自動で書き戻す
     });
     ta.addEventListener('keydown', (e)=>{
+      // 設定画面でキーを登録している最中は、何もしない
+      if(window.WDT && WDT.isRecording && WDT.isRecording()) return;
+      // Ver1.10.00: 元に戻す／やり直すは自前の履歴で行う
+      if(wdtHit(e,'md.undo')){ e.preventDefault(); mdUndo(); return; }
+      if(wdtHit(e,'md.redo')){ e.preventDefault(); mdRedo(); return; }
       if(e.key==='Enter' && !e.shiftKey && !e.ctrlKey && !e.metaKey){
-        if(handleEnterKey(ta)) e.preventDefault();
+        let done = false;
+        mduRun(()=>{ done = handleEnterKey(ta); });
+        if(done) e.preventDefault();
       } else if(e.key==='Tab'){
         e.preventDefault();
-        handleTabKey(ta, e.shiftKey);
+        mduRun(()=>handleTabKey(ta, e.shiftKey));
       } else if(wdtHit(e,'md.save')){
         e.preventDefault();
         manualSaveOrDownload(getActiveTab());
       } else if(wdtHit(e,'md.bold')){
-        e.preventDefault(); TOOLBAR_ACTIONS.bold(ta);
+        e.preventDefault(); mduRun(()=>TOOLBAR_ACTIONS.bold(ta));
       } else if(wdtHit(e,'md.italic')){
-        e.preventDefault(); TOOLBAR_ACTIONS.italic(ta);
+        e.preventDefault(); mduRun(()=>TOOLBAR_ACTIONS.italic(ta));
       }
     });
     ta.addEventListener('click', renderStatus);
@@ -7186,6 +7964,8 @@ function persistSessionDebounced(){
 document.getElementById('btnOpen').addEventListener('click', openViaPicker);
 document.getElementById('btnNew').addEventListener('click', ()=>newTab());
 document.getElementById('btnSaveNow').addEventListener('click', ()=>manualSaveOrDownload(getActiveTab()));
+document.getElementById('btnMdUndo').addEventListener('click', ()=>mdUndo());
+document.getElementById('btnMdRedo').addEventListener('click', ()=>mdRedo());
 
 /* ---- 作業記録DBへワンクリックで戻る ---- */
 function backToDbMode(){
@@ -7319,7 +8099,15 @@ window.addEventListener('keydown', (e)=>{
     e.preventDefault();
     const t = getActiveTab();
     if(t) manualSaveOrDownload(t);
+    return;
   }
+  /* Ver1.10.00: 編集欄の外にカーソルがあっても Ctrl+Z / Ctrl+Y を効かせる。
+     ただし設定画面などの入力欄にいるときは、そちらの邪魔をしない。 */
+  const tg = e.target;
+  const tn = (tg && tg.tagName) ? tg.tagName.toUpperCase() : '';
+  if(tn === 'INPUT' || tn === 'TEXTAREA' || (tg && tg.isContentEditable)) return;
+  if(wdtHit(e, 'md.undo')){ e.preventDefault(); mdUndo(); return; }
+  if(wdtHit(e, 'md.redo')){ e.preventDefault(); mdRedo(); return; }
 });
 
 /* ------------------------------------------------------------------ *
@@ -7382,7 +8170,9 @@ var SC = [
   {id:'md.italic',      label:'斜体',                        where:'メモ',  def:['Ctrl+I']},
   {id:'md.view.split',  label:'分割表示',                    where:'メモ',  def:['Ctrl+Alt+1']},
   {id:'md.view.edit',   label:'編集だけ表示',                where:'メモ',  def:['Ctrl+Alt+2']},
-  {id:'md.view.preview',label:'プレビューだけ表示',          where:'メモ',  def:['Ctrl+Alt+3']}
+  {id:'md.view.preview',label:'プレビューだけ表示',          where:'メモ',  def:['Ctrl+Alt+3']},
+  {id:'md.undo',        label:'メモ：元に戻す',              where:'メモ',  def:['Ctrl+Z']},
+  {id:'md.redo',        label:'メモ：やり直す',              where:'メモ',  def:['Ctrl+Y','Ctrl+Shift+Z']}
 ];
 var SC_BY_ID = {};
 SC.forEach(function(x){ SC_BY_ID[x.id] = x; });
@@ -7448,7 +8238,7 @@ var ADDONS = [
 /* ---------- 既定の設定 ---------- */
 function defaults(){
   return {
-    headerSize : 'normal',   // normal | small | hidden
+    headerSize : 'small',    // normal | small | hidden（Ver1.10.00 から既定は small）
     startMode  : 'db',       // db | md | last
     lastMode   : 'db',
     gridFont   : 12.5,
@@ -9920,6 +10710,20 @@ function buildCommands(showHidden){
             }});
   out.push({id:'db.cols', group:'操作', icon:'\u2699', label:'表示する列を選ぶ',
             kw:'retsu column hyouji れつ', run:function(){ gotoSection('secSearch'); setTimeout(call('toggleColPanel'), 380); }});
+  /* --- Ver1.10.00 で足した機能 --- */
+  out.push({id:'db.advsearch', group:'検索', icon:'\uD83E\uDDEE', label:'くわしい検索（AND / OR / NOT・最大5段）',
+            kw:'and or not kuwashii detail sagasu くわしい けんさく じょうけん',
+            run:function(){
+              gotoSection('secSearch');
+              setTimeout(function(){
+                var p = document.getElementById('advPanel');
+                if(p && p.style.display === 'block') return;      /* もう開いていれば何もしない */
+                if(typeof window.toggleAdvSearch === 'function') window.toggleAdvSearch();
+              }, 380);
+            }});
+  out.push({id:'db.newrow', group:'操作', icon:'\u2795', label:'新しい行を登録する（入力欄へ移動）',
+            kw:'atarashii tuika touroku あたらしい ついか とうろく にゅうりょく',
+            run:function(){ toDb(); if(typeof window.gotoNewEntry === 'function') window.gotoNewEntry(); }});
   out.push({id:'db.csv', group:'操作', icon:'\u21E9', label:'CSVで書き出す',
             kw:'csv export kakidashi かきだし', run:call('exportCsv')});
   out.push({id:'db.txt', group:'操作', icon:'\u21E9', label:'TXTで書き出す',
