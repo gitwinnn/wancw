@@ -3,7 +3,65 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.16.00</title>
+<title>記録台帳＋MDメモ Ver1.16.12</title>
+
+<!-- ============================================================
+     ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
+     ============================================================
+     このHTMLには、次の第三者ソフトウェアが埋め込まれています。
+     同じ内容は画面からも読めます:
+         ⚙設定 → 「ℹ このソフトについて」タブ
+
+     1) sql.js  ...  MIT License
+        Copyright (c) 2017 sql.js authors (see AUTHORS)
+        https://github.com/sql-js/sql.js/blob/master/LICENSE
+
+     2) Emscripten ランタイム（sql.js のビルド生成物に含まれる）
+        MIT License / University of Illinois NCSA の二者択一。
+        ここでは MIT を選択します。
+        Copyright (c) 2010-2014 Emscripten authors, see AUTHORS file.
+        https://github.com/emscripten-core/emscripten/blob/main/LICENSE
+
+     3) SQLite 3.49.1（sql.js の中に同梱）... パブリックドメイン
+        表示の義務はありませんが、謝辞として記載します。
+        https://sqlite.org/copyright.html
+
+     ============================================================
+     MIT License 全文（上記 1) と 2) の両方に適用されます）
+     ============================================================
+Permission is hereby granted, free of charge, to any person obtaining a copy
+of this software and associated documentation files (the "Software"), to deal
+in the Software without restriction, including without limitation the rights
+to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+copies of the Software, and to permit persons to whom the Software is
+furnished to do so, subject to the following conditions:
+
+The above copyright notice and this permission notice shall be included in all
+copies or substantial portions of the Software.
+
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+SOFTWARE.
+
+     ============================================================
+     SQLite について（謝辞。義務ではありません）
+     ============================================================
+The author disclaims copyright to this source code. In place of
+a legal notice, here is a blessing:
+
+   May you do good and not evil.
+   May you find forgiveness for yourself and forgive others.
+   May you share freely, never taking more than you give.
+
+     ============================================================
+     ★このコメントは消さないでください。
+       消しても動きますが、MIT ライセンスの条件
+       （著作権表示と許諾文を同梱すること）を満たさなくなります。
+     ============================================================ -->
 
 <!-- ============================================================
      起動時ファイル名チェック  (Ver1.0 / 2026-08 追加)
@@ -523,6 +581,117 @@ html,body{height:100%;margin:0;overflow:hidden}
 }
 #modeSwitcher .msSpacer{ flex:1; }
 #modeSwitcher .msHint{ color:#6f757e; font-size:11.5px; }
+
+/* ---------- Ver1.16.02 (B1) 保存の状態バー / 警告バー ----------
+   なぜ要るか
+     「元ファイルに上書き保存しました。」のような大事な知らせが
+     画面のなかほどにあると、下へスクロールしたとき見えなくなる。
+     いちばん上（ナビバーの真下）に出せば、どの画面からでも確認できる。
+     危ないときはナビバーごと赤くして、見逃せないようにする。   */
+#rttAlertBar{
+  flex:0 0 auto; display:none;
+  align-items:center; gap:10px; flex-wrap:wrap;
+  padding:7px 14px; font-size:12.5px; line-height:1.5;
+  background:#20242c; color:#8f959e; border-bottom:1px solid #3d4046;
+}
+#rttAlertBar.on{ display:flex; }
+#rttAlertBar .rttAbIco{ font-size:15px; flex:0 0 auto; }
+#rttAlertBar .rttAbTxt{ flex:1 1 260px; min-width:0; }
+#rttAlertBar .rttAbSub{ display:block; opacity:.9; font-size:11.5px; font-weight:400; }
+#rttAlertBar button{
+  font-family:inherit; font-size:11.5px; font-weight:600; cursor:pointer;
+  border:1px solid rgba(255,255,255,.35); background:rgba(0,0,0,.20); color:inherit;
+  border-radius:6px; padding:4px 10px; flex:0 0 auto;
+}
+#rttAlertBar button:hover{ background:rgba(0,0,0,.38); }
+#rttAlertBar.lv-info  { background:#20242c; color:#8f959e; }
+#rttAlertBar.lv-ok    { background:#123a24; color:#9ff0c4; border-bottom-color:#2f7d55; font-weight:600; }
+#rttAlertBar.lv-warn  { background:#5a3a06; color:#ffd79a; border-bottom-color:#c98b1e; font-weight:600; }
+#rttAlertBar.lv-danger{ background:#7d0d1c; color:#fff;    border-bottom-color:#ff5b6e; font-weight:700; }
+
+/* 危ないときは、ナビバー全体を赤くする（どの画面からでも気づけるように） */
+#appShell.rtt-danger #modeSwitcher{
+  background:#7d0d1c; border-bottom-color:#ff5b6e;
+  animation:rttDangerBlink 1.2s ease-in-out infinite;
+}
+#appShell.rtt-danger #modeSwitcher .msTitle,
+#appShell.rtt-danger #modeSwitcher .msHint,
+#appShell.rtt-danger #modeSwitcher .verNo{ color:#fff !important; }
+#appShell.rtt-danger #modeSwitcher button{ border-color:#ff9aa6; }
+#appShell.rtt-warn #modeSwitcher{ background:#5a3a06; border-bottom-color:#c98b1e; }
+#appShell.rtt-warn #modeSwitcher .msTitle{ color:#ffe9c4; }
+@keyframes rttDangerBlink{
+  0%,100%{ background:#7d0d1c; }
+  50%    { background:#a81428; }
+}
+/* 動きが苦手な人・OS設定で「視差効果を減らす」にしている人には点滅させない */
+@media (prefers-reduced-motion: reduce){
+  #appShell.rtt-danger #modeSwitcher{ animation:none; }
+}
+/* ヘッダーを隠す設定にしていても、危ないときだけは必ず出す
+   （id 2つ＋クラス2つで、hdr-hidden の display:none より詳細度が高い） */
+#appShell.hdr-hidden.rtt-danger #modeSwitcher{ display:flex; }
+#appShell.hdr-hidden.rtt-warn   #modeSwitcher{ display:flex; }
+/* Ver1.16.05 (U3) 緑の「保存しました」も、設定しだいで強制的に出す。
+   上の2行とまったく同じ手口（id 2つ＋クラス 2つ）で詳細度を上げている。
+   rtt-ok を付けるかどうかは rttOkVisibility() が決める（既定＝付けない）。 */
+#appShell.hdr-hidden.rtt-ok     #modeSwitcher{ display:flex; }
+
+/* ---------- Ver1.16.03 (U1) 警告バーをナビバーの中へ入れる ----------
+   なぜ変えたか
+     Ver1.16.02 では、ナビバーの「下の行」に独立したバーを置いていた。
+     見やすいかわりに、縦に 1 行ぶん（約 30px）画面が狭くなっていた。
+     ナビバーの右側は「⚙ 設定」のあとが空いているので、そこへ入れる。
+   考え方
+     ・ふだん（保存済み・自動保存）は 1 行に収まる小さな札にする
+     ・危ないとき（warn / danger）はナビバー全体が赤くなり、
+       補足の文も出す（#modeSwitcher は flex-wrap:wrap なので折り返す）
+   注意
+     「⚙設定 → 🖥表示 → ヘッダーを隠す」にしていると、ナビバーごと
+     隠れる＝バーも隠れる。ただし warn / danger のときは上の 2 行の
+     ルールで強制的に出るので、危険を見逃すことはない。            */
+#modeSwitcher #rttAlertBar{
+  flex:0 1 auto; min-width:0; max-width:100%;
+  margin:0 2px; padding:4px 10px;
+  border:1px solid #343841; border-bottom:1px solid #343841;
+  border-radius:7px;
+  background:#262a33; color:#8f959e;
+  font-size:12px; line-height:1.45;
+}
+#modeSwitcher #rttAlertBar .rttAbTxt{
+  flex:0 1 auto; min-width:0;
+  overflow:hidden; text-overflow:ellipsis;
+}
+/* ふだんの知らせ（ok / info）は 1 行に収める。補足はマウスを載せると出る。 */
+#modeSwitcher #rttAlertBar.lv-ok   .rttAbTxt,
+#modeSwitcher #rttAlertBar.lv-info .rttAbTxt{ white-space:nowrap; }
+#modeSwitcher #rttAlertBar.lv-ok   .rttAbSub,
+#modeSwitcher #rttAlertBar.lv-info .rttAbSub{ display:none; }
+/* 色（ナビバーの上に乗るので、枠と文字だけで分かるようにする） */
+#modeSwitcher #rttAlertBar.lv-info  { background:#262a33; color:#98a0aa; border-color:#3d4046; }
+#modeSwitcher #rttAlertBar.lv-ok    { background:#123a24; color:#9ff0c4; border-color:#2f7d55; font-weight:600; }
+#modeSwitcher #rttAlertBar.lv-warn  { background:#5a3a06; color:#ffd79a; border-color:#c98b1e; font-weight:600; }
+#modeSwitcher #rttAlertBar.lv-danger{ background:#7d0d1c; color:#fff;    border-color:#ff5b6e; font-weight:700; }
+/* ナビバーごと赤（橙）になっているときは、札を透かして 1 枚に見せる */
+#appShell.rtt-danger #modeSwitcher #rttAlertBar,
+#appShell.rtt-warn   #modeSwitcher #rttAlertBar{
+  background:transparent; border-color:rgba(255,255,255,.40); color:#fff;
+}
+#appShell.rtt-danger #modeSwitcher #rttAlertBar .rttAbSub,
+#appShell.rtt-warn   #modeSwitcher #rttAlertBar .rttAbSub{ color:#fff; opacity:.92; }
+/* 危ないときは、ナビバーの飾り（項目アイコン・説明文）を引っ込めて場所を譲る */
+#appShell.rtt-danger #modeSwitcher .msHint,
+#appShell.rtt-warn   #modeSwitcher .msHint{ display:none; }
+#appShell.rtt-danger #modeSwitcher .msTblBar{ max-width:22%; }
+/* ヘッダーを「小さく」にしているとき */
+#appShell.hdr-small #modeSwitcher #rttAlertBar{ padding:2px 8px; font-size:11px; }
+#appShell.hdr-small #modeSwitcher #rttAlertBar button{ padding:2px 8px; font-size:10.5px; }
+/* 画面が狭いとき（スマホ・小窓）は、札を丸ごと次の行へ回す */
+@media (max-width:820px){
+  #modeSwitcher #rttAlertBar{ flex:1 1 100%; margin:2px 0; }
+  #modeSwitcher #rttAlertBar.lv-ok   .rttAbTxt,
+  #modeSwitcher #rttAlertBar.lv-info .rttAbTxt{ white-space:normal; }
+}
 
 /* ---------- 本体エリア（片方だけ表示） ---------- */
 #appBody{
@@ -2026,15 +2195,42 @@ summary:focus-visible,
   outline:none !important;
 }
 
+/* 除外その2（Ver1.16.01 / E3）:
+   DB画面の「長文（複数行テキスト）」の欄を編集しているとき。
+   ここは textarea 自身が 1px の枠（--accent）を最初から持っています。
+   その外側に R4' の 2px の枠がもう1本出るので、枠が二重に見えていました。
+
+   ★これはブラウザの決まりごとです。
+     :focus-visible は「キーボードで来たときだけ光る」しくみですが、
+     文字を打つ欄（input / textarea）だけは例外で、マウスで押しても必ず光ります。
+     「文字を打つ場所は、どこに打つのか常に見えているべき」という考え方によるものです。
+     だから、すぐ上のメモの本文にも同じ打ち消しが要りました。
+
+   外側の1本だけを消します。「いまここに打っている」ことは
+   1px の枠・背景色（--editfocus）・点滅するカーソルの3つで分かります。 */
+#app-db td.mdcell textarea:focus-visible{
+  outline:none !important;
+}
+
 </style>
 </head>
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.16.00</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.16.12</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
+  <!-- Ver1.16.03 (U1) 保存の状態／警告バー。ナビバーの空きスペースに入れてある。
+       別行にすると画面が縦に狭くなるため、Ver1.16.03 でここへ移した。
+       #appBody の外なので、作業記録DB でも Markdownメモ でも同じ場所に出る。 -->
+  <div id="rttAlertBar" class="lv-info" role="status" aria-live="polite">
+    <span class="rttAbIco">💾</span>
+    <span class="rttAbTxt" id="rttAlertTxt">保存の状態: -</span>
+    <button type="button" id="rttAlertBk" style="display:none" title="これまでに取った控えの一覧を開きます">🕐 控えの一覧</button>
+    <button type="button" id="rttAlertOk" style="display:none" title="確認しました（この知らせを閉じます）">✔ OK</button>
+    <button type="button" id="rttAlertClose" style="display:none" title="この知らせを閉じます">✕ 閉じる</button>
+  </div>
   <span class="msSpacer"></span>
   <span id="msTableBar" class="msTblBar" title="押すとその項目（テーブル）に切り替わります"></span>
   <span class="msHint">1ファイル完結・オフライン動作</span>
@@ -2183,6 +2379,168 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.16.12 で増えたこと（キーの重なりが、まとめて外れるようになった）：</strong>
+        <br>・<b>同じキーが2つ以上の動作に割り当たっているとき、振り直すと「全部」外れるようになりました。</b>
+        <br>
+        <br><b>【これまで何が起きていたか】</b>
+        <br>・このソフトでは <b>Ctrl ＋ K</b> を、わざと2つの動作に重ねてあります。
+        <br>　・<b>リンクを入れる</b>（メモの編集欄の中だけ）
+        <br>　・<b>コマンドパレットを開く</b>（それ以外の場所）
+        <br>・ここで <b>Ctrl ＋ K を、まったく別の動作に振り直す</b>とします。
+        これまでは、上から探して<b>最初に見つかった1つ</b>だけを外していました。
+        <br>・そのため <b>もう片方は Ctrl ＋ K のまま残り</b>、
+        ⚙設定の一覧を見ると<b>同じキーが2か所に出たまま</b>になっていました。
+        <br>
+        <br><b>【これからどうなるか】</b>
+        <br>・振り直そうとすると、<b>そのキーを使っている動作が全部並んで出ます。</b>
+        <br>　例：<code>「Ctrl+K」は すでに次の 2 件で使われています。</code>
+        <br>　　　<code>・コマンドパレットを開く</code>
+        <br>　　　<code>・リンクを入れる</code>
+        <br>・「はい」を押すと、<b>並んでいたものが全部まとめて未割り当てになります。</b>
+        <br>・1つしか重なっていないときの文面は、<b>今までと同じ</b>です。
+        <br>
+        <br><b>【元に戻したいとき】</b>
+        <br>・⚙設定 → ショートカットキー の一覧で、外れてしまった行の
+        <b>［既定］</b>ボタンを押せば、はじめの割り当てに戻ります。
+        <br>・1つずつ戻す形なので、<b>Ctrl ＋ K を元の2つに戻すときは［既定］を2回</b>押してください。
+      </p>
+      <p><strong>Ver1.16.11 で増えたこと（隠れていたキーが⚙設定に出てきた）：</strong>
+        <br>・<b>コマンドパレットとメニューのキーが、⚙設定 → ショートカットキー の一覧に出るようになりました。</b>
+        <br>　・<b>Ctrl ＋ K</b>／<b>Ctrl ＋ Shift ＋ P</b> … コマンドパレットを開く
+        <br>　・<b>Ctrl ＋ Shift ＋ M</b> … メニューを開く
+        <br>・これまで、この3つだけはプログラムの中に直接書き込んでありました。
+        そのため一覧に出てこず、<b>他のキーとぶつかっても振り直せませんでした。</b>
+        <br>
+        <br><b>【なにが便利になるのか】</b>
+        <br>・<b>会社のブラウザにキーを取られたときに、逃げられます。</b>
+        たとえば <b>Ctrl+Shift+P</b> は、Edge では「InPrivate ウィンドウを開く」に
+        使われていることがあり、その場合ページ側までキーが届きません。
+        これまでは打つ手がありませんでしたが、いまは ⚙設定 で
+        <b>Ctrl ＋ Alt ＋ P</b> などの空いているキーに振り直せます。
+        <br>・振り直した内容は、他の設定と同じくこのDBの中に入ります。
+        <code>work.sqlite</code> を持ち歩けば、別のPCでも同じキーで使えます。
+        <br>
+        <br><b>【Ctrl+K が2か所に出ているのは、わざとです】</b>
+        <br>・⚙設定の一覧を見ると、<b>Ctrl+K が「リンクを入れる」と
+        「コマンドパレットを開く」の2つに割り当たって見えます。</b>
+        これは間違いではありません。
+        <br>・<b>メモの編集欄で文字を打っているときだけ「リンクを入れる」が勝ちます。</b>
+        それ以外の場所（作業記録DBの画面・プレビュー側・上のヘッダーなど）では
+        パレットが開きます。Ver1.16.09 で決めた動きをそのまま引き継いでいます。
+        <br>・どちらか片方だけにしたいときは、⚙設定 でもう片方を別のキーに
+        振り直してください。
+        <br>
+        <br><b>【そのほか】</b>
+        <br>・<b>日本語を変換している最中（IMEがONで文字を確定する前）は、
+        これらのキーが反応しないようにしました。</b>
+        変換の途中で急にパレットが開くことがなくなります。
+        <br>・下の <b>Ver1.16.07</b> の節を新しく書き起こしました。
+        見出しのキー（Ctrl+1〜6 など）と、このソフトが借りている部品の
+        表示について書いてあります。
+      </p>
+
+      <p><strong>Ver1.16.09 で増えたこと（キーボードだけで書式を付けられる）：</strong>
+        <br>・<b>字下げ・リスト・表・打ち消し線などを、キーボードだけで入れられるようになりました。</b>
+        これまではマウスでツールバーのボタンを押す必要がありました。
+        キーの割り当ては <b>Typora</b> という有名なMarkdownソフトに合わせてあります。
+        別のソフトで覚えた指の動きが、そのまま使えます。
+        <br>
+        <br><b>【字下げ・字上げ】</b>
+        <br>・<b>Ctrl ＋ [ で字下げ、Ctrl ＋ ] で字上げ</b>です。
+        箇条書きの行で押すと、その項目が一段深くなったり浅くなったりします。
+        ふつうの文の行で押すと、行の頭に空白が入ったり消えたりします。
+        <br>・<b>何行かをまとめて選んでから押せば、選んだ行が全部いっしょに動きます。</b>
+        1行ずつ直す必要はありません。
+        <br>
+        <br><b>【リストと表】</b>
+        <br>・<b>Ctrl ＋ Shift ＋ [ で番号付きリスト</b>（1. 2. 3. …）、
+        <b>Ctrl ＋ Shift ＋ ] で箇条書きリスト</b>（・）になります。
+        もう一度同じキーを押すと、ふつうの文に戻ります。
+        <br>・<b>Ctrl ＋ T で表（テーブル）</b>のひな形が入ります。
+        <br>　★<b>会社のEdgeでは Ctrl+T は効きません。</b>
+        ブラウザ自身が「新しいタブを開く」に使っていて、ページ側から止められないためです
+        （Edge・Chrome・Firefox どれも同じ）。
+        そこで <b>Ctrl ＋ Alt ＋ T</b> でも同じ表が入るようにしてあります。
+        通るほうのキーが効きます。
+        <br>　（自宅の Linux Mint では、逆に Ctrl+Alt+T が「端末を開く」に
+        取られていることがあります。その場合はブラウザまで届きません。）
+        <br>
+        <br><b>【文字の飾り】</b>
+        <br>・<b>Alt ＋ Shift ＋ 5 で打ち消し線</b>です。消したい文字が <code>~~</code> で囲まれます。
+        <br>・<b>Ctrl ＋ K でリンク</b>、<b>Ctrl ＋ Shift ＋ I で画像</b>を入れます。
+        <br>　★<b>会社のEdgeでは Ctrl+Shift+I も効きません。</b>
+        ブラウザの「開発者ツール」に取られているためです。
+        そこで <b>Ctrl ＋ Alt ＋ I</b> でも画像を入れられるようにしてあります。
+        <br>・<b>Ctrl ＋ ￥（バックスラッシュ）で書式を消します。</b>
+        太字・斜体・下線・打ち消し線などの飾りを、選んだ範囲からまとめて外します。
+        書きかけの飾りを消したいときに使ってください。
+        <br>
+        <br><b>【Ctrl+K の行き先が変わりました】</b>
+        <br>・これまで <b>Ctrl+K は、どこで押してもコマンドパレット</b>が開いていました。
+        Ver1.16.09 からは、<b>メモの編集欄で文字を打っているときだけ「リンクを入れる」</b>に変わります。
+        文章を書いている最中は、そちらのほうが自然なためです。
+        <br>・<b>編集欄の外（作業記録DBの画面、プレビュー側、上のヘッダーなど）では、
+        今までどおりパレットが開きます。</b>
+        <br>・メモを書いている最中にパレットを開きたいときは <b>Ctrl ＋ Shift ＋ P</b> が使えます。
+        こちらは前から用意されていて、場所に関係なく開きます。
+        <br>・<b>この3つのキー（Ctrl+K ／ Ctrl+Shift+P ／ Ctrl+Shift+M）も、
+        ⚙設定 → ショートカットキー の一覧に出るようになりました。</b>
+        以前はプログラムの中に直接書き込んであったため、一覧に出ず、振り直しもできませんでした。
+        <br>　★一覧では <b>Ctrl+K が「リンクを入れる」と「コマンドパレットを開く」の
+        2つに割り当たって見えます。これは わざとです。</b>
+        メモの編集欄の中だけリンクが勝ち、それ以外の場所ではパレットが開きます。
+        <br>
+        <br><b>【あえて入れなかったもの】</b>
+        <br>・Typora には <b>数式ブロック（Ctrl+Shift+M）</b>がありますが、これは入れていません。
+        このソフトには数式を絵にして表示する部品が入っていないので、
+        割り当てても、押したときに何も起きない飾りになってしまうためです。
+        <br>・<b>Ctrl+Shift+M は今までどおり、メニューを開きます。</b>
+        <br>
+        <br><b>【うまく効かないときは】</b>
+        <br>・上のキーが手元のキーボードやブラウザとぶつかるときは、
+        <b>⚙設定 → ショートカットキー</b> から自由に振り直せます。
+        <br>・振り直した内容はこのDBの中に入るので、
+        <code>work.sqlite</code> を持ち歩けば、別のPCでもそのまま同じキーで使えます。
+        <br>・<b>どのキーが今なにに割り当たっているかは、⚙設定 の一覧で確かめられます。</b>
+      </p>
+
+      <p><strong>Ver1.16.07 で増えたこと（見出しと飾りをキーボードで／使っている部品の表示）：</strong>
+        <br>・ここは Ver1.16.09 より1つ前の版で増えた分です。
+        キーの割り当ては <b>Typora</b> という有名なMarkdownソフトに合わせてあります。
+        <br>
+        <br><b>【見出しをキーボードで付ける】</b>
+        <br>・<b>Ctrl ＋ 1 〜 Ctrl ＋ 6</b> で、その行を見出し1〜見出し6にします。
+        行の頭に <code>#</code> が1〜6個付くだけなので、見た目で確かめられます。
+        <br>・<b>Ctrl ＋ 0</b> で見出しを外して、ふつうの文に戻します。
+        <br>・<b>Ctrl ＋ =</b> で1段大きく（<code>##</code>→<code>#</code>）、
+        <b>Ctrl ＋ -</b> で1段小さく（<code>#</code>→<code>##</code>）します。
+        <br>　★<b>日本語キーボード（JIS配列）では、= は Shift を押さないと出ません。</b>
+        そのためブラウザには「Ctrl+Shift+=」として届きます。
+        これに気付かず「Ctrl+=」だけを登録すると、日本語キーボードでは永久に効きません。
+        そこで <b>Ctrl+= ／ Ctrl+Shift+= ／ Ctrl++ の3通りすべて</b>を登録してあります。
+        <br>
+        <br><b>【文字を囲む飾り】</b>
+        <br>・<b>Ctrl ＋ U で下線</b>です。Markdown には下線の記号が無いので、
+        <code>&lt;u&gt;</code> というHTMLのタグで囲みます。プレビューにもきちんと線が出ます。
+        <br>・<b>Ctrl ＋ Shift ＋ K でコードブロック</b>（<code>```</code> で囲む）、
+        <b>Ctrl ＋ Shift ＋ Q で引用</b>（行頭に <code>&gt;</code>）です。
+        <br>・<b>インラインコード</b>（文の途中を <code>`</code> で囲む）も入れました。
+        <br>　★<b>バッククォートのキーは配列によって場所が違います。</b>
+        US配列は「`」キー＋Shift、日本語キーボードは「@」キー＋Shift です。
+        押したときにブラウザへ届く文字も変わるため、両方を登録してあります。
+        <br>
+        <br><b>【このソフトが使っている部品の表示（ライセンス）】</b>
+        <br>・<b>⚙設定 に「ℹ このソフトについて」というタブが増えました。</b>
+        <br>・このソフトは、中で次の3つを借りて動いています。
+        どれも「表示すれば無料で使ってよい」決まりなので、そのための欄です。
+        <br>　1. <b>sql.js</b>（MITライセンス）… ブラウザの中でデータベースを動かす部品
+        <br>　2. <b>SQLite</b>（パブリックドメイン）… データベース本体。版は <b>3.49.1</b>
+        <br>　3. <b>Emscripten</b> の実行部（MIT ／ NCSA）… 上の2つをブラウザで動くようにしたもの
+        <br>・<b>会社で配る・人に渡すときは、この表示を消さないでください。</b>
+        表示を消すと、無料で使える条件から外れてしまいます。
+        <br>・ライセンスの全文は、このタブの中から丸ごとコピーできます。
+      </p>
+
       <p><strong>Ver1.16.00 で増えたこと（キーボードで「いまどこにいるか」が見える）：</strong>
         <br>・<b>Tab キーで移動したとき、いる場所に青い枠が出るようになりました。</b>
         これまではブラウザ任せの細い灰色の線だけで、暗い配色に溶けて見つけられませんでした。
@@ -3971,11 +4329,21 @@ async function rttBackupList(){
   return Array.isArray(l) ? l : [];
 }
 /* 控えを1つ取る。取れたら控えのID、駄目なら null を返す。 */
-async function rttBackupMake(reason){
-  if(!db) return null;
-  let bytes = null;
-  try{ bytes = db.export(); }catch(e){ return null; }
-  if(!bytes) return null;
+async function rttBackupMake(reason, bytesIn){
+  /* Ver1.16.02 (B1) 第2引数でバイト列を直接渡せるようにした。
+     理由: 起動直後（boot から loadDbFromHandle が呼ばれる時点）は
+           まだ db が null なので、db.export() では控えが取れなかった。
+           いちばん危ない入口で、いちばん効く安全策が効かない状態だった。
+     省略したときは今までどおり db から取るので、既存の呼び出しは無改修で動く。 */
+  let bytes = bytesIn || null;
+  if(bytes && !(bytes instanceof Uint8Array)){
+    try{ bytes = new Uint8Array(bytes); }catch(e){ bytes = null; }
+  }
+  if(!bytes){
+    if(!db) return null;
+    try{ bytes = db.export(); }catch(e){ return null; }
+  }
+  if(!bytes || !bytes.length) return null;
   const id = rttBkNewId();
   try{
     const ok = await idbSet('rtt_bk_' + id, bytes);
@@ -7081,6 +7449,30 @@ function wdtEnsurePop(){
       if(wdtCtx && wdtCtx.anchor && wdtCtx.anchor.contains && wdtCtx.anchor.contains(e.target)) return;
       closePicker();
     });
+    /* --------------------------------------------------------------
+       Ver1.16.04 (B3) Tab などでフォーカスが他所へ移ったら閉じる。
+
+       直す前は、閉じるきっかけが
+         ①外をマウスで押す ②Esc ③表をスクロール ④窓の大きさを変える
+         ⑤「閉じる」ボタン ⑥日付だけの欄で日を選ぶ
+       の6つしかなく、キーボードの Tab で抜けた場合が抜けていた。
+       そのため「時間の欄から複数行テキストへ Tab で移ると、時計が
+       画面に残ったまま」になっていた。
+
+       ここで document に付ける理由:
+         focusin は #results のハンドラに先に届き、そのあと document へ
+         上がってくる。別の日付・時刻セルへ移ったときは、その時点で
+         wdtCtx.anchor が新しいセルに入れ替わっているので、ここでは
+         閉じない。つまり「閉じて開き直す」チラつきが起きない。
+       -------------------------------------------------------------- */
+    document.addEventListener('focusin', e => {
+      if(!wdtPop || wdtPop.style.display === 'none') return;
+      const t = e.target;
+      if(wdtPop.contains && wdtPop.contains(t)) return;      /* ピッカーの中は対象外 */
+      const an = wdtCtx && wdtCtx.anchor;
+      if(an && (an === t || (an.contains && an.contains(t)))) return;  /* 同じ欄のまま */
+      closePicker();
+    });
     document.addEventListener('keydown', e => {
       if(e.key === 'Escape' && wdtPop && wdtPop.style.display !== 'none') closePicker();
     });
@@ -7436,18 +7828,319 @@ document.addEventListener('keydown', e => {
   else if((e.ctrlKey || e.metaKey) && (e.key.toLowerCase() === 'y' || (e.shiftKey && e.key.toLowerCase() === 'z'))){ e.preventDefault(); redo(); }
 });
 
+/* ==================================================================
+   Ver1.16.02 (B1)  保存の状態バー / 警告バー
+   ------------------------------------------------------------------
+   使い方
+     rttNotify('ok'|'info'|'warn'|'danger', 見出し, 補足, オプション)
+       オプション  backup:true  … 「控えの一覧」ボタンを出す
+                   sticky:true  … 大事な知らせ。自動保存の定期表示で消さない
+                   soft  :true  … 定期表示。sticky が立っている間は書き換えない
+                   clear :true  … sticky を解除してから書き換える
+     rttNotifyReset()  … ふだんの色に戻す
+   なぜ 2 段構えか
+     赤い警告が 0.7 秒後の自動保存メッセージで上書きされて消えてしまうと、
+     いちばん見てほしい知らせを見逃す。だから sticky / soft を分けている。
+   ================================================================== */
+var RTT_AB_STICKY = false;      /* 大事な知らせを出しているか */
+var rttKnownFileName = '';      /* 前回開いていたファイル名（許可待ちのとき用） */
+
+/* ==================================================================
+   Ver1.16.05 (U3) ヘッダーを隠しているときに、緑の「保存しました」を出すか
+   ------------------------------------------------------------------
+   ① off  … 出さない（既定。いままでと同じ）
+   ② auto … 出して、決めた秒数で自動的に閉じる
+   ③ ok   … 出して、「OK」を押すまで閉じない
+   設定は st ごと dbOptSet で work.sqlite の _meta_opts に入る。
+   localStorage は会社PCの file:// で黙って失敗するので使わない。
+   ------------------------------------------------------------------
+   ★注意（画面にも同じ説明を出してある）
+     ②③にすると自動保存のたびに緑が出てヘッダーが現れる。
+     つまり「ヘッダーを隠す」設定が事実上効かなくなる。
+   ================================================================== */
+var RTT_OK_TIMER = null;
+var RTT_OK_WAIT  = false;   /* ③のとき「OKを押すまで待っている」印 */
+function rttOkMode(){
+  try{
+    var v = (window.WDT && typeof window.WDT.getOpt === 'function')
+              ? window.WDT.getOpt('okWhenHidden') : null;
+    return (v === 'auto' || v === 'ok') ? v : 'off';
+  }catch(e){ return 'off'; }
+}
+function rttOkSec(){
+  try{
+    var n = Number((window.WDT && typeof window.WDT.getOpt === 'function')
+                     ? window.WDT.getOpt('okHideSec') : 4);
+    if(!isFinite(n) || n < 1) n = 4;
+    if(n > 60) n = 60;
+    return n;
+  }catch(e){ return 4; }
+}
+function rttOkClear(){
+  /* 緑の強制表示をやめる（OKを押したとき／リセットのとき） */
+  try{
+    if(RTT_OK_TIMER){ clearTimeout(RTT_OK_TIMER); RTT_OK_TIMER = null; }
+    RTT_OK_WAIT = false;
+    var sh = document.getElementById('appShell');
+    if(sh) sh.classList.remove('rtt-ok');
+    var b = document.getElementById('rttAlertOk');
+    if(b) b.style.display = 'none';
+  }catch(e){}
+}
+function rttOkVisibility(shell, lv){
+  try{
+    var mode = rttOkMode();
+
+    /* ① 出さない設定なら、いつでも消しておく */
+    if(mode === 'off'){ rttOkClear(); return; }
+
+    /* 緑の知らせが来たとき */
+    if(lv === 'ok'){
+      if(RTT_OK_TIMER){ clearTimeout(RTT_OK_TIMER); RTT_OK_TIMER = null; }
+      shell.classList.add('rtt-ok');
+      var okb = document.getElementById('rttAlertOk');
+      if(okb) okb.style.display = (mode === 'ok') ? '' : 'none';
+      if(mode === 'ok'){
+        RTT_OK_WAIT = true;                 /* ③ 押されるまで待つ */
+      }else{
+        RTT_OK_WAIT = false;                /* ② 秒で閉じる */
+        RTT_OK_TIMER = setTimeout(function(){
+          try{
+            var s2 = document.getElementById('appShell');
+            if(s2) s2.classList.remove('rtt-ok');
+          }catch(e2){}
+          RTT_OK_TIMER = null;
+        }, rttOkSec() * 1000);
+      }
+      return;
+    }
+
+    /* 緑以外の知らせが来たとき
+       ★ここが Ver1.16.05 で直したところ。
+         ③のときは、自動保存などの別の知らせが来ても
+         「OKを押すまで」の約束を守って消さない。 */
+    if(RTT_OK_WAIT) return;                 /* ③ OKを押すまで消さない */
+    if(RTT_OK_TIMER) return;                /* ②の秒数を数えているあいだは消さない */
+    shell.classList.remove('rtt-ok');
+    var okb2 = document.getElementById('rttAlertOk');
+    if(okb2) okb2.style.display = 'none';
+  }catch(e){}
+}
+function rttNotify(level, text, sub, opts){
+  opts = opts || {};
+  try{
+    var bar = document.getElementById('rttAlertBar');
+    if(!bar) return;
+    var lv = (level === 'danger' || level === 'warn' || level === 'ok') ? level : 'info';
+    if(opts.clear){ RTT_AB_STICKY = false; rttOkClear(); }   /* Ver1.16.05 (U3) */
+    if(opts.soft && RTT_AB_STICKY) return;          /* 大事な知らせを消さない */
+    if(opts.sticky) RTT_AB_STICKY = true;
+
+    bar.className = 'lv-' + lv + ' on';
+    var ico = bar.querySelector('.rttAbIco');
+    if(ico) ico.textContent = (lv === 'danger') ? '\u{1F6A8}'
+                            : (lv === 'warn')   ? '\u26A0'
+                            : (lv === 'ok')     ? '\u{1F4BE}' : '\u{1F4BE}';
+    var t = document.getElementById('rttAlertTxt');
+    if(t){
+      t.textContent = String(text || '');
+      if(sub){
+        var s = document.createElement('span');
+        s.className = 'rttAbSub';
+        s.textContent = String(sub);
+        t.appendChild(s);
+      }
+    }
+    var bk = document.getElementById('rttAlertBk');
+    if(bk) bk.style.display = opts.backup ? '' : 'none';
+    var cl = document.getElementById('rttAlertClose');
+    if(cl) cl.style.display = (lv === 'danger' || lv === 'warn') ? '' : 'none';
+
+    var shell = document.getElementById('appShell');
+    if(shell){
+      shell.classList.toggle('rtt-danger', lv === 'danger');
+      shell.classList.toggle('rtt-warn',   lv === 'warn');
+      rttOkVisibility(shell, lv);          /* Ver1.16.05 (U3) */
+    }
+  }catch(e){}
+}
+function rttNotifyReset(){
+  RTT_AB_STICKY = false;
+  rttNotify('info', '保存の状態: -', '', {clear:true});
+}
+/* バーの中のボタン。DOM が後から差し替わっても効くように、まとめて受ける。 */
+document.addEventListener('click', function(e){
+  var t = e.target;
+  if(!t || !t.id) return;
+  if(t.id === 'rttAlertBk'){
+    try{
+      if(window.currentAppMode === 'md' && typeof window.setAppMode === 'function'){
+        window.setAppMode('db');
+      }
+    }catch(e2){}
+    try{ if(typeof window.openBackupList === 'function') window.openBackupList(); }catch(e2){}
+    return;
+  }
+  if(t.id === 'rttAlertOk'){ rttOkClear(); return; }   /* Ver1.16.05 (U3) 確認しました */
+  if(t.id === 'rttAlertClose'){ rttNotifyReset(); return; }
+});
+
+/* ------------------------------------------------------------------
+   Ver1.16.03 (U2) いま書き込んでいるファイルの名前を返す。
+   なぜ要るか
+     「元ファイルに上書き保存しました」だけでは、どのファイルに
+     書けたのか分からない。work.sqlite なのか 2026年8月.sqlite なのか、
+     名前が出れば一目で分かる。
+   優先順位
+     1) いま開いているハンドル（fileHandle.name）
+     2) 前回開いていた名前（rttKnownFileName・許可待ちのとき）
+     3) どちらも無ければ「元ファイル」
+   ------------------------------------------------------------------ */
+function rttFileLabel(){
+  try{ if(typeof fileHandle !== 'undefined' && fileHandle && fileHandle.name) return String(fileHandle.name); }catch(e){}
+  try{ if(rttKnownFileName) return String(rttKnownFileName); }catch(e){}
+  return '元ファイル';
+}
+
+/* 自動保存のたびに呼ぶ。いまの保存先を、いちばん上のバーに出す。 */
+function rttSaveStateBar(wrote, werr){
+  try{
+    if(wrote){
+      rttNotify('ok',
+        '「' + rttFileLabel() + '」に上書き保存しました（' + nowStr() + '）',
+        'この表示はいちばん上に出るので、下へスクロールしても確認できます。',
+        {soft:true});
+      return;
+    }
+    if(werr){
+      rttNotify('danger',
+        'このままではデータが失われます（「' + rttFileLabel() + '」に書けていません）',
+        '理由: ' + werr + '  いまの編集はこのブラウザの中だけにあります。'
+      + '「\u{1F4BE} 名前を付けて保存」でファイルに書き出してください。',
+        {sticky:true, backup:true});
+      return;
+    }
+    if(rttKnownFileName){
+      rttNotify('danger',
+        'このままではデータが失われます（元ファイル「' + rttKnownFileName + '」に書けていません）',
+        '書き込みの許可が切れています。いまの編集はこのブラウザの中だけです。'
+      + '「許可して開く」を押す前に「\u{1F4BE} 名前を付けて保存」でファイルに書き出してください。',
+        {sticky:true, backup:true});
+      return;
+    }
+    rttNotify('info',
+      '自動保存: ' + nowStr() + '（このブラウザの中）',
+      'このブラウザの中だけに保存しています。持ち出すときは「\u{1F4BE} 名前を付けて保存」を。',
+      {soft:true});
+  }catch(e){}
+}
+
+/* ==================================================================
+   Ver1.16.02 (B1)  ファイルで置き換える前の見張り
+   ------------------------------------------------------------------
+   何をするか（案 G2＋G4＋G1）
+     このブラウザの自動保存が、これから開くファイルより新しいときは
+       G2  先に控えを1つ取る（どう転んでも戻せるようにする）
+       G4  赤い警告バーを出す（下へスクロールしていても気づける）
+       G1  本当に開いてよいか、必ず人に聞く（自動では選ばない）
+   どうやって「新しい」を判定するか
+     doAutosave はディスクへ書けたときだけ disk_written_at を打っている。
+     autosave_time > disk_written_at なら「自動保存がディスクに届いていない」。
+     どちらも同じブラウザの時計なので、会社のネットワークドライブで
+     サーバの時計がズレていても誤判定しない。
+     disk_written_at がまだ無い（版を上げた直後など）ときだけ、
+     file.lastModified で代替する。こちらは時計が違うので余裕を持たせる。
+   返り値
+     true  … 開いてよい
+     false … 利用者がやめた。呼び出し側は何もせずに戻ること
+   ================================================================== */
+var RTT_B1_SLACK = 60000;   /* lastModified で代替するときの余裕（1分） */
+
+async function guardBeforeReplace(file, label){
+  try{
+    var at = await idbGet('autosave_time');
+    if(!at) return true;                       /* 自動保存が無い＝失うものが無い */
+    var bytes = await idbGet('autosave_bytes');
+    if(!bytes || !bytes.length) return true;
+
+    var danger = false, base = 0;
+    var dw = await idbGet('disk_written_at');
+    if(dw){
+      base = Number(dw);
+      danger = (Number(at) > base);
+    }else if(file && file.lastModified){
+      base = Number(file.lastModified);
+      danger = (Number(at) > base + RTT_B1_SLACK);
+    }
+    if(!danger) return true;
+
+    /* --- G2: 何が起きても戻せるように、まず控えを取る --- */
+    var bkId = null;
+    try{ bkId = await rttBackupMake('ファイルを開く前の自動保存', bytes); }catch(e){}
+
+    var f1 = function(n){ return n ? new Date(Number(n)).toLocaleString('ja-JP') : '不明'; };
+    var nm = (file && file.name) ? file.name : (label || 'ファイル');
+
+    /* --- G4: どの画面からでも見える赤い警告 --- */
+    rttNotify('danger',
+      'このままではデータが失われます',
+      'このブラウザの自動保存（' + f1(at) + '）のほうが、開こうとしているファイル「'
+      + nm + '」（' + f1(base) + '）より新しいです。'
+      + (bkId ? '念のため控えを1つ取りました。' : '\u203B 控えが取れませんでした。'),
+      {sticky:true, backup:true});
+
+    /* --- G1: 自動で選ばない。必ず人に聞く --- */
+    var ok = window.confirm(
+        'このブラウザに、ファイルより新しい自動保存があります。\n\n'
+      + '  ファイル  : ' + f1(base) + '\n'
+      + '  自動保存  : ' + f1(at) + '  \u2190 こちらのほうが新しい\n\n'
+      + 'このままファイルを開くと、自動保存のほうは消えます。\n'
+      + (bkId ? '念のため控えを1つ取りました（\u2699 設定 \u2192 \u{1F4BE} データ \u2192 \u{1F550} 控えの一覧 から戻せます）。\n'
+              : '\u203B 控えが取れませんでした。先に「\u{1F4BE} 名前を付けて保存」をおすすめします。\n')
+      + '\nそれでもファイルを開きますか？\n'
+      + '   OK        = ファイルを開く（自動保存は控えに残ります）\n'
+      + '   キャンセル = 開くのをやめる（いまの自動保存を使い続けます）'
+    );
+
+    if(!ok){
+      rttNotify('warn',
+        'ファイルを開くのをやめました。いまの自動保存の内容をそのまま使っています',
+        '控えは \u2699 設定 \u2192 \u{1F4BE} データ \u2192 \u{1F550} 控えの一覧 にあります。'
+      + '大事な内容は「\u{1F4BE} 名前を付けて保存」でファイルに書き出してください。',
+        {sticky:true, backup:true});
+      setStatus('ファイルを開くのをやめました。いまの自動保存の内容をそのまま使っています。', 'ok');
+      return false;
+    }
+    rttNotify('warn',
+      'ファイルを開きました。直前の自動保存は控えに退避してあります',
+      '戻したいときは \u2699 設定 \u2192 \u{1F4BE} データ \u2192 \u{1F550} 控えの一覧 から。',
+      {sticky:true, backup:true});
+    return true;
+  }catch(e){
+    /* 見張りで落ちても、開く動作そのものは止めない */
+    return true;
+  }
+}
+
 // ====== 自動保存 ======
+/* Ver1.16.03 (G10b) まだディスク／IndexedDB に落ちていない編集があるか。
+   これが false のときは何もしない。db.export() は重いので、
+   タブを切り替えるたびに走らせてはいけない。 */
+var RTT_G10_PENDING = false;
 function scheduleAutosave(){
   clearTimeout(autosaveTimer);
+  RTT_G10_PENDING = true;              /* Ver1.16.03 (G10b) */
   autosaveTimer = setTimeout(doAutosave, 700);
 }
 async function doAutosave(){
   if(!db) return;
+  RTT_G10_PENDING = false;             /* Ver1.16.03 (G10b) これから書くので降ろす */
   try{
     const bytes = db.export();
     await idbSet('autosave_bytes', bytes);
     await idbSet('autosave_time', Date.now());
     let msg = '自動保存: ' + nowStr() + '（このブラウザ内）';
+    let wroteToDisk = false, writeErr = '';     /* Ver1.16.02 (B1) */
     if(fileHandle && fileHandle.queryPermission){
       try{
         const perm = await fileHandle.queryPermission({mode: 'readwrite'});
@@ -7455,14 +8148,101 @@ async function doAutosave(){
           const w = await fileHandle.createWritable();
           await w.write(bytes);
           await w.close();
-          msg = '自動保存: ' + nowStr() + '（元ファイルに上書き保存済み）';
+          /* Ver1.16.02 (B1/G4) ディスクへ確かに届いた時刻を、同じブラウザの時計で打つ。
+             autosave_time より必ず後になるので、
+             autosave_time > disk_written_at なら「届いていない」と分かる。 */
+          await idbSet('disk_written_at', Date.now());
+          wroteToDisk = true;
+          msg = '自動保存: ' + nowStr() + '（「' + rttFileLabel() + '」に上書き保存済み）';
+        }else{
+          writeErr = '書き込みの許可が切れています';
         }
-      }catch(err){ /* 上書きに失敗してもブラウザ内保存は残る */ }
+      }catch(err){
+        /* Ver1.16.02 (B1) ここは以前 catch(err){} で握り潰していた。
+           ディスクに書けていないのに画面は「（このブラウザ内）」に戻るだけで、
+           気づけないままズレが広がるのが B1 の発生源のひとつだった。 */
+        writeErr = (err && err.message) ? String(err.message) : '書き込みに失敗しました';
+      }
     }
     const el = document.getElementById('autosaveInfo');
     if(el) el.textContent = msg;
+    rttSaveStateBar(wroteToDisk, writeErr);     /* Ver1.16.02 (B1) 上のバーにも出す */
   }catch(e){}
 }
+
+/* ==================================================================
+   Ver1.16.03 (G10b)  タブが隠れた瞬間に、待たずに保存する（場面ウ）
+   ------------------------------------------------------------------
+   何が困っていたか
+     自動保存は「最後の操作から 700ms 待って」から走る。
+     だから、打ち込んだ直後に
+       ・タブの ✕ を押す
+       ・別のタブへ切り替える
+       ・ウィンドウを閉じる
+     をすると、その 700ms のあいだに画面が消えて、
+     ディスクにもブラウザの中にも届かない。最後の数文字が消える。
+
+   どう直したか
+     タブが隠れた瞬間（visibilitychange で document.hidden になった時）に
+     700ms の待ち時間を取り消して、その場で doAutosave() を呼ぶ。
+     ブラウザは「隠す」を「閉じる」より必ず先に行うので、間に合う。
+
+       打つ ──700ms待ち──▶ 自動保存      ← いままで（閉じると間に合わない）
+       打つ ──┐
+               └ タブが隠れた ──▶ すぐ自動保存   ← Ver1.16.03
+
+   なぜ pagehide も見るのか
+     iPhone / iPad の Safari など、閉じるときに visibilitychange が
+     来ない環境があるため。保険として両方に付ける。
+
+   重くならないための歯止め
+     ・RTT_G10_PENDING が false（未保存の編集が無い）なら何もしない
+     ・250ms 以内の二重発火は捨てる
+     この 2 つが無いと、タブを行き来するたびに db.export()（重い）が
+     走って、画面がカクつく。
+
+   メモ側も一緒に流す
+     Markdownメモの編集はいったんメモ側が持っている。先に
+       MDEditor.flushDbSync()   … DB連携タブの本文をDBへ書き戻す
+       __mdeSessionFlush()      … タブの並び・📌・本文を _meta_opts へ
+     を呼んでから doAutosave() する。順番を逆にすると、
+     メモの最後の編集だけ取り残される。
+   ================================================================== */
+var RTT_G10_LAST = 0;              /* 前回流した時刻（二重発火よけ） */
+function rttFlushAutosave(why){
+  try{
+    if(typeof db === 'undefined' || !db) return false;
+
+    /* 1) メモ側の未反映ぶんを、先に SQLite のメモリへ落とす */
+    try{
+      if(window.MDEditor && typeof window.MDEditor.flushDbSync === 'function'){
+        window.MDEditor.flushDbSync();
+      }
+    }catch(e){}
+    try{
+      if(typeof window.__mdeSessionFlush === 'function') window.__mdeSessionFlush();
+    }catch(e){}
+
+    /* 2) 未保存の編集が無ければ、ここで終わり（db.export() は重い） */
+    if(!RTT_G10_PENDING) return false;
+
+    var now = Date.now();
+    if(now - RTT_G10_LAST < 250) return false;   /* 二重発火は捨てる */
+    RTT_G10_LAST = now;
+
+    /* 3) 700ms の待ちを取り消して、いますぐ書く */
+    clearTimeout(autosaveTimer);
+    doAutosave();
+    return true;
+  }catch(e){ return false; }
+}
+try{
+  document.addEventListener('visibilitychange', function(){
+    if(document.hidden) rttFlushAutosave('hidden');
+  });
+  window.addEventListener('pagehide', function(){ rttFlushAutosave('pagehide'); });
+}catch(e){}
+try{ window.rttFlushAutosave = rttFlushAutosave; }catch(e){}
 
 // ====== 保存・読込 ======
 function saveDbAs(){
@@ -7483,12 +8263,23 @@ async function saveDbOverwrite(){
     const w = await fileHandle.createWritable();
     await w.write(bytes);
     await w.close();
-    setStatus('元ファイルに上書き保存しました。', 'ok');
+    await idbSet('disk_written_at', Date.now());   /* Ver1.16.02 (B1/G4) */
+    setStatus('「' + rttFileLabel() + '」に上書き保存しました。', 'ok');
+    /* Ver1.16.02 (B1) いちばん上にも出す。下へスクロールしても消えない。
+       手で上書きできた＝ズレは解消したので、赤い警告も解除する。 */
+    rttKnownFileName = '';
+    rttNotify('ok', '「' + rttFileLabel() + '」に上書き保存しました（' + nowStr() + '）',
+              'この表示はいちばん上に出ます。下へスクロールしても確認できます。',
+              {clear:true});
   }catch(e){ setStatus('上書き保存に失敗: ' + e.message, 'err'); }
 }
 async function loadDbFromHandle(handle){
   try{
     const file = await handle.getFile();
+    /* Ver1.16.02 (B1) 置き換える前の見張り。
+       ここを通る入口は4つ（起動時の自動復元 / 許可して開く /
+       📂 DBを開く / ドラッグ＆ドロップ）。内側で守るので全部まとめて効く。 */
+    if(!(await guardBeforeReplace(file, handle && handle.name))) return;
     const buf = await file.arrayBuffer();
     db = new SQL.Database(new Uint8Array(buf));
     registerRegexp();
@@ -7499,12 +8290,16 @@ async function loadDbFromHandle(handle){
     if(metaTables.length) openTab(metaTables[0].key);
     setStatus('DBファイル「' + file.name + '」を読み込みました（今後はこのファイルへ自動保存します）。', 'ok');
     historyStack = []; redoStack = []; updateUndoRedoButtons();
+    rttKnownFileName = '';        /* Ver1.16.02 (B1) 許可待ちは解消した */
     scheduleAutosave();
   }catch(e){ setStatus('読込に失敗: ' + e.message, 'err'); }
 }
-function loadDb(file){
+async function loadDb(file){
   // File System Access APIが使えないブラウザ（自宅のFirefoxなど）向けの従来方式
   if(!SQL){ setStatus('エンジンの準備中です。少し待ってからお試しください。', 'err'); return; }
+  /* Ver1.16.02 (B1) 入口⑤。fileInput とドラッグ＆ドロップの代替経路を守る。
+     async にしたが、呼び出し側は返り値を見ていないのでそのままで動く。 */
+  if(!(await guardBeforeReplace(file, file && file.name))) return;
   const r = new FileReader();
   r.onload = () => {
     try{
@@ -7537,6 +8332,16 @@ function showReopenBanner(handle){
   const el = document.getElementById('reopenBanner');
   el.style.display = 'flex';
   el.querySelector('.name').textContent = handle.name || 'ファイル';
+  /* Ver1.16.02 (B1) 場面ア。許可が切れている間は元ファイルに一切書けない。
+     バナーはページの上のほうにあるだけで、下へスクロールすると見えなくなる。
+     いちばん上のバーを赤くして、どの画面からでも気づけるようにする。 */
+  rttKnownFileName = handle.name || 'ファイル';
+  rttNotify('danger',
+    'このままではデータが失われます（元ファイル「' + rttKnownFileName + '」に書けていません）',
+    '書き込みの許可が切れています。いまの編集はこのブラウザの中だけに残ります。'
+  + '「許可して開く」を押すとファイルの中身で置き換わるので、'
+  + '先に「\u{1F4BE} 名前を付けて保存」でファイルに書き出しておくと安全です。',
+    {sticky:true, backup:true});
   document.getElementById('reopenBtn').onclick = async () => {
     try{
       const perm = await handle.requestPermission({mode: 'readwrite'});
@@ -9262,11 +10067,145 @@ function editRow(tr){
     cell.click();
   }
 }
+/* Ver1.16.04 (B4) タグの列が複数あるとき、1つ目しか開けなかったのを直す。
+
+   直す前は querySelector（＝最初の1個だけ）だったので、
+   タグの列が2つ以上ある表では、何度 e を押しても1つ目しか開かなかった。
+
+   直したあとの決まり:
+     1) いまカーソルがタグのセルの中にあるなら、そのセルを開く
+        （Tab で目当ての列まで移ってから e を押せば、その列が開く）
+     2) そうでなければ、押すたびに次のタグ列へ回る（1つ目 → 2つ目 → 1つ目 …）
+     3) 行が変わったら、また1つ目に戻す
+     4) タグの列が1つだけの表では、今までとまったく同じ動き（お知らせも出さない）
+*/
+var tagRoundRow = null, tagRoundIdx = 0;
+
+/* ==================================================================
+   Ver1.16.05 (B4再) 会社のEdgeで「タグの列 1/2」が出ず、いきなり
+   1つ目のピッカー（🛠 タグの管理 が見えるあの画面）が開いた件。
+   ------------------------------------------------------------------
+   【原因】
+     openTagOfRow は「行に描かれている td.tagcell の数」だけを見ていた。
+     タグ列が2つ定義されていても、画面に描かれるのが1つだけなら
+     cells.length は 1 になる。1のときはお知らせを出さない決まりなので、
+     利用者からは「何も言わずに1列目が開く＝2列目に行けない」に見える。
+
+   【td.tagcell が描かれない条件は3つだけ】（renderQuery の描画部）
+     1) いま出している検索結果（SELECT）の列に、その列が入っていない
+     2) 「⚙ 表示する列」で、その列を隠している
+     3) 項目（テーブル）の設定で、その列が「編集できない(editable=0)」
+
+   【これから】
+     画面に描かれた数ではなく _meta_columns の定義（＝本当は何列あるか）と
+     突き合わせる。届かない列があれば、上の1〜3のどれなのかを名指しで知らせる。
+
+   【注意】
+     getColumnVisibility は localStorage を使う。会社PCの file:// では
+     例外になって {} が返る＝「全部表示」扱いになるので、会社PCで出る理由は
+     ふつう 1 か 3 のどちらか。
+   ================================================================== */
+function tagColDiag(tr){
+  /* 戻り値 {defs:定義されているタグ列の数, missing:[{label,why}, …]} */
+  var out = {defs: 0, missing: []};
+  try{
+    var cols = metaColumnsByTable[currentTable] || [];
+    if(!cols.length) return out;
+    var vis = {};
+    try{ vis = getColumnVisibility(currentTable) || {}; }catch(e1){ vis = {}; }
+    var inSql = {}, j;
+    try{
+      var lc = lastCols || [];
+      for(j = 0; j < lc.length; j++) inSql[lc[j]] = 1;
+    }catch(e2){}
+    var drawn = {}, cs = [];
+    try{ cs = tr ? tr.querySelectorAll('td.tagcell') : []; }catch(e3){ cs = []; }
+    for(j = 0; j < cs.length; j++){
+      try{ drawn[(cs[j].dataset && cs[j].dataset.col) || ''] = 1; }catch(e4){}
+    }
+    for(j = 0; j < cols.length; j++){
+      var c = cols[j];
+      if(!c || c.col_type !== 'tags') continue;
+      out.defs++;
+      if(drawn[c.col_name]) continue;
+      var nm = c.label || c.col_name, why;
+      if(!inSql[c.col_name]){
+        why = 'いま出している検索結果に、この列が入っていません（左の項目ボタンを押し直して全件を出すと入ります）';
+      }else if(vis[c.col_name] === false){
+        why = '「⚙ 表示する列」で、この列を隠しています（表の上の「列」ボタンから戻せます）';
+      }else if(!c.editable){
+        why = '項目（テーブル）の設定で、この列が「編集できない」になっています（項目管理の列設定で直せます）';
+      }else{
+        why = '理由を特定できませんでした（表を出し直してみてください）';
+      }
+      out.missing.push({label: nm, why: why});
+    }
+  }catch(e){}
+  return out;
+}
+function tagMissingMsg(d){
+  var a = [], j;
+  try{
+    for(j = 0; j < d.missing.length; j++){
+      a.push('「' + d.missing[j].label + '」は' + d.missing[j].why);
+    }
+  }catch(e){}
+  return a.join(' ／ ');
+}
 function openTagOfRow(tr){
   if(!tr) return;
-  var cell = tr.querySelector('td.tagcell');
-  if(!cell){ say('この行にはタグの列がありません。', 'err'); return; }
-  cell.click();
+  var cells = tr.querySelectorAll('td.tagcell');
+  var diag = tagColDiag(tr);
+  if(!cells.length){
+    if(diag.defs > 0){
+      say('この表にはタグの列が ' + diag.defs + ' つありますが、いまの画面では開けません。' +
+          tagMissingMsg(diag), 'err');
+    }else{
+      say('この行にはタグの列がありません。', 'err');
+    }
+    return;
+  }
+  if(tr !== tagRoundRow){ tagRoundRow = tr; tagRoundIdx = 0; }   /* 行が変わったら最初へ */
+  var a = document.activeElement, hit = -1, k, i;
+  for(k = 0; k < cells.length; k++){
+    if(cells[k] === a || (a && cells[k].contains && cells[k].contains(a))){ hit = k; break; }
+  }
+  if(hit >= 0){
+    i = hit;                                   /* いる場所を優先する */
+  }else{
+    i = tagRoundIdx % cells.length;            /* 押すたびに次へ回る */
+  }
+  tagRoundIdx = (i + 1) % cells.length;
+  var nm = '';
+  try{ nm = tagLabelOfCell(cells[i]); }catch(e){ nm = ''; }
+  if(cells.length > 1){
+    say('タグの列 ' + (i + 1) + '/' + cells.length + (nm ? '「' + nm + '」' : '') +
+        ' を開きます。もう一度押すと次の列です。' +
+        (diag.missing.length
+           ? '（ほかに開けない列が ' + diag.missing.length + ' つあります。' + tagMissingMsg(diag) + '）'
+           : ''), 'ok');
+  }else if(diag.missing.length){
+    /* ★ここが B4再 の本命。描かれているのは1つだけなのに、定義は2つ以上ある。
+       いままではここで何も言わずに開いていた（＝会社PCで起きた症状）。 */
+    say('タグの列は全部で ' + diag.defs + ' つですが、いま開けるのは' +
+        (nm ? '「' + nm + '」' : 'この1つ') + 'だけです。' + tagMissingMsg(diag), 'err');
+  }
+  cells[i].click();
+}
+/* セルの列名から、人が読む見出しを引く（引けなければ列名そのまま）
+   metaColumnsByTable / currentTable は let 宣言なので window からは見えない。
+   同じ script ブロックのトップレベル変数なので、ここから直に参照する
+   （既存の switchTable と同じ作法）。 */
+function tagLabelOfCell(td){
+  var cn = td && td.dataset ? (td.dataset.col || '') : '';
+  if(!cn) return '';
+  try{
+    var cols = metaColumnsByTable[currentTable] || [];
+    for(var i = 0; i < cols.length; i++){
+      if(cols[i].col_name === cn) return cols[i].label || cn;
+    }
+  }catch(e){}
+  return cn;
 }
 function switchTable(dir){
   var keys = [];
@@ -9342,12 +10281,62 @@ function lookup(strokes){
   return prefix ? {hit:'prefix'} : null;
 }
 
+/* ==================================================================
+   Ver1.16.05 (B2) 表の編集セルで Esc を押してもコマンドモードへ戻れない件
+   ------------------------------------------------------------------
+   【いままで】
+     Esc で抜けられるのは rk-esc というクラスが付いた要素だけ。
+     ところが rk-esc が付いていたのは検索欄（#q_kw）ただ1つ。
+     日付セルで Esc を押すと、カレンダーは閉じるがセルには居残る。
+     もう一度押しても何も起きない＝コマンドモードへ戻れない。
+
+   【採用案：案ウ（Esc 二段階）】
+     1回目 … カレンダー／時計（.wdt-pop）だけ閉じる
+     2回目 … セルから抜けてコマンドモードへ戻る
+
+   【1段目に何も書かなくてよい理由】
+     onDocKey は capture 登録（addEventListener(…, true)）なので必ず先に走る。
+     ピッカー側の Esc は bubble 登録。1段目で preventDefault せずに
+     素通りさせれば、そのあと bubble でピッカーが自分で閉じてくれる。
+     つまり「ピッカーが開いているあいだは手を出さない」だけでよい。
+
+   【触らないもの】
+     ・メモ画面（dbMode() が false のとき）… 別のキー体系なので一切触らない
+     ・#app-db の外にある入力欄
+     ・td.mdcell.editing の中の textarea
+       … 自前の Esc（＝編集の取消）を持っているため（renderQuery の keydown）
+   ================================================================== */
+function pickerOpenNow(){
+  /* カレンダー／時計が開いているか。
+     wdtPop は同じ script ブロックの let だが、DOM を直に見たほうが確実。 */
+  try{
+    var p = document.querySelector('.wdt-pop');
+    return !!(p && p.style.display !== 'none');
+  }catch(e){ return false; }
+}
+function escStage2(a){
+  /* 「2段目の Esc（＝セルから抜ける）」の対象かどうか */
+  if(!a) return false;
+  if(!dbMode()) return false;                     /* メモ画面は触らない */
+  if(!isEditableEl(a)) return false;              /* 入力欄でなければ関係ない */
+  try{ if(!a.closest || !a.closest('#app-db')) return false; }catch(e){ return false; }
+  try{ if(a.closest('td.mdcell.editing')) return false; }catch(e2){}   /* 自前のEscがある */
+  if(pickerOpenNow()) return false;               /* 1段目はピッカーに譲る */
+  return true;
+}
 function onDocKey(e){
   /* Esc は「入力欄から抜けてコマンドモードへ戻る」ためだけに使う */
   if(e.key === 'Escape'){
     if(anyModalOpen() || recordingNow()) return;
     var a = document.activeElement;
     if(a && a.classList && a.classList.contains('rk-esc')){
+      e.preventDefault();
+      try{ a.blur(); }catch(err){}
+      refreshBar();
+      return;
+    }
+    /* ★Ver1.16.05 (B2) ここから追加。案ウの2段目。 */
+    if(escStage2(a)){
       e.preventDefault();
       try{ a.blur(); }catch(err){}
       refreshBar();
@@ -10114,6 +11103,7 @@ const DEFAULT_TOOLBAR = [
   {id:'bold',      label:'B',   title:'太字 (Ctrl+B)',        on:true},
   {id:'italic',    label:'I',   title:'斜体 (Ctrl+I)',        on:true},
   {id:'strike',    label:'S',   title:'取り消し線',           on:true},
+  {id:'underline', label:'U',   title:'下線 (Ctrl+U)',        on:false},
   {id:'h1',        label:'H1',  title:'見出し1',              on:true},
   {id:'h2',        label:'H2',  title:'見出し2',              on:true},
   {id:'h3',        label:'H3',  title:'見出し3',              on:false},
@@ -10127,8 +11117,8 @@ const DEFAULT_TOOLBAR = [
   {id:'image',     label:'🖼️',  title:'画像挿入',              on:false},
   {id:'hr',        label:'―',   title:'水平線',                on:false},
   {id:'table',     label:'⊞ 表', title:'表（テーブル）を挿入', on:false},
-  {id:'indent',    label:'→|',  title:'字下げ (Tab)',          on:true},
-  {id:'outdent',   label:'|←',  title:'字上げ (Shift+Tab)',    on:true},
+  {id:'indent',    label:'→|',  title:'字下げ (Tab / Ctrl+[)',       on:true},
+  {id:'outdent',   label:'|←',  title:'字上げ (Shift+Tab / Ctrl+])', on:true},
 ];
 
 let settings = loadJSON('mdeditor_settings', {
@@ -10196,6 +11186,11 @@ function renderInline(text){
   // 斜体（太字処理後の単一記号）
   text = text.replace(/(^|[^*])\*([^*\n]+)\*/g,'$1<em>$2</em>');
   text = text.replace(/(^|[^_])_([^_\n]+)_/g,'$1<em>$2</em>');
+  /* Ver1.16.06 (束D): 下線 <u> をプレビューに出す。
+     ここまでで本文は mdeEscapeHtml() を通っているので、<u> は &lt;u&gt; になっている。
+     その2語だけをタグに戻す。戻す許可があるのはこの2語だけなので、
+     <u onclick="..."> のような属性つきタグも <script> も戻らない（安全）。 */
+  text = text.replace(/&lt;u&gt;/g, '<u>').replace(/&lt;\/u&gt;/g, '</u>');
   // コードスパン復元
   text = text.replace(/\u0001SPAN(\d+)\u0001/g,(m,i)=>`<code>${spans[+i]}</code>`);
   return text;
@@ -11454,6 +12449,9 @@ function mdeSessionAdoptDb(){
 /* メモ側は (function(){...})(); に包まれていて外から見えないので、
    DB側（WDT.onDbReady）から呼べるように窓口を1つだけ出しておく。 */
 try{ window.__mdeOnDbReady = mdeSessionAdoptDb; }catch(e){}
+/* Ver1.16.03 (G10b) タブを閉じる直前に、DB側から「いま書き出して」と
+   頼めるようにする窓口。作業記録DB本体の自動保存より先に呼ぶ。 */
+try{ window.__mdeSessionFlush = mdeSessionFlush; }catch(e){}
 
 /* 本文だけの変更をまとめて書くタイマーと、画面を離れるときの書き出し */
 try{
@@ -11985,6 +12983,53 @@ function allLinesMatch(lines, re){
   return check.length > 0 && check.every(l => re.test(l));
 }
 
+/* ==================================================================
+   Ver1.16.09 (束E): 書式を消す（Typora の Ctrl+\ = Clear Format）
+   ------------------------------------------------------------------
+   ■ 何を消して、何を残すか
+     消す … 太字 ** __ ／ 斜体 * _ ／ 打消し ~~ ／ コード ` ／
+            下線 <u></u> ／ リンク [表示](URL) は表示だけ残す
+     残す … 見出し # ／ 引用 > ／ リスト - 1. ／ 画像 ![説明](URL)
+
+   ■ なぜ見出しやリストを消さないのか
+     Typora の Clear Format も、行の種類（段落・見出し・リスト）は変えず、
+     文字の飾りだけを落とします。見出しを外したいときは Ctrl+0 が別にあります。
+     役割を分けておかないと、どちらを押したのか分からなくなります。
+
+   ■ なぜ画像だけよけるのか（★重要）
+     画像は ![説明](URL) と書きます。リンク [表示](URL) と形がそっくりなので、
+     よけずにリンク解除をかけると画像が壊れ、URL がまるごと消えます。
+     URL は打ち直せないので、先に別の場所へ預けてから作業し、最後に戻します。
+     （プレビューの描画が、コード部分を先に預けているのと同じやり方です）
+
+   ■ 記号を外す順番
+     長い記号から先に外します。** より先に * を外すと、** が * ひとつ分だけ
+     欠けた壊れた形になってしまうためです。
+
+   ■ 対応している記法は、このソフトの表示処理 renderInline() に合わせてあります。
+     表示できない書き方をここで消しても意味がないためです。
+   ================================================================== */
+function mdStripInline(s){
+  /* ① 画像を預ける（\u0002 は文章に出てこない制御文字なので目印に使える） */
+  const keep = [];
+  s = s.replace(/!\[[^\]]*\]\([^)]*\)/g, function(m){
+    keep.push(m); return '\u0002IMG' + (keep.length - 1) + '\u0002';
+  });
+  /* ② リンクは表示テキストだけ残す（URL は消える。Ctrl+Z で戻せる） */
+  s = s.replace(/\[([^\]]+)\]\([^)\s]+(?:\s+"[^"]*")?\)/g, '$1');
+  /* ③ 下線タグ（束D で入れたもの） */
+  s = s.replace(/<\/?u>/gi, '');
+  /* ④ 打消し → 太字 → 斜体 → コード の順に外す */
+  s = s.replace(/~~([^~]+)~~/g, '$1');
+  s = s.replace(/\*\*([^*]+)\*\*/g, '$1');
+  s = s.replace(/__([^_]+)__/g, '$1');
+  s = s.replace(/(^|[^*])\*([^*\n]+)\*/g, '$1$2');
+  s = s.replace(/(^|[^_])_([^_\n]+)_/g, '$1$2');
+  s = s.replace(/`([^`]+)`/g, '$1');
+  /* ⑤ 預けておいた画像を戻す */
+  return s.replace(/\u0002IMG(\d+)\u0002/g, function(m, i){ return keep[+i]; });
+}
+
 const TOOLBAR_ACTIONS = {
   bold: ta=>wrapSelection(ta,'**'),
   italic: ta=>wrapSelection(ta,'*'),
@@ -12002,6 +13047,48 @@ const TOOLBAR_ACTIONS = {
     const off = allLinesMatch(selectedBlockLines(ta), /^\s*###\s/);
     return prefixLines(ta, l => off ? l.replace(/^(\s*)#+\s*/,'$1') : l.replace(/^(\s*)#*\s*/,'$1### '));
   },
+  /* Ver1.16.06 (束A): 見出し4〜6。h1〜h3 とまったく同じ考え方。
+     同じレベルの見出しの上でもう一度押すと、見出しを外して標準の文に戻す。 */
+  h4: ta=>{
+    const off = allLinesMatch(selectedBlockLines(ta), /^\s*####\s/);
+    return prefixLines(ta, l => off ? l.replace(/^(\s*)#+\s*/,'$1') : l.replace(/^(\s*)#*\s*/,'$1#### '));
+  },
+  h5: ta=>{
+    const off = allLinesMatch(selectedBlockLines(ta), /^\s*#####\s/);
+    return prefixLines(ta, l => off ? l.replace(/^(\s*)#+\s*/,'$1') : l.replace(/^(\s*)#*\s*/,'$1##### '));
+  },
+  h6: ta=>{
+    const off = allLinesMatch(selectedBlockLines(ta), /^\s*######\s/);
+    return prefixLines(ta, l => off ? l.replace(/^(\s*)#+\s*/,'$1') : l.replace(/^(\s*)#*\s*/,'$1###### '));
+  },
+  /* Ver1.16.06 (束A): 見出しを外して「ふつうの文」に戻す。
+     Typora の Ctrl+0（メニューでは Paragraph）と同じはたらき。
+     見出しでない行に使っても何も起きない（安全）。 */
+  h0: ta=>prefixLines(ta, l => l.replace(/^(\s*)#+\s*/,'$1')),
+  /* Ver1.16.06 (束A): 見出しを1段「大きく」する。## あああ → # あああ
+     Typora の Ctrl+=（Increase Heading Level）。
+     H1 のときにもう一度押すと、見出しが外れて標準の文になる。
+     見出しでない行は何も変わらない。 */
+  headUp: ta=>prefixLines(ta, l=>{
+    const m = l.match(/^(\s*)(#{1,6})\s+([\s\S]*)$/);
+    if(!m) return l;                                  /* 見出しでなければ触らない */
+    const n = m[2].length - 1;
+    return n <= 0 ? m[1] + m[3] : m[1] + '#'.repeat(n) + ' ' + m[3];
+  }),
+  /* Ver1.16.06 (束A): 見出しを1段「小さく」する。# あああ → ## あああ
+     Typora の Ctrl+-（Decrease Heading Level）。
+     見出しでない行に使うと H1 になる。H6 より下は無いので据え置き。
+     空行には何もしない（空行が "# " だけになるのを防ぐ）。 */
+  headDown: ta=>prefixLines(ta, l=>{
+    const m = l.match(/^(\s*)(#{1,6})\s+([\s\S]*)$/);
+    if(m){
+      const n = m[2].length;
+      return n >= 6 ? l : m[1] + '#'.repeat(n + 1) + ' ' + m[3];
+    }
+    const p = l.match(/^(\s*)([\s\S]*)$/);
+    if(!p[2].trim()) return l;                        /* まっさらな空行は触らない */
+    return p[1] + '# ' + p[2];
+  }),
   // 箇条書き：既に箇条書きなら外して標準文に戻す。番号付き/チェックからは箇条書きへ変換。
   ul: ta=>prefixLines(ta,l=>{
     const p = parseListLine(l);
@@ -12029,6 +13116,11 @@ const TOOLBAR_ACTIONS = {
       ? l.replace(/^(\s*)>\s?/, '$1')                       // トグルオフ
       : (/^\s*>\s?/.test(l) ? l : '> ' + l));               // トグルオン
   },
+  /* Ver1.16.06 (束D): 下線。
+     Markdown に下線の記法は無いので、Typora と同じく <u> タグで囲む。
+     wrapSelection は「もう一度押すと外れる」トグルになっているので、
+     選んだ文字がすでに <u> で囲まれていれば、逆に外れる。 */
+  underline: ta=>wrapSelection(ta,'<u>','</u>'),
   code: ta=>wrapSelection(ta,'`'),
   codeblock: ta=>{
     const start = ta.selectionStart, end = ta.selectionEnd;
@@ -12045,6 +13137,24 @@ const TOOLBAR_ACTIONS = {
   table: ta=>{ insertAtLineEnd(ta, '\n| 見出し1 | 見出し2 |\n| --- | --- |\n| セル1 | セル2 |\n'); },
   indent: ta=>handleTabKey(ta,false),
   outdent: ta=>handleTabKey(ta,true),
+  /* Ver1.16.09 (束E): 書式を消す。
+     文字を選んでいれば その範囲。選んでいなければ カーソルのある行ぜんぶ。
+     中身が1文字も変わらないときは何もしない（「元に戻す」の履歴を汚さないため）。 */
+  clearfmt: ta=>{
+    const value = ta.value;
+    let from = ta.selectionStart, to = ta.selectionEnd;
+    if(from === to){
+      from = value.lastIndexOf('\n', from - 1) + 1;
+      const nl = value.indexOf('\n', to);
+      to = (nl < 0) ? value.length : nl;
+    }
+    const before = value.substring(from, to);
+    const after  = mdStripInline(before);
+    if(after === before) return;
+    mdReplaceRange(ta, from, to, after);
+    try{ ta.setSelectionRange(from, from + after.length); }catch(e){}
+    try{ ta.focus(); }catch(e){}
+  },
 };
 
 function wrapSelectionRaw(ta, text){
@@ -12772,6 +13882,66 @@ function wdtHit(e, id){
   return false;
 }
 
+/* ==================================================================
+   Ver1.16.06 (回7-4 段階2)  Typora互換ショートカットの対応表
+   ------------------------------------------------------------------
+   ■ ここに書いてあるのは「機能のIDと、実際に動かす処理の名前」だけです。
+     どのキーを押すかは、いっさい書いてありません。
+     キーの割り当ては ⚙設定 の一覧（SC 配列）が持っています。
+
+   ■ なぜ if 文で決め打ちしないのか
+     会社のパソコン（Edge）では、ブラウザが先にキーを取ってしまって
+     こちらに届かないことがあります。そのときは利用者自身が
+     「⚙ 設定 → ショートカットキー」で別のキーに振り直せます。
+     決め打ちで書いてしまうと、それができなくなります。
+
+   ■ 追加のしかた
+     1. SC 配列（下のブロック）に {id:'md.xxx', ..., def:['Ctrl+…']} を足す
+     2. この表に {id:'md.xxx', act:'ツールバーの処理名'} を足す
+     この2つだけで新しいショートカットが増えます。
+   ================================================================== */
+var MD_SC_ACTIONS = [
+  /* --- 束A: 見出し --- */
+  {id:'md.h1',       act:'h1'},
+  {id:'md.h2',       act:'h2'},
+  {id:'md.h3',       act:'h3'},
+  {id:'md.h4',       act:'h4'},
+  {id:'md.h5',       act:'h5'},
+  {id:'md.h6',       act:'h6'},
+  {id:'md.h0',       act:'h0'},
+  {id:'md.headUp',   act:'headUp'},
+  {id:'md.headDown', act:'headDown'},
+  /* --- 束D: 囲む系 --- */
+  {id:'md.underline', act:'underline'},
+  {id:'md.codeblock', act:'codeblock'},
+  {id:'md.quote',     act:'quote'},
+  {id:'md.code',      act:'code'},
+  /* --- 束B: インデント（Ver1.16.08） --- */
+  {id:'md.indent',    act:'indent'},
+  {id:'md.outdent',   act:'outdent'},
+  /* --- 束C: 段落（Ver1.16.09）--- */
+  {id:'md.ol',        act:'ol'},
+  {id:'md.ul',        act:'ul'},
+  {id:'md.table',     act:'table'},
+  /* --- 束E: 書式（Ver1.16.09）--- */
+  {id:'md.strike',    act:'strike'},
+  {id:'md.link',      act:'link'},
+  {id:'md.image',     act:'image'},
+  {id:'md.clearfmt',  act:'clearfmt'}
+];
+
+/* 押されたキーがこの表のどれかに当てはまるか調べる。
+   当てはまれば {id, act} を、当てはまらなければ null を返す。
+   ★ここでは何も実行しません。呼び出し側が preventDefault() してから動かします。
+     （先に文字を書き換えてしまうと、ブラウザの元の動きも一緒に起きてしまうため） */
+function mdTyporaFind(e){
+  for(var i = 0; i < MD_SC_ACTIONS.length; i++){
+    var x = MD_SC_ACTIONS[i];
+    if(wdtHit(e, x.id)) return x;
+  }
+  return null;
+}
+
 function renderMain(){
   const main = document.getElementById('main');
   main.innerHTML = '';
@@ -12845,6 +14015,15 @@ function renderMain(){
         e.preventDefault(); mduRun(()=>TOOLBAR_ACTIONS.bold(ta));
       } else if(wdtHit(e,'md.italic')){
         e.preventDefault(); mduRun(()=>TOOLBAR_ACTIONS.italic(ta));
+      } else {
+        /* Ver1.16.06 (回7-4 段階2): Typora互換ショートカット。
+           どのキーがどの機能かは ⚙設定 の一覧（SC配列）が決めるので、
+           ここでは「表を引いて、あれば動かす」だけ。決め打ちしない。 */
+        const tk = mdTyporaFind(e);
+        if(tk){
+          e.preventDefault();
+          mduRun(()=>{ (TOOLBAR_ACTIONS[tk.act] || function(){})(ta); });
+        }
       }
     });
     ta.addEventListener('click', renderStatus);
@@ -13874,6 +15053,12 @@ var LS_KEY = 'wdt_shell_v1';
      Ctrl も Alt も付かない1文字キーは、コマンドモード側（RTTKEY）が受け持つ。 */
 var SC = [
   {id:'app.settings',   label:'設定を開く',                  where:'共通',  def:['Ctrl+,']},
+  /* ---- Ver1.16.11 案E-K5: それまで bindKeys() に直書きだった3キーを SC へ移しました。
+         これで ⚙設定 → ショートカットキー の一覧に出るようになり、振り直しもできます。
+         ★Ctrl+K は md.link（リンクを入れる）と わざと重ねています。
+           メモの編集欄の中だけ md.link が勝ち、それ以外ではパレットが開きます。 ---- */
+  {id:'app.palette',    label:'コマンドパレットを開く',      where:'共通',  def:['Ctrl+K','Ctrl+Shift+P']},
+  {id:'app.menu',       label:'メニューを開く',              where:'共通',  def:['Ctrl+Shift+M']},
   {id:'mode.db',        label:'作業記録DBに切り替え',        where:'共通',  def:['Ctrl+Alt+D']},
   {id:'mode.md',        label:'Markdownメモに切り替え',      where:'共通',  def:['Ctrl+Alt+M']},
   {id:'db.undo',        label:'元に戻す',                    where:'DB',    def:['Ctrl+Z'],
@@ -13890,7 +15075,113 @@ var SC = [
   {id:'md.view.preview',label:'プレビューだけ表示',          where:'メモ',  def:['Ctrl+Alt+3']},
   {id:'md.undo',        label:'メモ：元に戻す',              where:'メモ',  def:['Ctrl+Z'],
    emacs:['Ctrl+Z','Ctrl+/']},
-  {id:'md.redo',        label:'メモ：やり直す',              where:'メモ',  def:['Ctrl+Y','Ctrl+Shift+Z']}
+  {id:'md.redo',        label:'メモ：やり直す',              where:'メモ',  def:['Ctrl+Y','Ctrl+Shift+Z']},
+  /* ---- Ver1.16.06 束A: 見出し（Typora互換。一次情報 support.typora.io/Shortcut-Keys） ---- */
+  {id:'md.h1',          label:'見出し1（大見出し）',         where:'メモ',  def:['Ctrl+1']},
+  {id:'md.h2',          label:'見出し2',                     where:'メモ',  def:['Ctrl+2']},
+  {id:'md.h3',          label:'見出し3',                     where:'メモ',  def:['Ctrl+3']},
+  {id:'md.h4',          label:'見出し4',                     where:'メモ',  def:['Ctrl+4']},
+  {id:'md.h5',          label:'見出し5',                     where:'メモ',  def:['Ctrl+5']},
+  {id:'md.h6',          label:'見出し6（小見出し）',         where:'メモ',  def:['Ctrl+6']},
+  {id:'md.h0',          label:'見出しを外してふつうの文に',  where:'メモ',  def:['Ctrl+0']},
+  /* ★JIS配列対応（Ver1.16.06 追補）
+     日本語キーボードに「=」の単独キーは無く、Shift+- で打つ。
+     そのため Ctrl+= を押しても e.shiftKey が立ち、'Ctrl+Shift+=' として届く。
+     'Ctrl+=' だけでは永久に一致しないので、US・JIS・テンキーの3通りを登録する。
+       'Ctrl+='       … US配列
+       'Ctrl+Shift+=' … JIS配列（実測で確認済み）
+       'Ctrl++'       … テンキーの + */
+  {id:'md.headUp',      label:'見出しを1段大きく（##→#）',   where:'メモ',
+   def:['Ctrl+=','Ctrl+Shift+=','Ctrl++']},
+  {id:'md.headDown',    label:'見出しを1段小さく（#→##）',   where:'メモ',  def:['Ctrl+-']},
+  /* ---- Ver1.16.06 束D: 囲む系（Typora互換。一次情報 support.typora.io/Shortcut-Keys） ---- */
+  {id:'md.underline',   label:'下線（u タグで囲む）',        where:'メモ',  def:['Ctrl+U']},
+  {id:'md.codeblock',   label:'コードブロック',              where:'メモ',  def:['Ctrl+Shift+K']},
+  {id:'md.quote',       label:'引用',                        where:'メモ',  def:['Ctrl+Shift+Q']},
+  /* ★JIS配列対応: バッククォートは配列で e.key が変わる。
+       US配列 「`」キー+Shift → e.key='~'
+       JIS配列 「@」キー+Shift → e.key='`'
+     どちらでも効くように両方登録する。 */
+  {id:'md.code',        label:'インラインコード',            where:'メモ',
+   def:['Ctrl+Shift+~','Ctrl+Shift+`']},
+  /* ---- Ver1.16.08 束B: インデント（Typora互換）----
+     一次情報 support.typora.io/Shortcut-Keys（2026-07-19 更新）より
+       Indent  = Ctrl + [  ／ Tab
+       Outdent = Ctrl + ]  ／ Shift + Tab
+     ★直感（[ が左だから解除）とは逆です。公式がこの向きです。
+       向きを入れ替えたい人は ⚙設定 → ショートカットキー で振り直せます。
+
+     ★なぜ Shift 変種を登録しないのか
+       束A の Ctrl+= は、JIS に「=」の単独キーが無いため Shift が立ってしまい、
+       3通り登録する必要がありました。
+       一方 [ と ] は US・JIS どちらでも Shift 無しで押せる単独キーなので、
+       1通りで足ります（実測で e.key='[' / ']' / shiftKey=false を確認）。
+       さらに Ctrl+Shift+[ ／ Ctrl+Shift+] は Typora 公式で
+       「番号付きリスト」「箇条書きリスト」に予約されています。
+       ここで奪ってしまうと、あとでリストの束を入れるときに使えなくなります。
+
+     ★書いてはいけない文字列: 'Ctrl+Shift+[' と 'Ctrl+Shift+]'
+       Shift+[ を押すと e.key は '[' ではなく '{' になります（US・JIS 共通、実測）。
+       comboOf() は e.key をそのまま使うので 'Ctrl+Shift+{' という文字列になり、
+       'Ctrl+Shift+[' と書いても永久に一致しません。 */
+  {id:'md.indent',      label:'インデント（字下げ）',        where:'メモ',  def:['Ctrl+[']},
+  {id:'md.outdent',     label:'インデント解除（字上げ）',    where:'メモ',  def:['Ctrl+]']},
+  /* ---- Ver1.16.09 束C: 段落系の残り（Typora互換）----
+     一次情報 support.typora.io/Shortcut-Keys（2026-07-19 更新）より
+       Ordered List   = Ctrl + Shift + [
+       Unordered List = Ctrl + Shift + ]
+       Table          = Ctrl + T
+
+     ★Math Block（Ctrl+Shift+M）は入れていません。
+       このソフトには数式を描く部品（KaTeX / MathJax）が入っていないので、
+       割り当てても押したときに何も起きない飾りになってしまうためです。
+
+     ★書いてはいけない文字列: 'Ctrl+Shift+[' と 'Ctrl+Shift+]'
+       Shift を押しながら [ を打つと、e.key は '[' ではなく '{' になります
+       （US配列・JIS配列とも同じ。実測で確認）。] のほうも '}' になります。
+       comboOf() は e.key をそのままつなぐので 'Ctrl+Shift+{' という文字列に
+       なり、'Ctrl+Shift+[' と書いても永久に一致しません。
+
+     ★Ctrl+T について（会社の Edge では効きません）
+       Ctrl+T はブラウザ自身が「新しいタブを開く」に使っており、
+       ページ側から止めることができません（Chrome・Edge・Firefox 共通）。
+       そこで、実際に押せる Ctrl+Alt+T も一緒に登録してあります。
+       どちらか通るほうが効きます。
+       なお自宅の Linux Mint（Cinnamon）では Ctrl+Alt+T が「端末を開く」に
+       割り当てられていることがあります。その場合はブラウザまで届きません。
+       そのときは ⚙設定 → ショートカットキー で好きなキーに振り直してください。 */
+  {id:'md.ol',          label:'番号付きリスト',              where:'メモ',  def:['Ctrl+Shift+{']},
+  {id:'md.ul',          label:'箇条書きリスト',              where:'メモ',  def:['Ctrl+Shift+}']},
+  {id:'md.table',       label:'表（テーブル）を入れる',      where:'メモ',
+   def:['Ctrl+T','Ctrl+Alt+T']},
+  /* ---- Ver1.16.09 束E: 書式系の残り（Typora互換）----
+     一次情報 support.typora.io/Shortcut-Keys（2026-07-19 更新）より
+       Strike       = Alt + Shift + 5
+       Hyperlink    = Ctrl + K
+       Image        = Ctrl + Shift + I
+       Clear Format = Ctrl + \
+
+     ★打消し線の書き方に注意
+       Shift を押しながら 5 を打つと、e.key は '5' ではなく '%' になります
+       （US配列・JIS配列とも同じ。実測で確認）。
+       さらに comboOf() は Ctrl → Alt → Shift の順に並べるので、
+       'Shift+Alt+%' ではなく 'Alt+Shift+%' と書かないと一致しません。
+       念のため 'Alt+Shift+5' も入れてあります（配列によっては '5' で届くため）。
+
+     ★Windows で Alt+Shift はキーボードの切り替えに使われています。
+       ほかのキーと一緒に押せばふつう切り替わりませんが、
+       もし切り替わってしまう設定なら ⚙設定 で振り直してください。
+
+     ★Ctrl+Shift+I について（会社の Edge では効きません）
+       Ctrl+Shift+I はブラウザの「開発者ツール」に使われていて、
+       ページ側から止めることができません（Chrome・Edge・Firefox 共通）。
+       そこで、実際に押せる Ctrl+Alt+I も一緒に登録してあります。 */
+  {id:'md.strike',      label:'打ち消し線',                  where:'メモ',
+   def:['Alt+Shift+%','Alt+Shift+5']},
+  {id:'md.link',        label:'リンクを入れる',              where:'メモ',  def:['Ctrl+K']},
+  {id:'md.image',       label:'画像を入れる',                where:'メモ',
+   def:['Ctrl+Shift+I','Ctrl+Alt+I']},
+  {id:'md.clearfmt',    label:'書式を消す（飾りを外す）',    where:'メモ',  def:['Ctrl+\\']}
 ];
 var SC_BY_ID = {};
 SC.forEach(function(x){ SC_BY_ID[x.id] = x; });
@@ -13977,6 +15268,9 @@ function defaults(){
     cmdKeys    : {},         // 単独キーの個別上書き  {動作id: 'j' / 'g g' / ''}
     tagFocus   : 'cmd',      // タグ画面を開いたときのフォーカス位置（I1・5択）
     tagHotOn   : true,       // タグにキーの印を出すか（H5）
+    /* ---- Ver1.16.05 (U3) ヘッダーを隠しているときの緑の知らせ ---- */
+    okWhenHidden: 'off',     // off=出さない（既定） / auto=秒で閉じる / ok=OKを押すまで
+    okHideSec   : 4,         // auto のときの秒数（1〜60）
     addons     : { mobilefix:'auto', bigtap:false, quickbar:false, autofocus:false,
                    stickyhead:true, oneopen:false, cmdrank:true }
   };
@@ -14203,12 +15497,29 @@ function matches(e, id){
   if(!c) return false;
   return combosFor(id).indexOf(c) >= 0;
 }
-function whoUses(combo, exceptId){
+/* ------------------------------------------------------------------
+   Ver1.16.12 案W-b — 重なっているキーを「全件」拾えるようにした。
+
+   これまで whoUses() は SC を上から探し、最初に見つけた1件で return して
+   いた。Ctrl+K のように わざと2つのIDへ重ねているキーがあると、
+   ユーザーが第3の機能へ振り直したとき「片方だけ」が外れ、もう片方は
+   同じキーのまま残っていた（＝重複が消えない）。
+
+   ★戻り値の型は変えていない。whoUses() は今までどおり
+     「先頭の1件 または null」を返す。全件が要るところだけ
+     whoUsesAll() を呼ぶ。判定の実体は whoUsesAll() の1か所だけにした。
+   ------------------------------------------------------------------ */
+function whoUsesAll(combo, exceptId){
+  var hit = [];
   for(var i = 0; i < SC.length; i++){
     if(SC[i].id === exceptId) continue;
-    if(combosFor(SC[i].id).indexOf(combo) >= 0) return SC[i];
+    if(combosFor(SC[i].id).indexOf(combo) >= 0) hit.push(SC[i]);
   }
-  return null;
+  return hit;
+}
+function whoUses(combo, exceptId){
+  var a = whoUsesAll(combo, exceptId);
+  return a.length ? a[0] : null;
 }
 
 /* ==================================================================
@@ -14759,11 +16070,53 @@ function radioRow(label, name, opts, cur, hint){
   return h;
 }
 
+/* ==================================================================
+   Ver1.16.07 (案L1) 「ℹ このソフトについて」で使うライセンス本文
+   ------------------------------------------------------------------
+   ・sql.js は MIT。著作権表示と許諾文の同梱が「義務」。
+   ・Emscripten ランタイムも MIT（NCSA との二者択一。MIT を選択）。
+   ・SQLite はパブリックドメイン。義務は無いが謝辞として載せる。
+   ・原文をそのまま持つ。翻訳は横に添えるだけで、原文は書き換えない。
+   ・同じ内容は HTML 冒頭のコメント（案L2）にも入れてある。
+     画面が壊れても、テキストエディタで開けば読める状態にするため。
+   ================================================================== */
+var RTT_LIC_MIT = 'Permission is hereby granted, free of charge, to any person obtaining a copy\nof this software and associated documentation files (the "Software"), to deal\nin the Software without restriction, including without limitation the rights\nto use, copy, modify, merge, publish, distribute, sublicense, and/or sell\ncopies of the Software, and to permit persons to whom the Software is\nfurnished to do so, subject to the following conditions:\n\nThe above copyright notice and this permission notice shall be included in all\ncopies or substantial portions of the Software.\n\nTHE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\nIMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\nFITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE\nAUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\nLIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\nOUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\nSOFTWARE.';
+var RTT_LIC_CR_SQLJS = 'Copyright (c) 2017 sql.js authors (see AUTHORS)';
+var RTT_LIC_CR_EMCC  = 'Copyright (c) 2010-2014 Emscripten authors, see AUTHORS file.';
+var RTT_LIC_SQLITE   = 'The author disclaims copyright to this source code. In place of\na legal notice, here is a blessing:\n\n   May you do good and not evil.\n   May you find forgiveness for yourself and forgive others.\n   May you share freely, never taking more than you give.';
+
+/* 画面に出ている版番号を拾う。ここを固定値で書くと、版を上げたときに
+   直し忘れて古いまま残る（実際に ⚙設定 の見出しが Ver1.12.00 のまま
+   残っていた）。だから毎回 DOM から読む。 */
+function rttAppVer(){
+  var v = '';
+  try{
+    var e2 = document.querySelector('.verNo');
+    if(e2) v = String(e2.textContent || '').trim();
+  }catch(e2){}
+  if(!/^Ver/.test(v)){
+    v = (String(document.title || '').match(/Ver[0-9.]+/) || [''])[0];
+  }
+  return v || '（版の表示が見つかりません）';
+}
+
+/* ライセンス全文を表示する <pre> の見た目。ダークモードで統一。
+   CSS ブロックを触らずに済むよう、あえて inline style にしてある
+   （直す場所を1か所に閉じ込めて、事故の範囲を小さくするため）。 */
+var RTT_LIC_PRE_CSS = 'white-space:pre-wrap;word-break:break-word;'
+  + 'background:#12141a;border:1px solid #3d4046;border-radius:6px;'
+  + 'padding:10px 12px;margin:6px 0;max-height:250px;overflow:auto;'
+  + 'font-family:ui-monospace,Consolas,monospace;font-size:11.5px;'
+  + 'line-height:1.55;color:#c7ccd4;';
+
 function buildSettings(){
   var box = el('wdtSettingsBody');
   if(!box) return;
   var h = '';
-  h += '<h2>⚙ 設定 <span style="font-size:11px;color:#8b93a0;font-weight:400">Ver1.12.00</span></h2>';
+  /* Ver1.16.08: ここは 'Ver1.12.00' が固定で書かれていて、4版ぶん取り残されていた。
+     rttAppVer() は画面の .verNo（無ければ <title>）から今の版を読む関数なので、
+     これを使えば以後この場所を直す必要がなくなる。 */
+  h += '<h2>⚙ 設定 <span style="font-size:11px;color:#8b93a0;font-weight:400">' + rttAppVer() + '</span></h2>';
   h += '<div class="wdtx-hint">Ver1.14.01 から、この設定は <code>work.sqlite</code> の中にも保存されます。'
      + 'DBファイルを持ち運べば、会社のPCでも同じ設定で使えます。'
      + '（ブラウザの中にも控えを置きますが、そちらはあくまで補助です）<br>'
@@ -14774,6 +16127,8 @@ function buildSettings(){
      + '<button type="button" data-pg="addon">🧩 アドオン</button>'
      + '<button type="button" data-pg="fav">⭐ お気に入り</button>'
      + '<button type="button" data-pg="data">💾 データ</button>'
+     /* Ver1.16.07 (案L1) ライセンス表記 */
+     + '<button type="button" data-pg="about">ℹ このソフトについて</button>'
      + '</div>';
 
   /* ---- 表示 ---- */
@@ -14784,6 +16139,23 @@ function buildSettings(){
         'スマホで縦が狭いときは「小さくする」か「表示しない」。'
       + '<b>「表示しない」にしても</b>、画面右下に丸いクイックボタン（▲ / 🗄 / 📝 / ⚙）が自動で出るので、'
       + '画面の切り替えと設定はそこからできます。');
+  /* ---- Ver1.16.05 (U3) ---- */
+  h += '<h3>ヘッダーを「表示しない」にしているときの、緑の「保存しました」</h3>';
+  h += radioRow('出し方', 'wdtOkHidden',
+        [['off','出さない（おすすめ）'],['auto','出して自動で閉じる'],['ok','OKを押すまで出す']],
+        (st.okWhenHidden || 'off'),
+        'ヘッダーを「表示しない」にすると、保存の知らせもヘッダーごと隠れます。'
+      + '（危ないとき＝赤・黄の知らせだけは、今までどおり強制的に出ます）<br>'
+      + '<b style="color:#e8b13f">⚠ ご注意</b> '
+      + '「出して自動で閉じる」「OKを押すまで出す」にすると、'
+      + '<b>自動保存のたびに緑の帯が出てヘッダーが現れます</b>。'
+      + 'つまり<b>「ヘッダーを表示しない」が事実上きかなくなります</b>。'
+      + '画面を広く使いたくて隠している方は「出さない」のままをおすすめします。');
+  h += '<div class="wdtx-row"><span class="lbl">自動で閉じる秒数</span><span>'
+     + '<input type="number" id="wdtOkHideSec" min="1" max="60" step="1" '
+     + 'style="width:72px" value="' + esc(String(st.okHideSec == null ? 4 : st.okHideSec)) + '"> 秒'
+     + '<span style="color:#8b93a0;font-size:11px;margin-left:10px">'
+     + '（「出して自動で閉じる」を選んだときだけ使います。1〜60秒）</span></span></div>';
   h += '<h3>文字の大きさ</h3>';
   h += radioRow('検索結果の表', 'wdtGridFont',
         [['11','小'],['12.5','標準'],['14','大'],['16','特大']], String(st.gridFont), '');
@@ -14944,6 +16316,14 @@ function buildSettings(){
   h += '<div class="wdtx-row"><span class="lbl">履歴を記録する</span>'
      + '<label><input type="checkbox" id="wdtKeepHist"' + (st.keepHistory ? ' checked' : '') + '> 記録する（最新200件まで）</label></div>';
   h += '<div class="wdtx-row"><button type="button" class="danger" id="wdtHistClear">検索履歴をすべて消す</button></div>';
+  h += '<h3>控え（バックアップ）</h3>';
+  h += '<div class="wdtx-hint">「控え」は、行をほかの項目へ移す前などに自動で取っておく'
+     + 'データの写しです。<b>これまでは「➡ ほかの項目へ移動」の窓を開かないと</b>'
+     + 'たどり着けませんでした。ここからも開けます'
+     + '（<code>Ctrl+K</code> の一覧で「控え」と打っても開けます）。</div>';
+  h += '<div class="wdtx-row">'
+     + '<button type="button" id="wdtOpenBk" title="これまでに取った控えの一覧を開きます">'
+     + '\u{1F550} 控えの一覧を開く</button></div>';
   h += '<h3>設定の持ち運び</h3>';
   h += '<div class="wdtx-hint">設定はこのブラウザの中（localStorage）にあるので、会社PCと自宅PCでは別々です。'
      + 'JSONに書き出して GitHub 経由で持っていけば、そろえられます。<br>'
@@ -14952,6 +16332,76 @@ function buildSettings(){
      + '<button type="button" id="wdtExport">⇩ 設定をJSONに書き出す</button>'
      + '<button type="button" id="wdtImport">⇧ 設定をJSONから読み込む</button>'
      + '<button type="button" class="danger" id="wdtReset">設定を初期状態に戻す</button></div>';
+  h += '</div>';
+
+  /* ---- Ver1.16.07 (案L1) このソフトについて ---- */
+  h += '<div class="wdtx-page" data-pg="about">';
+  h += '<h3>このソフト</h3>';
+  h += '<div class="wdtx-card">'
+     + '<b>記録台帳＋MDメモ</b>　' + esc(rttAppVer()) + '<br>'
+     + 'HTMLファイル1個だけで動きます。インターネット接続は要りません。'
+     + '<code>file://</code> でそのまま開けます。'
+     + '</div>';
+
+  h += '<h3>使っている外部ソフト（第三者ソフトウェア）</h3>';
+  h += '<table class="wdtx-tbl">'
+     + '<tr><th>名前</th><th>版</th><th>ライセンス</th><th>こちらの義務</th></tr>'
+     + '<tr><td>sql.js</td><td class="wdtx-hint">版表記なし</td><td>MIT</td>'
+     +     '<td><b class="wdtx-ng">著作権表示とライセンス全文の同梱が必須</b></td></tr>'
+     + '<tr><td>SQLite</td><td>3.49.1</td><td>パブリックドメイン</td>'
+     +     '<td class="wdtx-ok">義務なし（謝辞として記載）</td></tr>'
+     + '<tr><td>Emscripten ランタイム</td><td class="wdtx-hint">版表記なし</td>'
+     +     '<td>MIT ／ NCSA の二者択一</td>'
+     +     '<td>MIT を選択。著作権表示と全文の同梱</td></tr>'
+     + '</table>';
+  h += '<div class="wdtx-hint" style="margin-top:6px">'
+     + 'SQLite の版「3.49.1」は、このHTMLに埋め込んである WASM バイナリの中の'
+     + '版文字列から実測した値です。sql.js 自身の版番号はファイルの中に'
+     + '記録されていないため、特定できません。'
+     + '</div>';
+
+  h += '<h3>著作権表示</h3>';
+  h += '<div class="wdtx-card">'
+     + '<div>sql.js &mdash; <code>' + esc(RTT_LIC_CR_SQLJS) + '</code></div>'
+     + '<div style="margin-top:4px">Emscripten &mdash; <code>' + esc(RTT_LIC_CR_EMCC) + '</code></div>'
+     + '<div class="wdtx-hint" style="margin-top:8px">'
+     +   'この2つは、どちらも下の MIT ライセンスの条件で使わせてもらっています。'
+     + '</div></div>';
+
+  h += '<h3>MIT ライセンス全文（原文のまま）</h3>';
+  h += '<pre id="rttLicPre" style="' + RTT_LIC_PRE_CSS + '">'
+     + esc(RTT_LIC_CR_SQLJS) + '\n' + esc(RTT_LIC_CR_EMCC) + '\n\n'
+     + esc(RTT_LIC_MIT) + '</pre>';
+  h += '<div class="wdtx-row">'
+     + '<button type="button" id="wdtLicSel" title="全文を選択します。そのあと Ctrl+C を押してください">'
+     +   '\u{1F4C4} 全文を選ぶ（そのあと Ctrl+C）</button></div>';
+  h += '<div class="wdtx-hint">'
+     + '会社のPCなどでは、ボタンからの自動コピーが許可されていないことがあります。'
+     + 'そのため「選ぶだけ」にしてあります。選ばれた状態で <code>Ctrl+C</code> を押してください。'
+     + '</div>';
+
+  h += '<h3>SQLite について（謝辞）</h3>';
+  h += '<div class="wdtx-card">'
+     + 'SQLite はパブリックドメインです。使うのに許可も表示も要りません。'
+     + 'それでも、このソフトの土台そのものなので、感謝を込めて名前を残しておきます。'
+     + '<div class="wdtx-hint" style="margin-top:8px">'
+     +   'SQLite の原文にある一節です。作者が著作権を放棄したうえで、'
+     +   '法的な文言の代わりに置いた言葉です。'
+     + '</div>'
+     + '<pre style="' + RTT_LIC_PRE_CSS + 'max-height:none">' + esc(RTT_LIC_SQLITE) + '</pre>'
+     + '</div>';
+
+  h += '<h3>出典（あとから確かめたいとき）</h3>';
+  h += '<table class="wdtx-tbl">'
+     + '<tr><td>sql.js の MIT</td><td><code>https://github.com/sql-js/sql.js/blob/master/LICENSE</code></td></tr>'
+     + '<tr><td>SQLite</td><td><code>https://sqlite.org/copyright.html</code></td></tr>'
+     + '<tr><td>Emscripten</td><td><code>https://github.com/emscripten-core/emscripten/blob/main/LICENSE</code></td></tr>'
+     + '</table>';
+  h += '<div class="wdtx-hint" style="margin-top:6px">'
+     + '会社のPCではこれらのページが見られないことがあります。'
+     + '上に出している全文が、そのまま原文です。'
+     + '同じものは、このHTMLをテキストエディタで開いたときの一番上（コメント）にも入っています。'
+     + '</div>';
   h += '</div>';
 
   h += '<div class="wdtx-actions"><button type="button" class="primary" id="wdtClose">閉じる</button></div>';
@@ -14996,11 +16446,24 @@ function onRecordKey(e){
   }
   var c = comboOf(e);
   if(!c) return;
-  var other = whoUses(c, recording.id);
-  if(other){
-    if(!confirm('「' + c + '」は すでに「' + other.label + '」で使われています。\n'
-              + 'そちらを未割り当てにして、こちらに付け替えますか？')){ return; }
-    st.shortcuts[other.id] = combosFor(other.id).filter(function(x){ return x !== c; });
+  /* Ver1.16.12 案W-b — 重なっているぶんを「全部」外す。
+     1件のときの文面は今までどおり（見た目を変えないため）。
+     2件以上のときだけ、外れる機能の名前を並べて確認する。 */
+  var others = whoUsesAll(c, recording.id);
+  if(others.length){
+    var msg;
+    if(others.length === 1){
+      msg = '「' + c + '」は すでに「' + others[0].label + '」で使われています。\n'
+          + 'そちらを未割り当てにして、こちらに付け替えますか？';
+    }else{
+      msg = '「' + c + '」は すでに次の ' + others.length + ' 件で使われています。\n'
+          + others.map(function(o){ return '・' + o.label; }).join('\n') + '\n\n'
+          + 'これらをすべて未割り当てにして、こちらに付け替えますか？';
+    }
+    if(!confirm(msg)){ return; }
+    others.forEach(function(o){
+      st.shortcuts[o.id] = combosFor(o.id).filter(function(x){ return x !== c; });
+    });
   }
   st.shortcuts[recording.id] = [c];
   save();
@@ -15073,6 +16536,44 @@ function bindSettings(){
       return;
     }
     if(t.id === 'wdtClose'){ closeSettings(); return; }
+    /* Ver1.16.07 (案L1) ライセンス全文を選択する。
+       navigator.clipboard は file:// や権限を絞った環境で黙って失敗する。
+       「コピーできていないのにできたように見える」のが一番まずいので、
+       自動コピーはせず、選択だけして Ctrl+C は人に押してもらう。 */
+    if(t.id === 'wdtLicSel'){
+      try{
+        var licPre = box.querySelector('#rttLicPre');
+        if(licPre){
+          var licRange = document.createRange();
+          licRange.selectNodeContents(licPre);
+          var licSel = window.getSelection();
+          licSel.removeAllRanges();
+          licSel.addRange(licRange);
+          t.textContent = '\u2705 選びました。Ctrl+C を押してください';
+          setTimeout(function(){
+            try{ t.textContent = '\u{1F4C4} 全文を選ぶ（そのあと Ctrl+C）'; }catch(e3){}
+          }, 4000);
+        }
+      }catch(e2){}
+      return;
+    }
+    if(t.id === 'wdtOpenBk'){
+      /* Ver1.16.01 (E4) ⚙設定から 🕐控えの一覧 へ。
+         控えの窓（#bkBack）は ⚙設定 と同じ重なり順（z-index 900）なので、
+         先に ⚙設定 を閉じてから開く。重なって操作できなくなるのを防ぐため。 */
+      closeSettings();
+      setTimeout(function(){
+        try{
+          if(typeof window.setAppMode === 'function' && window.currentAppMode === 'md'){
+            window.setAppMode('db');
+          }
+        }catch(e2){}
+        try{
+          if(typeof window.openBackupList === 'function'){ window.openBackupList(); }
+        }catch(e2){}
+      }, 60);
+      return;
+    }
     if(t.id === 'wdtOpenMdSet'){
       closeSettings();
       if(typeof setAppMode === 'function') setAppMode('md');
@@ -15181,6 +16682,14 @@ function bindSettings(){
     if(t.name === 'wdtGridFont'){ st.gridFont = Number(t.value); save(); applyDynStyle(); return; }
     if(t.name === 'wdtMdFont'){ st.mdFont = Number(t.value); save(); applyDynStyle(); return; }
     if(t.name === 'wdtStart'){ st.startMode = t.value; save(); return; }
+    /* ---- Ver1.16.05 (U3) ---- */
+    if(t.name === 'wdtOkHidden'){ st.okWhenHidden = t.value; save(); return; }
+    if(t.id === 'wdtOkHideSec'){
+      var sec = Number(t.value);
+      if(!isFinite(sec) || sec < 1) sec = 1;
+      if(sec > 60) sec = 60;
+      st.okHideSec = sec; t.value = String(sec); save(); return;
+    }
     if(t.id === 'wdtKeepHist'){ st.keepHistory = t.checked; save(); return; }
     /* ---- Ver1.12.00: コマンドモード関連 ---- */
     if(t.name === 'wdtKeyPreset'){
@@ -15317,6 +16826,12 @@ function refreshKeyUi(){
 
 return {
   matches: matches,
+  /* Ver1.16.12: そのキーを使っている項目を「全部」返す（調査・テスト用）。
+     WDT.whoUsesAll('Ctrl+K') → [{id:'app.palette',…},{id:'md.link',…}] */
+  whoUsesAll: whoUsesAll,
+  /* Ver1.16.12 案D-b: 先頭の1件だけを返す（従来どおりの契約）。
+     無いときは null を返す。判定の実体は whoUsesAll() の1か所だけ。 */
+  whoUses: whoUses,
   isRecording: isRecording,
   openSettings: openSettings,
   closeSettings: closeSettings,
@@ -17808,19 +19323,67 @@ function bindKeys(){
     }
     if(!(e.ctrlKey || e.metaKey)) return;
 
-    /* Ctrl+K：コマンドパレット */
+    /* Ctrl+K：コマンドパレット
+       ★Ver1.16.09 (束E): メモの編集欄で打っているときだけは、ここを譲ります。
+         Typora では Ctrl+K が「リンクを入れる」なので、文章を書いている最中は
+         そちらのほうが自然なためです。
+         編集欄の外（作業記録DBの画面・プレビュー側・ヘッダーなど）では
+         今までどおりパレットが開きます。
+         メモを書いている最中にパレットを開きたいときは Ctrl+Shift+P が使えます。
+         ※この行を消せば、元のとおり どこでも Ctrl+K でパレットが開く状態に戻ります。 */
+    /* 日本語IMEの変換中は何もしない（abc.md 7章 罠#10）。
+       変換中の Chromium は e.key を 'Process' にするので実害は無いはずですが、
+       環境差で素通りする例があるため明示的に止めます。 */
+    if(e.isComposing || e.keyCode === 229) return;
+
+    /* ============================================================
+       Ver1.16.11 案E-K5：ここから下は SC 配列（⚙設定の一覧）を見ます。
+       以前はキーを直書きしていたため、設定画面に出てこず振り直せませんでした。
+       設計方針「ハードコードの if を増やさない」に合わせた形です。
+       ============================================================ */
+    var W = window.WDT;
+    if(W && typeof W.matches === 'function'){
+      /* ⚙設定でキーを登録している最中は、絶対に反応しない */
+      if(W.isRecording && W.isRecording()) return;
+
+      /* コマンドパレット（既定 Ctrl+K / Ctrl+Shift+P）
+         ★Ver1.16.09（束E）の約束をそのまま守ります：
+           メモの編集欄で打っているときだけ md.link（リンクを入れる）に譲る。
+           preventDefault も stopPropagation もせずに return するので、
+           イベントはそのまま流れてメモ側のリンク処理が動きます。 */
+      if(W.matches(e, 'app.palette')){
+        var _ae = e.target || document.activeElement;
+        if(_ae && _ae.id === 'editorTextarea' && W.matches(e, 'md.link')) return;
+        e.preventDefault(); e.stopPropagation();
+        if(palOpened()) closePalette(); else openPalette('');
+        return;
+      }
+      /* メニュー（既定 Ctrl+Shift+M） */
+      if(W.matches(e, 'app.menu')){
+        e.preventDefault(); e.stopPropagation();
+        if(drawerOpened()) closeDrawer(); else openDrawer();
+        return;
+      }
+      return;   /* SC で見つからなければ、下の保険は通しません */
+    }
+
+    /* ------------------------------------------------------------
+       保険：window.WDT がまだ読めていない／壊れているときだけ通ります。
+       中身は Ver1.16.09 までの直書きと同じです。
+       （行2904 付近のモード切替と同じ考え方）
+       ------------------------------------------------------------ */
     if(!e.altKey && !e.shiftKey && (e.key === 'k' || e.key === 'K')){
+      var _ae2 = e.target || document.activeElement;
+      if(_ae2 && _ae2.id === 'editorTextarea') return;
       e.preventDefault(); e.stopPropagation();
       if(palOpened()) closePalette(); else openPalette('');
       return;
     }
-    /* Ctrl+Shift+P：同じもの（VS Code に慣れている人向け） */
     if(!e.altKey && e.shiftKey && (e.key === 'p' || e.key === 'P')){
       e.preventDefault(); e.stopPropagation();
       openPalette('');
       return;
     }
-    /* Ctrl+Shift+M：メニュー */
     if(!e.altKey && e.shiftKey && (e.key === 'm' || e.key === 'M')){
       e.preventDefault(); e.stopPropagation();
       if(drawerOpened()) closeDrawer(); else openDrawer();
@@ -18085,6 +19648,144 @@ window.RTT20 = {
     ok:       okToFocus,
     panel:    panelOf,
     apply:    applyFocus
+  };
+})();
+</script>
+
+<!-- Ver1.16.01 (E1) Esc の処理が無かった3つの窓を、Esc で閉じられるようにする -->
+<script data-rtt-fp="1">
+/* ==================================================================
+   Ver1.16.01 (E1)  Esc で閉じられない窓をなくす
+   ------------------------------------------------------------------
+   何が困っていたか:
+     小さな窓（モーダル）は9つあるが、Esc で閉じられるのは6つだけだった。
+
+       ⚙ 設定        #wdtSettings    Esc の処理が無い
+       メモの設定     #settingsModal  Esc の処理が無い
+       📦 使い方      #helpModal      Esc の処理が無い
+
+     残りの6つは、開いた窓の背景（back）に keydown を付けている。
+     つまり「印（フォーカス）が窓の中にあること」が前提の作りで、
+     土台としては弱い。ここでは同じ弱い作りを増やさない。
+
+   どう直したか:
+     document の「つかまえる側（capture）」に見張りを1つだけ置く。
+     Esc が押されたら、いま画面に出ている覆いを全部集めて
+     「いちばん上はどれか」を調べる。それが上の3つのどれかのときだけ閉じる。
+
+     ★ 既存の6つは 1行も書き換えていない。
+       いちばん上が #bkBack などのときは、この見張りは何もしないので、
+       これまでどおり、その窓が自分で持っている Esc の処理が動く。
+
+   気をつけたこと（実測にもとづく）:
+     ・日本語入力の変換中（isComposing / keyCode 229）は無視する。
+       変換の取り消しの Esc で窓が閉じてしまうのを防ぐため。
+     ・⚙設定でキーを記録している最中（「変更」を押した直後）は横取りしない。
+       記録の中止は、記録側の処理（capture）に任せる。
+     ・覆いの上下は z-index で決める。実測値は
+         .modal-backdrop 500 / .wdtx-back 900 / .wdtx-pop 920
+         .tgp-back 940 / .tgm-back 960 / .rk-back 2200
+       同じ数のときは、HTMLの下にある方を上とみなす。
+     ・見えているかどうかは class ではなく getClientRects() で見る。
+       画面を切り替えると #app-md ごと消えるため、class だけでは判定できない。
+   ================================================================== */
+(function(){
+  'use strict';
+
+  /* この見張りが相手にするのは、この3つだけ */
+  var TARGET = ['wdtSettings', 'settingsModal', 'helpModal'];
+
+  /* 画面に出ている可能性のある覆いを、全系統ぶん並べる */
+  var ALL_SEL = '.tgp-back.show, .tgm-back.show, .modal-backdrop.show, .wdtx-back.show,'
+              + '.rk-back.show, .wdtx-pop.show, #dropOverlay.show,'
+              + '#rtt19-reg, #rtt19-lock, #rtt19-panel, #rtt19-alert, #rttNameLock';
+
+  /* 本当に見えているか。表示していない親の中にあると、四角が1つも取れない */
+  function visible(el){
+    if(!el) return false;
+    try{ return el.getClientRects().length > 0; }catch(e){ return false; }
+  }
+
+  /* いま見えている覆いの一覧 */
+  function openList(){
+    var out = [], nodes, i;
+    try{ nodes = document.querySelectorAll(ALL_SEL); }catch(e){ return out; }
+    for(i = 0; i < nodes.length; i++){ if(visible(nodes[i])) out.push(nodes[i]); }
+    return out;
+  }
+
+  /* 重なりの順番。数が大きいほど上 */
+  function zOf(el){
+    var z;
+    try{ z = parseInt(window.getComputedStyle(el).zIndex, 10); }catch(e){ return 0; }
+    return isNaN(z) ? 0 : z;
+  }
+
+  /* いちばん上はどれか。同じ数なら、後（HTMLの下）にある方を上とする */
+  function topMost(list){
+    var best = null, bz = -1, i, z;
+    for(i = 0; i < list.length; i++){
+      z = zOf(list[i]);
+      if(z >= bz){ bz = z; best = list[i]; }
+    }
+    return best;
+  }
+
+  /* 見つかったものが対象の窓の中身なら、窓そのものに読み替える */
+  function resolve(el){
+    var i, t;
+    if(!el) return null;
+    for(i = 0; i < TARGET.length; i++){
+      t = document.getElementById(TARGET[i]);
+      if(t && (t === el || (t.contains && t.contains(el)))) return t;
+    }
+    return el;
+  }
+
+  /* ⚙設定でキーを記録している最中か */
+  function recording(){
+    try{ return !!(window.WDT && WDT.isRecording && WDT.isRecording()); }
+    catch(e){ return false; }
+  }
+
+  /* 閉じ方。専用の関数があればそれを使う（後始末が入っているため） */
+  function closeIt(id){
+    if(id === 'wdtSettings'){
+      try{
+        if(window.WDT && typeof WDT.closeSettings === 'function'){ WDT.closeSettings(); return true; }
+      }catch(e){}
+    }
+    var box = document.getElementById(id);
+    if(!box) return false;
+    box.classList.remove('show');
+    return true;
+  }
+
+  function onKey(e){
+    if(!e || e.key !== 'Escape') return;
+    if(e.isComposing || e.keyCode === 229) return;   /* 日本語入力の変換中 */
+    if(recording()) return;                          /* キーの記録中は触らない */
+
+    var top = resolve(topMost(openList()));
+    if(!top || TARGET.indexOf(top.id) < 0) return;   /* 相手は3つだけ */
+
+    e.preventDefault();
+    e.stopPropagation();
+    closeIt(top.id);
+  }
+
+  document.addEventListener('keydown', onKey, true);
+
+  /* 実ブラウザ検証から中を覗くための窓口 */
+  window.__RTT_E1__ = {
+    targets : TARGET,
+    sel     : ALL_SEL,
+    list    : openList,
+    top     : topMost,
+    resolve : resolve,
+    z       : zOf,
+    close   : closeIt,
+    version : '1.16.01'
   };
 })();
 </script>
