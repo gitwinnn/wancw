@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>らったった キー衝突プローブ v1 — Typora準拠ショートカットの下調べ</title>
+<style>
+:root{
+  --bg:#12151b; --bg2:#1a1f28; --bg3:#232a35; --line:#3a4553;
+  --fg:#e6edf3; --dim:#93a1b1;
+  --ok:#3fb950; --ng:#f85149; --none:#d29922; --wait:#58a6ff; --txt:#a371f7;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;background:var(--bg);color:var(--fg);
+  font-family:"Noto Sans JP","Yu Gothic UI","Meiryo",system-ui,sans-serif;
+  font-size:15px;line-height:1.7}
+.wrap{max-width:1000px;margin:0 auto;padding:16px 18px 80px}
+h1{font-size:20px;margin:14px 0 4px}
+h2{font-size:17px;margin:26px 0 8px;padding:6px 10px;background:var(--bg3);
+  border-left:5px solid var(--wait);border-radius:0 6px 6px 0}
+h3{font-size:15px;margin:16px 0 6px;color:var(--wait)}
+p{margin:6px 0}
+small{color:var(--dim)}
+.card{background:var(--bg2);border:1px solid var(--line);border-radius:8px;padding:12px 14px;margin:10px 0}
+.warn{border-color:var(--none);background:#2a2313}
+.bad{border-color:var(--ng);background:#2b1618}
+.good{border-color:var(--ok);background:#13251a}
+table{border-collapse:collapse;width:100%;margin:8px 0;font-size:13.5px}
+th,td{border:1px solid var(--line);padding:5px 8px;text-align:left;vertical-align:top}
+th{background:var(--bg3);color:var(--dim);font-weight:600;white-space:nowrap}
+tr.now td{background:#1d2b3d;outline:2px solid var(--wait);outline-offset:-2px}
+tr.done td{opacity:.92}
+code,kbd{font-family:"DejaVu Sans Mono","Consolas",monospace}
+kbd{background:var(--bg3);border:1px solid var(--line);border-bottom-width:2px;
+  border-radius:4px;padding:1px 6px;font-size:12.5px;white-space:nowrap}
+button{background:var(--bg3);color:var(--fg);border:1px solid var(--line);
+  border-radius:6px;padding:7px 14px;font-size:14px;cursor:pointer;margin:3px 4px 3px 0}
+button:hover{background:#2e3746}
+button.primary{background:#1f6feb;border-color:#1f6feb;color:#fff}
+button.primary:hover{background:#2a7cf7}
+button.danger{background:#5a1f22;border-color:#8b2c31}
+button:disabled{opacity:.4;cursor:not-allowed}
+textarea{width:100%;background:#0d1117;color:var(--fg);border:1px solid var(--line);
+  border-radius:6px;padding:10px;font-family:"DejaVu Sans Mono",monospace;font-size:14px;resize:vertical}
+textarea:focus{outline:2px solid var(--wait);outline-offset:1px}
+.badge{display:inline-block;min-width:2.4em;text-align:center;border-radius:4px;
+  padding:1px 7px;font-weight:700;font-size:12.5px}
+.b-O{background:#13351d;color:var(--ok);border:1px solid var(--ok)}
+.b-X{background:#3a1618;color:var(--ng);border:1px solid var(--ng)}
+.b-N{background:#33280c;color:var(--none);border:1px solid var(--none)}
+.b-T{background:#2a1a3d;color:var(--txt);border:1px solid var(--txt)}
+.b-Q{background:var(--bg3);color:var(--dim);border:1px solid var(--line)}
+#now{font-size:26px;font-weight:700;text-align:center;padding:18px 10px;
+  background:var(--bg3);border:2px dashed var(--wait);border-radius:10px;margin:10px 0}
+#now .sub{display:block;font-size:14px;font-weight:400;color:var(--dim);margin-top:6px}
+#code{font-size:15px;font-weight:700;letter-spacing:.02em;color:#7ee787}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+@media(max-width:700px){.grid2{grid-template-columns:1fr}}
+.kv{font-size:13px}
+.kv b{color:var(--wait);display:inline-block;min-width:6.5em}
+ol,ul{margin:6px 0 6px 22px;padding:0}
+li{margin:3px 0}
+hr{border:0;border-top:1px solid var(--line);margin:22px 0}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>らったった キー衝突プローブ v1</h1>
+<p><small>メモ画面に Typora 準拠のショートカットを入れる前の下調べ用。本体（らったった.html）とは無関係の、単独で動く検査ページです。<b>ここで何をしても、らったったのデータには一切さわりません。</b></small></p>
+
+<div class="card warn">
+<b>このページが答えるのは1つだけ</b><br>
+「そのキーの組み合わせを、Webページ側が <code>preventDefault()</code> で<u>ブラウザから奪えるか</u>」です。<br>
+結果は4種類:
+<span class="badge b-O">O</span> 奪えた　
+<span class="badge b-X">X</span> 来るけど奪えない（ブラウザが勝つ）　
+<span class="badge b-N">−</span> そもそもキー入力が届かない　
+<span class="badge b-T">T</span> 文字が入ってしまう
+</div>
+
+<h2>1. はじめる前に（3つだけ）</h2>
+<div class="card">
+<ol>
+<li><b>タブを2枚以上開いて、このページを「2枚目以降」にしてください。</b><br>
+<small>理由: <kbd>Ctrl</kbd>+<kbd>1</kbd> は「1枚目のタブへ移動」です。このページが1枚目だと、押しても画面が変わらないので「奪えた」と誤判定します。</small></li>
+<li><b>全画面（F11）にしないでください。</b><br>
+<small>全画面中はブラウザが一部のキーを自動的に抑えるので、普段と違う結果になります。</small></li>
+<li><b>ズーム(拡大率)を100%に戻してください。</b><br>
+<small>Ctrl+0 の判定にズーム率の変化を使います。<span id="zoomNow"></span></small></li>
+</ol>
+</div>
+
+<h2>2. この環境</h2>
+<div class="card kv" id="env">読み込み中…</div>
+
+<h2>3. 測定（順番に押すだけ）</h2>
+<div class="card">
+<p>下の入力欄をクリックしてカーソルを置き、<b>画面が指示するキーを押す</b>だけです。押すと自動で次に進みます。</p>
+<textarea id="ta" rows="3" placeholder="ここをクリックしてから、キーを押してください（メモ画面のつもりで）"></textarea>
+<div id="now">▶ ボタンを押して始めてください<span class="sub">まだ測定していません</span></div>
+<div>
+  <button class="primary" id="btnStart">▶ 測定を始める</button>
+  <button id="btnNone" disabled>⚠ 押したのに何も起きなかった／別の動きをした</button>
+  <button id="btnSkip" disabled>⏭ このキーは飛ばす</button>
+  <button class="danger" id="btnReset">↺ 最初からやり直す</button>
+</div>
+<p><small>「⚠」ボタンは、<b>キーを押したのにこの画面が反応しなかったとき</b>に押してください（新しいタブが開いた、開発者ツールが出た、アドレス欄に飛んだ、など）。それが「ブラウザに取られた」という証拠になります。</small></p>
+</div>
+
+<h2>4. 結果表</h2>
+<table id="tbl">
+<thead><tr>
+<th style="width:3em">#</th><th>キー</th><th>Typoraでの役目</th><th style="width:4.5em">判定</th>
+<th>e.key</th><th>e.code</th><th>らったったが作る名前</th><th>備考</th>
+</tr></thead>
+<tbody id="tb"></tbody>
+</table>
+
+<h2>5. 持ち帰り用の「結果コード」</h2>
+<div class="card good">
+<p>会社のPCではファイルを外に出せないので、<b>この1行だけを紙に書き写す（または撮る）</b>だけで結果を持ち帰れます。</p>
+<div id="code">（測定するとここに出ます）</div>
+<p><small>読み方: <code>ブラウザ名 | 判定20文字 | 括弧キーの正体</code>。判定20文字は上の表の上から順です。</small></p>
+<button id="btnCopy">📋 コピー（会社PCではコピー不可のことがあります）</button>
+</div>
+
+<h2>6. キーの正体を見る（日本語キーボード対策）</h2>
+<div class="card">
+<p><b>これがいちばん重要かもしれません。</b> 日本語(JIS)キーボードと英語(US)キーボードでは、<kbd>[</kbd> と <kbd>]</kbd> の<u>物理的な位置が1つずれています</u>。<br>
+<code>e.code</code>（物理位置）で判定するとJISで別のキーになり、<code>e.key</code>（出る文字）で判定すると両方で動きます。</p>
+<textarea id="ta2" rows="2" placeholder="ここをクリックして、何でもいいのでキーを押してください"></textarea>
+<div class="card" id="raw" style="margin-top:8px"><small>まだ何も押されていません</small></div>
+<p><small>特に <kbd>Ctrl</kbd>+<kbd>[</kbd> と <kbd>Ctrl</kbd>+<kbd>]</kbd>、<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>[</kbd>、<kbd>Ctrl</kbd>+<kbd>=</kbd> を押して、<code>e.key</code> と <code>e.code</code> をメモしてください。</small></p>
+</div>
+
+<h2>7. すでに らったった が使っているキー（衝突注意）</h2>
+<div class="card bad">
+<p>本体を実測して抜き出したものです。<b>Typora と正面衝突するものに ★</b> を付けています。</p>
+<table>
+<thead><tr><th>キー</th><th>らったったの今の役目</th><th>Typoraでの役目</th></tr></thead>
+<tbody>
+<tr><td><kbd>Ctrl+K</kbd></td><td>★ コマンドパレット</td><td>ハイパーリンク</td></tr>
+<tr><td><kbd>Ctrl+Shift+M</kbd></td><td>★ メニュー</td><td>数式ブロック</td></tr>
+<tr><td><kbd>Ctrl+Shift+V</kbd></td><td>★ 表として貼り付け</td><td>書式なし貼り付け</td></tr>
+<tr><td><kbd>Ctrl+B</kbd></td><td>太字（md.bold）</td><td>太字 — 一致</td></tr>
+<tr><td><kbd>Ctrl+I</kbd></td><td>斜体（md.italic）</td><td>斜体 — 一致</td></tr>
+<tr><td><kbd>Ctrl+S</kbd></td><td>メモを保存（md.save）</td><td>保存 — 一致</td></tr>
+<tr><td><kbd>Ctrl+Z</kbd> / <kbd>Ctrl+Y</kbd></td><td>元に戻す／やり直す</td><td>同じ</td></tr>
+<tr><td><kbd>Ctrl+,</kbd></td><td>設定を開く</td><td>設定 — 一致</td></tr>
+<tr><td><kbd>Ctrl+Shift+P</kbd></td><td>コマンドパレット</td><td>（未使用）</td></tr>
+<tr><td><kbd>Ctrl+Shift+F</kbd></td><td>検索キーワード欄へ</td><td>（未使用）</td></tr>
+<tr><td><kbd>Ctrl+Shift+S</kbd></td><td>名前を付けて保存</td><td>名前を付けて保存 — 一致</td></tr>
+<tr><td><kbd>Ctrl+Alt+1/2/3</kbd></td><td>分割／編集だけ／プレビューだけ</td><td>（未使用）</td></tr>
+<tr><td><kbd>Ctrl+Alt+M</kbd> / <kbd>Ctrl+Alt+D</kbd></td><td>画面の切り替え</td><td>（未使用）</td></tr>
+<tr><td><kbd>Ctrl+Enter</kbd></td><td>セルの編集を終える</td><td>（未使用）</td></tr>
+</tbody>
+</table>
+</div>
+
+<hr>
+<p><small>らったった キー衝突プローブ v1 / 段階1（下調べ）専用 / 本体には一切パッチを当てていません</small></p>
+</div>
+
+<script>
+'use strict';
+
+/* ============================================================
+   測定したいキーの一覧（Typora公式 support.typora.io/Shortcut-Keys/ 準拠）
+   hit(e) は「その組み合わせが押されたか」を判定する。
+   JIS/US 両対応のため、e.key と e.code の両方を見る。
+   ============================================================ */
+var COMBOS = [
+  {id:'h1',  disp:'Ctrl + 1', role:'見出し1',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&(e.key==='1'||e.code==='Digit1');}},
+  {id:'h2',  disp:'Ctrl + 2', role:'見出し2',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&(e.key==='2'||e.code==='Digit2');}},
+  {id:'h3',  disp:'Ctrl + 3', role:'見出し3',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&(e.key==='3'||e.code==='Digit3');}},
+  {id:'h4',  disp:'Ctrl + 4', role:'見出し4',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&(e.key==='4'||e.code==='Digit4');}},
+  {id:'h5',  disp:'Ctrl + 5', role:'見出し5',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&(e.key==='5'||e.code==='Digit5');}},
+  {id:'h6',  disp:'Ctrl + 6', role:'見出し6',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&(e.key==='6'||e.code==='Digit6');}},
+  {id:'p0',  disp:'Ctrl + 0', role:'ふつうの段落に戻す',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&(e.key==='0'||e.code==='Digit0');}},
+  {id:'b',   disp:'Ctrl + B', role:'太字（本体も同じ）',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&k(e)==='b';}},
+  {id:'i',   disp:'Ctrl + I', role:'斜体（本体も同じ）',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&k(e)==='i';}},
+  {id:'u',   disp:'Ctrl + U', role:'下線',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&k(e)==='u';}},
+  {id:'kk',  disp:'Ctrl + K', role:'リンク ★本体はパレット',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&k(e)==='k';}},
+  {id:'csk', disp:'Ctrl + Shift + K', role:'コードブロック',
+   hit:function(e){return c(e)&&e.shiftKey&&!e.altKey&&k(e)==='k';}},
+  {id:'ind', disp:'Ctrl + [', role:'インデント（字下げ）',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&(e.key==='['||e.code==='BracketLeft');}},
+  {id:'out', disp:'Ctrl + ]', role:'アウトデント（字上げ）',
+   hit:function(e){return c(e)&&!e.shiftKey&&!e.altKey&&(e.key===']'||e.code==='BracketRight');}},
+  {id:'ol',  disp:'Ctrl + Shift + [', role:'番号付きリスト',
+   hit:function(e){return c(e)&&e.shiftKey&&!e.altKey&&(e.key==='{'||e.key==='['||e.code==='BracketLeft');}},
+  {id:'ul',  disp:'Ctrl + Shift + ]', role:'箇条書きリスト',
+   hit:function(e){return c(e)&&e.shiftKey&&!e.altKey&&(e.key==='}'||e.key===']'||e.code==='BracketRight');}},
+  {id:'cq',  disp:'Ctrl + Shift + Q', role:'引用',
+   hit:function(e){return c(e)&&e.shiftKey&&!e.altKey&&k(e)==='q';}},
+  {id:'cg',  disp:'Ctrl + Shift + `', role:'インラインコード',
+   hit:function(e){return c(e)&&e.shiftKey&&!e.altKey&&(e.key==='~'||e.key==='`'||e.code==='Backquote');}},
+  {id:'eq',  disp:'Ctrl + =', role:'見出しレベルを上げる',
+   hit:function(e){return c(e)&&!e.altKey&&(e.key==='='||e.key==='+'||e.code==='Equal');}},
+  {id:'mi',  disp:'Ctrl + -', role:'見出しレベルを下げる',
+   hit:function(e){return c(e)&&!e.altKey&&(e.key==='-'||e.key==='_'||e.code==='Minus');}}
+];
+
+function c(e){ return e.ctrlKey || e.metaKey; }
+function k(e){ return (e.key||'').toLowerCase(); }
+
+/* 本体（らったった）の comboOf() と同じ手順で名前を作る。
+   これで「設定画面に何と表示されるか」が事前に分かる。 */
+var MODS = {Control:1, Alt:1, Shift:1, Meta:1, AltGraph:1, CapsLock:1, Dead:1};
+function comboOf(e){
+  var kk = e.key;
+  if(!kk || MODS[kk]) return null;
+  if(kk.length === 1) kk = kk.toUpperCase();
+  if(kk === ' ') kk = 'Space';
+  var p = [];
+  if(e.ctrlKey)  p.push('Ctrl');
+  if(e.altKey)   p.push('Alt');
+  if(e.shiftKey) p.push('Shift');
+  if(e.metaKey)  p.push('Meta');
+  p.push(kk);
+  return p.join('+');
+}
+
+/* ---------- 状態 ---------- */
+var R = {};                 // id -> {v,key,code,combo,note}
+var idx = -1;               // いま測っているもの
+var running = false;
+var watch = null;           // 「奪えたか」を見張る箱
+
+var $ = function(id){ return document.getElementById(id); };
+
+/* ---------- ズーム率 ---------- */
+function zoomSig(){
+  var a = Math.round((window.devicePixelRatio || 1) * 1000);
+  var b = 0;
+  try{ b = Math.round((window.outerWidth / window.innerWidth) * 1000); }catch(_){}
+  return a + '/' + b;
+}
+
+/* ---------- 表を描く ---------- */
+function draw(){
+  var tb = $('tb');
+  tb.innerHTML = '';
+  for(var i = 0; i < COMBOS.length; i++){
+    var cm = COMBOS[i], r = R[cm.id];
+    var tr = document.createElement('tr');
+    if(i === idx && running) tr.className = 'now';
+    else if(r) tr.className = 'done';
+    var v = r ? r.v : '?';
+    var cls = v === 'O' ? 'b-O' : v === 'X' ? 'b-X' : v === '-' ? 'b-N' : v === 'T' ? 'b-T' : 'b-Q';
+    var mark = v === '-' ? '−' : v;
+    tr.innerHTML =
+      '<td>' + (i + 1) + '</td>' +
+      '<td><kbd>' + esc(cm.disp) + '</kbd></td>' +
+      '<td>' + esc(cm.role) + '</td>' +
+      '<td><span class="badge ' + cls + '">' + mark + '</span></td>' +
+      '<td><code>' + esc(r ? r.key : '') + '</code></td>' +
+      '<td><code>' + esc(r ? r.code : '') + '</code></td>' +
+      '<td><code>' + esc(r ? r.combo : '') + '</code></td>' +
+      '<td><small>' + esc(r ? r.note : '') + '</small></td>';
+    tb.appendChild(tr);
+  }
+  makeCode();
+}
+function esc(s){
+  return String(s === undefined || s === null ? '' : s)
+    .replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ---------- 結果コード ---------- */
+function browserName(){
+  var u = navigator.userAgent;
+  if(/Edg\//.test(u))     return 'EDGE';
+  if(/Firefox\//.test(u)) return 'FIREFOX';
+  if(/Chrome\//.test(u))  return 'CHROME';
+  return 'OTHER';
+}
+function makeCode(){
+  var s = '';
+  for(var i = 0; i < COMBOS.length; i++){
+    var r = R[COMBOS[i].id];
+    s += r ? r.v : '?';
+  }
+  var bi = R['ind'], bo = R['out'];
+  var extra = ' | [=' + (bi ? (bi.key + '/' + bi.code) : '?') +
+              ' ]=' + (bo ? (bo.key + '/' + bo.code) : '?');
+  $('code').textContent = browserName() + ' | ' + s + extra;
+}
+
+/* ---------- 進行 ---------- */
+function say(main, sub){
+  $('now').innerHTML = esc(main) + '<span class="sub">' + esc(sub) + '</span>';
+}
+function next(){
+  idx++;
+  if(idx >= COMBOS.length){
+    running = false;
+    idx = -1;
+    $('btnNone').disabled = true;
+    $('btnSkip').disabled = true;
+    say('✅ 測定おわり', '第5章の「結果コード」を書き写してください');
+    draw();
+    return;
+  }
+  var cm = COMBOS[idx];
+  say('押してください → ' + cm.disp,
+      '（' + (idx + 1) + ' / ' + COMBOS.length + '）' + cm.role);
+  arm();
+  draw();
+}
+function arm(){
+  watch = {
+    zoom: zoomSig(),
+    blur: false,
+    hidden: false,
+    text: $('ta').value,
+    got: null
+  };
+}
+
+/* 押されたあと 700ms 見張って、ブラウザが動いていないか調べる */
+function judge(e){
+  var cm = COMBOS[idx];
+  watch.got = {
+    key: (e.key === ' ' ? '(Space)' : e.key),
+    code: e.code || '(なし)',
+    combo: comboOf(e) || '(なし)'
+  };
+  setTimeout(function(){
+    if(!watch || !watch.got) return;
+    var v = 'O', note = 'preventDefault() が効いた';
+    if(watch.blur || watch.hidden){
+      v = 'X';
+      note = 'ブラウザが動いた（' + (watch.hidden ? 'タブが切り替わった' : '画面の外へ移った') + '）';
+    }else if(zoomSig() !== watch.zoom){
+      v = 'X'; note = 'ズーム率が変わった（' + watch.zoom + ' → ' + zoomSig() + '）';
+    }else if($('ta').value !== watch.text){
+      v = 'T'; note = '文字が入ってしまった';
+    }
+    R[cm.id] = {v:v, key:watch.got.key, code:watch.got.code, combo:watch.got.combo, note:note};
+    next();
+  }, 700);
+}
+
+/* ---------- キーを拾う（本体と同じく capture 段階） ---------- */
+document.addEventListener('keydown', function(e){
+  if(!running || idx < 0 || !watch || watch.got) return;
+  var cm = COMBOS[idx];
+  if(!cm.hit(e)) return;
+  e.preventDefault();
+  e.stopPropagation();
+  judge(e);
+}, true);
+
+/* 見張り */
+window.addEventListener('blur', function(){ if(watch) watch.blur = true; });
+document.addEventListener('visibilitychange', function(){
+  if(watch && document.hidden) watch.hidden = true;
+  else if(!document.hidden) stolen();
+});
+window.addEventListener('focus', function(){ setTimeout(stolen, 120); });
+
+/* キー入力が1つも来ないまま、ブラウザだけが動いた場合 = 完全に横取りされた */
+function stolen(){
+  if(!running || idx < 0 || !watch || watch.got) return;
+  if(!watch.blur && !watch.hidden) return;
+  var cm = COMBOS[idx];
+  R[cm.id] = {v:'-', key:'(来ない)', code:'(来ない)', combo:'(来ない)',
+              note:'ブラウザが横取り（' + (watch.hidden ? 'タブが切り替わった' : '画面の外へ移った') + '）。ページには届かない'};
+  next();
+}
+
+/* ---------- ボタン ---------- */
+$('btnStart').addEventListener('click', function(){
+  running = true; idx = -1;
+  $('btnNone').disabled = false;
+  $('btnSkip').disabled = false;
+  $('ta').focus();
+  next();
+});
+$('btnNone').addEventListener('click', function(){
+  if(!running || idx < 0) return;
+  var cm = COMBOS[idx];
+  R[cm.id] = {v:'-', key:'(来ない)', code:'(来ない)', combo:'(来ない)',
+              note:'ブラウザが横取り。ページには届かない'};
+  next();
+  $('ta').focus();
+});
+$('btnSkip').addEventListener('click', function(){
+  if(!running || idx < 0) return;
+  next();
+  $('ta').focus();
+});
+$('btnReset').addEventListener('click', function(){
+  R = {}; idx = -1; running = false; watch = null;
+  $('btnNone').disabled = true;
+  $('btnSkip').disabled = true;
+  $('ta').value = '';
+  say('▶ ボタンを押して始めてください', 'まだ測定していません');
+  draw();
+});
+$('btnCopy').addEventListener('click', function(){
+  var t = $('code').textContent;
+  try{
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(t);
+      alert('コピーしました');
+      return;
+    }
+  }catch(_){}
+  try{
+    var ta = document.createElement('textarea');
+    ta.value = t; document.body.appendChild(ta); ta.select();
+    document.execCommand('copy'); document.body.removeChild(ta);
+    alert('コピーしました');
+  }catch(_){ alert('この環境ではコピーできません。手で書き写してください。'); }
+});
+
+/* ---------- 第6章: キーの正体 ---------- */
+$('ta2').addEventListener('keydown', function(e){
+  var rows = [
+    ['e.key',      (e.key === ' ' ? '(Space)' : e.key)],
+    ['e.code',     e.code],
+    ['e.keyCode',  e.keyCode],
+    ['Ctrl',       e.ctrlKey],
+    ['Shift',      e.shiftKey],
+    ['Alt',        e.altKey],
+    ['Meta',       e.metaKey],
+    ['location',   e.location],
+    ['isComposing', e.isComposing],
+    ['らったったが作る名前', comboOf(e)]
+  ];
+  var h = '<div class="kv">';
+  for(var i = 0; i < rows.length; i++){
+    h += '<b>' + esc(rows[i][0]) + '</b> <code>' + esc(rows[i][1]) + '</code><br>';
+  }
+  h += '</div>';
+  $('raw').innerHTML = h;
+  /* Ctrl 付きは文字が入らないように止める（この欄だけ） */
+  if(e.ctrlKey || e.metaKey || e.altKey) e.preventDefault();
+});
+
+/* ---------- 環境情報 ---------- */
+function showEnv(){
+  var u = navigator.userAgent;
+  var h = '';
+  h += '<b>ブラウザ</b> <code>' + esc(browserName()) + '</code><br>';
+  h += '<b>UA</b> <code>' + esc(u) + '</code><br>';
+  h += '<b>platform</b> <code>' + esc(navigator.platform) + '</code><br>';
+  h += '<b>言語</b> <code>' + esc(navigator.language) + '</code><br>';
+  h += '<b>画面</b> <code>' + screen.width + 'x' + screen.height + '</code><br>';
+  h += '<b>ズーム値</b> <code id="zs">' + esc(zoomSig()) + '</code><br>';
+  h += '<b>場所</b> <code>' + esc(location.protocol) + '</code><br>';
+  h += '<b id="kbl">キー配列</b> <code id="kbv">調べています…</code>';
+  $('env').innerHTML = h;
+  $('zoomNow').textContent = '（いまの値: ' + zoomSig() + '）';
+
+  /* Chromium系のみ。物理キー → 実際に出る文字 の対応が分かる */
+  try{
+    if(navigator.keyboard && navigator.keyboard.getLayoutMap){
+      navigator.keyboard.getLayoutMap().then(function(m){
+        var want = ['BracketLeft','BracketRight','Backslash','Quote','Semicolon','Equal','Minus','Backquote'];
+        var s = [];
+        for(var i = 0; i < want.length; i++){
+          s.push(want[i] + '→"' + (m.get(want[i]) || '?') + '"');
+        }
+        var jis = (m.get('BracketRight') === '[');
+        $('kbv').textContent = s.join(' / ') + '  ⇒ ' + (jis ? '日本語(JIS)配列とみられます' : '英語(US)配列とみられます');
+      }).catch(function(){ $('kbv').textContent = '取得できませんでした'; });
+    }else{
+      $('kbv').textContent = 'この機能はこのブラウザにありません（Firefox は未対応。第6章で手で確かめてください）';
+    }
+  }catch(_){ $('kbv').textContent = '取得できませんでした'; }
+}
+
+showEnv();
+draw();
+</script>
+</body>
+</html>
