@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.16.12</title>
+<title>記録台帳＋MDメモ Ver1.17.00</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -2217,7 +2217,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.16.12</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.17.00</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2379,6 +2379,35 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.17.00 で増えたこと（日本語入力中は、文字カーソルの色が変わる）：</strong>
+        <br>・<b>日本語入力で変換を始めると、文字カーソル（縦棒）の色が変わります。</b>
+        <br>
+        <br><b>【何のためか】</b>
+        <br>・半角のつもりで打ち始めたら日本語入力がONだった、という打ち直しをなくすためです。
+        <br>・目はカーソルを見ているので、そこが変われば<b>打ち始める前に</b>気づけます。
+        <br>
+        <br><b>【どこで効くか】</b>
+        <br>・Markdownメモ／登録フォーム／表のセル直接編集／検索欄――<b>文字を打つところ全部</b>です。
+        <br>
+        <br><b>【色の決め方】</b>
+        <br>・<b>⚙設定 → 🖥 表示 → 「日本語入力中のカーソルの色」</b>で選べます。
+        <br>・配色は<b>10組</b>用意しました（緑→黄／緑→赤／緑→桃／白→橙／白→紫／
+        灰→水色／灰→黄緑／桃→青緑／橙→青／灰→緑）。
+        <br>・「自分で決める」を選ぶと、半角のときと日本語のときの色を自分で決められます。
+        <br>・<b>「半角のときは色を変えない（今までどおり）」</b>にチェックを入れると、
+        日本語入力中だけ色が付き、半角のときはこれまでどおりの見た目になります。
+        <br>・「使わない」を選べば、この機能そのものを切れます。
+        <br>・設定画面に<b>試し打ちの欄</b>があるので、その場で確かめられます。
+        <br>
+        <br><b>【できないこと（正直に書きます）】</b>
+        <br>・ブラウザからは「日本語入力がONかOFFか」を<b>直接知ることができません</b>。
+        分かるのは「変換中かどうか」だけです。
+        <br>・そこでこのソフトは、<b>変換を確定したあとも色を保ち</b>、
+        <b>変換を伴わない文字が1つ入った時点で</b>半角に戻ったとみなします。
+        <br>・つまり半角に切り替えた直後は、<b>1文字ぶんだけ</b>色が戻るのが遅れます。
+        <br>・<b>変換中の下線や候補の窓</b>の色は変えられません。変わるのはカーソルの色だけです。
+      </p>
+
       <p><strong>Ver1.16.12 で増えたこと（キーの重なりが、まとめて外れるようになった）：</strong>
         <br>・<b>同じキーが2つ以上の動作に割り当たっているとき、振り直すと「全部」外れるようになりました。</b>
         <br>
@@ -15271,6 +15300,14 @@ function defaults(){
     /* ---- Ver1.16.05 (U3) ヘッダーを隠しているときの緑の知らせ ---- */
     okWhenHidden: 'off',     // off=出さない（既定） / auto=秒で閉じる / ok=OKを押すまで
     okHideSec   : 4,         // auto のときの秒数（1〜60）
+    /* ---- Ver1.17.00 (案E-1) 日本語入力中のカーソル色 ----
+       imeCaret        … 配色の番号 'p1'〜'p10' / 'custom' / 'off'
+       imeCaretKeepOff … true なら半角のときは色を変えない（今までどおり）
+       imeCaretOff/On  … 'custom' のときに使う色 */
+    imeCaret       : 'p1',
+    imeCaretKeepOff: false,
+    imeCaretOff    : '#4ade80',
+    imeCaretOn     : '#fbbf24',
     addons     : { mobilefix:'auto', bigtap:false, quickbar:false, autofocus:false,
                    stickyhead:true, oneopen:false, cmdrank:true }
   };
@@ -15544,6 +15581,7 @@ function applyAll(){
   document.body.classList.toggle('wdt-nocmdrank', !st.addons.cmdrank);
   relocateViewMode(mobFixOn());
   applyDynStyle();
+  imeCaretBind();          /* Ver1.17.00 (案E-1) 1回だけ結線する */
 }
 
 /* 「分割／編集／プレビュー」ボタンの置き場所を変える。
@@ -15563,6 +15601,96 @@ function relocateViewMode(on){
     if(vm.parentNode !== sb) sb.appendChild(vm);
   }
 }
+/* ==================================================================
+   Ver1.17.00 (案E-1) 日本語入力中は、文字カーソルの色を変える
+   ------------------------------------------------------------------
+   【なぜ作るか】
+     半角のつもりで打ち始めて、実は日本語入力がONだった――という
+     打ち直しをなくしたい。目はカーソルを見ているので、そこが変われば
+     打ち始める前に気づける。
+
+   【できること・できないこと（正直に）】
+     ブラウザから「日本語入力がONかOFFか」を直接知る方法はない。
+     取れるのは compositionstart / compositionend、つまり
+     「変換中かどうか」だけ。そこで次のように振る舞う（案I-2）。
+
+       ・変換が始まった          → ON にする
+       ・変換を確定した          → ★ON のまま保つ（ここが案I-1との違い）
+       ・変換を伴わない1文字が来た → OFF に戻す
+
+     「あいうえお[Enter]」のたびに色が戻るとチラついて読みにくいので、
+     確定しても保つ。半角に切り替えたときは、1文字目を打った時点で戻る。
+     ＝「1文字ぶんだけ遅れて正しくなる」形。
+
+   【色の当て方（案M-1）】
+     caret-color は継承するプロパティなので、body に1回書けば
+     入力欄・長文欄・表のセル編集・検索欄まで全部に届く（案R-1）。
+     #editorTextarea はタブを切り替えるたびに作り直されるが、
+     クラス方式なら付け直しが要らない。
+   ================================================================== */
+var IME_PRESETS = [
+  {id:'p1',  name:'緑 → 黄（標準）', off:'#4ade80', on:'#fbbf24'},
+  {id:'p2',  name:'緑 → 赤',         off:'#4ade80', on:'#ef4444'},
+  {id:'p3',  name:'緑 → 桃',         off:'#4ade80', on:'#f472b6'},
+  {id:'p4',  name:'白 → 橙',         off:'#e6e9ef', on:'#fb923c'},
+  {id:'p5',  name:'白 → 紫',         off:'#e6e9ef', on:'#c084fc'},
+  {id:'p6',  name:'灰 → 水色',       off:'#9aa3b2', on:'#22d3ee'},
+  {id:'p7',  name:'灰 → 黄緑',       off:'#9aa3b2', on:'#a3e635'},
+  {id:'p8',  name:'桃 → 青緑',       off:'#fda4af', on:'#2dd4bf'},
+  {id:'p9',  name:'橙 → 青',         off:'#fdba74', on:'#60a5fa'},
+  {id:'p10', name:'灰 → 緑',         off:'#9aa3b2', on:'#4ade80'}
+];
+function imeHex(v, fallback){
+  var t = String(v == null ? '' : v).trim();
+  return /^#[0-9a-fA-F]{6}$/.test(t) ? t : fallback;
+}
+/* いま選ばれている配色を {off, on} で返す。'off'（使わない）のときは null。 */
+function imeCaretPair(){
+  var id = String(st.imeCaret || 'p1');
+  if(id === 'off') return null;
+  if(id === 'custom'){
+    return {off: imeHex(st.imeCaretOff, '#4ade80'), on: imeHex(st.imeCaretOn, '#fbbf24')};
+  }
+  for(var i = 0; i < IME_PRESETS.length; i++){
+    if(IME_PRESETS[i].id === id) return {off: IME_PRESETS[i].off, on: IME_PRESETS[i].on};
+  }
+  return {off: IME_PRESETS[0].off, on: IME_PRESETS[0].on};
+}
+/* applyDynStyle() が吐き出す CSS のかけら。
+   「半角は今までどおり」のときは OFF 側の行を出さない。
+   出さなければ caret-color は指定なし＝ブラウザ既定のまま。 */
+function imeCaretCss(){
+  var p = imeCaretPair();
+  if(!p) return '';
+  var css = '';
+  if(!st.imeCaretKeepOff) css += 'body{caret-color:' + p.off + '}';
+  css += 'body.wdt-ime{caret-color:' + p.on + '}';
+  return css;
+}
+var imeCaretOn = false;
+function imeCaretSet(on){
+  on = !!on;
+  if(on === imeCaretOn) return;
+  imeCaretOn = on;
+  try{ document.body.classList.toggle('wdt-ime', on); }catch(e){}
+}
+function imeCaretBind(){
+  if(imeCaretBind.done) return;
+  imeCaretBind.done = true;
+  /* capture を付けて、ほかの keydown より先に受け取る。
+     ここでは判定しかしないので、後段の処理を止めることはない。 */
+  document.addEventListener('compositionstart', function(){ imeCaretSet(true); }, true);
+  document.addEventListener('keydown', function(e){
+    if(!imeCaretOn) return;
+    /* 変換中のキーは無視する（落とし穴10 と同じ判定）*/
+    if(e.isComposing || e.keyCode === 229) return;
+    if(e.ctrlKey || e.altKey || e.metaKey) return;
+    /* 変換を伴わない「文字」が1つ来た＝半角に戻ったとみなす。
+       'Enter' 'Backspace' 'Process' などは length が 1 より大きいので当たらない。 */
+    if(typeof e.key === 'string' && e.key.length === 1) imeCaretSet(false);
+  }, true);
+}
+
 function applyDynStyle(){
   var s = el('wdtDynStyle');
   if(!s){ s = document.createElement('style'); s.id = 'wdtDynStyle'; document.head.appendChild(s); }
@@ -15570,7 +15698,8 @@ function applyDynStyle(){
   s.textContent =
       '#app-db table.grid{font-size:' + g + 'px}'
     + '#app-md .editor-pane textarea{font-size:' + m + 'px}'
-    + '#app-md .preview-pane{font-size:' + m + 'px}';
+    + '#app-md .preview-pane{font-size:' + m + 'px}'
+    + imeCaretCss();
 }
 
 /* ==================================================================
@@ -16164,6 +16293,34 @@ function buildSettings(){
   h += '<h3>起動したときに開く画面</h3>';
   h += radioRow('開く画面', 'wdtStart',
         [['db','作業記録DB'],['md','Markdownメモ'],['last','前回のつづき']], st.startMode, '');
+  /* ---- Ver1.17.00 (案E-1) ---- */
+  h += '<h3>日本語入力中のカーソルの色</h3>';
+  h += '<div class="wdtx-row"><span class="lbl">配色</span><span>'
+     + '<select id="wdtImeCaret" style="min-width:210px">'
+     + IME_PRESETS.map(function(p){
+         return '<option value="' + esc(p.id) + '"'
+              + (st.imeCaret === p.id ? ' selected' : '') + '>' + esc(p.name) + '</option>';
+       }).join('')
+     + '<option value="custom"' + (st.imeCaret === 'custom' ? ' selected' : '') + '>自分で決める</option>'
+     + '<option value="off"'    + (st.imeCaret === 'off'    ? ' selected' : '') + '>使わない</option>'
+     + '</select></span></div>';
+  h += '<div class="wdtx-row"><span class="lbl">半角のとき</span><span>'
+     + '<label><input type="checkbox" id="wdtImeKeepOff"'
+     + (st.imeCaretKeepOff ? ' checked' : '') + '> 色を変えない（今までどおり）</label>'
+     + '</span></div>';
+  h += '<div class="wdtx-row"><span class="lbl">自分で決める色</span><span>'
+     + '半角 <input type="color" id="wdtImeOffCol" value="' + esc(imeHex(st.imeCaretOff, '#4ade80')) + '" style="width:52px;vertical-align:middle">'
+     + '　日本語 <input type="color" id="wdtImeOnCol" value="' + esc(imeHex(st.imeCaretOn, '#fbbf24')) + '" style="width:52px;vertical-align:middle">'
+     + '<span style="color:#8b93a0;font-size:11px;margin-left:10px">（配色で「自分で決める」を選んだときだけ使います）</span>'
+     + '</span></div>';
+  h += '<div class="wdtx-row"><span class="lbl">ここで試せます</span><span>'
+     + '<input type="text" id="wdtImeTry" placeholder="日本語入力を切り替えて打ってみてください" style="width:320px">'
+     + '</span></div>';
+  h += '<div class="wdtx-hint" style="margin:-2px 0 8px 210px">'
+     + 'ブラウザからは「日本語入力がONかOFFか」を直接知ることができません。'
+     + 'このソフトは<b>変換が始まったら日本語入力中とみなし、確定したあとも色を保ちます</b>。'
+     + '半角に戻したときは、<b>1文字目を打った時点で</b>色が戻ります。'
+     + '<br>※ 変換中の下線や候補の窓の色は変えられません（カーソルの色だけです）。</div>';
   h += '<h3>Markdownメモ専用の設定</h3>';
   h += '<div class="wdtx-row"><button type="button" id="wdtOpenMdSet">📝 メモの設定を開く（ツールバー・自動保存・プラグイン）</button></div>';
   h += '</div>';
@@ -16691,6 +16848,11 @@ function bindSettings(){
       st.okHideSec = sec; t.value = String(sec); save(); return;
     }
     if(t.id === 'wdtKeepHist'){ st.keepHistory = t.checked; save(); return; }
+    /* ---- Ver1.17.00 (案E-1) ---- */
+    if(t.id === 'wdtImeCaret'){    st.imeCaret = t.value;         save(); applyDynStyle(); return; }
+    if(t.id === 'wdtImeKeepOff'){  st.imeCaretKeepOff = t.checked; save(); applyDynStyle(); return; }
+    if(t.id === 'wdtImeOffCol'){   st.imeCaretOff = imeHex(t.value, '#4ade80'); save(); applyDynStyle(); return; }
+    if(t.id === 'wdtImeOnCol'){    st.imeCaretOn  = imeHex(t.value, '#fbbf24'); save(); applyDynStyle(); return; }
     /* ---- Ver1.12.00: コマンドモード関連 ---- */
     if(t.name === 'wdtKeyPreset'){
       st.keyPreset = t.value; save(); renderKeyTable(); refreshKeyUi(); return;
