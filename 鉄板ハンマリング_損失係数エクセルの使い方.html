@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>鉄板ハンマリング　損失係数エクセルの使い方</title>
+<style>
+:root{--bg:#14161a;--pnl:#1d2027;--pnl2:#242832;--line:#3a4150;--tx:#e6e8ec;--sub:#9aa4b2;
+--blue:#5fb3ff;--grn:#6fe08a;--ylw:#ffd166;--red:#ff7b7b;--pnk:#ff9ad5;--org:#ffa25f;--vio:#c1a3ff;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Noto Sans JP","Hiragino Sans",Meiryo,sans-serif;line-height:1.9;font-size:16px}
+.wrap{max-width:1060px;margin:0 auto;padding:24px 18px 120px}
+h1{font-size:1.7em;color:#fff;background:linear-gradient(90deg,#1f3a5f,#2b5f8f);padding:18px 20px;border-radius:12px;border-left:8px solid var(--blue);margin:0 0 10px}
+h2{font-size:1.32em;color:var(--ylw);border-bottom:3px solid var(--ylw);padding-bottom:8px;margin:52px 0 18px}
+h3{font-size:1.12em;color:var(--grn);margin:30px 0 10px;border-left:5px solid var(--grn);padding-left:10px}
+h4{font-size:1.02em;color:var(--pnk);margin:22px 0 8px}
+p{margin:.6em 0}
+ruby rt{font-size:.5em;color:var(--sub)}
+.card{background:var(--pnl);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0}
+.warn{background:#3a2020;border-left:6px solid var(--red)}
+.tip{background:#1f3326;border-left:6px solid var(--grn)}
+.note{background:#332b18;border-left:6px solid var(--ylw)}
+.blue{color:var(--blue);font-weight:700}.grn{color:var(--grn);font-weight:700}.ylw{color:var(--ylw);font-weight:700}
+.red{color:var(--red);font-weight:700}.pnk{color:var(--pnk);font-weight:700}.vio{color:var(--vio);font-weight:700}.org{color:var(--org);font-weight:700}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.93em}
+th{background:#2c3340;color:#fff;border:1px solid var(--line);padding:8px 10px;text-align:left}
+td{border:1px solid var(--line);padding:8px 10px;background:var(--pnl2);vertical-align:top}
+td.num{text-align:right;font-family:"DejaVu Sans Mono",monospace}
+code{background:#11141a;color:var(--grn);padding:2px 6px;border-radius:5px;font-family:"DejaVu Sans Mono",monospace;font-size:.92em}
+.fx{background:#11141a;border:1px dashed var(--blue);border-radius:8px;padding:14px;margin:12px 0;text-align:center;font-size:1.06em;color:#cfe8ff;font-family:"DejaVu Sans Mono",monospace;overflow-x:auto}
+ol.st{counter-reset:s;list-style:none;padding-left:0}
+ol.st>li{counter-increment:s;position:relative;padding:12px 12px 12px 54px;margin:10px 0;background:var(--pnl2);border-radius:10px;border-left:4px solid var(--blue)}
+ol.st>li::before{content:counter(s);position:absolute;left:14px;top:12px;width:28px;height:28px;background:var(--blue);color:#0d1117;border-radius:50%;text-align:center;font-weight:800;line-height:28px}
+.badge{display:inline-block;font-size:.76em;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.b-ok{background:#16391f;color:#8ef0a5;border:1px solid #2f7a44}
+.b-es{background:#3a3418;color:#ffd982;border:1px solid #8a7524}
+.b-ck{background:#3d1c1c;color:#ff9d9d;border:1px solid #8a2f2f}
+.copy{background:#2b5f8f;color:#fff;border:0;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:.86em;margin:8px 0}
+.copy:hover{background:#3d7cb8}
+pre.tsv{display:none}
+.toc a{color:var(--blue);text-decoration:none}
+.toc li{margin:4px 0}
+svg{max-width:100%;height:auto;display:block;margin:14px auto;background:#0f1216;border-radius:10px;border:1px solid var(--line)}
+.k{background:#11141a;border-left:4px solid var(--vio);padding:10px 14px;margin:10px 0;border-radius:6px}
+hr{border:0;border-top:1px solid var(--line);margin:44px 0}
+</style></head><body><div class="wrap">
+
+<h1>🔨 鉄板ハンマリング → <ruby>損失係数<rt>そんしつけいすう</rt></ruby> η を自動で出す<br>エクセルの使い方（完全ガイド）</h1>
+<p class="sub" style="color:var(--sub)">対象ファイル：<code>鉄板ハンマリング_ピーク自動検出_損失係数カーブフィット.xlsx</code>　／　測定器：RION SA-01A4　／　OS：Linux Mint（LibreOffice Calc で動作確認済み）</p>
+
+<div class="card tip">
+<b class="grn">このガイドのゴール</b><br>
+鉄の<ruby>長方形<rt>ちょうほうけい</rt></ruby>の板を<ruby>金槌<rt>かなづち</rt></ruby>（インパクトハンマー）でコンッと<ruby>叩<rt>たた</rt></ruby>いて測ったデータを、
+エクセルに<b class="ylw">貼り付けるだけ</b>で、<br>
+① <b class="blue">たくさん並んだ山（ピーク）を自動で見つける</b><br>
+② 山ごとに<b class="pnk">カーブフィット</b>して <b class="grn">固有振動数 fn</b> と <b class="grn">損失係数 η</b> を出す<br>
+③ <b class="org">指数窓で余計に増えた減衰</b>を自動で引き算する<br>
+──ここまでを、手順どおりにやれば必ずできる状態にします。
+</div>
+
+<div class="card toc">
+<b>📚 目次</b>
+<ol>
+<li><a href="#c0">第0章　まず言葉から（小学生バージョン）</a></li>
+<li><a href="#c1">第1章　あなたの測定条件の確認と、いちばん大事な落とし穴</a></li>
+<li><a href="#c2">第2章　SA-01A4 の設定（実機の操作）</a></li>
+<li><a href="#c3">第3章　叩き方・板の吊り方</a></li>
+<li><a href="#c4">第4章　データをCSVで出す → エクセルに貼る</a></li>
+<li><a href="#c5">第5章　エクセルの使い方（4ステップ）</a></li>
+<li><a href="#c6">第6章　中で何をやっているか（自動ピーク検出のしくみ）</a></li>
+<li><a href="#c7">第7章　中で何をやっているか（カーブフィットのしくみ・数式の導出）</a></li>
+<li><a href="#c8">第8章　指数窓の補正（なぜ引き算するのか）</a></li>
+<li><a href="#c9">第9章　結果の読み方と「要確認」が出たときの対処</a></li>
+<li><a href="#c10">第10章　よくあるミス集</a></li>
+<li><a href="#c11">第11章　エクセル数式の全リスト（貼り付け用）</a></li>
+<li><a href="#c12">第12章　出典と確信度</a></li>
+</ol>
+</div>
+
+<hr>
+
+<h2 id="c0">第0章　まず言葉から（小学生バージョン）</h2>
+
+<h3>🔔 「<ruby>固有振動数<rt>こゆうしんどうすう</rt></ruby>」って何？</h3>
+<p>お<ruby>寺<rt>てら</rt></ruby>の<ruby>鐘<rt>かね</rt></ruby>を叩くと「ゴーン」と鳴ります。<b class="blue">同じ鐘は、いつ叩いても同じ高さの音</b>が出ますね。
+これは、その鐘が<b class="ylw">「この速さで揺れるのが一番ラク」</b>という揺れ方をいくつも持っているからです。
+その「一番ラクな揺れの速さ」が<b class="grn">固有振動数（fn）</b>です。単位は Hz（ヘルツ＝1秒間に何回揺れるか）。</p>
+<p>鉄の板も同じで、叩くと<b class="pnk">いくつもの音が同時に</b>鳴っています。だからグラフに山がたくさん並ぶのです。
+山1つ＝揺れ方1種類（これを<ruby>モード<rt>ゆれかた</rt></ruby>と呼びます）。</p>
+
+<h3>🔕 「損失係数 η（イータ）」って何？</h3>
+<p>鐘を叩いた後、音はだんだん小さくなって、やがて消えます。この<b class="org">「消えやすさ」</b>を数字にしたものが<b class="grn">損失係数 η</b>です。</p>
+<ul>
+<li>η が<b class="blue">小さい</b>（0.0005 など）＝ なかなか消えない ＝ <b>キーン</b>と長く鳴る（<ruby>鉄<rt>てつ</rt></ruby>の生板はこれ）</li>
+<li>η が<b class="red">大きい</b>（0.05 など）＝ すぐ消える ＝ <b>ボスッ</b>と鳴って終わり（ゴムや<ruby>制振材<rt>せいしんざい</rt></ruby>）</li>
+</ul>
+<div class="k">🍮 <b>たとえ話</b>：プリンをつつくと <b class="red">プルン…</b> ですぐ止まる（ηが大きい）。<br>
+<ruby>下敷<rt>したじ</rt></ruby>きをはじくと <b class="blue">ビイイイイン</b> と長く続く（ηが小さい）。</div>
+
+<h3>📈 「グラフの山（ピーク）」の形と η の関係</h3>
+<svg viewBox="0 0 760 300"><g font-family="sans-serif">
+<line x1="70" y1="250" x2="720" y2="250" stroke="#7d8794" stroke-width="2"/>
+<line x1="70" y1="250" x2="70" y2="30" stroke="#7d8794" stroke-width="2"/>
+<text x="640" y="275" fill="#9aa4b2" font-size="14">周波数 f [Hz]</text>
+<text x="16" y="45" fill="#9aa4b2" font-size="14">振幅 |H|</text>
+<path d="M70 245 Q200 244 240 238 Q265 60 290 238 Q330 245 400 243 Q450 120 470 243 Q560 246 620 244 Q660 180 675 244 Q700 246 720 246" fill="none" stroke="#5fb3ff" stroke-width="2.6"/>
+<line x1="240" y1="150" x2="340" y2="150" stroke="#ff7b7b" stroke-dasharray="5 4" stroke-width="1.6"/>
+<text x="345" y="155" fill="#ff7b7b" font-size="13">−3dB の線</text>
+<line x1="272" y1="150" x2="272" y2="250" stroke="#ffd166" stroke-width="1.2"/>
+<line x1="308" y1="150" x2="308" y2="250" stroke="#ffd166" stroke-width="1.2"/>
+<text x="200" y="285" fill="#ffd166" font-size="13">この幅＝半値幅 Δf3dB　→　η = Δf3dB / fn</text>
+<text x="255" y="50" fill="#6fe08a" font-size="13">細く鋭い山＝ηが小さい</text>
+<text x="425" y="110" fill="#ffa25f" font-size="13">太い山＝ηが大きい</text>
+</g></svg>
+<p><b class="ylw">覚え方</b>：<b>山が細ければ細いほど、よく響く（ηが小さい）</b>。<br>
+<b>山の太さ（半値幅）÷ 山の位置（fn）＝ η</b>　これが一番シンプルな考え方です。</p>
+
+<h3>🪟 「<ruby>窓関数<rt>まどかんすう</rt></ruby>」「指数窓」って何？</h3>
+<p>FFT<ruby>分析器<rt>ぶんせきき</rt></ruby>は、時間の波を「決まった長さでハサミで切って」から周波数に変換します。
+ところが<b class="red">切ったところで波がブツッと途切れる</b>と、ニセモノの山ができてしまいます（<ruby>漏<rt>も</rt></ruby>れ・リーケージ）。</p>
+<p>そこで、<b class="blue">記録の終わりに向かってだんだん音量を絞る</b>フェードアウトをかけます。これが<b class="grn">指数窓（exponential window）</b>です。</p>
+<div class="k">🎚️ <b>たとえ話</b>：音楽の最後をフェードアウトさせるのと同じ。ブツ切りの「プツッ」というノイズが消えます。</div>
+<p class="red">⚠ ただし副作用があります。フェードアウトは<b>「音が早く消えた」＝「減衰が大きい」</b>と分析器に誤解させます。
+つまり <b class="red">η が本当より大きく出る</b>のです。この分は<b class="grn">必ず引き算</b>します（→第8章）。</p>
+
+<h3>✏️ 「カーブフィット法」って何？</h3>
+<p><ruby>理科<rt>りか</rt></ruby>の実験で、点をたくさん打ってから<b class="blue">なめらかな線をスーッと引いた</b>ことはありませんか。あれです。</p>
+<p>山の形は、理論上こういう形になると分かっています（1<ruby>自由度<rt>じゆうど</rt></ruby>の式）。
+そこで<b class="ylw">「理論の形を、実測の点にいちばんピッタリ重なるように、fn と η をちょっとずつ動かして合わせる」</b>のがカーブフィットです。</p>
+<div class="card tip">
+<b class="grn">半値幅法よりカーブフィットが優れている理由</b><br>
+・半値幅法は「山のてっぺん」と「−3dBの2点」の<b>たった3点</b>しか使いません。1点でもノイズが乗ると答えがズレます。<br>
+・カーブフィットは山の周りの<b class="blue">数十点すべて</b>を使うので、ノイズが<ruby>平均化<rt>へいきんか</rt></ruby>されて<b>ずっと安定</b>します。<br>
+・さらに「どれくらいピッタリ合ったか」を <b>R²（決定係数）</b>という点数で確認できます（1.0に近いほど良い）。
+</div>
+
+<hr>
+
+<h2 id="c1">第1章　あなたの測定条件の確認と、いちばん大事な落とし穴</h2>
+
+<h3>1-1　あなたの指定した条件</h3>
+<table>
+<tr><th>項目</th><th>あなたの指定</th><th>SA-01A4での呼び名</th></tr>
+<tr><td>解析モード</td><td class="grn">FFT</td><td>機能ボタン「解析モード」→［FFT］</td></tr>
+<tr><td>窓関数</td><td class="grn">指数・指数</td><td>「ウインド」→［指数・指数］</td></tr>
+<tr><td>平均</td><td class="grn">無し（1発打ち）</td><td>「演算方法」→［無し］</td></tr>
+<tr><td>解析サンプリング点数</td><td class="grn">32768 点（最大）</td><td>「解析サンプリング点数」</td></tr>
+<tr><td>試験体</td><td class="grn">鉄の長方形の板</td><td>—</td></tr>
+</table>
+<p><span class="badge b-ok">🟢一次情報で確認</span> SA-01A4 の FFT 解析長は 2<sup>N</sup>（N=6〜15）＝<b>64〜32768ポイント</b>。
+窓関数は［無し／ハニング／フォース・指数／指数・指数／フラットトップ］。平均は［無し］が選べます。
+（出典：プロジェクト添付の SA-01/SA-01A2/SA-01A4 ハードウェアマニュアル「分析部」、ソフトウェアマニュアル p.39〜41, p.77〜78）</p>
+
+<h3>1-2　「32768点」が意味すること（表示ライン数は12801）</h3>
+<p><span class="badge b-ok">🟢</span>ここが勘違いしやすいところです。<b class="red">32768点＝グラフの点が32768個、ではありません。</b></p>
+<div class="fx">サンプリング周波数 fs = 解析周波数レンジ × 2.56（20kHzレンジ以下）<br>
+fs = 解析周波数レンジ × 2.4（40kHzレンジ）<br><br>
+Δf（周波数分解能）= fs ÷ N　　　　T（記録時間）= N ÷ fs</div>
+<table>
+<tr><th>解析周波数レンジ</th><th>fs [Hz]</th><th>N</th><th>表示ライン数</th><th>Δf [Hz]</th><th>記録時間 T [s]</th></tr>
+<tr><td class="num">40 kHz</td><td class="num">96,000</td><td class="num">32768</td><td class="num">13,654</td><td class="num">2.930</td><td class="num">0.341</td></tr>
+<tr><td class="num">20 kHz</td><td class="num">51,200</td><td class="num">32768</td><td class="num">12,801</td><td class="num">1.5625</td><td class="num">0.640</td></tr>
+<tr><td class="num">5 kHz</td><td class="num">12,800</td><td class="num">32768</td><td class="num">12,801</td><td class="num">0.3906</td><td class="num">2.560</td></tr>
+<tr><td class="num">2 kHz</td><td class="num">5,120</td><td class="num">32768</td><td class="num">12,801</td><td class="num">0.15625</td><td class="num">6.400</td></tr>
+<tr><td class="num">1 kHz</td><td class="num">2,560</td><td class="num">32768</td><td class="num">12,801</td><td class="num">0.078125</td><td class="num">12.800</td></tr>
+</table>
+<p><span class="badge b-ok">🟢</span>表示ライン数は仕様表に「20kHzレンジ以下：…6401, 12801」「40kHzレンジ：…6827, 13654」と明記されています。</p>
+
+<h3>1-3　⚠ いちばん大事な落とし穴：分解能が足りないと η は出ません</h3>
+<div class="card warn">
+<b class="red">鉄の生板（なまいた）は、ものすごく響きます。</b>だから山が<b>ものすごく細い</b>のです。<br>
+細い山を測るには、<b class="ylw">Δf（横軸の目盛りの細かさ）を山の幅よりずっと細かく</b>しないといけません。<br>
+目安：<b class="grn">半値幅の中にデータ点が10個以上</b>入ること。
+</div>
+<div class="fx">半値幅 Δf<sub>3dB</sub> ≒ η × fn　　→　必要な Δf ≦ (η × fn) ÷ 10</div>
+<h4>具体例で見てみましょう</h4>
+<table>
+<tr><th>fn [Hz]</th><th>η（想定）</th><th>半値幅 [Hz]</th><th>20kHzレンジ<br>(Δf=1.5625)</th><th>2kHzレンジ<br>(Δf=0.15625)</th><th>1kHzレンジ<br>(Δf=0.078)</th></tr>
+<tr><td class="num">400</td><td class="num">0.0005</td><td class="num">0.20</td><td class="red num">0.1点 ✗</td><td class="red num">1.3点 ✗</td><td class="ylw num">2.6点 △</td></tr>
+<tr><td class="num">400</td><td class="num">0.003</td><td class="num">1.20</td><td class="red num">0.8点 ✗</td><td class="grn num">7.7点 △</td><td class="grn num">15点 ✓</td></tr>
+<tr><td class="num">3000</td><td class="num">0.0005</td><td class="num">1.50</td><td class="red num">1.0点 ✗</td><td colspan="2" class="num">レンジ外</td></tr>
+<tr><td class="num">3000</td><td class="num">0.003</td><td class="num">9.00</td><td class="grn num">5.8点 △</td><td colspan="2" class="num">レンジ外</td></tr>
+<tr><td class="num">8000</td><td class="num">0.002</td><td class="num">16.0</td><td class="grn num">10.2点 ✓</td><td colspan="2" class="num">レンジ外</td></tr>
+</table>
+<p class="red"><b>結論：20kHzレンジ1発で低い周波数まで全部やろうとすると、低域のηは必ず失敗します。</b></p>
+<div class="card tip">
+<b class="grn">✅ おすすめのやり方（帯域を分けて2〜3回測る）</b>
+<ol class="st">
+<li><b>1回目：20kHz レンジ（Δf=1.5625Hz）</b> — 全体を眺めて「山がどこにあるか」を把握する。ηはまだ信用しない。</li>
+<li><b>2回目：2kHz レンジ（Δf=0.156Hz）</b> — 低域の山のηを正確に取る。</li>
+<li><b>3回目：必要なら 5kHz や 10kHz レンジ</b> — 中域の山を取る。</li>
+</ol>
+エクセルの「設定」シートの<b class="ylw">【6】分解能チェック</b>に fn と想定ηを入れると、
+<b>「OK：十分／注意：やや粗い／不足：レンジを下げて測り直す」</b>と自動で判定します。<b class="red">まずここを見てください。</b>
+</div>
+
+<hr>
+
+<h2 id="c2">第2章　SA-01A4 の設定（実機の操作）</h2>
+<p><span class="badge b-ok">🟢</span>以下はソフトウェアマニュアル（文書番号32873）の記載に沿った手順です。</p>
+<ol class="st">
+<li>機能ボタン「<b class="blue">解析モード</b>」→ <b>［FFT］</b>を選ぶ。</li>
+<li>機能ボタン「<b class="blue">解析周波数</b>」→ レンジを選ぶ（第1章の表を見て決める。まずは 20kHz、次に 2kHz）。</li>
+<li>機能ボタン「<b class="blue">解析サンプリング点数</b>」→ <b>32768</b> を選ぶ。</li>
+<li>機能ボタン「<b class="blue">ウインド</b>」→ <b>［指数・指数］</b>を選ぶ。<br>
+<span class="ylw">※［フォース・指数］は FFT&amp;1/Nオクターブ分析モードのときしか選べません（マニュアル p.39 のノートに明記）。FFTモードなら［指数・指数］でOKです。</span></li>
+<li>メニューバー［入力設定］→［ウインド］→ <b class="ylw">［指数ウィンド設定］</b>に「<b>フレームの終端での減衰値</b>」を入れる。<br>
+<span class="badge b-ck">🔴要現物確認</span> この欄の単位（％か dB か）は、マニュアル本文には「フレームの終端での減衰値を入力します」としか書かれていません。
+<b class="red">実機のダイアログに表示されている単位を必ず目で確認</b>し、エクセルの「設定」シート B14 に「%」か「dB」を合わせて入れてください。</li>
+<li>機能ボタン「<b class="blue">演算方法</b>」→ <b>［無し］</b>（＝平均なし・瞬時）。</li>
+<li>［解析設定］→［FFT解析設定］で「パワースペクトル関連の計算を行う」にチェック。<br>
+<span class="ylw">2ch使ってFRF（伝達関数）を取るなら「クロススペクトル関連の計算を行う」にもチェック。</span></li>
+<li>「スケール設定」で Y軸を<b>dB</b>にしておくと、後で貼り付けが楽です（エクセル側で dB を選ぶだけ）。</li>
+</ol>
+
+<h3>2-1　指数窓の減衰値はいくつにする？</h3>
+<p>減衰値を<b class="blue">小さく</b>する（例：1%）＝ フェードアウトがきつい ＝ 漏れは減るが<b class="red">ηが大きく歪む</b>。<br>
+減衰値を<b class="grn">大きく</b>する（例：20%）＝ フェードアウトが緩い ＝ 歪みは小さいが<b class="ylw">漏れが残る</b>。</p>
+<div class="fx">時定数 τ = − T / ln(r)　　（r = 終端での減衰比、T = 記録時間）<br>
+付加される損失係数 Δη = 1 / (π · fn · τ)</div>
+<table>
+<tr><th>終端減衰値 r</th><th>T=0.64s(20kHz)のτ</th><th>Δη @1kHz</th><th>T=6.4s(2kHz)のτ</th><th>Δη @1kHz</th></tr>
+<tr><td class="num">1 %</td><td class="num">0.139 s</td><td class="red num">0.00229</td><td class="num">1.390 s</td><td class="ylw num">0.000229</td></tr>
+<tr><td class="num">5 %</td><td class="num">0.214 s</td><td class="red num">0.00149</td><td class="num">2.136 s</td><td class="grn num">0.000149</td></tr>
+<tr><td class="num">10 %</td><td class="num">0.278 s</td><td class="ylw num">0.00115</td><td class="num">2.779 s</td><td class="grn num">0.000115</td></tr>
+<tr><td class="num">20 %</td><td class="num">0.398 s</td><td class="ylw num">0.00080</td><td class="num">3.977 s</td><td class="grn num">0.000080</td></tr>
+</table>
+<p class="red"><b>読み取り方</b>：20kHzレンジ（T=0.64s）だと Δη が 0.001〜0.002 もあります。
+鉄の生板の本当のηが 0.0005 なら、<b>測定値の 8割以上が窓のせい</b>ということになり、引き算しても誤差だらけです。
+→ <b class="grn">記録時間 T を長くする（＝レンジを下げる）のが唯一の解決策</b>です。</p>
+<div class="card tip"><b class="grn">🏆 究極の正解：窓を「無し」にする</b><br>
+記録時間 T の中で振動が完全にゼロまで収まるなら、<b>窓は不要（［無し］＝方形窓）</b>で、Δη の補正も要りません。<br>
+必要な時間の目安：<code>t ≒ 6.9 / (π · η · fn)</code>（振幅が 1/1000 になるまで）。<br>
+例：fn=400Hz, η=0.003 → t ≒ 1.83秒 → 2kHzレンジ（T=6.4s）なら<b class="grn">余裕でOK</b>。<br>
+今回は「指数・指数」指定なのでエクセルは補正機能付きにしてありますが、<b class="ylw">窓［無し］が使える条件なら、そちらの方が精度は上</b>です。
+その場合はエクセルの B15（終端減衰値）に大きな値（例 99.9）を入れれば Δη≒0 になります。
+</div>
+
+<hr>
+
+<h2 id="c3">第3章　叩き方・板の吊り方</h2>
+<h3>3-1　吊り方（<ruby>自由<rt>じゆう</rt></ruby>-自由）</h3>
+<svg viewBox="0 0 760 300"><g font-family="sans-serif">
+<rect x="60" y="30" width="640" height="14" fill="#3a4150"/>
+<text x="66" y="24" fill="#9aa4b2" font-size="13">天井・スタンド</text>
+<line x1="250" y1="44" x2="250" y2="150" stroke="#ffd166" stroke-width="2"/>
+<line x1="510" y1="44" x2="510" y2="150" stroke="#ffd166" stroke-width="2"/>
+<text x="150" y="105" fill="#ffd166" font-size="13">ピアノ線 φ0.3〜0.5mm</text>
+<rect x="220" y="150" width="320" height="40" fill="#5b6472" stroke="#9aa4b2" stroke-width="2"/>
+<text x="330" y="176" fill="#e6e8ec" font-size="15">鉄の長方形板</text>
+<circle cx="290" cy="150" r="5" fill="#6fe08a"/><circle cx="470" cy="150" r="5" fill="#6fe08a"/>
+<path d="M600 120 L560 155" stroke="#ff7b7b" stroke-width="3" marker-end="url(#a)"/>
+<defs><marker id="a" markerWidth="8" markerHeight="8" refX="6" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8Z" fill="#ff7b7b"/></marker></defs>
+<text x="590" y="112" fill="#ff7b7b" font-size="13">ハンマーで叩く点（角の近く）</text>
+<circle cx="270" cy="188" r="7" fill="#5fb3ff"/>
+<text x="120" y="215" fill="#5fb3ff" font-size="13">加速度センサ（叩く点と別の場所）</text>
+<line x1="220" y1="230" x2="540" y2="230" stroke="#c1a3ff" stroke-dasharray="6 4"/>
+<text x="300" y="252" fill="#c1a3ff" font-size="13">吊り点はモードの節（せつ）の近くを狙う</text>
+</g></svg>
+<ul>
+<li><b class="ylw">ピアノ線 φ0.3〜0.5mm</b> で吊る。ゴムひもは<b class="red">ダメ</b>（ゴム自体が減衰を持ち、Q値が2〜3倍悪化する＝ηが大きく出る）。</li>
+<li><b class="grn">1/10ルール</b>：吊り具由来の剛体モードが、1次曲げ fn の 1/10 以下になるようにする。効くのは主に<b>線のバウンス（縦揺れ）モード</b>。</li>
+<li>吊り点は、板の<b class="blue">端から0.224L</b>付近（自由-自由1次の節）を狙うと1次モードを邪魔しません。</li>
+</ul>
+<h3>3-2　叩く場所とセンサの場所</h3>
+<div class="card note">
+<b class="ylw">鉄則</b><br>
+① 叩く点は<b class="grn">角（かど）の近く・対称軸から外す</b>。→ 曲げモードもねじりモードも同時に出せる。<br>
+② センサは<b class="grn">叩く点とは別の場所</b>に置く（同じだと駆動点FRFになり、モード形状が取れない）。<br>
+③ <b class="red">節（せつ＝揺れない線）で叩くと、そのモードは出ません。</b> 山が1つ足りないときは、まずこれを疑う。<br>
+④ 対称軸のど真ん中で叩くと、反対称モード（ねじり）が全部消えます。
+</div>
+<h3>3-3　叩き方</h3>
+<ul>
+<li><b class="red">二度打ち（ダブルヒット）は絶対にNG。</b> 時間波形を見て、山が2つあったらそのデータは<b>捨てる</b>。</li>
+<li>強く叩きすぎて波形が<b class="red">クリップ（頭打ち）</b>したデータも捨てる。過負荷LEDが赤く点灯したら即やり直し。</li>
+<li>平均なし（1発打ち）なので、<b class="ylw">1回1回を目で確認</b>してから保存する。これが唯一の品質管理です。</li>
+<li><b class="ylw">コヒーレンスは使えません。</b> 1レコードから計算したコヒーレンスは必ず γ²=1 になり、意味がありません（平均が2回以上必要）。</li>
+</ul>
+
+<hr>
+
+<h2 id="c4">第4章　データをCSVで出す → エクセルに貼る</h2>
+<ol class="st">
+<li>SA-01 で測定 → 停止 → グラフを<b class="blue">「パワースペクトル」</b>（または伝達関数の振幅）にする。</li>
+<li>メニューの［ファイル］系から<b class="ylw">CSV（テキスト）保存</b>を行う。<br>
+<span class="badge b-ck">🔴要現物確認</span> メニュー項目の正確な名前はバージョンによって異なります。実機で「CSV」「テキスト」を含む項目を探してください。</li>
+<li>CSVを LibreOffice Calc で開く。先頭に<b>ヘッダ行（測定条件）</b>が数行〜数十行入っていることが多いので、<b class="red">数値だけの部分</b>を見つける。</li>
+<li>数値部分の <b class="grn">1列目＝周波数[Hz]</b>、<b class="grn">2列目＝レベル</b> をコピー。</li>
+<li>エクセルの<b class="blue">「データ」シートの A2 セル</b>を選んで貼り付け（形式を選択して貼り付け→<b class="ylw">値のみ</b>）。</li>
+</ol>
+<div class="card warn">
+<b class="red">よくある事故</b><br>
+・貼り付けたら数字が<b>文字列</b>になっていた → 右揃えになっていなければ文字列です。［データ］→［テキストから列へ］で数値化。<br>
+・小数点が「,」の<ruby>欧州<rt>おうしゅう</rt></ruby>式になっていた → 読み込み時のロケール設定を確認。<br>
+・元の<b>サンプルデータが下に残っている</b> → 貼り付けた行数が 12801 行未満のとき、A列の残りを<b class="ylw">必ず削除</b>してください（Delete キー）。
+</div>
+
+<hr>
+
+<h2 id="c5">第5章　エクセルの使い方（4ステップ）</h2>
+
+<h3>シート構成</h3>
+<table>
+<tr><th>シート</th><th>役割</th><th>あなたが触る所</th></tr>
+<tr><td><b class="blue">使い方</b></td><td>簡易マニュアル</td><td>なし</td></tr>
+<tr><td><b class="blue">設定</b></td><td>測定条件・窓・ピーク検出・帯域・分解能チェック</td><td class="ylw">黄色いセル（B列）</td></tr>
+<tr><td><b class="blue">データ</b></td><td>貼り付け場所＋自動ピーク検出</td><td class="ylw">A列・B列（2行目から）</td></tr>
+<tr><td><b class="blue">ピーク一覧</b></td><td>★結果★ カーブフィット結果</td><td>なし（見るだけ）</td></tr>
+<tr><td><b class="blue">理論値参考</b></td><td>鉄板のモード周波数の目安</td><td class="ylw">寸法・材料</td></tr>
+</table>
+
+<h3>STEP 1　「設定」シートに測定条件を入れる</h3>
+<table>
+<tr><th>セル</th><th>項目</th><th>入れる値の例</th><th>意味</th></tr>
+<tr><td>B4</td><td>解析周波数レンジ [Hz]</td><td class="num">2000</td><td>SA-01の「解析周波数」の設定値をそのまま</td></tr>
+<tr><td>B5</td><td>レンジ区分</td><td>20kHz以下</td><td>40kHzレンジのときだけ「40kHz」と入力</td></tr>
+<tr><td>B8</td><td>解析サンプリング点数 N</td><td class="num">32768</td><td>今回は最大値</td></tr>
+<tr><td>B14</td><td>減衰値の指定方式</td><td>%</td><td>実機のダイアログ表示に合わせる（%かdB）</td></tr>
+<tr><td>B15</td><td>フレーム終端の減衰値</td><td class="num">5</td><td>実機に入れた値と同じ数字</td></tr>
+<tr><td>B21</td><td>B列（振幅）の単位</td><td>dB</td><td>リニアで貼るなら「リニア」</td></tr>
+<tr><td>B24</td><td>探索の片側点数 m</td><td class="num">8</td><td>山の頂上判定の幅</td></tr>
+<tr><td>B25</td><td>しきい値 [dB]</td><td class="num">-45</td><td>最大ピークより何dB下まで拾うか</td></tr>
+<tr><td>B26</td><td>突出量ウィンドウ M</td><td class="num">40</td><td>ふもと（谷）を見る幅</td></tr>
+<tr><td>B27</td><td>必要な突出量 [dB]</td><td class="num">6</td><td>ノイズの小波を除外する要（かなめ）</td></tr>
+<tr><td>B28 / B29</td><td>解析 開始／終了 周波数</td><td class="num">50 / 2000</td><td>低域のうねりや帯域外を無視する</td></tr>
+<tr><td>B36</td><td>1回目 帯域 片側点数</td><td class="num">25</td><td>最初のざっくりフィット幅</td></tr>
+<tr><td>B37</td><td>2回目 帯域係数</td><td class="num">1.5</td><td>1.0〜2.0 推奨</td></tr>
+<tr><td>B41 / B42</td><td>分解能チェック用 fn / η</td><td class="num">1000 / 0.003</td><td class="red">B45の判定を必ず見る</td></tr>
+</table>
+
+<h3>STEP 2　「データ」シートに貼る</h3>
+<p><b class="ylw">A2セル</b>から下へ 周波数、<b class="ylw">B2セル</b>から下へ 振幅。C〜H列は自動計算なので<b class="red">触らない</b>。</p>
+
+<h3>STEP 3　完全再計算する</h3>
+<div class="card note"><b class="ylw">LibreOffice Calc では <code>Ctrl + Shift + F9</code></b>（完全再計算）を押してください。<br>
+数式が約8万個あるので、<b>数十秒かかることがあります</b>。焦らず待ってください。<br>
+（Excel の場合も <code>Ctrl + Alt + F9</code> で完全再計算）</div>
+
+<h3>STEP 4　「ピーク一覧」シートを読む</h3>
+<table>
+<tr><th>列</th><th>内容</th><th>見方</th></tr>
+<tr><td><b class="grn">Y列</b></td><td><b>★固有振動数 fn [Hz]</b></td><td>これが答え①</td></tr>
+<tr><td>Z列</td><td>η実測（窓込み）</td><td>まだ補正前。大きめに出る</td></tr>
+<tr><td>AA列</td><td>Δη 窓補正量</td><td>指数窓が上乗せした分</td></tr>
+<tr><td><b class="grn">AB列</b></td><td><b>★損失係数 η（補正後）</b></td><td>これが答え②　AB = Z − AA</td></tr>
+<tr><td>AC列</td><td>Q値</td><td>Q = 1/η。響きやすさ</td></tr>
+<tr><td>AD列</td><td>減衰比 ζ</td><td>ζ = η/2</td></tr>
+<tr><td>W列</td><td>R²（フィットの良さ）</td><td class="ylw">0.9未満なら疑う。0.99以上なら優秀</td></tr>
+<tr><td>AE列</td><td>半値幅法のη（参考）</td><td>AB列と大きくズレたら要注意</td></tr>
+<tr><td><b class="red">AF列</b></td><td>判定 OK / 要確認</td><td class="red">「要確認」の行は必ず目で見る</td></tr>
+</table>
+
+<h3>📊 サンプルデータでの動作確認結果（このファイルに最初から入っています）</h3>
+<p>2kHzレンジ・32768点・指数窓5%を想定した<b>模擬データ</b>（正解が分かっているデータ）を入れてあります。
+実際に計算させた結果がこちらです。<span class="badge b-ok">🟢このファイルで実測</span></p>
+<table>
+<tr><th>No</th><th>真の fn</th><th>算出 fn</th><th>誤差</th><th>真の η</th><th>算出 η</th><th>誤差</th><th>R²</th><th>判定</th></tr>
+<tr><td class="num">1</td><td class="num">412.50</td><td class="num">412.41</td><td class="grn num">-0.02%</td><td class="num">0.00400</td><td class="num">0.003948</td><td class="grn num">-1.3%</td><td class="num">0.9966</td><td class="grn">OK</td></tr>
+<tr><td class="num">2</td><td class="num">628.10</td><td class="num">627.98</td><td class="grn num">-0.02%</td><td class="num">0.00350</td><td class="num">0.003505</td><td class="grn num">+0.2%</td><td class="num">0.9971</td><td class="grn">OK</td></tr>
+<tr><td class="num">3</td><td class="num">905.00</td><td class="num">904.84</td><td class="grn num">-0.02%</td><td class="num">0.00300</td><td class="num">0.002982</td><td class="grn num">-0.6%</td><td class="num">0.9951</td><td class="grn">OK</td></tr>
+<tr><td class="num">4</td><td class="num">1120.50</td><td class="num">1120.47</td><td class="grn num">-0.00%</td><td class="num">0.00280</td><td class="num">0.002764</td><td class="grn num">-1.3%</td><td class="num">0.9987</td><td class="grn">OK</td></tr>
+<tr><td class="num">5</td><td class="num">1438.00</td><td class="num">1438.01</td><td class="grn num">+0.00%</td><td class="num">0.00250</td><td class="num">0.002499</td><td class="grn num">-0.0%</td><td class="num">0.9990</td><td class="grn">OK</td></tr>
+<tr><td class="num">6</td><td class="num">1742.50</td><td class="num">1742.61</td><td class="grn num">+0.01%</td><td class="num">0.00220</td><td class="num">0.002197</td><td class="grn num">-0.1%</td><td class="num">0.9971</td><td class="grn">OK</td></tr>
+</table>
+<p class="grn"><b>fn の誤差 0.02% 以内、η の誤差 1.3% 以内</b>で正解を復元できています。ノイズ（1.2%）を乗せた状態での結果です。</p>
+
+<hr>
+
+<h2 id="c6">第6章　自動ピーク検出のしくみ</h2>
+<p>「山を見つける」を機械にやらせるには、<b class="ylw">「山とは何か」を数式で定義</b>しないといけません。このファイルでは<b>4つの条件を全部</b>満たしたときだけ「山」と認めます。</p>
+<svg viewBox="0 0 760 300"><g font-family="sans-serif">
+<line x1="60" y1="250" x2="720" y2="250" stroke="#7d8794" stroke-width="2"/>
+<path d="M60 240 L140 236 L180 238 L200 232 L220 234 L240 200 L255 120 L262 70 L268 62 L275 75 L282 130 L300 205 L320 236 L360 240 L400 233 L430 238 L470 200 L485 165 L495 158 L505 168 L520 205 L560 238 L600 234 L640 240 L680 236 L720 241"
+ fill="none" stroke="#5fb3ff" stroke-width="2.4"/>
+<line x1="60" y1="215" x2="720" y2="215" stroke="#ff7b7b" stroke-dasharray="6 4"/>
+<text x="600" y="209" fill="#ff7b7b" font-size="12">② しきい値（最大から−45dB）</text>
+<circle cx="268" cy="62" r="6" fill="#6fe08a"/><circle cx="495" cy="158" r="6" fill="#6fe08a"/>
+<text x="278" y="55" fill="#6fe08a" font-size="12">①左右m点より高い＝頂上</text>
+<line x1="230" y1="62" x2="230" y2="205" stroke="#ffd166" stroke-width="1.4"/>
+<line x1="230" y1="62" x2="255" y2="62" stroke="#ffd166" stroke-dasharray="3 3"/>
+<line x1="230" y1="205" x2="320" y2="205" stroke="#ffd166" stroke-dasharray="3 3"/>
+<text x="90" y="130" fill="#ffd166" font-size="12">③ 突出量</text>
+<text x="90" y="148" fill="#ffd166" font-size="12">（谷から6dB以上）</text>
+<rect x="60" y="255" width="40" height="40" fill="#3a2020" opacity=".8"/>
+<text x="62" y="280" fill="#ff7b7b" font-size="11">④帯域外</text>
+</g></svg>
+<h3>4つの条件</h3>
+<ol class="st">
+<li><b class="grn">頂上であること</b>：左 m 点の最大値以上、かつ 右 m 点の最大値より大きい。（設定 B24 = m）</li>
+<li><b class="grn">十分に高いこと</b>：全体の最大振幅から −45 dB 以内。（設定 B25）<br>
+<span class="sub">これは「ノイズの床すれすれの小さな山は無視する」というルールです。</span></li>
+<li><b class="grn">十分に突き出ていること（突出量 / prominence）</b>：左右 M 点の範囲にある「谷（最小値）」のうち<b class="ylw">浅い方</b>より 6 dB 以上高いこと。（設定 B26, B27）<br>
+<span class="sub">🍰 <b>たとえ話</b>：山の高さを「海面からの高さ」ではなく「まわりの谷底からの高さ」で測るということ。
+高い台地の上のちょっとした<ruby>凸凹<rt>でこぼこ</rt></ruby>を「山」と呼ばないための工夫です。<b class="red">これが無いと、ノイズのさざ波を数百個も拾ってしまいます。</b></span></li>
+<li><b class="grn">指定した周波数帯の中</b>：開始周波数〜終了周波数の間。（設定 B28, B29）<br>
+<span class="sub">DC付近のうねりや、吊り具の剛体モード（数Hz〜数十Hz）を除外します。</span></li>
+</ol>
+<h3>調整のコツ</h3>
+<table>
+<tr><th>症状</th><th>原因</th><th>対処</th></tr>
+<tr><td class="red">ピークが多すぎる（40個超）</td><td>ノイズを拾っている</td><td>B27（突出量）を 6→10 dB、B26（M）を 40→80 に上げる</td></tr>
+<tr><td class="red">明らかな山が拾われない</td><td>しきい値が厳しい</td><td>B25 を -45→-60 dB、B27 を 6→3 dB に下げる</td></tr>
+<tr><td class="red">1つの山が2つに割れる</td><td>ノイズで頂上がギザギザ</td><td>B24（m）を 8→20 に上げる</td></tr>
+<tr><td class="red">近い2つの山が1つになる</td><td>M が広すぎる</td><td>B26（M）を 40→15 に下げる</td></tr>
+</table>
+
+<hr>
+
+<h2 id="c7">第7章　カーブフィットのしくみ（数式の導出）</h2>
+<div class="card note"><b class="ylw">ここは「なぜそうなるか」の説明です。</b> 使うだけなら読み飛ばして構いませんが、
+上司に説明するときや、結果を疑ったときに戻ってきてください。</div>
+
+<h3>7-1　1自由度系の理論式</h3>
+<p>1つの山（＝1つのモード）だけを取り出すと、その周りの応答は次の形になります（<ruby>構造減衰<rt>こうぞうげんすい</rt></ruby>モデル）。</p>
+<div class="fx">H(f) = A / ( f<sub>n</sub>² − f² + i·η·f<sub>n</sub>² )</div>
+<p>大きさ（振幅）の2乗をとると：</p>
+<div class="fx">|H(f)|² = A² / [ (f<sub>n</sub>² − f²)² + η²·f<sub>n</sub>⁴ ]</div>
+
+<h3>7-2　<ruby>逆数<rt>ぎゃくすう</rt></ruby>をとると「ただの2次関数」になる（これが仕掛け）</h3>
+<p>両辺をひっくり返します。</p>
+<div class="fx">y ≡ 1 / |H(f)|² = [ (f<sub>n</sub>² − f²)² + η²·f<sub>n</sub>⁴ ] / A²</div>
+<p>ここで <b class="ylw">v = f² / f<sub>p</sub>²</b>（f<sub>p</sub>はピークのおおよその周波数）、<b class="ylw">v<sub>n</sub> = f<sub>n</sub>² / f<sub>p</sub>²</b> と置き換えると：</p>
+<div class="fx">y = a₂·v² + a₁·v + a₀　　←　<b>ただの2次関数！</b></div>
+<p>係数と物理量の対応は次のようになります（展開して比べるだけ）：</p>
+<div class="fx">a₁ = −2·v<sub>n</sub>·a₂　　→　<b class="grn">v<sub>n</sub> = − a₁ / (2·a₂)</b>　→　<b class="grn">f<sub>n</sub> = f<sub>p</sub>·√v<sub>n</sub></b><br><br>
+a₀ = v<sub>n</sub>²·(1 + η²)·a₂　　→　<b class="grn">η = √( a₀ / (a₂·v<sub>n</sub>²) − 1 )</b></div>
+<div class="card tip">
+<b class="grn">🎯 なぜこれが嬉しいのか</b><br>
+本来のカーブフィットは「非線形<ruby>最小二乗法<rt>さいしょうにじょうほう</rt></ruby>」で、<ruby>反復計算<rt>はんぷくけいさん</rt></ruby>（ソルバー）が必要です。<br>
+ところが<b class="ylw">逆数をとると2次関数になる</b>ので、エクセルの <code>LINEST</code>（線形回帰）1発で、<b class="grn">反復なし・ソルバー不要・一意な解</b>が得られます。<br>
+つまり<b>「山の周りの数十点すべてを使った、正真正銘の最小二乗カーブフィット」</b>が、関数1つでできてしまうのです。<br>
+<span class="sub">※ これは有理分数多項式法（RFP / Rational Fraction Polynomial）の1自由度・分母のみ版に相当します。</span>
+</div>
+
+<h3>7-3　v で<ruby>規格化<rt>きかくか</rt></ruby>する理由</h3>
+<p>もし f² のまま計算すると、f=1000Hz で f²=10⁶、f⁴=10¹² となり、<b class="red">桁が違いすぎて計算精度が壊れます</b>（数値的に<ruby>不安定<rt>ふあんてい</rt></ruby>）。<br>
+v = f²/f<sub>p</sub>² と割ると <b class="grn">v ≒ 1 付近の小さな数</b>になり、精度が保たれます。エクセルの数式で <code>/$C5^2</code> と割っているのがこれです。</p>
+
+<h3>7-4　2回フィットする理由（帯域の自動調整）</h3>
+<ol class="st">
+<li><b>1回目</b>：とりあえず ±25点 の固定幅でフィット → ざっくり η を推定。</li>
+<li><b>2回目</b>：得られた η から <b class="ylw">帯域幅 = 1.5 × η × f<sub>n</sub></b> を計算し、その幅（点数に換算）で再フィット。</li>
+</ol>
+<p>これで、<b class="grn">細い山には狭い帯域、太い山には広い帯域</b>が自動的に割り当てられます。
+帯域が広すぎると隣の山が混ざり、狭すぎると点数が足りません。この自動調整が精度の要です。</p>
+
+<h3>7-5　R²（決定係数）の見方</h3>
+<table>
+<tr><th>R²</th><th>意味</th><th>対応</th></tr>
+<tr><td class="num">0.99 以上</td><td class="grn">非常に良い</td><td>そのまま採用</td></tr>
+<tr><td class="num">0.90〜0.99</td><td class="ylw">おおむね良い</td><td>採用可。念のためグラフ確認</td></tr>
+<tr><td class="num">0.90 未満</td><td class="red">悪い</td><td>双子モード・ノイズ・分解能不足を疑う</td></tr>
+</table>
+
+<hr>
+
+<h2 id="c8">第8章　指数窓の補正（なぜ引き算するのか）</h2>
+<h3>8-1　しくみ</h3>
+<p>指数窓は時間波形に <code>w(t) = exp(−t/τ)</code> を掛けます。
+一方、揺れそのものも <code>exp(−ζ·ωn·t)</code> で減っています。掛け算すると：</p>
+<div class="fx">exp(−ζ·ω<sub>n</sub>·t) × exp(−t/τ) = exp( −(ζ·ω<sub>n</sub> + 1/τ)·t )</div>
+<p>つまり<b class="red">「実際より 1/τ だけ速く減衰した波」</b>に見えます。減衰比に直すと <code>Δζ = 1/(ω<sub>n</sub>·τ)</code>、
+損失係数は η = 2ζ なので：</p>
+<div class="fx"><b class="grn">Δη = 2/(ω<sub>n</sub>·τ) = 2/(2π·f<sub>n</sub>·τ) = 1/(π·f<sub>n</sub>·τ)</b><br><br>
+<b class="grn">η<sub>真</sub> = η<sub>実測</sub> − Δη</b></div>
+<svg viewBox="0 0 760 250"><g font-family="sans-serif">
+<line x1="60" y1="200" x2="720" y2="200" stroke="#7d8794" stroke-width="2"/>
+<line x1="60" y1="200" x2="60" y2="30" stroke="#7d8794" stroke-width="2"/>
+<path d="M60 40 Q160 150 260 180 Q400 197 720 199" fill="none" stroke="#6fe08a" stroke-width="2.6"/>
+<text x="270" y="150" fill="#6fe08a" font-size="13">本当の揺れ（ゆっくり減る）</text>
+<path d="M60 40 Q120 160 180 190 Q300 199 720 200" fill="none" stroke="#ffd166" stroke-width="2.2" stroke-dasharray="7 4"/>
+<text x="230" y="80" fill="#ffd166" font-size="13">指数窓 exp(−t/τ)</text>
+<path d="M60 40 Q100 170 150 194 Q260 200 720 200" fill="none" stroke="#ff7b7b" stroke-width="2.6"/>
+<text x="120" y="230" fill="#ff7b7b" font-size="13">分析器が見る波（速く減る）→ ηが大きく出る</text>
+</g></svg>
+
+<h3>8-2　補正が効かなくなる限界</h3>
+<div class="card warn">
+<b class="red">Δη が η実測 の半分を超えたら、その値は信用してはいけません。</b><br>
+引き算した後に残るのが「小さい数どうしの差」になり、<ruby>桁落<rt>けたお</rt></ruby>ちで誤差が暴れます。<br>
+エクセルの判定（AF列）では <code>η実測 &gt; Δη × 1.05</code> を条件に入れていますが、
+実用上は <b class="ylw">Δη ≦ η実測 × 0.3</b> を目標にしてください。<br>
+→ 満たせないときは <b class="grn">記録時間 T を長くする（レンジを下げる）</b>か <b class="grn">窓を［無し］にする</b>。
+</div>
+
+<hr>
+
+<h2 id="c9">第9章　結果の読み方と「要確認」の対処</h2>
+<h3>「要確認」が出る条件</h3>
+<p>AF列は次のすべてを満たしたときだけ「OK」になります。</p>
+<ul>
+<li>R²（2回目）≧ 0.9</li>
+<li>補正後の η &gt; 0</li>
+<li>フィットに使った点数 ≧ 10</li>
+<li>η実測 &gt; Δη × 1.05（窓の影響で全部説明できてしまわない）</li>
+</ul>
+<h3>原因と対処</h3>
+<table>
+<tr><th>症状</th><th>考えられる原因</th><th>対処</th></tr>
+<tr><td class="red">η が<b>マイナス</b>になる</td><td>指数窓の付加分の方が大きい</td><td>レンジを下げて T を伸ばす／窓を［無し］に</td></tr>
+<tr><td class="red">点数が10未満</td><td>Δf が粗すぎる</td><td>解析周波数レンジを下げる（設定B4）</td></tr>
+<tr><td class="red">R² が低い</td><td>双子モード（近接2モード）</td><td>1自由度フィットでは原理的に不可。CMIF＋多参照法（MIMO・PolyMAX/RFP）が必要</td></tr>
+<tr><td class="red">R² が低い</td><td>ノイズが多い</td><td>叩き直す。強めに叩く（ただしクリップさせない）</td></tr>
+<tr><td class="red">半値幅法(AE列)と大きく違う</td><td>山が非対称＝隣のモードの影響</td><td>設定B37（帯域係数）を 1.5→1.0 に狭める</td></tr>
+</table>
+<div class="card warn">
+<b class="red">⚠ 双子モード（degenerate / doublet）について</b><br>
+長方形板でも、寸法比によっては2つのモードがほとんど同じ周波数に来ることがあります。
+時間波形に<b class="ylw">「うなり（ビート）」</b>が見えたら、その山は2つのモードが重なっています。<br>
+<b class="red">このエクセルの1自由度フィットでは、双子モードは分離できません。絶対に1つに<ruby>丸<rt>まる</rt></ruby>めないでください。</b><br>
+分離には <b>複数点加振・複数点計測（MIMO）＋多参照カーブフィット（PolyMAX / RFP）</b>と、
+モード指標関数 <b>CMIF</b> による本数判定が必要です。
+</div>
+
+<hr>
+
+<h2 id="c10">第10章　よくあるミス集</h2>
+<table>
+<tr><th>#</th><th>ミス</th><th>結果</th><th>正しくは</th></tr>
+<tr><td class="num">1</td><td>20kHzレンジ1発で低域のηも取ろうとする</td><td class="red">低域のηが全部デタラメ</td><td>帯域を分けて2〜3回測る</td></tr>
+<tr><td class="num">2</td><td>指数窓の補正を忘れる</td><td class="red">ηが数倍大きく出る</td><td>AB列（補正後）を使う。Z列を使わない</td></tr>
+<tr><td class="num">3</td><td>ゴムひもで吊る</td><td class="red">ηが2〜3倍大きく出る</td><td>ピアノ線 φ0.3〜0.5mm</td></tr>
+<tr><td class="num">4</td><td>二度打ちデータを混ぜる</td><td class="red">ニセの山が出る</td><td>時間波形を毎回目視、二度打ちは捨てる</td></tr>
+<tr><td class="num">5</td><td>クリップ（過負荷）したまま測る</td><td class="red">高調波のニセ山＋ηが歪む</td><td>過負荷LED点灯なら入力レンジを上げる</td></tr>
+<tr><td class="num">6</td><td>節（せつ）を叩く</td><td class="red">山が1つ消える</td><td>角の近く・対称軸を外して叩く</td></tr>
+<tr><td class="num">7</td><td>コヒーレンスが1だから良いデータだと判断</td><td class="red">全くの誤解</td><td>平均なしのγ²は常に1。品質判断に使えない</td></tr>
+<tr><td class="num">8</td><td>貼り付け後に再計算していない</td><td class="red">前の結果が残ったまま</td><td>Ctrl+Shift+F9（完全再計算）</td></tr>
+<tr><td class="num">9</td><td>古いサンプルデータが下に残っている</td><td class="red">ニセの山が出る</td><td>A列の余った行をDeleteで消す</td></tr>
+<tr><td class="num">10</td><td>dB/リニアの設定を間違える</td><td class="red">ηが桁違いになる</td><td>設定B21を貼ったデータに合わせる</td></tr>
+<tr><td class="num">11</td><td>センサを叩く点と同じ場所に付ける</td><td class="ylw">モード形状が取れない</td><td>別の場所に付ける（ηだけなら問題なし）</td></tr>
+<tr><td class="num">12</td><td>センサの質量が板に対して重い</td><td class="ylw">fnが下がる（質量負荷）</td><td>センサ質量 ≦ 板質量の 1/100 を目安に</td></tr>
+</table>
+
+<hr>
+
+<h2 id="c11">第11章　エクセル数式の全リスト（貼り付け用）</h2>
+<p>ファイルには全部入っていますが、<b class="ylw">自分で組み直したいとき</b>や、<b class="ylw">別のブックで一部だけ使いたいとき</b>のために、
+数式を「セル → 式」の形で全部並べておきます。</p>
+
+<h3>11-1　測定条件の計算（設定シート）</h3>
+<button class="copy" onclick="cp('t1',this)">📋 コピー（タブ区切り・そのままエクセルへ）</button>
+<pre class="tsv" id="t1">セル	入力/式	意味
+B4	2000	解析周波数レンジ [Hz]
+B5	20kHz以下	レンジ区分
+B6	=IF($B$5="40kHz",2.4,2.56)	サンプリング係数
+B7	=$B$4*$B$6	サンプリング周波数 fs [Hz]
+B8	32768	解析サンプリング点数 N
+B9	=ROUNDDOWN($B$8/$B$6,0)+1	表示ライン数
+B10	=$B$8/$B$7	記録時間 T [s]
+B11	=$B$7/$B$8	周波数分解能 Δf [Hz]</pre>
+<table>
+<tr><th>セル</th><th>入力／式</th><th>意味</th></tr>
+<tr><td>B4</td><td class="num">2000</td><td>解析周波数レンジ [Hz]</td></tr>
+<tr><td>B5</td><td>20kHz以下</td><td>レンジ区分</td></tr>
+<tr><td>B6</td><td><code>=IF($B$5="40kHz",2.4,2.56)</code></td><td>サンプリング係数</td></tr>
+<tr><td>B7</td><td><code>=$B$4*$B$6</code></td><td>サンプリング周波数 fs</td></tr>
+<tr><td>B8</td><td class="num">32768</td><td>解析サンプリング点数 N</td></tr>
+<tr><td>B9</td><td><code>=ROUNDDOWN($B$8/$B$6,0)+1</code></td><td>表示ライン数</td></tr>
+<tr><td>B10</td><td><code>=$B$8/$B$7</code></td><td>記録時間 T [s]</td></tr>
+<tr><td>B11</td><td><code>=$B$7/$B$8</code></td><td>周波数分解能 Δf [Hz]</td></tr>
+</table>
+
+<h3>11-2　指数窓の時定数</h3>
+<button class="copy" onclick="cp('t2',this)">📋 コピー</button>
+<pre class="tsv" id="t2">セル	入力/式	意味
+B14	%	減衰値の指定方式（%かdB）
+B15	5	フレーム終端の減衰値
+B16	=IF($B$14="dB",10^($B$15/20),$B$15/100)	減衰比 r
+B17	=-$B$10/LN($B$16)	時定数 τ [s]
+B18	=1/(PI()*1000*$B$17)	付加損失係数 Δη @1kHz</pre>
+<table>
+<tr><th>セル</th><th>入力／式</th><th>意味</th></tr>
+<tr><td>B14</td><td>%</td><td>減衰値の指定方式</td></tr>
+<tr><td>B15</td><td class="num">5</td><td>フレーム終端の減衰値</td></tr>
+<tr><td>B16</td><td><code>=IF($B$14="dB",10^($B$15/20),$B$15/100)</code></td><td>減衰比 r</td></tr>
+<tr><td>B17</td><td><code>=-$B$10/LN($B$16)</code></td><td>時定数 τ [s]</td></tr>
+<tr><td>B18</td><td><code>=1/(PI()*1000*$B$17)</code></td><td>Δη @1kHz</td></tr>
+</table>
+
+<h3>11-3　分解能チェック</h3>
+<button class="copy" onclick="cp('t3',this)">📋 コピー</button>
+<pre class="tsv" id="t3">セル	入力/式	意味
+B41	1000	代表周波数 fn [Hz]
+B42	0.003	想定する損失係数 η
+B43	=$B$41*$B$42	半値幅 Δf3dB [Hz]
+B44	=$B$43/$B$11	半値幅内のデータ点数
+B45	=IF($B$44>=10,"OK：十分",IF($B$44>=5,"注意：やや粗い","不足：レンジを下げて測り直す"))	判定</pre>
+<table>
+<tr><th>セル</th><th>入力／式</th></tr>
+<tr><td>B43</td><td><code>=$B$41*$B$42</code></td></tr>
+<tr><td>B44</td><td><code>=$B$43/$B$11</code></td></tr>
+<tr><td>B45</td><td><code>=IF($B$44&gt;=10,"OK：十分",IF($B$44&gt;=5,"注意：やや粗い","不足：レンジを下げて測り直す"))</code></td></tr>
+</table>
+
+<h3>11-4　データシート（2行目の式。下へコピー）</h3>
+<button class="copy" onclick="cp('t4',this)">📋 コピー</button>
+<pre class="tsv" id="t4">列	2行目の式	意味
+A	（貼付）	周波数 f [Hz]
+B	（貼付）	振幅
+C	=IF($A2="","",IF(設定!$B$21="dB",10^($B2/20),ABS($B2)))	|H| リニア
+D	=IF($A2="","",$A2^2)	u = f^2
+E	=IF($A2="","",IF($C2<=0,"",1/$C2^2))	y = 1/|H|^2
+G	=IF($F2=1,1,0)　（3行目以降は =$G2+IF($F3=1,1,0)）	通番
+H	=IF($F2=1,$G2,"")	ピークID</pre>
+<table>
+<tr><th>列</th><th>2行目の式</th><th>意味</th></tr>
+<tr><td>C</td><td><code>=IF($A2="","",IF(設定!$B$21="dB",10^($B2/20),ABS($B2)))</code></td><td>|H| リニア</td></tr>
+<tr><td>D</td><td><code>=IF($A2="","",$A2^2)</code></td><td>u = f²</td></tr>
+<tr><td>E</td><td><code>=IF($A2="","",IF($C2&lt;=0,"",1/$C2^2))</code></td><td>y = 1/|H|²</td></tr>
+<tr><td>G</td><td><code>=IF($F2=1,1,0)</code> / 3行目以降 <code>=$G2+IF($F3=1,1,0)</code></td><td>通番</td></tr>
+<tr><td>H</td><td><code>=IF($F2=1,$G2,"")</code></td><td>ピークID</td></tr>
+</table>
+
+<h4>F列（ピーク判定）— これが心臓部です</h4>
+<button class="copy" onclick="cp('t5',this)">📋 コピー（F2セルに貼る）</button>
+<pre class="tsv" id="t5">=IF(OR(ROW()-設定!$B$30&lt;2,ROW()+設定!$B$30&gt;13701,N($A2)&lt;=0,N(INDEX($A$2:$A$13701,MIN(13700,MAX(1,ROW()-1+設定!$B$30))))&lt;=0,$A2&lt;設定!$B$28,$A2&gt;設定!$B$29),0,IF(AND($C2&gt;=MAX(INDEX($C$1:$C$13701,MAX(1,ROW()-設定!$B$24)):INDEX($C$1:$C$13701,MAX(1,ROW()-1))),$C2&gt;MAX(INDEX($C$1:$C$13701,MIN(13701,ROW()+1)):INDEX($C$1:$C$13701,MIN(13701,ROW()+設定!$B$24))),$C2&gt;=設定!$B$32,$C2&gt;=MAX(MIN(INDEX($C$1:$C$13701,MAX(1,ROW()-設定!$B$26)):INDEX($C$1:$C$13701,MAX(1,ROW()-1))),MIN(INDEX($C$1:$C$13701,MIN(13701,ROW()+1)):INDEX($C$1:$C$13701,MIN(13701,ROW()+設定!$B$26))))*10^(設定!$B$27/20)),1,0))</pre>
+<p class="sub">長いですが、やっていることは第6章の4条件そのものです。
+<code>INDEX(範囲,a):INDEX(範囲,b)</code> は「a行目からb行目までの<ruby>可変<rt>かへん</rt></ruby>範囲」を作るテクニックで、
+<code>OFFSET</code> と違って<b class="grn">揮発性関数ではない</b>ため、再計算が速くなります。</p>
+
+<h3>11-5　ピーク一覧シート（5行目の式。下へコピー）</h3>
+<button class="copy" onclick="cp('t6',this)">📋 コピー</button>
+<pre class="tsv" id="t6">セル	式	意味
+A5	1	番号
+B5	=IFERROR(MATCH($A5,データ!$H$2:$H$13701,0),"")	何行目のピークか
+C5	=IF($B5="","",INDEX(データ!$A$2:$A$13701,$B5))	ピーク周波数 f_p
+E5	=IF($B5="","",INDEX(データ!$C$2:$C$13701,$B5))	|H|peak
+F5	=IF($B5="","",MAX(1,$B5-設定!$B$36))	1回目 帯域 開始
+G5	=IF($B5="","",MIN(設定!$B$38,$B5+設定!$B$36))	1回目 帯域 終了
+I5	=IFERROR(INDEX(LINEST(INDEX(データ!$E$2:$E$13701,$F5):INDEX(データ!$E$2:$E$13701,$G5),(INDEX(データ!$D$2:$D$13701,$F5):INDEX(データ!$D$2:$D$13701,$G5)/$C5^2)^{1,2},TRUE,TRUE),1,1),"")	a2
+J5	=IFERROR(INDEX(LINEST(...同上...),1,2),"")	a1
+K5	=IFERROR(INDEX(LINEST(...同上...),1,3),"")	a0
+L5	=IFERROR(INDEX(LINEST(...同上...),3,1),"")	R^2
+M5	=IF($I5="","",-$J5/(2*$I5))	vn
+N5	=IF($M5="","",IF($M5<=0,"",$C5*SQRT($M5)))	1回目 fn
+O5	=IF($M5="","",IFERROR(SQRT(MAX(0,$K5/($I5*$M5^2)-1)),""))	1回目 η
+P5	=IF(OR($O5="",$N5=""),"",MAX(6,MIN(400,ROUND(設定!$B$37*$O5*$N5/設定!$B$11,0))))	2回目 片側点数
+Q5	=IF($P5="","",MAX(1,$B5-$P5))	2回目 開始
+R5	=IF($P5="","",MIN(設定!$B$38,$B5+$P5))	2回目 終了
+X5	=IF($T5="","",-$U5/(2*$T5))	vn（2回目）
+Y5	=IF($X5="","",IF($X5<=0,"",$C5*SQRT($X5)))	★固有振動数 fn
+Z5	=IF($X5="","",IFERROR(SQRT(MAX(0,$V5/($T5*$X5^2)-1)),""))	η実測（窓込み）
+AA5	=IF($Y5="","",1/(PI()*$Y5*設定!$B$17))	Δη 窓補正量
+AB5	=IF(OR($Z5="",$AA5=""),"",$Z5-$AA5)	★損失係数 η（補正後）
+AC5	=IF($AB5="","",IF($AB5<=0,"",1/$AB5))	Q値
+AD5	=IF($AB5="","",$AB5/2)	減衰比 ζ</pre>
+
+<h4>★ カーブフィットの核（I5セル）を単独で</h4>
+<button class="copy" onclick="cp('t7',this)">📋 コピー</button>
+<pre class="tsv" id="t7">=IFERROR(INDEX(LINEST(INDEX(データ!$E$2:$E$13701,$F5):INDEX(データ!$E$2:$E$13701,$G5),(INDEX(データ!$D$2:$D$13701,$F5):INDEX(データ!$D$2:$D$13701,$G5)/$C5^2)^{1,2},TRUE,TRUE),1,1),"")</pre>
+<div class="card note">
+<b class="ylw">この式の読み方</b><br>
+・<code>LINEST(yの範囲, xの範囲, TRUE, TRUE)</code> ＝ 最小二乗の直線／曲線あてはめ<br>
+・<code>(… /$C5^2)^{1,2}</code> ＝ <b class="grn">v と v² の2列を同時に作る</b>魔法。これで2次関数のフィットになります<br>
+・<code>INDEX(…,1,1)</code>＝v²の係数 a₂、<code>(1,2)</code>＝vの係数 a₁、<code>(1,3)</code>＝定数項 a₀、<code>(3,1)</code>＝R²<br>
+・<span class="red">LINESTの係数は「次数の高い順」に返ってくる</span>ので、この順番になります。ここを間違えると答えが逆さまになります。
+</div>
+
+<h3>11-6　理論値（鉄板の目安）— 自由-自由はり</h3>
+<button class="copy" onclick="cp('t8',this)">📋 コピー</button>
+<pre class="tsv" id="t8">セル	入力/式	意味
+B5	2.06E+11	ヤング率 E [Pa]（鉄）
+B6	7850	密度 ρ [kg/m^3]（鉄）
+B7	0.2	長さ L [m]
+B8	0.1	幅 w [m]
+B9	0.005	厚さ h [m]
+B12	=SQRT($B$5/$B$6)	sqrt(E/ρ)
+B16	4.730041	βL（1次）
+C16	=$B16^2	(βL)^2
+D16	=$C16/(2*PI()*$B$7^2)*$B$9*$B$12/SQRT(12)	長さ方向 f [Hz]
+E16	=$C16/(2*PI()*$B$8^2)*$B$9*$B$12/SQRT(12)	幅方向 f [Hz]</pre>
+<p><b class="ylw">βL の値</b>（cos(βL)·cosh(βL)=1 の解）：
+<code>4.730041, 7.853205, 10.995608, 14.137165, 17.278760, 20.420352</code> <span class="badge b-ok">🟢</span></p>
+<div class="fx">f<sub>n</sub> = (βL)² / (2π·L²) × h·√(E/ρ) / √12</div>
+<p class="sub">※ 断面2次モーメント I = w·h³/12、断面積 A = w·h より √(EI/(ρA)) = h·√(E/ρ)/√12 となることから。<br>
+※ <b class="red">L/w ≧ 4 でないと「はり近似」は成立しません</b>（板は2次元的に曲がるため）。目安として使ってください。</p>
+
+<hr>
+
+<h2 id="c12">第12章　出典と確信度</h2>
+<table>
+<tr><th>内容</th><th>確信度</th><th>根拠</th></tr>
+<tr><td>SA-01A4 FFT解析長 2^N（64〜32768点）</td><td><span class="badge b-ok">🟢検証済</span></td><td>SA01A2_SA01A4_Manual_Hardware_32863.pdf「分析部」</td></tr>
+<tr><td>表示ライン数（20kHz以下:…12801／40kHz:…13654）</td><td><span class="badge b-ok">🟢検証済</span></td><td>同上</td></tr>
+<tr><td>サンプリング周波数＝レンジ×2.56（40kHzのみ×2.4）</td><td><span class="badge b-ok">🟢検証済</span></td><td>同上</td></tr>
+<tr><td>窓関数の種類、［フォース・指数］はFFT&amp;1/Nモード限定</td><td><span class="badge b-ok">🟢検証済</span></td><td>SA-01…Manual_Software_32873.pdf p.39, p.77-78</td></tr>
+<tr><td>［指数ウィンド設定］＝フレーム終端での減衰値</td><td><span class="badge b-ok">🟢検証済</span></td><td>同 p.78</td></tr>
+<tr><td>その減衰値の<b>単位</b>（%かdBか）</td><td><span class="badge b-ck">🔴要現物確認</span></td><td>マニュアル本文に単位の明記なし。実機ダイアログで確認を</td></tr>
+<tr><td>平均［無し］が選択可能</td><td><span class="badge b-ok">🟢検証済</span></td><td>同 p.40, p.81</td></tr>
+<tr><td>Δη = 1/(π·fn·τ)（指数窓の付加減衰）</td><td><span class="badge b-ok">🟢理論導出</span></td><td>本ガイド第8章に導出。ASTM E756 等でも標準的な扱い</td></tr>
+<tr><td>逆FRF2次多項式によるカーブフィット</td><td><span class="badge b-ok">🟢理論導出＋数値検証</span></td><td>第7章に導出。模擬データでη誤差1.3%以内を確認</td></tr>
+<tr><td>自由-自由はりの βL 値</td><td><span class="badge b-ok">🟢検証済</span></td><td>cos(βL)cosh(βL)=1 の数値解（古典的既知値）</td></tr>
+<tr><td>CSV保存メニューの正確な名称</td><td><span class="badge b-ck">🔴要現物確認</span></td><td>バージョン差あり。実機で確認を</td></tr>
+</table>
+
+<div class="card tip" style="margin-top:36px">
+<b class="grn">🎓 最後に、覚えておくべき3行</b><br>
+① <b class="ylw">分解能チェックが「不足」なら、何をやってもηは出ない。</b>まずレンジを下げる。<br>
+② <b class="ylw">Z列（実測η）ではなく AB列（補正後η）が答え。</b>指数窓の分は必ず引く。<br>
+③ <b class="ylw">AF列が「要確認」の行は、必ず自分の目でスペクトルを見る。</b>機械任せにしない。
+</div>
+
+</div>
+<script>
+function cp(id,btn){
+  var t=document.getElementById(id).textContent;
+  navigator.clipboard.writeText(t).then(function(){
+    var o=btn.textContent; btn.textContent='✅ コピーしました'; setTimeout(function(){btn.textContent=o;},1600);
+  },function(){ btn.textContent='❌ コピー失敗（手動で選択してください）'; });
+}
+</script>
+</body></html>
