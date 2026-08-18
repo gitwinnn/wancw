@@ -1,0 +1,362 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>長方形の板 加振点とセンサー位置ガイド</title>
+<style>
+  :root{
+    --bg:#14161f;
+    --panel:#1c1f2b;
+    --panel2:#232739;
+    --text:#e6e6ea;
+    --sub:#9aa0b4;
+    --cyan:#5fd0e8;
+    --amber:#f2b04a;
+    --green:#6fd88a;
+    --red:#ef6a6a;
+    --magenta:#e07be0;
+    --gray:#7d8bb0;
+    --line:#3a3f55;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+    line-height:1.85;
+    margin:0;
+    padding:0 0 60px 0;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:24px 20px;}
+  h1{
+    font-size:1.5em;
+    color:var(--cyan);
+    border-bottom:3px solid var(--cyan);
+    padding-bottom:10px;
+    margin-top:6px;
+  }
+  h2{
+    font-size:1.2em;
+    color:var(--amber);
+    margin-top:40px;
+    padding:8px 12px;
+    background:var(--panel2);
+    border-left:6px solid var(--amber);
+    border-radius:4px;
+  }
+  h3{
+    font-size:1.05em;
+    color:var(--green);
+    margin-top:26px;
+  }
+  p{margin:10px 0;}
+  .lead{color:var(--sub);font-size:0.95em;}
+  ruby rt{color:var(--sub);font-size:0.55em;}
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 18px;
+    margin:16px 0;
+  }
+  .card.red{border-color:#5a3030;background:#241a1a;}
+  .card.green{border-color:#2f5a3a;background:#182219;}
+  .card.amber{border-color:#5a4a20;background:#241f14;}
+  .card.cyan{border-color:#20505a;background:#142024;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:14px 0;
+    font-size:0.95em;
+  }
+  th,td{
+    border:1px solid var(--line);
+    padding:8px 10px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--panel2);color:var(--cyan);}
+  tr:nth-child(even) td{background:#1a1d29;}
+  .badge{
+    display:inline-block;
+    padding:1px 7px;
+    border-radius:5px;
+    font-size:0.85em;
+    font-weight:bold;
+  }
+  .b-ok{background:#183a24;color:var(--green);}
+  .b-est{background:#3a3218;color:var(--amber);}
+  .b-check{background:#3a1c1c;color:var(--red);}
+
+  .diagram-panel{
+    background:#0e1017;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px;
+    margin:18px 0;
+  }
+  .plate-svg{width:100%;height:auto;display:block;}
+  .plate-outline{
+    fill:#2b3040;
+    stroke:#7d8bb0;
+    stroke-width:2;
+  }
+  .gridpt{
+    fill:var(--cyan);
+    fill-opacity:0.9;
+    stroke:#0e1017;
+    stroke-width:0.6;
+  }
+  .hammer-halo{
+    fill:var(--amber);
+    fill-opacity:0.18;
+  }
+  .hammer-ring{
+    fill:none;
+    stroke:var(--amber);
+    stroke-width:2.6;
+  }
+  .hammer-x{
+    stroke:var(--amber);
+    stroke-width:3;
+    stroke-linecap:round;
+  }
+  .accel-box{
+    fill:var(--magenta);
+    fill-opacity:0.9;
+    stroke:#1a0e1a;
+    stroke-width:1.5;
+  }
+  .spare-circle{
+    fill:none;
+    stroke:var(--gray);
+    stroke-width:2;
+    stroke-dasharray:3 2;
+  }
+  .marker-label{
+    fill:var(--text);
+    font-size:14px;
+    font-weight:bold;
+    text-anchor:middle;
+  }
+  .hammer-label{fill:var(--amber);}
+  .accel-label{fill:var(--magenta);}
+  .spare-label{fill:var(--gray);font-size:12px;}
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px dashed var(--line);
+    font-size:0.92em;
+  }
+  .legend-item{display:flex;align-items:center;gap:8px;}
+  .swatch{width:16px;height:16px;border-radius:50%;flex:0 0 auto;}
+  .sw-grid{background:var(--cyan);}
+  .sw-hammer{background:transparent;border:2.5px solid var(--amber);border-radius:50%;}
+  .sw-accel{background:var(--magenta);border-radius:3px;transform:rotate(45deg);}
+  .sw-spare{background:transparent;border:2px dashed var(--gray);border-radius:50%;}
+
+  .steps{counter-reset:stepnum;}
+  .step{
+    position:relative;
+    padding:12px 12px 12px 52px;
+    margin:10px 0;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+  }
+  .step::before{
+    counter-increment:stepnum;
+    content:counter(stepnum);
+    position:absolute;
+    left:12px;top:12px;
+    width:28px;height:28px;
+    background:var(--cyan);
+    color:#0e1017;
+    font-weight:bold;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .footer-note{
+    margin-top:40px;
+    padding:14px;
+    border-top:1px solid var(--line);
+    color:var(--sub);
+    font-size:0.85em;
+  }
+  .num{color:var(--cyan);font-weight:bold;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>長方形の板 加振点とセンサー位置ガイド</h1>
+<p class="lead">
+いただいた画像（縦横比 約3.15：1 の長方形）をもとに、ワークブックの標準寸法 <b>L=110mm（長手）× w=34mm（幅）</b> を仮定して作図しました。実際の板の寸法が違う場合は、後述の「④ 自分の板のサイズに置き換える方法」を見てください。
+</p>
+
+<div class="card cyan">
+<b>この図でわかること</b>
+<ul>
+<li>🔵 <b>水色の点</b>＝<ruby>測定点<rt>そくていてん</rt></ruby>（レーザーまたは加速度計で応答を測る場所、<span class="num">27点</span>＝長手9点×幅3列）</li>
+<li>🟠 <b>オレンジの丸(×印)</b>＝<ruby>加振点<rt>かしんてん</rt></ruby>（ハンマーで叩く場所、<span class="num">2箇所</span>）</li>
+<li>🟣 <b>マゼンタの四角</b>＝固定基準センサー（加速度計）を貼る場所、<span class="num">1箇所</span></li>
+<li>点線の丸＝予備の角（もし①②で拾いきれないモードが出た場合の3箇所目の候補）</li>
+</ul>
+</div>
+
+<div class="diagram-panel">
+
+<svg viewBox="0 0 725.0 317.0" xmlns="http://www.w3.org/2000/svg" class="plate-svg">
+  <rect x="60.0" y="55.0" width="605.0" height="187.0" class="plate-outline" rx="4"/>
+  <circle cx="104.0" cy="209.0" r="4" class="gridpt"/>
+<circle cx="168.62" cy="209.0" r="4" class="gridpt"/>
+<circle cx="233.25" cy="209.0" r="4" class="gridpt"/>
+<circle cx="297.88" cy="209.0" r="4" class="gridpt"/>
+<circle cx="362.5" cy="209.0" r="4" class="gridpt"/>
+<circle cx="427.12" cy="209.0" r="4" class="gridpt"/>
+<circle cx="491.75" cy="209.0" r="4" class="gridpt"/>
+<circle cx="556.38" cy="209.0" r="4" class="gridpt"/>
+<circle cx="621.0" cy="209.0" r="4" class="gridpt"/>
+<circle cx="104.0" cy="148.5" r="4" class="gridpt"/>
+<circle cx="168.62" cy="148.5" r="4" class="gridpt"/>
+<circle cx="233.25" cy="148.5" r="4" class="gridpt"/>
+<circle cx="297.88" cy="148.5" r="4" class="gridpt"/>
+<circle cx="362.5" cy="148.5" r="4" class="gridpt"/>
+<circle cx="427.12" cy="148.5" r="4" class="gridpt"/>
+<circle cx="491.75" cy="148.5" r="4" class="gridpt"/>
+<circle cx="556.38" cy="148.5" r="4" class="gridpt"/>
+<circle cx="621.0" cy="148.5" r="4" class="gridpt"/>
+<circle cx="104.0" cy="88.0" r="4" class="gridpt"/>
+<circle cx="168.62" cy="88.0" r="4" class="gridpt"/>
+<circle cx="233.25" cy="88.0" r="4" class="gridpt"/>
+<circle cx="297.88" cy="88.0" r="4" class="gridpt"/>
+<circle cx="362.5" cy="88.0" r="4" class="gridpt"/>
+<circle cx="427.12" cy="88.0" r="4" class="gridpt"/>
+<circle cx="491.75" cy="88.0" r="4" class="gridpt"/>
+<circle cx="556.38" cy="88.0" r="4" class="gridpt"/>
+<circle cx="621.0" cy="88.0" r="4" class="gridpt"/>
+
+  
+<g class="hammer-marker">
+  <circle cx="137.0" cy="203.5" r="15" class="hammer-halo"/>
+  <path d="M 128.0,212.5 L 146.0,194.5 M 128.0,194.5 L 146.0,212.5" class="hammer-x"/>
+  <circle cx="137.0" cy="203.5" r="16" class="hammer-ring"/>
+  <text x="137.0" y="178.5" class="marker-label hammer-label">① ハンマー</text>
+</g>
+
+<g class="hammer-marker">
+  <circle cx="588.0" cy="93.5" r="15" class="hammer-halo"/>
+  <path d="M 579.0,102.5 L 597.0,84.5 M 579.0,84.5 L 597.0,102.5" class="hammer-x"/>
+  <circle cx="588.0" cy="93.5" r="16" class="hammer-ring"/>
+  <text x="588.0" y="68.5" class="marker-label hammer-label">② ハンマー</text>
+</g>
+
+  
+<g class="accel-marker">
+  <rect x="126.0" y="82.5" width="22" height="22" class="accel-box" transform="rotate(45 137.0 93.5)"/>
+  <text x="137.0" y="65.5" class="marker-label accel-label">③ 固定基準センサー</text>
+</g>
+
+  
+<g class="spare-marker">
+  <circle cx="588.0" cy="203.5" r="10" class="spare-circle"/>
+  <text x="588.0" y="229.5" class="marker-label spare-label">④予備角</text>
+</g>
+
+</svg>
+
+<div class="legend">
+  <div class="legend-item"><span class="swatch sw-grid"></span>測定点（27点）</div>
+  <div class="legend-item"><span class="swatch sw-hammer"></span>加振点（ハンマー・2箇所）</div>
+  <div class="legend-item"><span class="swatch sw-accel"></span>固定基準センサー（1箇所）</div>
+  <div class="legend-item"><span class="swatch sw-spare"></span>予備の角（バックアップ候補）</div>
+</div>
+</div>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<h2>① 配置の考え方（4つの角を使い分ける）</h2>
+
+<p>
+単純な長方形は、左右にも上下にも対称な形です。対称な形ほど「<ruby>節<rt>ふし</rt></ruby>（まったく動かない場所）」が規則的に出やすく、点の置き方を間違えると特定のモードを丸ごと見逃します。そこで、この図では長方形の <b>4つの角をそれぞれ別の役割</b> に割り当てています。
+</p>
+
+<table>
+<tr><th>角の位置</th><th>役割</th><th>なぜここか</th></tr>
+<tr><td>左下</td><td>🟠 ①加振点（ハンマー）</td><td>対称の中心（板のど真ん中）から見て、左右・上下ともに最も離れた場所のひとつ</td></tr>
+<tr><td>右上</td><td>🟠 ②加振点（ハンマー）</td><td>①と対角線上にあり、①では拾いにくいモードも拾える組み合わせ</td></tr>
+<tr><td>左上</td><td>🟣 ③固定基準センサー</td><td>①②とは別の角。試験中ずっと動かさない基準点</td></tr>
+<tr><td>右下</td><td>⚪ ④予備の角</td><td>もし①②で説明のつかないピークが出た時に、追加の加振点として使う保険</td></tr>
+</table>
+
+<div class="card">
+<b>たとえ話：4人で毛布を引っ張る</b><br>
+長方形の毛布（板）の4隅をイメージしてください。1人（1箇所）だけで毛布を揺らすと、毛布の「対角線」方向の揺れ方は伝わりにくいことがあります。4隅それぞれに役割（叩く・測る）を分けておくと、どんな揺れ方（縦揺れ・横揺れ・ねじれ）が来ても、必ずどこかの隅が反応してくれます。
+</div>
+
+<h2>② 測定点（水色）を置く手順</h2>
+
+<div class="steps">
+<div class="step">
+<b>長手方向に9列、間隔を均等にする</b><br>
+板の左右の端から少し内側（今回は8mm）を最初と最後にして、間を均等に8等分＝9点に区切ります。端ギリギリだと欠けや反りの影響を受けやすいので、少し内側から始めます。
+</div>
+<div class="step">
+<b>幅方向は3列（中心線1本だけにしない）</b><br>
+「下寄り・中央・上寄り」の3列に分けます。中央の1列だけだと、ねじりモード（板がひねれる揺れ方）が対称軸上でちょうどゼロになり、見逃してしまいます。上下にずらした列があることで、ねじれの動きも拾えます。
+</div>
+<div class="step">
+<b>合計 9×3＝27点が基本形</b><br>
+もっと細かい揺れ方（高次モード）まで見たい場合は、列・行の数を増やします。目安は「見たい一番細かい波の、半波長あたり最低2〜3点」です。
+</div>
+</div>
+
+<h2>③ 加振点・固定基準センサーの手順</h2>
+
+<div class="steps">
+<div class="step">
+<b>①をまず叩いて周波数サーベイ</b><br>
+左下の角①をハンマーで叩き、大まかにどのあたりに山（共振）があるかを確認します。
+</div>
+<div class="step">
+<b>②でも同じことを行い、見比べる</b><br>
+右上の角②でも同様に叩きます。①・②どちらでも同じ場所に山が出ていれば、その周波数は信頼できます。
+</div>
+<div class="step">
+<b>片方にしか出ないピークがあれば④を試す</b><br>
+①だけ、または②だけにしか出ない山があれば、そのモードの節がもう片方の加振点に近い可能性があります。右下の④で叩いてみて、山が出るか確認します。
+</div>
+<div class="step">
+<b>③には加速度計を固定し、試験終了まで動かさない</b><br>
+左上の角③に加速度計を貼ります。ここは「位相の基準（ものさし）」なので、途中で貼り直すと、それ以前・それ以降のデータのつじつまが合わなくなります。
+</div>
+</div>
+
+<h2>④ 自分の板の実際のサイズに置き換える方法</h2>
+
+<div class="card amber">
+🟡 <b>この図は仮の寸法（110mm×34mm）です。</b>実際の板を測ったら、以下のように単純に比例計算すれば、同じ配置パターンを自分の板に当てはめられます。
+</div>
+
+<table>
+<tr><th>この図の値</th><th>置き換え方の式</th><th>Excelでの例</th></tr>
+<tr><td>長手方向の位置 x [mm]</td><td>x_実物 = x_この図 ÷ 110 × 実物のL</td><td>A1に実物のL、B1に8、C1に <code>=B1/110*A1</code></td></tr>
+<tr><td>幅方向の位置 y [mm]</td><td>y_実物 = y_この図 ÷ 34 × 実物のw</td><td>A2に実物のw、B2に6、C2に <code>=B2/34*A2</code></td></tr>
+</table>
+
+<p>
+もし正確な形（穴の位置や、輪郭が長方形でない）が分かっているなら、以前お渡しした「形状シート」に実測値を入れれば、そちらのデータを使ってより正確な図を作ることもできます。ノギスで測った実寸をいただければ、その通りの形で図を作り直します。
+</p>
+
+<div class="footer-note">
+会話規模：中（座標計算・図の作成を含むため、厳密なトークン数は Settings › Usage でご確認ください）。<br>
+このHTMLファイルは自己完結型（画像・外部ファイル不要）で、ブラウザで開くだけで表示されます。
+</div>
+
+</div>
+</body>
+</html>

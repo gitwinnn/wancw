@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>測定点管理表 作成ガイド</title>
+<style>
+  :root{
+    --bg:#0e1017;
+    --panel:#171b28;
+    --panel2:#1b2136;
+    --line:#2b3040;
+    --text:#e8eaf0;
+    --sub:#9aa3b8;
+    --cyan:#4fd1e8;
+    --amber:#f5a742;
+    --magenta:#e85fd0;
+    --gray:#7d8bb0;
+    --green:#4ade80;
+    --red:#f2555a;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+    line-height:1.85;
+    margin:0;
+    padding:0 16px 60px;
+  }
+  .wrap{max-width:920px;margin:0 auto;}
+  h1{
+    font-size:1.6em;
+    border-bottom:3px solid var(--cyan);
+    padding-bottom:10px;
+    margin-top:34px;
+  }
+  h2.sec{
+    font-size:1.25em;
+    color:var(--cyan);
+    margin-top:44px;
+    padding:8px 12px;
+    background:var(--panel2);
+    border-left:6px solid var(--cyan);
+    border-radius:6px;
+  }
+  h3.sub{
+    font-size:1.05em;
+    color:var(--amber);
+    margin-top:26px;
+    border-left:4px solid var(--amber);
+    padding-left:10px;
+  }
+  .lead{color:var(--sub);font-size:0.98em;}
+  p{margin:10px 0;}
+  ruby rt{color:var(--sub);font-size:0.6em;}
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:16px 18px;
+    margin:18px 0;
+  }
+  .card.cyan{border-color:var(--cyan);}
+  .card.amber{border-color:var(--amber);}
+  .card.magenta{border-color:var(--magenta);}
+  .card.red{border-color:var(--red);}
+  .card.green{border-color:var(--green);}
+  .badge{
+    display:inline-block;
+    padding:2px 9px;
+    border-radius:6px;
+    font-size:0.82em;
+    font-weight:bold;
+    white-space:nowrap;
+  }
+  .b-ok{background:rgba(74,222,128,0.14);color:var(--green);border:1px solid var(--green);}
+  .b-est{background:rgba(245,167,66,0.14);color:var(--amber);border:1px solid var(--amber);}
+  .b-check{background:rgba(242,85,90,0.14);color:var(--red);border:1px solid var(--red);}
+  .hl-green{color:var(--green);font-weight:bold;}
+  .hl-red{color:var(--red);font-weight:bold;}
+  .hl-amber{color:var(--amber);font-weight:bold;}
+  .hl-cyan{color:var(--cyan);font-weight:bold;}
+  .hl-magenta{color:var(--magenta);font-weight:bold;}
+  .num{color:var(--cyan);font-weight:bold;}
+  table{border-collapse:collapse;width:100%;margin:14px 0;font-size:0.92em;}
+  th,td{border:1px solid var(--line);padding:7px 9px;text-align:left;vertical-align:top;}
+  th{background:var(--panel2);color:var(--cyan);}
+  tr.row-blue td{background:rgba(79,209,232,0.06);}
+  tr.row-orange td{background:rgba(245,167,66,0.07);}
+  tr.row-magenta td{background:rgba(232,95,208,0.08);}
+  tr.row-gray td{background:rgba(125,139,176,0.07);}
+  .cell-input{color:#8ec9ff;font-weight:bold;} /* 青セル=入力 */
+  .cell-formula{color:var(--green);} /* 緑セル=数式 */
+  .steps{counter-reset:stepnum;}
+  .step{
+    position:relative;
+    padding:14px 14px 14px 56px;
+    margin:12px 0;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+  }
+  .step::before{
+    counter-increment:stepnum;
+    content:counter(stepnum);
+    position:absolute;
+    left:14px;top:14px;
+    width:30px;height:30px;
+    background:var(--cyan);
+    color:#0e1017;
+    font-weight:bold;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .tbl-wrap{margin:16px 0;}
+  .copybtn{
+    background:var(--panel2);
+    color:var(--cyan);
+    border:1px solid var(--cyan);
+    border-radius:8px;
+    padding:6px 14px;
+    cursor:pointer;
+    font-size:0.88em;
+    margin-bottom:8px;
+  }
+  .copybtn:hover{background:rgba(79,209,232,0.15);}
+  pre.tsv{
+    background:#0a0c12;
+    border:1px solid var(--line);
+    border-radius:8px;
+    padding:10px;
+    overflow-x:auto;
+    font-size:0.78em;
+    color:#c8d0e0;
+    white-space:pre;
+    max-height:420px;
+    overflow-y:auto;
+  }
+  .legend{display:flex;flex-wrap:wrap;gap:18px;margin:14px 0;}
+  .legend-item{display:flex;align-items:center;gap:8px;font-size:0.92em;}
+  .swatch{width:16px;height:16px;flex:0 0 auto;border-radius:50%;}
+  .sw-cyan{background:var(--cyan);}
+  .sw-amber{background:transparent;border:3px solid var(--amber);border-radius:50%;}
+  .sw-magenta{background:var(--magenta);border-radius:3px;transform:rotate(45deg);}
+  .sw-gray{background:transparent;border:2px dashed var(--gray);border-radius:50%;}
+  .footer-note{
+    margin-top:50px;
+    padding:14px;
+    border-top:1px solid var(--line);
+    color:var(--sub);
+    font-size:0.85em;
+  }
+  .mini-diagram{
+    display:flex;
+    align-items:center;
+    gap:18px;
+    flex-wrap:wrap;
+    justify-content:center;
+    margin:14px 0;
+  }
+  .toc{background:var(--panel);border:1px solid var(--line);border-radius:12px;padding:16px 20px;}
+  .toc a{color:var(--cyan);text-decoration:none;}
+  .toc a:hover{text-decoration:underline;}
+  .toc li{margin:4px 0;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>測定点管理表<ruby>作成<rt>さくせい</rt></ruby>ガイド</h1>
+<p class="lead">
+「長方形の板 加振点とセンサー位置ガイド」の図に出てきた <span class="hl-cyan">🔵水色＝測定点</span>、<span class="hl-amber">🟠オレンジ＝加振点</span>、<span class="hl-magenta">🟣マゼンタ＝固定基準センサー</span>。<br>
+図では場所はわかるのに、それを<b>「表（Excel）にどう書けばいいか」</b>がどこにも書いていなかった問題を、今日はぜんぶ解決します。<br>
+小学生の子に説明するくらいのつもりで、1行ずつ、なぜそうするのかも含めて説明します。
+</p>
+
+<div class="toc">
+<b>この中身（もくじ）</b>
+<ol>
+<li><a href="#p1">なぜ「記録する表」が必要なのか（たとえ話）</a></li>
+<li><a href="#p2">3種類の点のおさらい</a></li>
+<li><a href="#p3">記録表（測定点管理表）の設計 ― 列の意味を1つずつ</a></li>
+<li><a href="#p4">Excelに実際に作る手順</a></li>
+<li><a href="#p5">コピペでそのまま貼れるデータ（TSV）</a></li>
+<li><a href="#p6">座標がどう計算されているか（数式の中身）</a></li>
+<li><a href="#p7">自分の板の実寸に自動で連動させる方法</a></li>
+<li><a href="#p8">当日、測定しながら書き込む場所</a></li>
+<li><a href="#p9">PSV-400・RION との対応づけ</a></li>
+<li><a href="#p10">よくある間違い</a></li>
+<li><a href="#p11">まとめチェックリスト</a></li>
+</ol>
+</div>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<!-- ============================================================ -->
+<section id="p1">
+<h2 class="sec">① なぜ「記録する表」が必要なのか（たとえ話）</h2>
+
+<div class="card cyan">
+<b>たとえ話：遠足の「しおり」</b><br>
+遠足に行くとき、先生は「地図」だけでなく「しおり」も配りますよね。<br>
+地図だけでは「どこに何があるか」はわかりますが、「1班は誰か」「集合時間は何時か」「持ち物は何か」までは地図に書けません。<br>
+これを紙（しおり＝表）に書いておかないと、当日みんなバラバラになってしまいます。
+</div>
+
+<p>
+今回の測定も同じです。「長方形の板 加振点とセンサー位置ガイド」のSVG図は、いわば<b>「地図」</b>です。どこに🔵🟠🟣を置くかは、目で見てわかります。<br>
+でも、
+</p>
+<ul>
+<li>その点は<ruby>何番<rt>なんばん</rt></ruby>の点か（27個もあると、あとで「あの点」と言われても区別できない）</li>
+<li>実際の<ruby>座標<rt>ざひょう</rt></ruby>（X, Y）は<ruby>何mm<rt>なんミリ</rt></ruby>か</li>
+<li>PSVやRIONの<ruby>何チャンネル<rt>なんチャンネル</rt></ruby>につながっているか</li>
+<li>その点は測定に<ruby>使う<rt>つかう</rt></ruby>のか、<ruby>使わない<rt>つかわない</rt></ruby>のか（穴に当たって測れなかった、など）</li>
+</ul>
+<p>
+これらは「地図」には書き込めません。だから<b>「表（＝測定点管理表）」</b>を別に作る必要があります。これが今回作るものです。
+</p>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<!-- ============================================================ -->
+<section id="p2">
+<h2 class="sec">② 3種類の点のおさらい</h2>
+
+<div class="mini-diagram">
+  <div class="legend-item"><span class="swatch sw-cyan"></span>🔵 測定点（<ruby>応答<rt>おうとう</rt></ruby>を測る場所）</div>
+  <div class="legend-item"><span class="swatch sw-amber"></span>🟠 加振点（ハンマーで叩く場所）</div>
+  <div class="legend-item"><span class="swatch sw-magenta"></span>🟣 固定基準センサー（動かさない基準の1点）</div>
+  <div class="legend-item"><span class="swatch sw-gray"></span>⚪ 予備角（保険の1点）</div>
+</div>
+
+<table>
+<tr><th>色</th><th>名前</th><th>役割</th><th>個数の例</th><th>試験中に動かす？</th></tr>
+<tr class="row-blue"><td>🔵水色</td><td>測定点<br><ruby>（そくていてん）</ruby></td><td>レーザーや加速度計で「どれだけ揺れたか」を測る場所</td><td>27個（9×3）</td><td class="hl-green">動かさない（1つずつスキャン）</td></tr>
+<tr class="row-orange"><td>🟠オレンジ</td><td>加振点<br><ruby>（かしんてん）</ruby></td><td>ハンマーで叩いて、揺れを「起こす」場所</td><td>2箇所（①②）</td><td class="hl-amber">同じ点を毎回同じように叩く</td></tr>
+<tr class="row-magenta"><td>🟣マゼンタ</td><td>固定基準センサー</td><td>試験中ずっと動かさない「位相のものさし」</td><td>1箇所（③）</td><td class="hl-red">絶対に動かさない</td></tr>
+<tr class="row-gray"><td>⚪灰（点線）</td><td>予備角</td><td>①②で説明できない山が出たときの保険</td><td>1箇所（④）</td><td class="hl-cyan">通常は使わない</td></tr>
+</table>
+
+<div class="card amber">
+🟡 <b>なぜ「固定基準センサー」だけ特別扱いなのか</b><br>
+測定点は1点ずつ順番にレーザーを当てていく（＝あとで場所を変える）のに対し、固定基準センサーは<ruby>試験<rt>しけん</rt></ruby>の最初から最後まで<b>同じ場所に貼りっぱなし</b>にします。<br>
+これは、27個の測定点それぞれの「山」が、時間的に<ruby>同期<rt>どうき</rt></ruby>して動いているのか、それとも<ruby>逆位相<rt>ぎゃくいそう</rt></ruby>（反対向き）に動いているのかを判定する「ものさし」の役目をするからです。<br>
+途中で貼り直すと、それより前と後のデータで「ものさし」がズレてしまい、モード形状（板がどうねじれているか）が正しく再現できなくなります。
+</div>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<!-- ============================================================ -->
+<section id="p3">
+<h2 class="sec">③ 記録表（測定点管理表）の設計 ― 列の意味を1つずつ</h2>
+
+<p>
+「測定点管理表」というシートをExcelに<b>新しく1枚追加</b>して、以下の10個の列を作ります。1つずつ、何のためにあるか説明します。
+</p>
+
+<div class="tbl-wrap">
+<table>
+<tr><th>列</th><th>見出し</th><th>色（Excelの慣習）</th><th>何のための列か（かみくだいた説明）</th></tr>
+<tr><td>A</td><td>No（<ruby>通し番号<rt>とおしばんごう</rt></ruby>）</td><td class="hl-cyan">青＝入力</td><td>1, 2, 3…と数字を振るだけ。「あの点」ではなく「12番の点」と呼べるようにする、名札のようなもの。</td></tr>
+<tr><td>B</td><td>種類</td><td class="hl-cyan">青＝入力</td><td>「測定点」「加振点」「固定基準センサー」「予備角」のどれか。あとで色分け表示やフィルターに使う。</td></tr>
+<tr><td>C</td><td>記号</td><td class="hl-green">緑＝数式</td><td>種類に応じて🔵🟠🟣⚪の絵文字を自動で出す（見た目でパッとわかるように）。</td></tr>
+<tr><td>D</td><td>i（長手方向<ruby>番号<rt>ばんごう</rt></ruby>）</td><td class="hl-green">緑＝数式</td><td>板の長い方向（左右）で何番目の列かを表す番号（1〜9など）。</td></tr>
+<tr><td>E</td><td>j（幅方向番号）</td><td class="hl-green">緑＝数式</td><td>板の短い方向（上下）で何番目の行かを表す番号（1〜3など）。</td></tr>
+<tr><td>F</td><td>X [mm]</td><td class="hl-green">緑＝数式</td><td>i番号から自動計算される、実際のX座標（長手方向の位置）。</td></tr>
+<tr><td>G</td><td>Y [mm]</td><td class="hl-green">緑＝数式</td><td>j番号から自動計算される、実際のY座標（幅方向の位置）。</td></tr>
+<tr><td>H</td><td>CH（チャンネル番号）</td><td class="hl-cyan">青＝入力</td><td>RIONやPSVの何番の入力端子・スキャンチャンネルに対応するかを、<b>当日</b>書き込む。</td></tr>
+<tr><td>I</td><td>使用フラグ（1/0）</td><td class="hl-cyan">青＝入力</td><td>その点が実際に測れたら1、穴にかかって測れなかった・データが壊れたら0にする。あとの解析でこの列を使い、0の点を計算から除外できる。</td></tr>
+<tr><td>J</td><td>メモ</td><td class="hl-cyan">青＝入力</td><td>「ここはドロップアウトした」「節に近く反応が小さい」など、当日その場で気づいたことを自由に書く欄。</td></tr>
+</table>
+</div>
+
+<div class="card">
+<b>たとえ話：クラス名簿</b><br>
+学校のクラス名簿には「出席番号・名前・組・出席したか」が書いてありますよね。<br>
+測定点管理表も同じ考え方で、「点番号（No）・種類・座標（住所）・つながっている機械の番号（CH）・使えたか（出席したか）」を1行にまとめた「点の名簿」です。
+</div>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<!-- ============================================================ -->
+<section id="p4">
+<h2 class="sec">④ Excelに実際に作る手順</h2>
+
+<div class="steps">
+<div class="step">
+<b>新しいシートを追加する</b><br>
+「ブレーキパッド_金属部（摩擦材抜き）固有振動数予測.xlsx」を開き、シートタブの右にある「＋」を押して、新しいシートを1枚追加します。
+</div>
+<div class="step">
+<b>シート名を「測定点管理表」に変える</b><br>
+新しいシートのタブをダブルクリックして、名前を <b>測定点管理表</b> と入力します（他のシート名とそろえるため）。
+</div>
+<div class="step">
+<b>パラメータ欄（青セル）を上のほうに作る</b><br>
+セル B3〜B8 に「L [mm]」「w [mm]」「Nx（長手点数）」「Ny（幅方向点数）」「端マージンmx [mm]」「幅マージン割合」というラベルを書き、C3〜C8 に数字を入力します（詳しい値は次の章で説明します）。
+</div>
+<div class="step">
+<b>ヘッダー行（見出し）を作る</b><br>
+10行目あたりに A列から J列まで「No, 種類, 記号, i, j, X [mm], Y [mm], CH, 使用, メモ」と入力します。
+</div>
+<div class="step">
+<b>次の章のTSV（コピペ用データ）を貼り付ける</b><br>
+11行目のA列を選んでから貼り付けると、31行ぶん（測定点27＋加振点2＋固定基準センサー1＋予備角1）が自動で入ります。
+</div>
+<div class="step">
+<b>数式が壊れていないか確認する</b><br>
+貼り付けた直後、F列・G列に数字（X, Yの座標）が表示されていればOKです。「#REF!」や「0」ばかり出る場合は、パラメータ欄（C3〜C8）に数字が入っているか確認してください。
+</div>
+</div>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<!-- ============================================================ -->
+<section id="p5">
+<h2 class="sec">⑤ コピペでそのまま貼れるデータ（TSV）</h2>
+
+<p>
+下のデータは、「長方形の板 加振点とセンサー位置ガイド」で使ったのと<b>同じ仮の寸法（L=110mm, w=34mm, 9×3グリッド）</b>で作ってあります。自分の板の実寸がわかったら、パラメータ欄（C3〜C8）の数字を書き換えるだけで、F列・G列の座標が自動的に更新されます（数式になっているため）。
+</p>
+
+<h3 class="sub">5-1｜まずパラメータ欄（C3:C8）</h3>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-param', this)">📋 パラメータ欄をコピー</button>
+<pre class="tsv" id="tsv-param">L [mm]	110
+w [mm]	34
+Nx（長手点数）	9
+Ny（幅方向点数）	3
+端マージンmx [mm]	8
+幅マージン割合	0.15</pre>
+</div>
+<p class="lead">※ B3セルを選んで貼り付けると、B3:C8 に自動で入ります。</p>
+
+<h3 class="sub">5-2｜ヘッダー行（10行目）</h3>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-header', this)">📋 ヘッダーをコピー</button>
+<pre class="tsv" id="tsv-header">No	種類	記号	i	j	X [mm]	Y [mm]	CH	使用	メモ</pre>
+</div>
+
+<h3 class="sub">5-3｜本体データ（11行目から、数式込み）</h3>
+<div class="card amber">
+🟡 このまま貼り付けると<b>数式</b>が入ります（値ではありません）。パラメータ欄（C3:C8）の数字を変えると、X・Y列が自動で再計算されます。<br>
+もし数式ではなく「その時の数字」で固定したい場合は、貼り付け後に該当セルを選んで <b>コピー→「形式を選択して貼り付け」→「値」</b> を選んでください。
+</div>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-body', this)">📋 本体データ（31行）をコピー</button>
+<pre class="tsv" id="tsv-body">1	測定点	=IF(B11="測定点","🔵",IF(B11="加振点","🟠",IF(B11="固定基準センサー","🟣","⚪")))	=MOD(A11-1,$C$5)+1	=INT((A11-1)/$C$5)+1	=$C$7+(D11-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E11-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+2	測定点	=IF(B12="測定点","🔵",IF(B12="加振点","🟠",IF(B12="固定基準センサー","🟣","⚪")))	=MOD(A12-1,$C$5)+1	=INT((A12-1)/$C$5)+1	=$C$7+(D12-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E12-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+3	測定点	=IF(B13="測定点","🔵",IF(B13="加振点","🟠",IF(B13="固定基準センサー","🟣","⚪")))	=MOD(A13-1,$C$5)+1	=INT((A13-1)/$C$5)+1	=$C$7+(D13-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E13-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+4	測定点	=IF(B14="測定点","🔵",IF(B14="加振点","🟠",IF(B14="固定基準センサー","🟣","⚪")))	=MOD(A14-1,$C$5)+1	=INT((A14-1)/$C$5)+1	=$C$7+(D14-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E14-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+5	測定点	=IF(B15="測定点","🔵",IF(B15="加振点","🟠",IF(B15="固定基準センサー","🟣","⚪")))	=MOD(A15-1,$C$5)+1	=INT((A15-1)/$C$5)+1	=$C$7+(D15-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E15-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+6	測定点	=IF(B16="測定点","🔵",IF(B16="加振点","🟠",IF(B16="固定基準センサー","🟣","⚪")))	=MOD(A16-1,$C$5)+1	=INT((A16-1)/$C$5)+1	=$C$7+(D16-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E16-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+7	測定点	=IF(B17="測定点","🔵",IF(B17="加振点","🟠",IF(B17="固定基準センサー","🟣","⚪")))	=MOD(A17-1,$C$5)+1	=INT((A17-1)/$C$5)+1	=$C$7+(D17-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E17-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+8	測定点	=IF(B18="測定点","🔵",IF(B18="加振点","🟠",IF(B18="固定基準センサー","🟣","⚪")))	=MOD(A18-1,$C$5)+1	=INT((A18-1)/$C$5)+1	=$C$7+(D18-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E18-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+9	測定点	=IF(B19="測定点","🔵",IF(B19="加振点","🟠",IF(B19="固定基準センサー","🟣","⚪")))	=MOD(A19-1,$C$5)+1	=INT((A19-1)/$C$5)+1	=$C$7+(D19-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E19-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+10	測定点	=IF(B20="測定点","🔵",IF(B20="加振点","🟠",IF(B20="固定基準センサー","🟣","⚪")))	=MOD(A20-1,$C$5)+1	=INT((A20-1)/$C$5)+1	=$C$7+(D20-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E20-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+11	測定点	=IF(B21="測定点","🔵",IF(B21="加振点","🟠",IF(B21="固定基準センサー","🟣","⚪")))	=MOD(A21-1,$C$5)+1	=INT((A21-1)/$C$5)+1	=$C$7+(D21-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E21-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+12	測定点	=IF(B22="測定点","🔵",IF(B22="加振点","🟠",IF(B22="固定基準センサー","🟣","⚪")))	=MOD(A22-1,$C$5)+1	=INT((A22-1)/$C$5)+1	=$C$7+(D22-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E22-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+13	測定点	=IF(B23="測定点","🔵",IF(B23="加振点","🟠",IF(B23="固定基準センサー","🟣","⚪")))	=MOD(A23-1,$C$5)+1	=INT((A23-1)/$C$5)+1	=$C$7+(D23-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E23-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+14	測定点	=IF(B24="測定点","🔵",IF(B24="加振点","🟠",IF(B24="固定基準センサー","🟣","⚪")))	=MOD(A24-1,$C$5)+1	=INT((A24-1)/$C$5)+1	=$C$7+(D24-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E24-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+15	測定点	=IF(B25="測定点","🔵",IF(B25="加振点","🟠",IF(B25="固定基準センサー","🟣","⚪")))	=MOD(A25-1,$C$5)+1	=INT((A25-1)/$C$5)+1	=$C$7+(D25-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E25-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+16	測定点	=IF(B26="測定点","🔵",IF(B26="加振点","🟠",IF(B26="固定基準センサー","🟣","⚪")))	=MOD(A26-1,$C$5)+1	=INT((A26-1)/$C$5)+1	=$C$7+(D26-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E26-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+17	測定点	=IF(B27="測定点","🔵",IF(B27="加振点","🟠",IF(B27="固定基準センサー","🟣","⚪")))	=MOD(A27-1,$C$5)+1	=INT((A27-1)/$C$5)+1	=$C$7+(D27-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E27-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+18	測定点	=IF(B28="測定点","🔵",IF(B28="加振点","🟠",IF(B28="固定基準センサー","🟣","⚪")))	=MOD(A28-1,$C$5)+1	=INT((A28-1)/$C$5)+1	=$C$7+(D28-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E28-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+19	測定点	=IF(B29="測定点","🔵",IF(B29="加振点","🟠",IF(B29="固定基準センサー","🟣","⚪")))	=MOD(A29-1,$C$5)+1	=INT((A29-1)/$C$5)+1	=$C$7+(D29-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E29-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+20	測定点	=IF(B30="測定点","🔵",IF(B30="加振点","🟠",IF(B30="固定基準センサー","🟣","⚪")))	=MOD(A30-1,$C$5)+1	=INT((A30-1)/$C$5)+1	=$C$7+(D30-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E30-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+21	測定点	=IF(B31="測定点","🔵",IF(B31="加振点","🟠",IF(B31="固定基準センサー","🟣","⚪")))	=MOD(A31-1,$C$5)+1	=INT((A31-1)/$C$5)+1	=$C$7+(D31-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E31-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+22	測定点	=IF(B32="測定点","🔵",IF(B32="加振点","🟠",IF(B32="固定基準センサー","🟣","⚪")))	=MOD(A32-1,$C$5)+1	=INT((A32-1)/$C$5)+1	=$C$7+(D32-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E32-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+23	測定点	=IF(B33="測定点","🔵",IF(B33="加振点","🟠",IF(B33="固定基準センサー","🟣","⚪")))	=MOD(A33-1,$C$5)+1	=INT((A33-1)/$C$5)+1	=$C$7+(D33-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E33-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+24	測定点	=IF(B34="測定点","🔵",IF(B34="加振点","🟠",IF(B34="固定基準センサー","🟣","⚪")))	=MOD(A34-1,$C$5)+1	=INT((A34-1)/$C$5)+1	=$C$7+(D34-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E34-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+25	測定点	=IF(B35="測定点","🔵",IF(B35="加振点","🟠",IF(B35="固定基準センサー","🟣","⚪")))	=MOD(A35-1,$C$5)+1	=INT((A35-1)/$C$5)+1	=$C$7+(D35-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E35-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+26	測定点	=IF(B36="測定点","🔵",IF(B36="加振点","🟠",IF(B36="固定基準センサー","🟣","⚪")))	=MOD(A36-1,$C$5)+1	=INT((A36-1)/$C$5)+1	=$C$7+(D36-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E36-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+27	測定点	=IF(B37="測定点","🔵",IF(B37="加振点","🟠",IF(B37="固定基準センサー","🟣","⚪")))	=MOD(A37-1,$C$5)+1	=INT((A37-1)/$C$5)+1	=$C$7+(D37-1)*($C$3-2*$C$7)/($C$5-1)	=IF($C$6=1,$C$4/2,$C$4*$C$8+(E37-1)*($C$4*(1-2*$C$8))/($C$6-1))		1	
+28	加振点①	=IF(B38="測定点","🔵",IF(B38="加振点①","🟠",IF(B38="固定基準センサー","🟣","⚪")))	-	-	=$C$7	=$C$4*$C$8		1	左下・まず叩いて周波数サーベイ
+29	加振点②	=IF(B39="測定点","🔵",IF(B39="加振点②","🟠",IF(B39="固定基準センサー","🟣","⚪")))	-	-	=$C$3-$C$7	=$C$4-$C$4*$C$8		1	右上・①と対角、見比べ用
+30	固定基準センサー	=IF(B40="測定点","🔵",IF(B40="加振点","🟠",IF(B40="固定基準センサー","🟣","⚪")))	-	-	=$C$7	=$C$4-$C$4*$C$8		1	左上・試験終了まで絶対に動かさない
+31	予備角	=IF(B41="測定点","🔵",IF(B41="加振点","🟠",IF(B41="固定基準センサー","🟣","⚪")))	-	-	=$C$3-$C$7	=$C$4*$C$8		0	右下・①②で説明できない山が出た時だけ使う</pre>
+</div>
+<p class="lead">※ A11セルを選んでから貼り付けると、A11:J41（31行×10列）にまとまって入ります。</p>
+
+<h3 class="sub">5-4｜貼り付けた結果、こういう数字になっているはずです（答え合わせ用）</h3>
+<div class="card">
+🟢 貼り付け・数式チェックが終わったら、F列・G列が下の表と同じ数字になっているか見比べてください。1つでもズレていたら、パラメータ欄（C3:C8）か、コピー範囲がズレている可能性があります。
+</div>
+<div class="tbl-wrap">
+<table>
+<tr><th>No</th><th>種類</th><th>i</th><th>j</th><th>X [mm]</th><th>Y [mm]</th></tr>
+<tr class="row-blue"><td>1</td><td>🔵測定点</td><td>1</td><td>1</td><td>8.00</td><td>5.10</td></tr>
+<tr class="row-blue"><td>5</td><td>🔵測定点</td><td>5</td><td>1</td><td>55.00</td><td>5.10</td></tr>
+<tr class="row-blue"><td>9</td><td>🔵測定点</td><td>9</td><td>1</td><td>102.00</td><td>5.10</td></tr>
+<tr class="row-blue"><td>10</td><td>🔵測定点</td><td>1</td><td>2</td><td>8.00</td><td>17.00</td></tr>
+<tr class="row-blue"><td>18</td><td>🔵測定点</td><td>9</td><td>2</td><td>102.00</td><td>17.00</td></tr>
+<tr class="row-blue"><td>19</td><td>🔵測定点</td><td>1</td><td>3</td><td>8.00</td><td>28.90</td></tr>
+<tr class="row-blue"><td>27</td><td>🔵測定点</td><td>9</td><td>3</td><td>102.00</td><td>28.90</td></tr>
+<tr class="row-orange"><td>28</td><td>🟠加振点①</td><td>-</td><td>-</td><td>8.00</td><td>5.10</td></tr>
+<tr class="row-orange"><td>29</td><td>🟠加振点②</td><td>-</td><td>-</td><td>102.00</td><td>28.90</td></tr>
+<tr class="row-magenta"><td>30</td><td>🟣固定基準センサー</td><td>-</td><td>-</td><td>8.00</td><td>28.90</td></tr>
+<tr class="row-gray"><td>31</td><td>⚪予備角</td><td>-</td><td>-</td><td>102.00</td><td>5.10</td></tr>
+</table>
+</div>
+<p>
+右端の座標を見ると、①②③④がそれぞれ板の「4つの角」にきちんと対応していることがわかります。これは「長方形の板 加振点とセンサー位置ガイド」の図と完全に一致するように作ってあります。
+</p>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<!-- ============================================================ -->
+<section id="p6">
+<h2 class="sec">⑥ 座標がどう計算されているか（数式の中身）</h2>
+
+<p>
+F列（X座標）とG列（Y座標）の数式は、一見むずかしそうに見えますが、やっていることは「たった1本のものさし」を「均等な間隔」で目盛りに区切っているだけです。かみくだいて説明します。
+</p>
+
+<h3 class="sub">6-1｜X座標（長手方向）の考え方</h3>
+<div class="formula" style="background:#0a0c12;border:1px solid var(--line);border-radius:8px;padding:12px;font-family:monospace;color:var(--cyan);margin:12px 0;">
+X = mx + (i − 1) × (L − 2×mx) ÷ (Nx − 1)
+</div>
+<div class="card cyan">
+<b>たとえ話：定規に目盛りを均等に打つ</b><br>
+110mmの板があるとして、両端ギリギリ（0mmと110mm）に点を置くと、板の縁が欠けていたり反っていたりして正しく測れないことがあります。<br>
+そこで「端から8mm（＝mx）だけ内側」を最初と最後の点にして、その間（110−8×2＝94mm）を9点で均等に割ります（8個の間隔）。<br>
+これは、定規の8mm〜102mmの区間に、9本の目盛りを均等に引くのとまったく同じ作業です。
+</div>
+
+<h3 class="sub">6-2｜Y座標（幅方向）の考え方</h3>
+<div class="formula" style="background:#0a0c12;border:1px solid var(--line);border-radius:8px;padding:12px;font-family:monospace;color:var(--cyan);margin:12px 0;">
+Y = w×my割合 + (j − 1) × (w − 2×w×my割合) ÷ (Ny − 1)
+</div>
+<p>
+考え方はX座標とまったく同じで、「板の幅（34mm）の上下15%（＝5.1mm）だけ内側」から始めて、残りを均等に3行に割っています。<br>
+中央の行（j=2）がちょうど w÷2＝17mm になるのは、上下対称に配置しているためで、これは検算にも使えます（実際、上の一覧表で No.10〜18 の Y は17.00になっています）。
+</p>
+
+<div class="card amber">
+🟡 <b>なぜ幅方向は「均等3分割」ではなく「端を少し内側に」しているのか</b><br>
+「長方形の板 加振点とセンサー位置ガイド」の説明にあった通り、中心線（真ん中の1列だけ）に点を置くと、<ruby>ねじりモード<rt>ねじりモード</rt></ruby>（板がひねれる揺れ方）はちょうどそこが節（動かない場所）になり、見逃してしまいます。<br>
+上下にわずかにずらした3行にしておくことで、曲げ・ねじりの両方の揺れ方を拾えるようにしています。
+</div>
+
+<h3 class="sub">6-3｜①②③④（角の点）の考え方</h3>
+<p>
+角の点は、グリッドの計算式とは別に、<b>「板の4つの角そのもの」</b>として座標を直接指定しています（X=mx or L−mx、Y=my or w−my の組み合わせ）。<br>
+これは測定点1・9・19・27のちょうど場所と一致するように、あえて意図的にそろえてあります。こうしておくと、「①のハンマー位置＝測定点1番の場所」というように、あとで見比べやすくなります。
+</p>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<!-- ============================================================ -->
+<section id="p7">
+<h2 class="sec">⑦ 自分の板の実寸に自動で連動させる方法</h2>
+
+<p>
+このシートを、すでにお持ちの「形状」シート・「測定計画」シートと<b>つないでしまう</b>と、ノギスで測った実測値がそのまま測定点管理表にも反映されるようになります。パラメータ欄（C3:C8）を、下のように書き換えるだけです。
+</p>
+
+<div class="tbl-wrap">
+<table>
+<tr><th>セル</th><th>今までの内容（手入力）</th><th>連動させる数式</th><th>意味</th></tr>
+<tr><td>C3（L）</td><td>110</td><td><code>=形状!$B$71</code></td><td>形状シートで確定した「採用L（長手長さ）」を自動で読む</td></tr>
+<tr><td>C4（w）</td><td>34</td><td><code>=形状!$B$72</code></td><td>形状シートで確定した「採用w（正味の等価幅）」を自動で読む</td></tr>
+<tr><td>C5（Nx）</td><td>9</td><td><code>=測定計画!$C$43</code></td><td>測定計画シートで決めた「長手方向の点数」を自動で読む</td></tr>
+<tr><td>C6（Ny）</td><td>3</td><td><code>=測定計画!$C$44</code></td><td>測定計画シートで決めた「幅方向の点数」を自動で読む</td></tr>
+</table>
+</div>
+
+<div class="card red">
+🔴 <b>注意</b><br>
+測定計画シートの現在の設定は Nx=25, Ny=5（総点数125点）になっています。この設定で連動させると、測定点管理表の行数も125行（＋角の4点＝129行）に増えます。<br>
+今回のTSVは「9×3＝27点」の説明用の例です。実際に125点で作る場合は、11行目〜37行目の数式（D・E・F・G列）を選んで、そのまま149行目あたりまで<b>下にドラッグ（オートフィル）</b>すれば、同じ数式が自動的に続きの行番号に対応して埋まります。
+</div>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<!-- ============================================================ -->
+<section id="p8">
+<h2 class="sec">⑧ 当日、測定しながら書き込む場所</h2>
+
+<p>
+表そのもの（No, 種類, i, j, X, Y）は測定前に作り終えていますが、<b>当日その場で埋める列</b>が3つあります。
+</p>
+
+<div class="steps">
+<div class="step">
+<b>H列（CH）に、実際につないだチャンネル番号を書く</b><br>
+RIONは手動でチャンネルを選ぶので、「1番の測定点はCH1」「固定基準センサーはCH2」のように、配線した通りに書きます。PSVはスキャン点を自動で処理しますが、あとで見返す時のためにスキャン番号を書いておくと安心です。
+</div>
+<div class="step">
+<b>I列（使用フラグ）を、測れなかった点だけ0にする</b><br>
+穴の上に乗ってレーザーが抜けた点、コヒーレンスが低すぎた点などは、測定後に1→0に変更します。あとで平均・解析するときに「0の行は無視する」という数式を組めば、自動的に除外できます。
+</div>
+<div class="step">
+<b>J列（メモ）に、気づいたことをその場で書く</b><br>
+「ここは節に近くて反応が小さい」「ダブルヒットが1回あったので測り直した」など、後から見て思い出せるように短くメモします。
+</div>
+</div>
+
+<div class="card cyan">
+🟢 <b>③固定基準センサーの行だけは特に注意</b><br>
+30行目（固定基準センサー）のCH番号は、試験の最初に決めたら、最後まで<b>絶対に変更しない</b>でください。途中でCHを配線し直した場合は、それより前のデータと後のデータを別々に扱う必要があります（位相の基準が変わってしまうため）。
+</div>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<!-- ============================================================ -->
+<section id="p9">
+<h2 class="sec">⑨ PSV-400・RION との対応づけ</h2>
+
+<table>
+<tr><th>機器</th><th>この表との関係</th><th>注意点</th></tr>
+<tr><td>RION SA-01A4</td><td>H列（CH）が、SA-01側の入力チャンネル設定（例：CH1〜CH4）と1対1で対応します。</td><td>手動で1点ずつ測るため、点を移動するたびにこの表を見ながら「今どの点を測っているか（No）」を確認すると、測り忘れ・重複を防げます。</td></tr>
+<tr><td>Polytec PSV-400</td><td>PSVソフト内部でも「スキャンポイント番号」が自動的に振られます。この表のNoと、PSV側のスキャンポイント番号を対応させておくと、あとでデータを突き合わせるときに迷いません。</td><td>PSV側で読み込む「ジオメトリ（形状）ファイル」にX, Y, Z座標を入れる機能がある場合は、F列・G列の数字をそのままコピーして使えます（Z＝0でよい。板は平面のため）。</td></tr>
+</table>
+
+<div class="card amber">
+🟡 <b>3Dモード形状ビューアとの関係</b><br>
+以前作成した「ブレーキパッド モード形状 3Dビューア」に測定データを入れる際も、この測定点管理表のNo・X・Y列がそのまま「どの点がどこにあるか」の元データとして使えます。実測が終わったら、この表のX・Y列（またはF・G列を値貼り付けしたもの）をビューア用のデータ入力にコピーする、という流れが一番迷いません。
+</div>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<!-- ============================================================ -->
+<section id="p10">
+<h2 class="sec">⑩ よくある間違い</h2>
+
+<table>
+<tr><th>間違い</th><th>何が起きるか</th><th>ふせぎ方</th></tr>
+<tr><td>貼り付け後、行を後から挿入・削除してしまう</td><td>数式の中の行番号（例：A11）がズレて、i・j・X・Yがおかしな数字になる</td><td>行の挿入・削除はせず、追加したい場合は表の末尾に足す</td></tr>
+<tr><td>固定基準センサー③を途中で貼り直す</td><td>それ以前・以降のデータで位相の基準がズレ、モード形状がおかしくなる</td><td>③の行のCH・場所は試験開始前に一度決めたら変えない。動かした場合は必ずJ列メモに時刻を記録する</td></tr>
+<tr><td>穴の上に測定点を置いたまま気づかない</td><td>レーザーが抜けて（ドロップアウト）異常な値が出て、構造の共振ピークと誤認する</td><td>形状シートで穴の位置（C55:E58）を確認し、その座標に重なる測定点はI列（使用フラグ）を先に0にしておく</td></tr>
+<tr><td>数式のセルを手で書き換えてしまう（値を直接入力）</td><td>あとでパラメータ（C3:C8）を変えても、その点だけ更新されなくなる</td><td>F・G列は基本的に数式のまま触らない。どうしても個別に修正したい点があれば、コメントをJ列に残す</td></tr>
+<tr><td>No（通し番号）と、実際に貼ったラベル・PSVのスキャン番号がズレる</td><td>あとで「このデータはどの点？」がわからなくなる</td><td>測定を始める前に、この表のNoを印刷するかタブレットで開いておき、貼り付けたラベル（付箋など）に同じ番号を書く</td></tr>
+</table>
+</section>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<!-- ============================================================ -->
+<section id="p11">
+<h2 class="sec">⑪ まとめチェックリスト</h2>
+
+<div class="card green">
+<ul>
+<li>☐ 「測定点管理表」シートを新規作成した</li>
+<li>☐ パラメータ欄（L, w, Nx, Ny, mx, 幅マージン割合）に数字を入れた</li>
+<li>☐ 31行（測定点27＋加振点2＋固定基準センサー1＋予備角1）を貼り付けた</li>
+<li>☐ F・G列の座標が、答え合わせ表と一致することを確認した</li>
+<li>☐ 実寸に合わせる場合は、形状／測定計画シートと連動させた（またはNx・Ny・L・wを書き換えた）</li>
+<li>☐ 穴の位置と重なる測定点のI列（使用フラグ）を0にした</li>
+<li>☐ 当日、H列（CH）とJ列（メモ）を測りながら書き込む準備ができている</li>
+<li>☐ 固定基準センサー（③）の場所とCHは試験終了まで変えない、と決めた</li>
+</ul>
+</div>
+
+<p>
+これで、「長方形の板 加振点とセンサー位置ガイド」の図（地図）と、この測定点管理表（しおり）がセットになり、当日迷わず測定できる状態になりました。
+</p>
+</section>
+
+<div class="footer-note">
+会話規模：中（Excel数式31行分の生成とHTMLガイド作成を含むため、厳密なトークン数は Settings › Usage でご確認ください）。区切りの良いところなので、次に「実際の板の実測値を入れて座標を確定する」作業に進む際は、新しいチャットに移ることも選択肢です。<br>
+このHTMLファイルは自己完結型（画像・外部ファイル不要）で、ブラウザで開くだけで表示されます。
+</div>
+
+</div>
+
+<script>
+function copyTSV(id, btn){
+  const el = document.getElementById(id);
+  const text = el.textContent;
+  navigator.clipboard.writeText(text).then(function(){
+    const orig = btn.textContent;
+    btn.textContent = '✅ コピーしました';
+    setTimeout(function(){ btn.textContent = orig; }, 1500);
+  }).catch(function(){
+    // フォールバック：選択状態にする
+    const range = document.createRange();
+    range.selectNode(el);
+    window.getSelection().removeAllRanges();
+    window.getSelection().addRange(range);
+    document.execCommand('copy');
+    window.getSelection().removeAllRanges();
+    btn.textContent = '✅ コピーしました';
+    setTimeout(function(){ btn.textContent = '📋 コピー'; }, 1500);
+  });
+}
+</script>
+
+</body>
+</html>

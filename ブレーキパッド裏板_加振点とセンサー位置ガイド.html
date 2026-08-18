@@ -1,0 +1,435 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<title>ブレーキパッド裏板 加振点とセンサー位置ガイド</title>
+<style>
+  :root{
+    --bg:#14161f;
+    --panel:#1c1f2b;
+    --panel2:#232739;
+    --text:#e6e6ea;
+    --sub:#9aa0b4;
+    --cyan:#5fd0e8;
+    --amber:#f2b04a;
+    --green:#6fd88a;
+    --red:#ef6a6a;
+    --magenta:#e07be0;
+    --line:#3a3f55;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Hiragino Sans","Yu Gothic","Meiryo",sans-serif;
+    line-height:1.85;
+    margin:0;
+    padding:0 0 60px 0;
+  }
+  .wrap{max-width:920px;margin:0 auto;padding:24px 20px;}
+  h1{
+    font-size:1.5em;
+    color:var(--cyan);
+    border-bottom:3px solid var(--cyan);
+    padding-bottom:10px;
+    margin-top:6px;
+  }
+  h2{
+    font-size:1.2em;
+    color:var(--amber);
+    margin-top:40px;
+    padding:8px 12px;
+    background:var(--panel2);
+    border-left:6px solid var(--amber);
+    border-radius:4px;
+  }
+  h3{
+    font-size:1.05em;
+    color:var(--green);
+    margin-top:26px;
+  }
+  p{margin:10px 0;}
+  .lead{color:var(--sub);font-size:0.95em;}
+  ruby rt{color:var(--sub);font-size:0.55em;}
+  .card{
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+    padding:16px 18px;
+    margin:16px 0;
+  }
+  .card.red{border-color:#5a3030;background:#241a1a;}
+  .card.green{border-color:#2f5a3a;background:#182219;}
+  .card.amber{border-color:#5a4a20;background:#241f14;}
+  .card.cyan{border-color:#20505a;background:#142024;}
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin:14px 0;
+    font-size:0.95em;
+  }
+  th,td{
+    border:1px solid var(--line);
+    padding:8px 10px;
+    text-align:left;
+    vertical-align:top;
+  }
+  th{background:var(--panel2);color:var(--cyan);}
+  tr:nth-child(even) td{background:#1a1d29;}
+  .badge{
+    display:inline-block;
+    padding:1px 7px;
+    border-radius:5px;
+    font-size:0.85em;
+    font-weight:bold;
+  }
+  .b-ok{background:#183a24;color:var(--green);}
+  .b-est{background:#3a3218;color:var(--amber);}
+  .b-check{background:#3a1c1c;color:var(--red);}
+
+  /* ---- diagram area ---- */
+  .diagram-panel{
+    background:#0e1017;
+    border:1px solid var(--line);
+    border-radius:12px;
+    padding:14px;
+    margin:18px 0;
+  }
+  .plate-svg{width:100%;height:auto;display:block;}
+  .plate-outline{
+    fill:#2b3040;
+    stroke:#7d8bb0;
+    stroke-width:2;
+  }
+  .hole{
+    fill:#0e1017;
+    stroke:#565c72;
+    stroke-width:1.5;
+    stroke-dasharray:3 2;
+  }
+  .gridpt{
+    fill:var(--cyan);
+    fill-opacity:0.85;
+    stroke:#0e1017;
+    stroke-width:0.6;
+  }
+  .hammer-halo{
+    fill:var(--amber);
+    fill-opacity:0.18;
+  }
+  .hammer-ring{
+    fill:none;
+    stroke:var(--amber);
+    stroke-width:2.4;
+  }
+  .hammer-x{
+    stroke:var(--amber);
+    stroke-width:3;
+    stroke-linecap:round;
+  }
+  .accel-box{
+    fill:var(--magenta);
+    fill-opacity:0.85;
+    stroke:#1a0e1a;
+    stroke-width:1.5;
+  }
+  .marker-label{
+    fill:var(--text);
+    font-size:13px;
+    font-weight:bold;
+    text-anchor:middle;
+  }
+  .hammer-label{fill:var(--amber);}
+  .accel-label{fill:var(--magenta);}
+
+  .legend{
+    display:flex;
+    flex-wrap:wrap;
+    gap:16px;
+    margin-top:14px;
+    padding-top:12px;
+    border-top:1px dashed var(--line);
+    font-size:0.92em;
+  }
+  .legend-item{display:flex;align-items:center;gap:8px;}
+  .swatch{width:16px;height:16px;border-radius:50%;flex:0 0 auto;}
+  .sw-grid{background:var(--cyan);}
+  .sw-hammer{background:transparent;border:2.5px solid var(--amber);border-radius:50%;}
+  .sw-accel{background:var(--magenta);border-radius:3px;transform:rotate(45deg);}
+  .sw-hole{background:#0e1017;border:1.5px dashed #7d8bb0;border-radius:50%;}
+
+  .steps{counter-reset:stepnum;}
+  .step{
+    position:relative;
+    padding:12px 12px 12px 52px;
+    margin:10px 0;
+    background:var(--panel);
+    border:1px solid var(--line);
+    border-radius:10px;
+  }
+  .step::before{
+    counter-increment:stepnum;
+    content:counter(stepnum);
+    position:absolute;
+    left:12px;top:12px;
+    width:28px;height:28px;
+    background:var(--cyan);
+    color:#0e1017;
+    font-weight:bold;
+    border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .footer-note{
+    margin-top:40px;
+    padding:14px;
+    border-top:1px solid var(--line);
+    color:var(--sub);
+    font-size:0.85em;
+  }
+  .num{color:var(--cyan);font-weight:bold;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<h1>ブレーキパッド裏板 加振点とセンサー位置ガイド</h1>
+<p class="lead">
+「ブレーキパッド_金属部（摩擦材抜き）固有振動数予測.xlsx」の <b>形状シート</b> に入力されている実際の外形データ（頂点22点・穴2個）をそのまま使って描いた、<ruby>実物<rt>じつぶつ</rt></ruby>と同じ形の図です。
+</p>
+
+<div class="card cyan">
+<b>この図でわかること</b>
+<ul>
+<li>🔵 <b>水色の点</b>＝<ruby>測定点<rt>そくていてん</rt></ruby>（PSV-400のレーザーで走査する場所、全 <span class="num">52点</span>）</li>
+<li>🟠 <b>オレンジの丸(×印)</b>＝<ruby>加振点<rt>かしんてん</rt></ruby>（ハンマーで叩く場所、<span class="num">2箇所</span>）</li>
+<li>🟣 <b>マゼンタの四角</b>＝固定基準センサー（加速度計）を貼り付ける場所、<span class="num">1箇所</span></li>
+<li>点線の丸＝穴（あな）。ここには測定点を置きません</li>
+</ul>
+</div>
+
+<div class="diagram-panel">
+
+<svg viewBox="0 0 692.0 386.0" xmlns="http://www.w3.org/2000/svg" class="plate-svg">
+  <polygon points="60.0,249.16 131.5,251.24 136.6,311.46 147.88,336.0 266.34,290.03 341.94,277.76 466.54,279.84 561.54,311.46 567.62,255.3 622.8,266.58 632.0,257.32 622.8,179.74 561.54,177.66 551.3,130.7 466.54,70.44 395.04,50.0 301.02,57.12 210.12,76.52 132.54,137.88 124.38,160.34 125.36,198.1 61.04,197.06" class="plate-outline"/>
+  <circle cx="247.56" cy="204.34" r="38.14" class="hole"/>
+<circle cx="419.68" cy="185.98" r="30.5" class="hole"/>
+
+  <circle cx="104.2" cy="219.0" r="4" class="gridpt"/>
+<circle cx="148.4" cy="297.0" r="4" class="gridpt"/>
+<circle cx="148.4" cy="258.0" r="4" class="gridpt"/>
+<circle cx="148.4" cy="219.0" r="4" class="gridpt"/>
+<circle cx="148.4" cy="180.0" r="4" class="gridpt"/>
+<circle cx="148.4" cy="141.0" r="4" class="gridpt"/>
+<circle cx="192.6" cy="297.0" r="4" class="gridpt"/>
+<circle cx="192.6" cy="258.0" r="4" class="gridpt"/>
+<circle cx="192.6" cy="219.0" r="4" class="gridpt"/>
+<circle cx="192.6" cy="180.0" r="4" class="gridpt"/>
+<circle cx="192.6" cy="141.0" r="4" class="gridpt"/>
+<circle cx="192.6" cy="102.0" r="4" class="gridpt"/>
+<circle cx="236.8" cy="297.0" r="4" class="gridpt"/>
+<circle cx="236.8" cy="258.0" r="4" class="gridpt"/>
+<circle cx="236.8" cy="141.0" r="4" class="gridpt"/>
+<circle cx="236.8" cy="102.0" r="4" class="gridpt"/>
+<circle cx="281.0" cy="258.0" r="4" class="gridpt"/>
+<circle cx="281.0" cy="141.0" r="4" class="gridpt"/>
+<circle cx="281.0" cy="102.0" r="4" class="gridpt"/>
+<circle cx="281.0" cy="63.0" r="4" class="gridpt"/>
+<circle cx="325.2" cy="258.0" r="4" class="gridpt"/>
+<circle cx="325.2" cy="219.0" r="4" class="gridpt"/>
+<circle cx="325.2" cy="180.0" r="4" class="gridpt"/>
+<circle cx="325.2" cy="141.0" r="4" class="gridpt"/>
+<circle cx="325.2" cy="102.0" r="4" class="gridpt"/>
+<circle cx="325.2" cy="63.0" r="4" class="gridpt"/>
+<circle cx="369.4" cy="258.0" r="4" class="gridpt"/>
+<circle cx="369.4" cy="219.0" r="4" class="gridpt"/>
+<circle cx="369.4" cy="180.0" r="4" class="gridpt"/>
+<circle cx="369.4" cy="141.0" r="4" class="gridpt"/>
+<circle cx="369.4" cy="102.0" r="4" class="gridpt"/>
+<circle cx="369.4" cy="63.0" r="4" class="gridpt"/>
+<circle cx="413.6" cy="258.0" r="4" class="gridpt"/>
+<circle cx="413.6" cy="102.0" r="4" class="gridpt"/>
+<circle cx="413.6" cy="63.0" r="4" class="gridpt"/>
+<circle cx="457.8" cy="258.0" r="4" class="gridpt"/>
+<circle cx="457.8" cy="219.0" r="4" class="gridpt"/>
+<circle cx="457.8" cy="141.0" r="4" class="gridpt"/>
+<circle cx="457.8" cy="102.0" r="4" class="gridpt"/>
+<circle cx="502.0" cy="258.0" r="4" class="gridpt"/>
+<circle cx="502.0" cy="219.0" r="4" class="gridpt"/>
+<circle cx="502.0" cy="180.0" r="4" class="gridpt"/>
+<circle cx="502.0" cy="141.0" r="4" class="gridpt"/>
+<circle cx="502.0" cy="102.0" r="4" class="gridpt"/>
+<circle cx="546.2" cy="297.0" r="4" class="gridpt"/>
+<circle cx="546.2" cy="258.0" r="4" class="gridpt"/>
+<circle cx="546.2" cy="219.0" r="4" class="gridpt"/>
+<circle cx="546.2" cy="180.0" r="4" class="gridpt"/>
+<circle cx="546.2" cy="141.0" r="4" class="gridpt"/>
+<circle cx="590.4" cy="258.0" r="4" class="gridpt"/>
+<circle cx="590.4" cy="219.0" r="4" class="gridpt"/>
+<circle cx="590.4" cy="180.0" r="4" class="gridpt"/>
+
+  
+<g class="hammer-marker">
+  <circle cx="91.2" cy="226.8" r="14" class="hammer-halo"/>
+  <path d="M 82.2,235.8 L 100.2,217.8 M 82.2,217.8 L 100.2,235.8" class="hammer-x"/>
+  <circle cx="91.2" cy="226.8" r="15" class="hammer-ring"/>
+  <text x="91.2" y="204.8" class="marker-label hammer-label">① ハンマー</text>
+</g>
+
+<g class="hammer-marker">
+  <circle cx="533.2" cy="154.0" r="14" class="hammer-halo"/>
+  <path d="M 524.2,163.0 L 542.2,145.0 M 524.2,145.0 L 542.2,163.0" class="hammer-x"/>
+  <circle cx="533.2" cy="154.0" r="15" class="hammer-ring"/>
+  <text x="533.2" y="132.0" class="marker-label hammer-label">② ハンマー</text>
+</g>
+
+  
+<g class="accel-marker">
+  <rect x="163.4" y="96.2" width="22" height="22" class="accel-box" transform="rotate(45 174.4 107.2)"/>
+  <text x="174.4" y="83.2" class="marker-label accel-label">③ 固定基準センサー</text>
+</g>
+
+</svg>
+
+<div class="legend">
+  <div class="legend-item"><span class="swatch sw-grid"></span>測定点（レーザー走査・52点）</div>
+  <div class="legend-item"><span class="swatch sw-hammer"></span>加振点（ハンマーで叩く・2箇所）</div>
+  <div class="legend-item"><span class="swatch sw-accel"></span>固定基準センサー（加速度計・1箇所）</div>
+  <div class="legend-item"><span class="swatch sw-hole"></span>穴（測定点を置かない）</div>
+</div>
+</div>
+
+<div class="card amber">
+🟡 <b>注意</b>：図中の測定点52個は「代表的な配置例」です。実際のワークブック（測定計画シート）では長手方向25点×半径方向5点＝<b>125点</b>を推奨していますが、図が見づらくなるため、ここでは間引いて表示しています。考え方（碁盤の目に敷き詰める・穴を避ける・対称軸からずらす）は同じです。
+</div>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<h2>① なぜこの3種類の点が必要なのか（考え方）</h2>
+
+<p>
+まず、この試験（<ruby>実験モード解析<rt>じっけんモードかいせき</rt></ruby>）は「3つの役割」に分かれています。役割ごとに置く場所の考え方が違うので、混同しないことが大切です。
+</p>
+
+<table>
+<tr><th>役割</th><th>使う機材</th><th>置く場所の考え方</th></tr>
+<tr>
+<td><b>①測定点</b><br>（<ruby>応答<rt>おうとう</rt></ruby>を見る場所）</td>
+<td>Polytec PSV-400<br>（レーザー・非接触）</td>
+<td>板全体に均等に敷き詰める。ここが多いほど、揺れの「絵（モード形状）」が精密に見える</td>
+</tr>
+<tr>
+<td><b>②加振点</b><br>（力を入れる場所）</td>
+<td>B&amp;K 8203 ハンマー</td>
+<td>少数（1〜2箇所）に絞って固定する。ただし、その場所選びが最重要（後述）</td>
+</tr>
+<tr>
+<td><b>③固定基準センサー</b></td>
+<td>Fuji Ceramics S04ZSG<br>（三軸・電荷式）</td>
+<td>測定中ずっと同じ場所に貼ったまま動かさない。全ての測定データの「ものさし（位相の基準）」になる</td>
+</tr>
+</table>
+
+<div class="card">
+<b>たとえ話：オーケストラの録音</b><br>
+①測定点＝会場のあちこちに立てた「マイク」（音がどう届くかを聞く）。
+②加振点＝指揮者が「せーの」で音を出させる「合図（きっかけ）」の場所。
+③固定基準センサー＝録音の間ずっと同じ場所で鳴らし続ける「基準音（チューニングの音）」。これがあるおかげで、後から複数のマイクの音を正しく重ね合わせられます。
+</div>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<h2>② 加振点（ハンマーで叩く場所）の決め方 — 手順</h2>
+
+<div class="steps">
+<div class="step">
+<b>対称の中心線を意識する</b><br>
+この裏板は、だいたい左右対称に近い形をしています（真ん中の水平な線を「対称軸」と呼びます）。<ruby>ねじりモード<rt>ねじりモード</rt></ruby>（板がひねれるように揺れる形）は、この対称軸の上ではまったく動きません（＝<ruby>節<rt>ふし</rt></ruby>になります）。だからこの線の<b>真上には絶対に叩く点を置かない</b>のが鉄則です。
+</div>
+<div class="step">
+<b>「角（かど）」を選ぶ</b><br>
+板の輪郭がカクッと折れ曲がっている場所（角）は、多くの揺れ方（モード）で大きく動く場所（<ruby>腹<rt>はら</rt></ruby>）になりやすいという経験則があります。図の①・②のオレンジの点は、どちらも板の角付近を選んでいます。
+</div>
+<div class="step">
+<b>2箇所を、なるべく非対称に選ぶ</b><br>
+①は板の下寄り（対称軸より下）、②は板の上寄り（対称軸より上）に置いています。さらに左右でも位置をずらしています。こうすることで、もし片方の点が「たまたまあるモードの節に近い」場合でも、もう片方でそのモードを拾える保険になります。また、双子モード（そっくりな周波数のペア）を分離するときにも、2箇所のデータを見比べることが役立ちます。
+</div>
+<div class="step">
+<b>穴からは離す</b><br>
+穴のフチは薄くなっていて壊れやすく、また穴の近くはデータが乱れやすいので、穴から十分離れた場所を選びます（図では穴の中心から半径＋3mm以上離した場所だけを候補にしています）。
+</div>
+<div class="step">
+<b>叩いた後は必ず確認する</b><br>
+時間波形を見て「山が2つ出ていないか（二度打ち）」を確認。さらに、点①と点②で得た周波数がだいたい一致しているか見比べます。もし片方でしか出てこないピークがあれば、そのピークはもう片方の点の近くが節になっている可能性が高い、というサインです。
+</div>
+</div>
+
+<h2>③ 固定基準センサー（加速度計）の置き方</h2>
+
+<div class="card green">
+<b>🟢 基本ルール</b><br>
+測定が全部終わるまで、絶対に動かさない・貼り直さない場所を1箇所選びます。図の③（マゼンタの四角）のように、加振点①②とは別の、こちらも対称軸から外れた角を選ぶのがおすすめです。<br><br>
+役割は「物差し」なので、<b>大きく揺れる場所であれば厳密な位置精度はそこまで重要ではありません</b>が、対称軸の上や、狙っているモードの節の上だけは避けてください（信号がほぼゼロになり、物差しとして使えなくなるためです）。
+</div>
+
+<table>
+<tr><th>よくある失敗</th><th>なぜダメか</th><th>対策</th></tr>
+<tr>
+<td>基準センサーを対称軸の真上に貼る</td>
+<td>ねじりモードのときに信号がほぼゼロになり、位相の基準として機能しない</td>
+<td>軸から意図的に数cm〜1cmずらす</td>
+</tr>
+<tr>
+<td>基準センサーを穴のフチに貼る</td>
+<td>局所的にたわみやすく、データが暴れる／接着が剥がれやすい</td>
+<td>穴から十分離れた、板厚が均一な場所を選ぶ</td>
+</tr>
+<tr>
+<td>途中で場所を移動してしまう</td>
+<td>それまでのデータと以降のデータの「位相の基準」がズレて、後で繋げられなくなる</td>
+<td>1回貼ったら試験終了まで絶対に触らない（テープや油性ペンで印を残す）</td>
+</tr>
+</table>
+
+<h2>④ 測定点（レーザー走査点）の考え方（おさらい）</h2>
+
+<p>
+前回お伝えした通りですが、図と合わせて再確認します。
+</p>
+<table>
+<tr><th>ルール</th><th>理由</th></tr>
+<tr><td>板全体に均等な間隔で敷き詰める</td><td>1点だけでは「形（モード形状）」が絵として見えないため</td></tr>
+<tr><td>対称軸からずれた点・四隅も含める</td><td>ねじりモードは対称軸上では動かないため、軸上だけだと見逃す</td></tr>
+<tr><td>穴の上には置かない</td><td>レーザーが穴を抜けてドロップアウトし、異常な数値（スパイク）を構造の揺れと誤認するため</td></tr>
+</table>
+
+<hr style="border:none;border-top:1px solid var(--line);margin:30px 0;">
+
+<h2>⑤ 全体の配置がひと目でわかるまとめ表</h2>
+
+<table>
+<tr><th>記号</th><th>意味</th><th>おおよその座標<br>（板の中心を原点、単位mm）</th><th>個数</th></tr>
+<tr><td>🔵 水色の点</td><td>測定点（PSVレーザー走査）</td><td>板全体に約8mm間隔で配置</td><td>約52〜125点</td></tr>
+<tr><td>🟠 ①オレンジ</td><td>加振点（ハンマー）</td><td>X≈-49, Y≈21（下寄りの左角付近）</td><td>1箇所目</td></tr>
+<tr><td>🟠 ②オレンジ</td><td>加振点（ハンマー）</td><td>X≈36, Y≈35（上寄りの右角付近）</td><td>2箇所目</td></tr>
+<tr><td>🟣 ③マゼンタ</td><td>固定基準センサー</td><td>X≈-33, Y≈44（左上の角付近）</td><td>1箇所（動かさない）</td></tr>
+</table>
+
+<div class="card red">
+🔴 <b>最後に一番大事な確認</b><br>
+この座標はあくまで「この形状データ（形状シートの実測値）」に基づいた<b>推奨の一例</b>です。実物を目の前にしたら、
+<ol>
+<li>本当に穴の位置・板の輪郭が形状シートの値と一致しているか、ノギスで確認</li>
+<li>①②の加振点で、実際に叩いてみて「両方とも同じような周波数の山が出るか」を確認</li>
+<li>もし片方でしか出ないピークがあれば、その中間あたりに③点目の加振点を追加する</li>
+</ol>
+という<b>現物合わせ</b>のステップを、必ず踏んでください。
+</div>
+
+<div class="footer-note">
+会話規模：中（座標計算・図の作成を含むため、厳密なトークン数は Settings › Usage でご確認ください）。<br>
+このHTMLファイルは自己完結型（画像・外部ファイル不要）で、ブラウザで開くだけで表示されます。
+</div>
+
+</div>
+</body>
+</html>
