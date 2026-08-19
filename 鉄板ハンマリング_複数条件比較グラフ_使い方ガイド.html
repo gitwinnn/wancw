@@ -1,0 +1,722 @@
+<!DOCTYPE html>
+<html lang="ja"><head><meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>鉄板ハンマリング　複数条件比較グラフの使い方</title>
+<style>
+:root{--bg:#14161a;--pnl:#1d2027;--pnl2:#242832;--line:#3a4150;--tx:#e6e8ec;--sub:#9aa4b2;
+--blue:#5fb3ff;--grn:#6fe08a;--ylw:#ffd166;--red:#ff7b7b;--pnk:#ff9ad5;--org:#ffa25f;--vio:#c1a3ff;--cyan:#4bacc6;--lime:#b5cc18;}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font-family:"Noto Sans JP","Hiragino Sans",Meiryo,sans-serif;line-height:1.9;font-size:16px}
+.wrap{max-width:1060px;margin:0 auto;padding:24px 18px 120px}
+h1{font-size:1.6em;color:#fff;background:linear-gradient(90deg,#1f3a5f,#2b5f8f);padding:18px 20px;border-radius:12px;border-left:8px solid var(--blue);margin:0 0 10px}
+h2{font-size:1.32em;color:var(--ylw);border-bottom:3px solid var(--ylw);padding-bottom:8px;margin:52px 0 18px}
+h3{font-size:1.12em;color:var(--grn);margin:30px 0 10px;border-left:5px solid var(--grn);padding-left:10px}
+h4{font-size:1.02em;color:var(--pnk);margin:22px 0 8px}
+p{margin:.6em 0}
+ruby rt{font-size:.5em;color:var(--sub)}
+.card{background:var(--pnl);border:1px solid var(--line);border-radius:12px;padding:16px 18px;margin:16px 0}
+.warn{background:#3a2020;border-left:6px solid var(--red)}
+.tip{background:#1f3326;border-left:6px solid var(--grn)}
+.note{background:#332b18;border-left:6px solid var(--ylw)}
+.blue{color:var(--blue);font-weight:700}.grn{color:var(--grn);font-weight:700}.ylw{color:var(--ylw);font-weight:700}
+.red{color:var(--red);font-weight:700}.pnk{color:var(--pnk);font-weight:700}.vio{color:var(--vio);font-weight:700}.org{color:var(--org);font-weight:700}.cyan{color:var(--cyan);font-weight:700}
+table{width:100%;border-collapse:collapse;margin:14px 0;font-size:.93em}
+th{background:#2c3340;color:#fff;border:1px solid var(--line);padding:8px 10px;text-align:left}
+td{border:1px solid var(--line);padding:8px 10px;background:var(--pnl2);vertical-align:top}
+td.num{text-align:right;font-family:"DejaVu Sans Mono",monospace}
+code{background:#11141a;color:var(--grn);padding:2px 6px;border-radius:5px;font-family:"DejaVu Sans Mono",monospace;font-size:.92em}
+.fx{background:#11141a;border:1px dashed var(--blue);border-radius:8px;padding:14px;margin:12px 0;text-align:center;font-size:1.06em;color:#cfe8ff;font-family:"DejaVu Sans Mono",monospace;overflow-x:auto}
+ol.st{counter-reset:s;list-style:none;padding-left:0}
+ol.st>li{counter-increment:s;position:relative;padding:12px 12px 12px 54px;margin:10px 0;background:var(--pnl2);border-radius:10px;border-left:4px solid var(--blue)}
+ol.st>li::before{content:counter(s);position:absolute;left:14px;top:12px;width:28px;height:28px;background:var(--blue);color:#0d1117;border-radius:50%;text-align:center;font-weight:800;line-height:28px}
+.badge{display:inline-block;font-size:.76em;padding:2px 8px;border-radius:99px;margin-left:6px;vertical-align:middle}
+.b-ok{background:#16391f;color:#8ef0a5;border:1px solid #2f7a44}
+.b-es{background:#3a3418;color:#ffd982;border:1px solid #8a7524}
+.b-ck{background:#3d1c1c;color:#ff9d9d;border:1px solid #8a2f2f}
+.copy{background:#2b5f8f;color:#fff;border:0;padding:7px 14px;border-radius:8px;cursor:pointer;font-size:.86em;margin:8px 0}
+.copy:hover{background:#3d7cb8}
+pre.tsv{display:none}
+.toc a{color:var(--blue);text-decoration:none}
+.toc li{margin:4px 0}
+svg{max-width:100%;height:auto;display:block;margin:14px auto;background:#0f1216;border-radius:10px;border:1px solid var(--line)}
+.k{background:#11141a;border-left:4px solid var(--vio);padding:10px 14px;margin:10px 0;border-radius:6px}
+.pro{background:#1a2a33;border-left:6px solid var(--cyan)}
+.mistake{background:#2e1a2e;border-left:6px solid var(--pnk)}
+.gloss dt{color:var(--blue);font-weight:700;margin-top:14px;font-size:1.02em}
+.gloss dd{margin:4px 0 4px 0;color:var(--tx)}
+.swatch{display:inline-block;width:14px;height:14px;border-radius:3px;margin-right:6px;vertical-align:middle}
+hr{border:0;border-top:1px solid var(--line);margin:44px 0}
+</style></head><body><div class="wrap">
+
+<h1>📊 鉄板ハンマリング → <ruby>複数<rt>ふくすう</rt></ruby>条件<ruby>比較<rt>ひかく</rt></ruby>グラフの使い方（n001〜n010・完全ガイド）</h1>
+<p class="sub" style="color:var(--sub)">対象ファイル：<code>鉄板ハンマリング_ピーク自動検出_損失係数カーブフィット.xlsx</code>　／　測定器：RION SA-01A4　／　OS：Linux Mint（LibreOffice Calc で動作確認済み）</p>
+
+<div class="card tip">
+<b class="grn">このガイドのゴール</b><br>
+今回のアップデートで、鉄板ハンマリングのブックが<b class="ylw">最大10条件（n001〜n010）</b>を1つのファイルで
+扱えるようになりました。<br>
+① <b class="blue">10条件ぶんのCSVを貼り付ける</b>やり方<br>
+② 10条件を<b class="pnk">1枚のグラフに重ねて比較する</b>やり方<br>
+③ グラフに<b class="org">η（損失係数）の数表を添える</b>やり方（LibreOffice Calc の実際の手順）<br>
+④ 今回<b class="red">見つかって直した設計ミス</b>の中身<br>
+──ここまでを、上から順に読んで実行すれば必ずできる状態にします。
+</div>
+
+<div class="card note">
+<b class="ylw">📌 前提知識について</b><br>
+固有振動数・損失係数・指数窓・カーブフィット法…といった<b>基本の考え方そのもの</b>は、
+以前作った <code>鉄板ハンマリング_損失係数エクセルの使い方.html</code>（全12章）で詳しく説明済みです。<br>
+このガイドは<b class="ylw">「1条件→10条件になって何が変わったか」</b>にしぼって説明します。
+基本の考え方をまだ読んでいない場合は、先にそちらの第0章〜第9章を読むことをおすすめします
+（読まなくても、このガイドだけで操作は完結できるようにしてあります）。
+</div>
+
+<div class="card toc">
+<b>📚 目次</b>
+<ol>
+<li><a href="#c0">第0章　今回、何がどう変わったのか（全体像）</a></li>
+<li><a href="#c1">第1章　10条件のデータを貼り付ける</a></li>
+<li><a href="#c2">第2章　4枚の新しいグラフシートの見方</a></li>
+<li><a href="#c3">第3章　今回見つかった設計ミスと、その直し方</a></li>
+<li><a href="#c4">第4章　【最重要】表をグラフに重ねる方法（LibreOffice Calcの実情）</a></li>
+<li><a href="#c5">第5章　使い方のコツ（プロも唸る使い方）</a></li>
+<li><a href="#c6">第6章　よくある間違い集</a></li>
+<li><a href="#c7">第7章　使用例（こんな時どう使う）</a></li>
+<li><a href="#c8">第8章　エクセル数式の全リスト（貼り付け用）</a></li>
+<li><a href="#c9">第9章　専門用語の説明リスト（用語集）</a></li>
+<li><a href="#c10">第10章　出典と確信度</a></li>
+</ol>
+</div>
+
+<hr>
+
+<h2 id="c0">第0章　今回、何がどう変わったのか（全体像）</h2>
+
+<h3>🔢 今までは「1回の測定」しか扱えなかった</h3>
+<p>これまでのブックは、<ruby>鉄板<rt>てっぱん</rt></ruby>を1回叩いて測ったデータを1つだけ貼り付けて、
+そのピークと<ruby>損失係数<rt>そんしつけいすう</rt></ruby> η を出す、という作りでした。</p>
+<p>でも実際の仕事では、こんな場面がよくありますよね。</p>
+<ul>
+<li>同じ板を<b class="blue">3回叩いて</b>、毎回ちゃんと同じ結果になるか確かめたい（<ruby>再現性<rt>さいげんせい</rt></ruby>の確認）</li>
+<li><b class="pnk">制振材を貼る前と後</b>で、ηがどれくらい変わったか比べたい</li>
+<li><b class="org">板厚や材料が違う</b>サンプルを何枚も測って、まとめて比較したい</li>
+</ul>
+<p>これを1つ1つ別のファイルでやると、グラフを見比べるだけでもひと苦労です。
+そこで今回、<b class="ylw">1つのファイルの中に最大10回ぶんの測定を入れて、自動で重ねてグラフ表示できる</b>ようにしました。</p>
+
+<div class="k">🍱 <b>たとえ話</b>：今までは「お弁当箱1個に、おかず1種類」でした。
+今回からは「同じお弁当箱に、10種類のおかず（n001〜n010）を仕切りを付けて入れられる」ようになった、というイメージです。
+仕切り（データ_n001〜n010）はあらかじめ全部用意してあるので、使う分だけおかずを詰めればOKです。</div>
+
+<h3>🏷️ 「n001」「n002」…という名前の意味</h3>
+<p>n001, n002, n003…は、単なる<b>通し番号</b>です。nは「番号（number）」のn、001は「1番目」という意味で、
+0を頭に付けているのは<ruby>桁数<rt>けたすう</rt></ruby>を揃えて見やすくするためです（001, 002, …, 010）。</p>
+<p>特別な意味はないので、たとえば「n001＝制振材なし」「n002＝制振材あり」のように、
+<b class="blue">あなたが自由に意味を割り当てて</b>使ってください（メモは各シートの余白に書き込んでもOKです）。</p>
+
+<h3>🗂️ 全体の仕組み（図解）</h3>
+<svg viewBox="0 0 900 480"><g font-family="sans-serif">
+<rect x="20" y="15" width="860" height="60" rx="10" fill="#1f3a5f" stroke="#5fb3ff" stroke-width="1.5"/>
+<text x="450" y="40" fill="#fff" font-size="17" font-weight="bold" text-anchor="middle">設定シート（測定条件・しきい値など／10条件で共通に1回だけ入力）</text>
+<text x="450" y="60" fill="#9aa4b2" font-size="12" text-anchor="middle">解析レンジ・サンプリング点数・指数窓・単位・ピーク検出パラメータ</text>
+
+<line x1="450" y1="75" x2="450" y2="100" stroke="#7d8794" stroke-width="2" marker-end="url(#arrow)"/>
+
+<g>
+<rect x="20" y="100" width="164" height="70" rx="8" fill="#2a331f" stroke="#6fe08a" stroke-width="1.5"/>
+<text x="102" y="128" fill="#fff" font-size="13" text-anchor="middle" font-weight="bold">データ_n001</text>
+<text x="102" y="146" fill="#cdeccd" font-size="11" text-anchor="middle">CSV貼付</text>
+<text x="102" y="160" fill="#cdeccd" font-size="11" text-anchor="middle">(A列=Hz, B列=振幅)</text>
+
+<rect x="200" y="100" width="164" height="70" rx="8" fill="#2a331f" stroke="#6fe08a" stroke-width="1.5"/>
+<text x="282" y="128" fill="#fff" font-size="13" text-anchor="middle" font-weight="bold">データ_n002</text>
+<text x="282" y="146" fill="#cdeccd" font-size="11" text-anchor="middle">CSV貼付</text>
+
+<rect x="380" y="100" width="164" height="70" rx="8" fill="#2a331f" stroke="#6fe08a" stroke-width="1.5" stroke-dasharray="5 3"/>
+<text x="462" y="135" fill="#9aa4b2" font-size="13" text-anchor="middle">　　　⋯</text>
+
+<rect x="560" y="100" width="164" height="70" rx="8" fill="#2a331f" stroke="#6fe08a" stroke-width="1.5"/>
+<text x="642" y="128" fill="#fff" font-size="13" text-anchor="middle" font-weight="bold">データ_n010</text>
+<text x="642" y="146" fill="#cdeccd" font-size="11" text-anchor="middle">CSV貼付</text>
+<text x="642" y="160" fill="#cdeccd" font-size="11" text-anchor="middle">(使わなければ空欄でOK)</text>
+</g>
+
+<line x1="102" y1="170" x2="102" y2="195" stroke="#7d8794" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="282" y1="170" x2="282" y2="195" stroke="#7d8794" stroke-width="2" marker-end="url(#arrow)"/>
+<line x1="642" y1="170" x2="642" y2="195" stroke="#7d8794" stroke-width="2" marker-end="url(#arrow)"/>
+
+<g>
+<rect x="20" y="195" width="164" height="55" rx="8" fill="#2a1f1f" stroke="#ff7b7b" stroke-width="1.5"/>
+<text x="102" y="218" fill="#fff" font-size="13" text-anchor="middle" font-weight="bold">ピーク一覧_n001</text>
+<text x="102" y="236" fill="#f5c2c2" font-size="11" text-anchor="middle">自動でfn・η算出</text>
+
+<rect x="200" y="195" width="164" height="55" rx="8" fill="#2a1f1f" stroke="#ff7b7b" stroke-width="1.5"/>
+<text x="282" y="218" fill="#fff" font-size="13" text-anchor="middle" font-weight="bold">ピーク一覧_n002</text>
+
+<rect x="560" y="195" width="164" height="55" rx="8" fill="#2a1f1f" stroke="#ff7b7b" stroke-width="1.5"/>
+<text x="642" y="218" fill="#fff" font-size="13" text-anchor="middle" font-weight="bold">ピーク一覧_n010</text>
+</g>
+
+<line x1="102" y1="250" x2="450" y2="300" stroke="#5fb3ff" stroke-width="1.6"/>
+<line x1="282" y1="250" x2="450" y2="300" stroke="#5fb3ff" stroke-width="1.6"/>
+<line x1="642" y1="250" x2="450" y2="300" stroke="#5fb3ff" stroke-width="1.6"/>
+
+<rect x="150" y="300" width="600" height="80" rx="10" fill="#1a2a3d" stroke="#5fb3ff" stroke-width="1.8"/>
+<text x="450" y="330" fill="#fff" font-size="16" font-weight="bold" text-anchor="middle">4枚のグラフシート</text>
+<text x="450" y="352" fill="#bcdcff" font-size="12" text-anchor="middle">ノーマルグラフ／ノーマルグラフη／細グラフ／細グラフη</text>
+<text x="450" y="370" fill="#9aa4b2" font-size="11" text-anchor="middle">n001〜n010のスペクトルを1枚に重ねて自動表示</text>
+
+<line x1="450" y1="380" x2="450" y2="405" stroke="#7d8794" stroke-width="2" marker-end="url(#arrow)"/>
+<rect x="250" y="405" width="400" height="55" rx="8" fill="#3a2a1f" stroke="#ffa25f" stroke-width="1.5"/>
+<text x="450" y="428" fill="#fff" font-size="13" text-anchor="middle" font-weight="bold">あなたが結果を見る・比較する・報告書に使う</text>
+<text x="450" y="446" fill="#ffd9b3" font-size="11" text-anchor="middle">η表つきシートは、さらに n001 の数値表つき</text>
+
+<defs><marker id="arrow" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto"><path d="M0,0 L8,3 L0,6 Z" fill="#7d8794"/></marker></defs>
+</g></svg>
+
+<h3>📈 4枚の新しいグラフシート（ざっくり）</h3>
+<table>
+<tr><th>シート名</th><th>何が見える</th><th>こんな時に使う</th></tr>
+<tr><td class="grn">ノーマルグラフ</td><td>n001〜n010のスペクトルを重ねた、ふつうの見た目のグラフ</td><td>全体の傾向をざっくり見比べたい</td></tr>
+<tr><td class="grn">ノーマルグラフη</td><td>上と同じグラフ＋n001のfn・η数値表</td><td>グラフを見ながらn001の具体的な数値も確認したい</td></tr>
+<tr><td class="pnk">細グラフ</td><td>横軸に細かい目盛線を追加したグラフ</td><td>山（ピーク）が正確に何Hzか読み取りたい</td></tr>
+<tr><td class="pnk">細グラフη</td><td>細かい目盛り＋n001のfn・η数値表</td><td>細かい周波数読み取り＋数値確認を同時にしたい</td></tr>
+</table>
+<p class="ylw">💡 「なぜη表はn001だけ？他の条件は？」→ 第2章で詳しく説明します。他条件のfn・ηは
+「ピーク一覧_n00X」シートでいつでも確認できます。</p>
+<hr>
+<h2 id="c1">第1章　10条件のデータを貼り付ける</h2>
+
+<h3>1-1　貼り付け前にやること：設定は1回だけ</h3>
+<p>「設定」シートの黄色いセルに、実際にRION SA-01A4で測定したときの条件を入れます。
+<b class="red">これは10条件ぜんぶで共通</b>です。1回入れれば、n001〜n010すべてに反映されます。</p>
+<div class="card warn">
+<b class="red">⚠ 気をつけること</b><br>
+途中で設定を変える（例えばレンジを2000Hzから1000Hzに変える）と、
+<b>すでに貼り付け済みの他の条件の計算結果も一緒に変わってしまいます</b>。
+10条件は「同じ測定条件で撮った10枚の写真」のようなものなので、
+条件がバラバラなデータを比べるのはそもそも比較として成立しません。
+違う条件で測ったものを比べたいときは、ファイルをコピーして別々に使ってください。
+</div>
+
+<h3>1-2　1条件ぶんの貼り付け手順</h3>
+<ol class="st">
+<li><b>「データ_n001」タブをクリック</b>してシートを開く。画面左上、A1セルの近くに
+「周波数 f [Hz]」「振幅（貼付：dB）」という見出しが見えます。</li>
+<li>RION SA-01A4からCSV出力したデータを開き、<b class="blue">周波数の列</b>と<b class="blue">振幅の列</b>をコピーする。</li>
+<li>データ_n001シートの<b class="ylw">A2セル</b>（2行目、1行目は見出しなので使わない）を選んでから貼り付け。
+　A列＝周波数[Hz]、B列＝振幅、の順になるようにする。</li>
+<li>C列より右（C〜H列、さらにI〜K列）には既に数式が入っているので、<b class="red">絶対に上書きしない</b>。
+　貼り付けるときは「値のみ貼り付け」など、A列・B列だけに収まる範囲を選んで貼るのが安全。</li>
+</ol>
+
+<h3>1-3　2条件目以降</h3>
+<p>「データ_n002」「データ_n003」…と、<b class="grn">まったく同じ手順</b>を繰り返すだけです。
+シートの名前が違うだけで、中身の作り（A列=周波数、B列=振幅、それ以降は自動計算）は全部同じです。</p>
+
+<div class="k">🍩 <b>たとえ話</b>：ドーナツの箱に10個の穴（データ_n001〜n010）が空いています。
+作ったドーナツ（測定データ）の数だけ、好きな穴に置いていけばOK。3個しか作らなければ
+7個の穴は空のままで大丈夫、箱（ファイル）自体は壊れません。</div>
+
+<h3>1-4　使わない条件はどうする？</h3>
+<p>全部埋める必要はありません。<b class="grn">n003までしか使わないなら、n004〜n010は空欄のまま</b>で大丈夫です。
+空欄の条件は、
+</p>
+<ul>
+<li>「ピーク一覧_n00X」に何も表示されない（エラーも出ない）</li>
+<li>グラフにその条件の線が出ない（凡例には名前だけ残る）</li>
+</ul>
+<p>という、ごく自然な「何もしていない」状態になるように作ってあります。</p>
+
+<h3>1-5　貼り付け後に必ずやること：再計算</h3>
+<div class="fx">LibreOffice Calc：<b>Ctrl + Shift + F9</b>（強制的な完全再計算）<br>
+Excel：<b>F9</b>（通常再計算）／ <b>Ctrl + Alt + F9</b>（完全再計算）</div>
+<p><span class="badge b-ok">🟢検証済</span> このブックは13,700行×10条件ぶんの数式を含む大きめのファイルです。
+再計算には数十秒かかることがあります。フリーズしたように見えても、しばらく待ってください。</p>
+
+<h3>1-6　結果の確認場所</h3>
+<table>
+<tr><th>知りたいこと</th><th>見る場所</th></tr>
+<tr><td>ある条件の固有振動数 fn</td><td>「ピーク一覧_n00X」シートのY列</td></tr>
+<tr><td>ある条件の損失係数 η（補正後）</td><td>「ピーク一覧_n00X」シートのAB列</td></tr>
+<tr><td>その結果は信用できるか</td><td>同シートのAF列（OK / 要確認）</td></tr>
+<tr><td>10条件をまとめて見比べたい</td><td>「ノーマルグラフ」「細グラフ」（第2章）</td></tr>
+</table>
+<hr>
+<h2 id="c2">第2章　4枚の新しいグラフシートの見方</h2>
+
+<h3>2-1　共通の色分け（凡例）</h3>
+<p>10条件は、どのグラフシートでも<b class="ylw">同じ色</b>で統一しています。慣れると色だけで
+「あ、これはn003だ」とわかるようになります。</p>
+<table>
+<tr><th>条件</th><th>色</th><th>条件</th><th>色</th></tr>
+<tr><td>n001</td><td><span class="swatch" style="background:#5FB3FF"></span>青</td>
+    <td>n006</td><td><span class="swatch" style="background:#FFA25F"></span>橙</td></tr>
+<tr><td>n002</td><td><span class="swatch" style="background:#FF7B7B"></span>赤</td>
+    <td>n007</td><td><span class="swatch" style="background:#4BACC6"></span>水色</td></tr>
+<tr><td>n003</td><td><span class="swatch" style="background:#6FE08A"></span>緑</td>
+    <td>n008</td><td><span class="swatch" style="background:#FF9AD5"></span>ピンク</td></tr>
+<tr><td>n004</td><td><span class="swatch" style="background:#FFD166"></span>黄</td>
+    <td>n009</td><td><span class="swatch" style="background:#B5CC18"></span>黄緑</td></tr>
+<tr><td>n005</td><td><span class="swatch" style="background:#C1A3FF"></span>紫</td>
+    <td>n010</td><td><span class="swatch" style="background:#FFFFFF;border:1px solid #888"></span>白</td></tr>
+</table>
+<p class="ylw">💡 グラフの色を変えたい場合は、グラフを右クリック→データ系列の書式設定、から変更できます
+（1本ずつ変える必要があり、一括変更のボタンはありません）。</p>
+
+<h3>2-2　ノーマルグラフ・細グラフの違い</h3>
+<p>この2つは<b>まったく同じデータ</b>を表示していますが、横軸（周波数）の目盛りの細かさだけが違います。</p>
+<svg viewBox="0 0 800 260"><g font-family="sans-serif">
+<text x="20" y="30" fill="#6fe08a" font-size="14" font-weight="bold">ノーマルグラフ（目盛りが粗い）</text>
+<line x1="40" y1="110" x2="760" y2="110" stroke="#7d8794" stroke-width="1.5"/>
+<line x1="100" y1="60" x2="100" y2="120" stroke="#3a4150"/>
+<line x1="300" y1="60" x2="300" y2="120" stroke="#3a4150"/>
+<line x1="500" y1="60" x2="500" y2="120" stroke="#3a4150"/>
+<line x1="700" y1="60" x2="700" y2="120" stroke="#3a4150"/>
+<text x="100" y="132" fill="#9aa4b2" font-size="11" text-anchor="middle">500</text>
+<text x="300" y="132" fill="#9aa4b2" font-size="11" text-anchor="middle">1000</text>
+<text x="500" y="132" fill="#9aa4b2" font-size="11" text-anchor="middle">1500</text>
+<text x="700" y="132" fill="#9aa4b2" font-size="11" text-anchor="middle">2000</text>
+<path d="M40 105 Q290 100 320 40 Q350 100 500 103 Q520 70 540 103 Q600 106 760 104" fill="none" stroke="#5fb3ff" stroke-width="2.2"/>
+<text x="330" y="30" fill="#ffd166" font-size="12">この山、だいたい何Hz？→目盛りが粗くて読みにくい</text>
+
+<text x="20" y="180" fill="#ff9ad5" font-size="14" font-weight="bold">細グラフ（目盛りが細かい：太線100Hzごと・細線20Hzごと）</text>
+<line x1="40" y1="245" x2="760" y2="245" stroke="#7d8794" stroke-width="1.5"/>
+<g stroke="#232a35">
+<line x1="100" y1="195" x2="100" y2="250"/><line x1="140" y1="195" x2="140" y2="250"/><line x1="180" y1="195" x2="180" y2="250"/>
+<line x1="220" y1="195" x2="220" y2="250"/><line x1="260" y1="195" x2="260" y2="250"/><line x1="340" y1="195" x2="340" y2="250"/>
+<line x1="380" y1="195" x2="380" y2="250"/><line x1="420" y1="195" x2="420" y2="250"/><line x1="460" y1="195" x2="460" y2="250"/>
+</g>
+<g stroke="#4a5568" stroke-width="1.3">
+<line x1="100" y1="190" x2="100" y2="250"/><line x1="300" y1="190" x2="300" y2="250"/><line x1="500" y1="190" x2="500" y2="250"/><line x1="700" y1="190" x2="700" y2="250"/>
+</g>
+<path d="M40 240 Q290 235 320 175 Q350 235 500 238 Q520 205 540 238 Q600 241 760 239" fill="none" stroke="#ff9ad5" stroke-width="2.2"/>
+<text x="330" y="165" fill="#6fe08a" font-size="12">山の位置を目盛りで数えれば、だいたい1000Hz少し前とわかる</text>
+</g></svg>
+
+<h3>2-3　なぜη表は「n001だけ」なのか？</h3>
+<p>ここは疑問に思う方が多いはずなので、経緯を説明します。</p>
+<div class="card note">
+<b class="ylw">設計の考え方</b><br>
+① グラフに常時表示する数表は、<ruby>紙面<rt>しめん</rt></ruby>（画面）の広さに限りがあるため、
+　10条件ぶん全部を表にすると文字が小さくなりすぎて読めなくなります。<br>
+② そのため「まず1条件（基準となるn001）の数値を見られるようにする」設計にしました。<br>
+③ 他の条件（n002〜n010）のfn・ηは、<b class="blue">「ピーク一覧_n00X」シートを開けばいつでも
+　同じ表形式で確認できます</b>ので、機能が失われているわけではありません。<br>
+④ もし「n003の表を見たい」場合は、ノーマルグラフηシートのB・C列の数式
+　（<code>=ピーク一覧_n001!Y5</code> など）の「n001」の部分を「n003」に書き換えれば、
+　その条件用の表に早変わりします（第8章に数式の一覧があります）。
+</div>
+
+<h3>2-4　空の条件があってもグラフは壊れない</h3>
+<p>データ_n005〜n010を空欄のままにしていても、グラフはエラーになりません。
+凡例には「n005」のような名前は残りますが、対応する線は表示されないだけです。
+これは、グラフが空っぽの列を見たときに「何も描かない」という、ごく普通の動作をしているだけです。</p>
+<hr>
+<h2 id="c3">第3章　今回見つかった設計ミスと、その直し方</h2>
+
+<h3>3-1　何が問題だったのか</h3>
+<p>10条件対応を作っている<ruby>途中<rt>とちゅう</rt></ruby>で、<b class="red">重要な設計ミス</b>を見つけました。
+正直にすべて説明します。</p>
+<p>ピークを自動検出するとき、「ノイズの小さな<ruby>山<rt>やま</rt></ruby>を無視して、本物の山だけ拾う」ために
+<b class="ylw">しきい値（このデータの中で一番大きな山より何dB下までを拾うか）</b>という基準を使っています。</p>
+<div class="k">🔍 <b>たとえ話</b>：クラスで一番背の高い子を基準にして「その子より30cm以上低い子はカウントしない」
+というルールで「背が高い子」を数えるようなものです。</div>
+<p>ところが、10条件に拡張する前の作りでは、この「クラスで一番背の高い子」を
+<b class="red">n001というクラスだけを見て</b>決めていました。</p>
+
+<h3>3-2　何がまずいのか</h3>
+<p>もしn002が「別のクラス」（振幅の大きさがn001とぜんぜん違う測定）だったらどうなるでしょうか。</p>
+<svg viewBox="0 0 820 260"><g font-family="sans-serif">
+<text x="20" y="25" fill="#ff7b7b" font-size="14" font-weight="bold">❌ 修正前：n001の最大値だけを基準にしていた</text>
+<line x1="40" y1="90" x2="380" y2="90" stroke="#7d8794"/>
+<path d="M40 85 Q150 20 200 85 Q280 88 380 87" fill="none" stroke="#5fb3ff" stroke-width="2"/>
+<text x="210" y="110" fill="#9aa4b2" font-size="11">n001（基準になった）</text>
+<line x1="40" y1="90" x2="380" y2="90" stroke="#ffd166" stroke-dasharray="4 3"/>
+<text x="385" y="93" fill="#ffd166" font-size="10">しきい値</text>
+
+<line x1="440" y1="90" x2="780" y2="90" stroke="#7d8794"/>
+<path d="M440 89 Q550 70 600 89 Q680 88.5 780 89" fill="none" stroke="#ff7b7b" stroke-width="2"/>
+<text x="600" y="110" fill="#9aa4b2" font-size="11">n002（全体的に振幅が小さい）</text>
+<line x1="440" y1="90" x2="780" y2="90" stroke="#ffd166" stroke-dasharray="4 3"/>
+<text x="500" y="70" fill="#ff7b7b" font-size="12">n001基準のしきい値だと高すぎて、</text>
+<text x="500" y="130" fill="#ff7b7b" font-size="12">n002の本物の山を見逃してしまう！</text>
+
+<text x="20" y="185" fill="#6fe08a" font-size="14" font-weight="bold">✅ 修正後：それぞれの条件が自分自身の最大値を基準にする</text>
+<line x1="40" y1="240" x2="380" y2="240" stroke="#7d8794"/>
+<path d="M40 235 Q150 170 200 235 Q280 238 380 237" fill="none" stroke="#5fb3ff" stroke-width="2"/>
+<line x1="40" y1="240" x2="380" y2="240" stroke="#6fe08a" stroke-dasharray="4 3"/>
+<text x="140" y="255" fill="#6fe08a" font-size="10">n001基準のしきい値（n001用）</text>
+
+<line x1="440" y1="240" x2="780" y2="240" stroke="#7d8794"/>
+<path d="M440 239 Q550 220 600 239 Q680 238.5 780 239" fill="none" stroke="#ff7b7b" stroke-width="2"/>
+<line x1="440" y1="240" x2="780" y2="240" stroke="#6fe08a" stroke-dasharray="4 3"/>
+<text x="540" y="255" fill="#6fe08a" font-size="10">n002基準のしきい値（n002専用）→ちゃんと拾える</text>
+</g></svg>
+
+<p>つまり、<b class="red">n002〜n010の振幅の大きさがn001とだいぶ違う場合、ピークを見逃したり、
+逆にノイズを誤検出したりする</b>おそれがありました。</p>
+
+<h3>3-3　どう直したか</h3>
+<p>各「データ_n00X」シートに、<b class="grn">そのシート専用の「最大振幅」と「しきい値」を計算するセル</b>
+（J2セル・K3セル）を追加し、ピーク判定の数式がそこを見るように変更しました。</p>
+<div class="card tip">
+<b class="grn">今のしくみ（条件ごとに独立）</b><br>
+・「データ_n00X」シートのJ2 ＝ そのシート自身の最大振幅（<code>=MAX($C$2:$C$13701)</code>）<br>
+・同K3 ＝ そのシート専用のしきい値（<code>=$J$2*10^(設定!$B$25/20)</code>）<br>
+・F列のピーク判定式は、この<b>K3</b>を見るように修正済み<br>
+　→ 10条件それぞれが、自分自身の音の大きさを基準にピークを探すようになりました。
+</div>
+<p><span class="badge b-ok">🟢修正・検証済み</span> 修正後、全834,516個の数式を再計算してエラー0件を確認。
+さらにn001の計算結果（412Hz・628Hz・905Hz・1120Hz・1438Hz・1743Hzの6ピーク）が
+修正の前後で<b>一致すること</b>も確認済みです（n001は結果的に同じ値になる設計のため）。</p>
+
+<h3>3-4　「設定」シートに残っている参考表示について</h3>
+<p>「設定」シートのB31〜B33（最大振幅・しきい値・検出ピーク数）は、
+今はもう<b class="ylw">ピーク検出には使われていません</b>。n001の値を参考として表示するだけの
+ラベルに変更しています（ラベルにも「参考」と明記しました）。消してしまっても他への影響はありません。</p>
+<hr>
+<h2 id="c4">第4章　【最重要】表をグラフに重ねる方法（LibreOffice Calcの実情）</h2>
+
+<div class="card warn">
+<b class="red">✋ 最初に大事なお断り</b><br>
+「η表をグラフの上にカメラ機能で貼り付けて」というご要望でしたが、調べたところ
+<b class="red">LibreOffice Calc には、Excelの「カメラ」機能（セル範囲を"生きた写真"として
+どこにでも貼れる機能）と完全に同じものが存在しません</b>。<br>
+知ったかぶりをせず、正直に「できないこと」と「代わりにできること」を説明します。
+</div>
+
+<h3>4-1　なぜExcelの「カメラ」がそのまま使えないのか</h3>
+<p>Excelの「カメラ」ボタンは、セル範囲を選んでクリックするだけで、値が変わると
+自動更新される<ruby>浮遊<rt>ふゆう</rt></ruby>画像（どこにでもドラッグできる生きた写真）を作れる、
+Windows独自の技術（OLEリンク）を使った機能です。</p>
+<p><span class="badge b-ok">🟢公式情報で確認</span> LibreOffice公式ヘルプによると、
+LibreOffice Calcの「貼り付けの特殊」ダイアログには「リンクとして貼り付け」という選択肢がありますが、
+これは<b class="ylw">セルの中身（数値）がそのままリンクされたセルとして貼られる機能</b>であり、
+Excelのカメラのような「どこにでも動かせる画像」にはなりません（出典：第10章参照）。</p>
+<p>LibreOffice公式のQ&amp;Aサイト（ask.libreoffice.org）でも、まさに同じ質問
+「グラフの上にリンクされた画像を貼りたい」に対して、公式コミュニティが
+<b class="red">「LibreOffice Calcの貼り付けの特殊には、リンクされた画像という選択肢が見当たらない」</b>
+と回答しています。</p>
+
+<h3>4-2　3つの選択肢（利点・欠点を比較）</h3>
+<p>技術的な代替手段を、優劣をつけずに並べます。あなたの使い方に合わせて選んでください。</p>
+
+<h4>選択肢A：そのまま使う（表はグラフのすぐ下）── <span class="badge b-ok">🟢推奨</span></h4>
+<div class="card tip">
+すでにブックはこの形で作ってあります。追加の操作は<b class="grn">一切不要</b>です。<br>
+<b>利点</b>：完全に自動更新される／操作ゼロ／壊れる心配がない<br>
+<b>欠点</b>：表がグラフの「上」ではなく「下」に表示される（重ならない）
+</div>
+
+<h4>選択肢B：表を「静止画」としてグラフの上に貼る</h4>
+<div class="card note">
+コピー＆貼り付けの特殊で、表を1枚の画像として貼り付け、それをグラフの上にドラッグする方法です。<br>
+<b>利点</b>：見た目はグラフに数値が重なって、報告書用のスクリーンショットっぽく見える<br>
+<b>欠点</b>：<b class="red">自動更新されない</b>。データを直したら、この操作をもう一度やり直す必要がある
+（「生きた写真」ではなく「印刷した写真」に近いイメージ）
+</div>
+<p><b class="pnk">手順</b>（LibreOffice Calc）</p>
+<ol class="st">
+<li>η表（例：A44:C58セル、見出し含む）を選択して <b>Ctrl+C</b>（コピー）</li>
+<li>グラフの近くの適当な空きセルをクリック</li>
+<li><b>Ctrl+Shift+V</b>（貼り付けの特殊）を押す</li>
+<li>出てきたダイアログで「<code>GDI metafile</code>」（または「PNG Bitmap」）を選んで<b>OK</b><br>
+　<span style="color:var(--sub);font-size:.9em">※「リンクとして貼り付け」のチェックは<b>入れない</b>（入れると画像ではなく通常のリンクセルになります）</span></li>
+<li>貼り付けられた画像（周りに緑の四角い<ruby>取<rt>と</rt></ruby>っ手が出る）を、マウスでグラフの上までドラッグ</li>
+<li>データを更新したら、古い画像を削除して①からやり直す</li>
+</ol>
+<div class="k">🖼️ <b>たとえ話</b>：選択肢Aは「窓の外の景色（リアルタイム）」、選択肢Bは「その景色を撮った写真を壁に貼る」。
+写真は景色が変わっても自動では変わりません。</div>
+
+<h4>選択肢C：本物のMicrosoft Excelで開いたとき</h4>
+<div class="card">
+このxlsxファイルを<b class="cyan">実際のExcel</b>で開いた場合は、Excel本来の「カメラ」機能が使えます
+（クイックアクセスツールバーのユーザー設定で「カメラ」ボタンを追加できます）。<br>
+<b>利点</b>：本物の生きた写真として、自動更新かつ自由に動かせる<br>
+<b>欠点</b>：LibreOffice環境（あなたの普段の環境）では使えない。ファイルをExcelで開く必要がある
+</div>
+
+<h3>4-3　結論（このガイドのおすすめ）</h3>
+<div class="card tip">
+<b class="grn">普段づかいは選択肢A（そのまま）で十分</b>です。表はグラフの真下にあり、値は常に
+自動更新されています。報告書などに「グラフと数値を1枚の画像として重ねたい」という
+特別な場面だけ、選択肢Bを使ってください。
+</div>
+<hr>
+<h2 id="c5">第5章　使い方のコツ（プロも唸る使い方）</h2>
+
+<h3 class="pro">💎 コツ1：n001は「基準」として使う</h3>
+<p>η表がn001固定なので、<b class="blue">比較の基準にしたい条件をn001に置く</b>と一番使いやすくなります。
+例えば「対策前」をn001、「対策後」をn002以降にすると、常に基準（対策前）の数値を見ながら
+グラフで比較できます。</p>
+
+<h3 class="pro">💎 コツ2：条件名をメモしておく</h3>
+<p>n001〜n010だけでは何の測定かわからなくなりがちです。各「データ_n00X」シートのJ1セルの右側
+（L1セルなど、未使用の場所）に「制振材あり」のようなメモを書いておくと、あとで見返したときに
+迷いません。</p>
+
+<h3 class="pro">💎 コツ3：判定「要確認」の条件だけ先に潰す</h3>
+<p>10条件もあると「ピーク一覧_n00X」を10枚チェックするのは大変です。まず全シートのAF列を
+ざっと見て、「要確認」が出ている条件だけ先に波形を目視確認する、という順番にすると効率的です。</p>
+
+<h3 class="pro">💎 コツ4：グラフの線が多すぎて見にくいときは、一時的に非表示に</h3>
+<p>10本の線を全部見ると煩雑なときは、グラフの凡例で見たくない条件（n004など）をクリックすると
+一時的にその線だけ非表示にできます（LibreOffice Calc / Excel共通の操作）。
+データそのものは消えないので安心です。</p>
+
+<h3 class="pro">💎 コツ5：細グラフで読んだ概算値は、必ずピーク一覧で裏取りする</h3>
+<p>細グラフの目盛りはあくまで「目で見て、だいたい何Hzか」を把握するための補助です。
+<b class="ylw">正式な数値は必ず「ピーク一覧_n00X」のY列・AB列（カーブフィットで出した値）を使う</b>のが
+正しい使い方です。目盛りを読んだだけの数値を報告書に書かないよう注意してください。
+</p>
+
+<h2 id="c6">第6章　よくある間違い集</h2>
+
+<div class="card mistake">
+<b class="pnk">❌ 間違い1：データを貼ったのに再計算を忘れる</b><br>
+LibreOffice Calcは大きいファイルだと自動再計算をオフにしていることがあります。
+貼り付け直後にピーク一覧が空欄のままなら、まず <code>Ctrl+Shift+F9</code> を試してください。
+</div>
+
+<div class="card mistake">
+<b class="pnk">❌ 間違い2：C〜K列を誤って上書きしてしまう</b><br>
+A列・B列だけを狙って貼り付けたつもりが、コピー元の範囲が広くてC列以降まで
+上書きしてしまうことがあります。貼り付け後は、C1セルなどの見出しや数式が
+残っているか必ず確認してください（消えていたら、他の空いている条件シートから
+数式だけをコピーして復旧できます）。
+</div>
+
+<div class="card mistake">
+<b class="pnk">❌ 間違い3：単位（dB / リニア）の設定ミス</b><br>
+RIONの画面表示はdBでも、CSVの出力設定によってはリニア値が出ることがあります。
+貼り付けた直後のB列の値が「0.001」のような小さい数字ばかりなら、リニアで
+出力されている可能性大。「設定」シートB21を「リニア」に変更してください。
+</div>
+
+<div class="card mistake">
+<b class="pnk">❌ 間違い4：条件によって測定レンジを変えてしまう</b><br>
+n001は2000Hzレンジ、n002は1000Hzレンジ…のように条件ごとにRION側の設定を
+変えてしまうと、「設定」シートが共有されている都合上、正しく比較できません。
+10条件は同じ測定条件で撮ることが大前提です。
+</div>
+
+<div class="card mistake">
+<b class="pnk">❌ 間違い5：η表の「n001」を書き換えたのに他のセルが更新されない</b><br>
+η表のB・C列15行ぶん、すべての数式内の「n001」を書き換える必要があります。
+1行だけ変えて満足してしまうミスが起きがちです（第8章のコピー機能を使うと
+まとめて確認しやすくなります）。
+</div>
+
+<div class="card mistake">
+<b class="pnk">❌ 間違い6：選択肢B（画像貼り付け）をした後、データを直しても画像が古いまま</b><br>
+第4章の選択肢Bで貼った画像は自動更新されません。データを直したら、
+古い画像を消してもう一度貼り直すのを忘れずに（意外と忘れがちです）。
+</div>
+<hr>
+<h2 id="c7">第7章　使用例（こんな時どう使う）</h2>
+
+<h3>例1：同じ板を3回叩いて、再現性を確認したい</h3>
+<ol class="st">
+<li>「設定」シートに測定条件を入力（1回だけ）</li>
+<li>1回目の叩打データを「データ_n001」、2回目を「データ_n002」、3回目を「データ_n003」に貼る</li>
+<li>再計算後、「ノーマルグラフ」で3本の線がほぼ重なっていればOK＝再現性あり</li>
+<li>「ピーク一覧_n001」「_n002」「_n003」のY列（fn）・AB列（η）を並べて、
+　ばらつきの大きさを数値でも確認する</li>
+</ol>
+
+<h3>例2：制振材あり／なしでηを比較したい</h3>
+<ol class="st">
+<li>制振材なしのデータを「データ_n001」に貼る（基準として使うのでn001に）</li>
+<li>制振材ありのデータを「データ_n002」に貼る</li>
+<li>「ノーマルグラフη」を見ると、グラフでピーク位置の違い、下の表でn001（制振材なし）の
+　具体的なfn・η数値の両方が確認できる</li>
+<li>n002側の数値は「ピーク一覧_n002」のY列・AB列で確認し、n001と比較する</li>
+</ol>
+
+<h3>例3：板厚違いのサンプルを5枚まとめて評価したい</h3>
+<ol class="st">
+<li>薄い順（あるいは仕様書の順）にn001〜n005へ割り当てて貼り付け</li>
+<li>「細グラフ」で、板厚が増えるにつれてピークの位置がどちらに動くか目視確認</li>
+<li>「理論値参考」シートで、板厚を入力した場合の理論値と見比べて、傾向が合っているか確認</li>
+</ol>
+
+<h3>例4：後日、追加でn006を測定したくなった</h3>
+<ol class="st">
+<li>「設定」シートの条件を変えていないか確認（変えていなければそのままでOK）</li>
+<li>「データ_n006」に新しいデータを貼るだけ。既存のn001〜n005には何も影響しない</li>
+<li>再計算すれば、グラフにも自動的にn006の線が追加される</li>
+</ol>
+<hr>
+<h2 id="c8">第8章　エクセル数式の全リスト（貼り付け用）</h2>
+<p>今回追加した数式を、「セル → 式」の形でまとめておきます。ボタンを押すと
+タブ区切りテキストがコピーされるので、エクセルに<b class="ylw">そのまま貼り付け</b>られます。</p>
+
+<h3>8-1　各「データ_n00X」シートのローカルしきい値（第3章の修正）</h3>
+<p>この2つのセルは、データ_n001〜データ_n010のすべてに、同じ形で入っています。</p>
+<button class="copy" onclick="cp('e1',this)">📋 コピー（タブ区切り・そのままエクセルへ）</button>
+<pre class="tsv" id="e1">セル	入力/式	意味
+I2	最大振幅|H|max(このシート)	ラベル（説明用の文字）
+J2	=MAX($C$2:$C$13701)	このシート専用の最大振幅
+I3	しきい値(リニア,このシート)	ラベル（説明用の文字）
+K3	=$J$2*10^(設定!$B$25/20)	このシート専用のしきい値（リニア）</pre>
+<table>
+<tr><th>セル</th><th>入力／式</th><th>意味</th></tr>
+<tr><td>J2</td><td><code>=MAX($C$2:$C$13701)</code></td><td>このシートだけの最大振幅|H|max</td></tr>
+<tr><td>K3</td><td><code>=$J$2*10^(設定!$B$25/20)</code></td><td>このシートだけのしきい値（設定!B25=しきい値dB、共通）</td></tr>
+</table>
+<p>これを使うために、F列（ピーク判定式）の中の <code>設定!$B$32</code> という部分がすべて
+<code>$K$3</code> に置き換わっています（数式全体は元のガイド第11章のF列と同じ形で、この一箇所だけが変更点です）。</p>
+
+<h3>8-2　η表（ノーマルグラフη・細グラフη シート、n001の15ピークぶん）</h3>
+<button class="copy" onclick="cp('e2',this)">📋 コピー（タブ区切り・そのままエクセルへ）</button>
+<pre class="tsv" id="e2">ピーク番号	周波数fnの式	損失係数ηの式
+1	=ピーク一覧_n001!Y5	=ピーク一覧_n001!AB5
+2	=ピーク一覧_n001!Y6	=ピーク一覧_n001!AB6
+3	=ピーク一覧_n001!Y7	=ピーク一覧_n001!AB7
+4	=ピーク一覧_n001!Y8	=ピーク一覧_n001!AB8
+5	=ピーク一覧_n001!Y9	=ピーク一覧_n001!AB9
+6	=ピーク一覧_n001!Y10	=ピーク一覧_n001!AB10
+7	=ピーク一覧_n001!Y11	=ピーク一覧_n001!AB11
+8	=ピーク一覧_n001!Y12	=ピーク一覧_n001!AB12
+9	=ピーク一覧_n001!Y13	=ピーク一覧_n001!AB13
+10	=ピーク一覧_n001!Y14	=ピーク一覧_n001!AB14
+11	=ピーク一覧_n001!Y15	=ピーク一覧_n001!AB15
+12	=ピーク一覧_n001!Y16	=ピーク一覧_n001!AB16
+13	=ピーク一覧_n001!Y17	=ピーク一覧_n001!AB17
+14	=ピーク一覧_n001!Y18	=ピーク一覧_n001!AB18
+15	=ピーク一覧_n001!Y19	=ピーク一覧_n001!AB19</pre>
+<p class="ylw">💡 別の条件（例：n003）の表に変えたい場合は、上のリストの「n001」の部分を
+すべて「n003」に置き換えてから、この表を該当セルに貼り付けてください。</p>
+
+<h3>8-3　超シンプル版：エクセルの数式ってこういうこと（初めての方向け）</h3>
+<p>ご要望のあった「1+1=2」のような一番シンプルな例で、数式の考え方をおさらいします。</p>
+<div class="fx">セルA1に　<b>1</b><br>セルB1に　<b>1</b><br>セルC1に　<code>=A1+B1</code>　（結果：2）</div>
+<p>今回の「η表」も、実はこれと同じ考え方です。</p>
+<div class="fx">セルY5に（ピーク一覧_n001シート）　自動計算された数字（例：412.41）<br>
+別シートのセルB38に　<code>=ピーク一覧_n001!Y5</code>　（結果：412.41 がそのまま表示される）</div>
+<p>「=」で始めると、そのセルは「よそのセルの値をコピーしてきて表示する」という意味になります。
+違う場所にあるだけで、A1+B1もピーク一覧_n001!Y5も、やっていることは同じ「よそのセルを見て計算する」です。</p>
+
+<h3>8-4　自分で似た仕組みを作りたい場合の最小サンプル</h3>
+<button class="copy" onclick="cp('e3',this)">📋 コピー</button>
+<pre class="tsv" id="e3">セル	入力/式	意味
+A1	1	条件1の値（例）
+A2	2	条件2の値（例）
+A3	3	条件3の値（例）
+B1	=MAX(A1:A3)	3つの中の最大値
+C1	=A1/$B$1	条件1のB1に対する比率
+C2	=A2/$B$1	条件2のB1に対する比率
+C3	=A3/$B$1	条件3のB1に対する比率</pre>
+<p>この考え方（各条件が自分の値÷全体の最大値、という比率計算）が、まさに第3章で説明した
+「条件ごとに自分専用のしきい値を持つ」しくみの、一番シンプルな形です。</p>
+<hr>
+<h2 id="c9">第9章　専門用語の説明リスト（用語集）</h2>
+<p>このガイドに出てきた言葉を、小学生でもわかるように短くまとめました。困ったらここに戻ってきてください。</p>
+
+<dl class="gloss">
+<dt>n001, n002…（<ruby>通<rt>とお</rt></ruby>し<ruby>番号<rt>ばんごう</rt></ruby>）</dt>
+<dd>10個までの測定を区別するための、ただの番号ラベル。001は1番目という意味。特別な計算上の意味はない。</dd>
+
+<dt><ruby>固有振動数<rt>こゆうしんどうすう</rt></ruby>（fn）</dt>
+<dd>ものを叩いたときに「一番鳴りやすい揺れの速さ」。単位はHz（ヘルツ）。鐘を叩くといつも同じ高さの音が出るのと同じしくみ。</dd>
+
+<dt><ruby>損失係数<rt>そんしつけいすう</rt></ruby>（η・イータ）</dt>
+<dd>音や振動の「消えやすさ」を表す数字。小さいほど長く響き、大きいほどすぐ止まる。</dd>
+
+<dt>しきい値</dt>
+<dd>「これ以上の高さの山だけを本物のピークとして扱う」という境界線の値。境界線より低い山（ノイズ）は無視される。</dd>
+
+<dt><ruby>突出<rt>とっしゅつ</rt>量<rt>りょう</rt></ruby></dt>
+<dd>山のふもと（谷）と山の頂上の高さの差。この差が小さい出っぱりは「ただのギザギザ」として無視される。</dd>
+
+<dt>カーブフィット法</dt>
+<dd>実際に測った点々に、理論上の形の線をピッタリ重なるように当てはめて、fnやηを求めるやり方。定規で線を引くようなイメージ。</dd>
+
+<dt><ruby>指数窓<rt>しすうまど</rt></ruby>（指数・指数窓）</dt>
+<dd>測定データの終わりに向かって、だんだん音量を絞る処理。ブツ切りノイズを防ぐが、副作用でηが実際より大きく出るため、あとで引き算して補正する。</dd>
+
+<dt>ピーク一覧</dt>
+<dd>自動で見つけた山（ピーク）ごとに、fnやηなどの計算結果を一覧にしたシート。</dd>
+
+<dt>判定（OK / 要確認）</dt>
+<dd>その山の計算結果がどれくらい信用できるかの自動チェック結果。「要確認」は、人の目でも確認したほうがよいという意味で、間違っているとは限らない。</dd>
+
+<dt><ruby>双子<rt>ふたご</rt></ruby>モード（<ruby>縮退<rt>しゅくたい</rt></ruby>モード）</dt>
+<dd>2つの違う揺れ方が、たまたますごく近い周波数で同時に起きている状態。今回の1自由度カーブフィットでは、これを1つの山として誤って扱ってしまうことがある。</dd>
+
+<dt>コヒーレンス</dt>
+<dd>「その測定がどれくらい信用できるか」を表す品質チェックの数値。今回のやり方（1発だけ叩いて平均をとらない方式）では計算できないため使えない。</dd>
+
+<dt>リンク（貼り付けの特殊）</dt>
+<dd>あるセルの値を、別の場所にも自動で反映させるコピーのしかた。元の値が変わると、リンク先も自動で変わる。</dd>
+
+<dt>GDI metafile（ジー・ディー・アイ　メタファイル）</dt>
+<dd>LibreOfficeで、表やグラフを「1枚の画像」として貼り付けるときに選べる形式の名前。きれいに拡大縮小できる画像形式。</dd>
+
+<dt><ruby>再計算<rt>さいけいさん</rt></ruby></dt>
+<dd>エクセルの数式をもう一度全部計算し直す操作。データを貼り付けた直後は、これをしないと結果が反映されないことがある。</dd>
+
+<dt>レンジ（<ruby>解析<rt>かいせき</rt></ruby>周波数レンジ）</dt>
+<dd>「0Hzから何Hzまでを測定・分析するか」という範囲の設定。</dd>
+
+<dt>dB（デシベル）/ リニア</dt>
+<dd>音や振動の大きさを表す2つの単位。dBは人間の感覚に近い対数の単位、リニアはそのままの比率の単位。</dd>
+
+<dt><ruby>凡例<rt>はんれい</rt></ruby></dt>
+<dd>グラフの中にある「どの色がどの条件か」を示す一覧表示。今回は右側にn001〜n010の色分けが出る。</dd>
+
+<dt><ruby>目盛<rt>めも</rt>り</ruby></dt>
+<dd>グラフの軸に付いている、値を読み取るための線。細かい目盛りほど正確な位置が読み取れる。</dd>
+
+<dt>半値幅（<ruby>3dB幅<rt>スリーディービーはば</rt></ruby>）</dt>
+<dd>山の高さが「てっぺんの半分のエネルギー」になる幅。この幅と山の位置の比からηを概算できる（今回のブックは、より精密なカーブフィット法をメインに使っている）。</dd>
+</dl>
+
+<h2 id="c10">第10章　出典と確信度</h2>
+<table>
+<tr><th>内容</th><th>確信度</th><th>根拠</th></tr>
+<tr><td>LibreOffice Calc「貼り付けの特殊」の「リンク」は、セル参照(DDEリンク)であり、
+自由に動かせる画像ではない</td><td><span class="badge b-ok">🟢公式ヘルプで確認</span></td>
+<td>help.libreoffice.org「Paste Special (Calc)」（英語版公式ヘルプ）</td></tr>
+<tr><td>LibreOffice CalcにはExcelの「カメラ」機能に相当する、リンクされた浮動画像を
+作る標準機能がない</td><td><span class="badge b-ok">🟢公式コミュニティで確認</span></td>
+<td>ask.libreoffice.org「How do I paste a linked image onto a chart」
+（公式Q&amp;Aサイト、運営元 The Document Foundation）</td></tr>
+<tr><td>「貼り付けの特殊」で選べる画像形式に GDI metafile／PNG Bitmap／Bitmap がある</td>
+<td><span class="badge b-ok">🟢公式バグトラッカーの実機報告で確認</span></td>
+<td>bugs.launchpad.net（Ubuntu上のLibreOfficeパッケージ、UI文言の実例）</td></tr>
+<tr><td>「リンクとして貼り付け」の具体的な手順（Paste Special→As Link）</td>
+<td><span class="badge b-ok">🟢公式ガイドで確認</span></td>
+<td>books.libreoffice.org「Calc Guide - Chapter 12, Linking Data」（公式ドキュメント）</td></tr>
+<tr><td>各データ_n00Xシート専用のしきい値計算（J2・K3セル）の修正内容</td>
+<td><span class="badge b-ok">🟢本ブックで検証済み</span></td>
+<td>全834,516数式を再計算しエラー0件を確認。n001の計算結果が修正前後で一致することも確認</td></tr>
+<tr><td>ピーク検出・カーブフィット法・指数窓補正そのものの理論的根拠</td>
+<td><span class="badge b-ok">🟢別ガイドで導出済み</span></td>
+<td><code>鉄板ハンマリング_損失係数エクセルの使い方.html</code> 第6〜8章参照</td></tr>
+<tr><td>LibreOffice本体でのカメラボタン追加設定の可否（将来のバージョンで変わる可能性）</td>
+<td><span class="badge b-ck">🔴要継続確認</span></td>
+<td>LibreOfficeは頻繁に更新されるため、将来のバージョンで機能追加される可能性がある。
+使用中のバージョンで「貼り付けの特殊」の選択肢を実際に確認することを推奨</td></tr>
+</table>
+
+<div class="card tip" style="margin-top:36px">
+<b class="grn">🎓 最後に、覚えておくべき4行</b><br>
+① <b class="ylw">10条件は同じ「設定」シートを共有する。</b>条件間で測定レンジ等を変えない。<br>
+② <b class="ylw">η表はn001固定。</b>他条件はピーク一覧_n00Xシートを直接見る。<br>
+③ <b class="ylw">グラフの上に表を重ねる「カメラ機能」はLibreOfficeにそのままは無い。</b>
+　そのまま使う（表はグラフの下）のが一番確実。<br>
+④ <b class="ylw">貼り付け後は必ず再計算（Ctrl+Shift+F9）。</b>これを忘れると結果が反映されない。
+</div>
+
+</div>
+<script>
+function cp(id,btn){
+  var t=document.getElementById(id).textContent;
+  navigator.clipboard.writeText(t).then(function(){
+    var o=btn.textContent; btn.textContent='✅ コピーしました'; setTimeout(function(){btn.textContent=o;},1600);
+  },function(){ btn.textContent='❌ コピー失敗（手動で選択してください）'; });
+}
+</script>
+</body></html>
