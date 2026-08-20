@@ -1,0 +1,619 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>双子モード分離 RFP法カーブフィット 完全ガイド</title>
+
+<style>
+  :root{
+    --bg:#0d1117; --bg2:#151b23; --card:#1a212b; --line:#2a3441;
+    --text:#dbe2ea; --sub:#9aa7b5; --cyan:#5ad4ff; --amber:#ffb454;
+    --green:#5ee6a0; --yellow:#f4e04d; --red:#ff7a7a; --purple:#c792ea;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Hiragino Sans","Yu Gothic",-apple-system,sans-serif;
+    line-height:1.85; margin:0; padding:0 0 80px 0;
+  }
+  .wrap{max-width:920px; margin:0 auto; padding:28px 20px;}
+  header.top{
+    background:linear-gradient(160deg,#101820,#182230);
+    border-bottom:1px solid var(--line); padding:36px 20px 30px;
+  }
+  header.top h1{
+    font-size:1.5em; margin:0 0 8px; color:var(--cyan);
+    letter-spacing:.02em;
+  }
+  header.top p{color:var(--sub); margin:4px 0;}
+  nav.toc{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:18px 22px; margin:22px 0;
+  }
+  nav.toc h2{font-size:1em; color:var(--amber); margin:0 0 10px;}
+  nav.toc ol{margin:0; padding-left:1.4em;}
+  nav.toc a{color:var(--text); text-decoration:none; border-bottom:1px dotted var(--sub);}
+  nav.toc a:hover{color:var(--cyan);}
+  section{margin:44px 0;}
+  h2.sec{
+    font-size:1.25em; color:var(--cyan); border-left:4px solid var(--cyan);
+    padding:4px 0 4px 14px; margin:0 0 18px;
+  }
+  h3.sub{font-size:1.05em; color:var(--amber); margin:28px 0 10px;}
+  h4.subsub{font-size:.98em; color:var(--purple); margin:20px 0 8px;}
+  p{margin:12px 0;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:18px 20px; margin:16px 0;
+  }
+  .card.amber{border-left:4px solid var(--amber);}
+  .card.green{border-left:4px solid var(--green);}
+  .card.red{border-left:4px solid var(--red);}
+  .card.cyan{border-left:4px solid var(--cyan);}
+  .badge{
+    display:inline-block; font-size:.78em; padding:2px 9px; border-radius:20px;
+    margin-left:6px; white-space:nowrap;
+  }
+  .b-ok{background:#123d2a; color:var(--green); border:1px solid #1f6b47;}
+  .b-est{background:#403a10; color:var(--yellow); border:1px solid #7a6a1a;}
+  .b-check{background:#3d1a1a; color:var(--red); border:1px solid #7a2a2a;}
+  ruby rt{color:var(--sub); font-size:.62em;}
+  .hl-cyan{color:var(--cyan); font-weight:600;}
+  .hl-amber{color:var(--amber); font-weight:600;}
+  .hl-green{color:var(--green); font-weight:600;}
+  .hl-red{color:var(--red); font-weight:600;}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:.92em;}
+  th,td{border:1px solid var(--line); padding:8px 10px; text-align:left;}
+  th{background:#1e2733; color:var(--amber);}
+  td.num{font-family:"SF Mono",Consolas,monospace; color:var(--cyan);}
+  .formula{
+    font-family:"SF Mono",Consolas,monospace; background:#0f151d; border:1px solid var(--line);
+    border-radius:6px; padding:10px 14px; color:var(--green); margin:10px 0; overflow-x:auto;
+  }
+  .tbl-wrap{position:relative;}
+  .copybtn{
+    background:#1e2733; color:var(--cyan); border:1px solid var(--line); border-radius:6px;
+    padding:5px 12px; font-size:.82em; cursor:pointer; margin:6px 0 2px;
+  }
+  .copybtn:hover{background:#28323f;}
+  .copybtn.copied{color:var(--green); border-color:var(--green);}
+  svg{display:block; margin:18px auto; max-width:100%;}
+  .step-list{padding-left:1.3em;}
+  .step-list li{margin:10px 0;}
+  .note-box{
+    background:#151b23; border:1px dashed var(--sub); border-radius:8px;
+    padding:14px 18px; margin:14px 0; font-size:.94em; color:var(--sub);
+  }
+  .flow-svg-caption{text-align:center; color:var(--sub); font-size:.85em; margin-top:-6px;}
+  code{background:#1e2733; padding:1px 6px; border-radius:4px; color:var(--cyan); font-size:.92em;}
+  hr.sep{border:none; border-top:1px solid var(--line); margin:36px 0;}
+  .kv{display:grid; grid-template-columns:170px 1fr; gap:6px 14px; margin:10px 0;}
+  .kv div:nth-child(odd){color:var(--sub);}
+  footer.end{
+    text-align:center; color:var(--sub); font-size:.85em; margin-top:60px;
+    border-top:1px solid var(--line); padding-top:20px;
+  }
+  .sheetbadge{display:inline-block; background:#1e2733; color:var(--purple); border:1px solid var(--line);
+    border-radius:6px; padding:1px 8px; font-size:.85em; font-family:"SF Mono",Consolas,monospace;}
+  .compare-win{background:#123d2a !important;}
+</style>
+
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap" style="padding:0;">
+    <h1>🔬 <ruby>双子<rt>ふたご</rt></ruby>モード分離　RFP法カーブフィット　完全ガイド</h1>
+    <p>数ある<ruby>曲線<rt>きょくせん</rt></ruby>あてはめ（カーブフィット）法の中から、あなたの場面に一番合う方法を選び、
+    Solver（手動操作）なしで自動計算できるExcelファイルにしました。</p>
+    <p>これだけ読めば、手順を忘れても最初からやり直せます。</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h2>📖 目次</h2>
+  <ol>
+    <li><a href="#p1">このファイルは何をするものか（3行で）</a></li>
+    <li><a href="#p2">カーブフィット法、結局どれがおすすめ？（全種類の比較）</a></li>
+    <li><a href="#p3">なぜRFP法か？あなたの場面での結論</a></li>
+    <li><a href="#p4">今回、何が新しくなったか（Solver不要の閉形式解法）</a></li>
+    <li><a href="#p5">使い方（5ステップ・シートごとの解説）</a></li>
+    <li><a href="#p6">計算の中身（数式の意味を手取り足取り）</a></li>
+    <li><a href="#p7">判定が「要確認」になったときの対処</a></li>
+    <li><a href="#p8">よくあるミス 総まとめ</a></li>
+    <li><a href="#p9">出典・参考文献</a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<section id="p1">
+<h2 class="sec">第1部｜このファイルは何をするものか（3行で）</h2>
+
+<div class="card cyan">
+<p style="font-size:1.05em;">
+① 1つの山に見えるピークが、実は「近い周波数の2つの山が重なったもの」（<ruby>双子<rt>ふたご</rt></ruby>モード・<ruby>縮退<rt>しゅくたい</rt></ruby>モード）だったとき、<br>
+② <span class="hl-cyan">有理多項式法（RFP法／Rational Fraction Polynomial method）</span>というカーブフィット法で2つの山を数式ごと分離し、<br>
+③ 各モードの<ruby>固有振動数<rt>こゆうしんどうすう</rt></ruby> fn と<ruby>損失係数<rt>そんしつけいすう</rt></ruby> η を、Solver（ソルバー）の手動操作なしで自動計算します。
+</p>
+</div>
+
+<p>あなたのブレーキパッドは、穴があることで左右対称性が崩れ、本来1つだったはずのモードが2つに分かれる「ピーク割れ」が起きやすい構造です。これまでの鉄板ワークブック（1自由度・逆FRF2次多項式フィット）は「山が1つだけ孤立している」ことが前提なので、この双子モードには使えません。今回のファイルは、その次のレベル（2つの山を同時に数式で扱うMDOFカーブフィット）に対応します。</p>
+
+<div class="note-box">💡 「MDOF」とは Multi-Degree-Of-Freedom（多<ruby>自由度<rt>じゆうど</rt></ruby>）の略。1つの山だけを見る「SDOF（単一自由度）」に対して、複数の山を同時に1つの数式で表す考え方です。</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p2">
+<h2 class="sec">第2部｜カーブフィット法、結局どれがおすすめ？（全種類の比較）</h2>
+
+<p>「できる／できない」だけで終わらせず、実際に世の中で使われているカーブフィット法をひととおり並べ、それぞれの得意・不得意と一次情報の出典を明記します。専門用語は下に噛み砕いた説明を付けています。</p>
+
+<h3 class="sub">📊 全体比較表</h3>
+<div class="tbl-wrap">
+<table style="font-size:.85em;">
+<tr>
+  <th>手法</th><th>発表・原典</th><th>領域</th><th>山が重なった場合</th><th>Excelでの実装</th><th>この場面での評価</th>
+</tr>
+<tr>
+  <td>半値幅法<br><span style="color:var(--sub); font-size:.9em;">(Half-Power法)</span></td>
+  <td>-（古典的手法）</td>
+  <td>周波数</td>
+  <td class="hl-red">✕ 不可（1山専用）</td>
+  <td>◎ 超簡単</td>
+  <td>孤立した1山の速報値用</td>
+</tr>
+<tr>
+  <td>サークルフィット<br><span style="color:var(--sub); font-size:.9em;">(Kennedy-Pancu法)</span></td>
+  <td>Kennedy &amp; Pancu, 1947<sup>[1]</sup></td>
+  <td>周波数</td>
+  <td class="hl-red">✕ 不可（1山専用・SDOF）</td>
+  <td>○ やや手間</td>
+  <td>孤立した1山を精密に測る用</td>
+</tr>
+<tr>
+  <td>1自由度・逆FRF2次多項式<br><span style="color:var(--sub); font-size:.9em;">(既存の鉄板ワークブック)</span></td>
+  <td>Dobson法の考え方を発展<sup>[2]</sup></td>
+  <td>周波数</td>
+  <td class="hl-red">✕ 不可（1山専用・SDOF）</td>
+  <td>◎ LINEST1回で完結</td>
+  <td>孤立した1山の高精度計測用</td>
+</tr>
+<tr class="compare-win">
+  <td><strong>RFP法（有理多項式法）</strong><br><span style="color:var(--sub); font-size:.9em;">← 今回のファイル</span></td>
+  <td>Richardson &amp; Formenti, 1982<sup>[3]</sup></td>
+  <td>周波数</td>
+  <td class="hl-green">◎ 2山まで同時分離</td>
+  <td class="hl-green">○ MMULT・MINVERSE・数式のみ</td>
+  <td class="hl-green">★ 本命（今回採用）</td>
+</tr>
+<tr>
+  <td>直交多項式法<br><span style="color:var(--sub); font-size:.9em;">(Orthogonal Polynomial)</span></td>
+  <td>Van der Auweraer &amp; Leuridan, 1987<sup>[4]</sup></td>
+  <td>周波数</td>
+  <td class="hl-green">◎ 多数山も可</td>
+  <td class="hl-red">✕ 直交多項式の生成が煩雑</td>
+  <td>RFP法が数値的に不安定化する高次・広帯域の時の代替</td>
+</tr>
+<tr>
+  <td>複素指数法／LSCE<br><span style="color:var(--sub); font-size:.9em;">(Least-Squares Complex Exponential)</span></td>
+  <td>Brown, Allemang, Zimmerman, Mergeay, 1979<sup>[5]</sup></td>
+  <td>時間</td>
+  <td class="hl-green">◎ 多数山も可</td>
+  <td class="hl-red">✕ FRF→逆フーリエ変換＋Prony法が必要</td>
+  <td>Excel単体では非現実的</td>
+</tr>
+<tr>
+  <td>Ibrahim Time Domain法<br><span style="color:var(--sub); font-size:.9em;">(ITD法)</span></td>
+  <td>Ibrahim &amp; Mikulcik, 1977<sup>[6]</sup></td>
+  <td>時間</td>
+  <td class="hl-amber">△ 近接モードは苦手と報告あり</td>
+  <td class="hl-red">✕ Hankel行列＋固有値分解が必要</td>
+  <td>Excel単体では非現実的</td>
+</tr>
+<tr>
+  <td>固有系実現法<br><span style="color:var(--sub); font-size:.9em;">(ERA)</span></td>
+  <td>Juang &amp; Pappa, 1985</td>
+  <td>時間</td>
+  <td class="hl-green">◎ 多数山も可</td>
+  <td class="hl-red">✕ 特異値分解(SVD)が必要（Excel標準関数に無し）</td>
+  <td>Excel単体では非現実的</td>
+</tr>
+<tr>
+  <td>PolyMAX法<br><span style="color:var(--sub); font-size:.9em;">(poly-reference LSCF)</span></td>
+  <td>Peeters, Van der Auweraer, Guillaume, Leuridan, 2004<sup>[7]</sup></td>
+  <td>周波数</td>
+  <td class="hl-green">◎◎ 業界最強・複数加振点</td>
+  <td class="hl-red">✕✕ 行列多項式の固有値問題。Excel標準機能では原理的に不可</td>
+  <td>専用ソフト(LMS Test.Lab等)が必要。あなたのハンマー1点計測には過剰</td>
+</tr>
+</table>
+</div>
+<p style="font-size:.85em; color:var(--sub);">凡例：領域＝「周波数」はFRFの実部・虚部から直接、「時間」はFRFを逆フーリエ変換したインパルス応答から計算する方式。番号は第9部の出典に対応。</p>
+
+<h3 class="sub">🎓 各手法をひとことで（小学生にもわかる例え）</h3>
+<div class="card">
+<div class="kv">
+<div>半値幅法</div><div>定規で山の幅を測るだけ。山が1つならこれで十分。</div>
+<div>サークルフィット</div><div>コンパスで円をなぞって精密に測る。やっぱり山は1つ専用。</div>
+<div>RFP法</div><div>2つの山がくっついた形を、まるごと「分数の数式」に当てはめて、数式の中から2つの山の答えを両方いっぺんに取り出す。</div>
+<div>LSCE・ITD・ERA</div><div>山（周波数）ではなく、たたいた後の「揺れの波形そのもの」を見て答えを出す方式。理屈は近いが、Excelでは手に負えない計算（行列の固有値分解）が必要。</div>
+<div>PolyMAX</div><div>ハンマーを何箇所も叩いた結果を全部まとめて1つの巨大な数式で解く、現在の業界標準。専用ソフトが前提。</div>
+</div>
+</div>
+
+<div class="card amber">
+<p><span class="hl-amber">📌 学術的な裏付け</span>：ギアボックスの実測データで5手法（半値幅法・サークルフィット・LSCE・ERA・RFP法）を比較した研究では、<span class="hl-green">固有振動数はどの手法でもほぼ同じ結果になった一方、損失係数(減衰)の精度と安定性はRFP法が最も優れていた</span>と報告されています（3〜5モード中、ほぼ全モードでRFP法の誤差が最小）<sup>[8]</sup>。 <span class="badge b-ok">🟢検証済み（一次情報で確認）</span></p>
+</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p3">
+<h2 class="sec">第3部｜なぜRFP法か？あなたの場面での結論</h2>
+
+<p>第2部の比較を、あなたの実際の測定環境（ハンマー1点加振・応答1点・RION SA-01A4またはPSV-400）に当てはめると、結論は次の3点に整理できます。</p>
+
+<ol class="step-list">
+<li><span class="hl-green">RFP法は「ハンマー1点×応答1点（SISO）」のデータでそのまま使える</span>唯一のMDOF法です。LSCE・ERA・PolyMAXは、本来は複数の応答点や複数の加振点があってこそ真価を発揮する手法で、あなたの1点計測ではRFP法との差が縮まります（むしろExcelでの実装難易度だけが跳ね上がります）。</li>
+<li><span class="hl-green">RFP法はExcelの標準機能（MMULT・MINVERSE・SQRT・ACOSなど）だけで完結</span>します。LSCE・ITD・ERAは特異値分解(SVD)や固有値分解が必要で、これはExcelに対応する組み込み関数が存在しません。PolyMAXも同様に、行列多項式の固有値問題という高度な数値計算が前提です。</li>
+<li>研究レベルの比較でも<span class="hl-green">RFP法は損失係数(減衰)の精度・安定性で最良の成績</span>を記録しています<sup>[8]</sup>。</li>
+</ol>
+
+<div class="card green">
+<p><span class="hl-green">結論：</span>あなたの場面（Excel完結・SISO・双子モード最大2つ）では、RFP法が最も理にかなった選択です。将来、複数加振点でのMIMO化（既存ガイド4-8節で紹介した相反性を使った疑似MIMO）や、3つ以上のモードが重なる複雑なケースに発展したら、その時点でPython(NumPy/SciPy)への切り替えや、PolyMAX搭載の専用ソフト（PSV Acquisitionへの搭載有無は未確認）の検討をおすすめします。</p>
+</div>
+
+<div class="card red">
+<p><span class="badge b-check">🔴要確認</span> PSV 9.0/9.5.1 Acquisition本体にRFP法やPolyMAX相当のカーブフィット機能が標準搭載されているかどうかは、お使いのマニュアル該当ページでまだ一次確認できていません。搭載されていれば、今回のExcel実装よりソフト内で完結する方が速く確実な場合があります。</p>
+</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p4">
+<h2 class="sec">第4部｜今回、何が新しくなったか（Solver不要の閉形式解法）</h2>
+
+<h3 class="sub">🔁 おさらい：既存ガイドでは何が「手間」だったか</h3>
+<p>プロジェクトの既存ガイド（カーブフィット_窓関数_Excel解析ガイド.html 第4部）でも、RFP法そのものは既に紹介されていました。ただし最後の一歩──「4次方程式を2つの2次方程式に分解する」部分だけは、<span class="hl-amber">Excel Solver（ソルバー）を手動で毎回実行する</span>必要がありました。Solverには次の弱点があります。</p>
+<ul class="step-list">
+<li>データを貼り替えるたびに、Solverを<strong>また手動で実行</strong>しなければならない（自動再計算されない）。</li>
+<li>Solverの「初期値」を自分で見当をつけて入力する必要がある（山からかけ離れた初期値だと失敗する）。</li>
+<li>アドインが有効化されていないと、そもそも動かない。</li>
+</ul>
+
+<h3 class="sub">✨ 今回の改良：フェラリ法（Ferrari's method）による閉形式解</h3>
+<p>今回のワークブックでは、4次方程式を2つの2次方程式に分解する部分を、<span class="hl-cyan">「フェラリ法」と呼ばれる500年近く前から知られる代数的な解き方</span>で、SQRT・ACOS・COSなどの普通の数式だけに置き換えました。これにより、<span class="hl-green">データを貼り替えると自動的に（Solverを一切使わずに）答えが出ます</span>。</p>
+
+<h4 class="subsub">🧸 小学生にもわかる例え：なぜ「数式だけ」で解けるのか</h4>
+<div class="card">
+<p>2次方程式（x²+bx+c=0）は、あなたも中学校で習った「解の公式」で機械的に解けますよね。実は<span class="hl-cyan">4次方程式も、もっと複雑な手順を踏めば「解の公式」だけで機械的に解ける</span>ことが、16世紤のイタリアの数学者ジェロラモ・カルダノとその弟子ルドヴィコ・フェラリによって発見されています。手順は次の3段階です。</p>
+<ol class="step-list">
+<li><strong>4次方程式</strong>を、ちょっとした置き換え（x=z-（定数））で「3次の項が消えた、少しシンプルな4次方程式」に変形する。</li>
+<li>その中に隠れている<strong>「3次方程式」</strong>（レゾルベント3次方程式と呼びます）を、これもまた昔から知られる「3次方程式の解の公式」で解く。</li>
+<li>3次方程式の答えを使って、<strong>元の4次方程式を「2次方程式×2次方程式」の掛け算</strong>の形に組み立て直す。あとは中学校の解の公式で2つとも解ける。</li>
+</ol>
+<p>この一連の手順が全部「＋－×÷とSQRT（平方根）とACOS・COS（三角関数）」という、Excelの普通の関数だけでできる——というのが、今回Solverを追放できた理由です。</p>
+</div>
+
+<svg viewBox="0 0 700 230" width="100%">
+  <rect x="0" y="0" width="700" height="230" fill="#0f151d" rx="8"/>
+  <text x="350" y="28" fill="#5ad4ff" font-size="14" text-anchor="middle">4次方程式を解く3段階（フェラリ法）</text>
+
+  <rect x="30" y="55" width="180" height="70" rx="8" fill="#1a212b" stroke="#5ad4ff" stroke-width="1.5"/>
+  <text x="120" y="82" fill="#dbe2ea" font-size="12" text-anchor="middle">① 4次方程式を</text>
+  <text x="120" y="100" fill="#dbe2ea" font-size="12" text-anchor="middle">シンプルな形に変形</text>
+
+  <path d="M 215 90 L 255 90" stroke="#5ad4ff" stroke-width="2" marker-end="url(#arrow4)"/>
+
+  <rect x="260" y="55" width="180" height="70" rx="8" fill="#1a212b" stroke="#ffb454" stroke-width="1.5"/>
+  <text x="350" y="82" fill="#dbe2ea" font-size="12" text-anchor="middle">② 隠れている3次方程式</text>
+  <text x="350" y="100" fill="#dbe2ea" font-size="12" text-anchor="middle">（レゾルベント）を解く</text>
+
+  <path d="M 445 90 L 485 90" stroke="#ffb454" stroke-width="2" marker-end="url(#arrow4)"/>
+
+  <rect x="490" y="55" width="180" height="70" rx="8" fill="#1a212b" stroke="#5ee6a0" stroke-width="1.5"/>
+  <text x="580" y="82" fill="#dbe2ea" font-size="12" text-anchor="middle">③ 2次方程式×2つに</text>
+  <text x="580" y="100" fill="#dbe2ea" font-size="12" text-anchor="middle">分解して解の公式</text>
+
+  <text x="350" y="160" fill="#9aa7b5" font-size="12" text-anchor="middle">↓ この3段階が、SQRT・ACOS・COSなど「普通の数式」だけでできる</text>
+  <rect x="150" y="175" width="400" height="40" rx="8" fill="#123d2a" stroke="#5ee6a0" stroke-width="1.5"/>
+  <text x="350" y="200" fill="#5ee6a0" font-size="13" text-anchor="middle">→ Solverが不要！データを貼り替えれば自動で再計算</text>
+
+  <defs>
+    <marker id="arrow4" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#5ad4ff"/>
+    </marker>
+  </defs>
+</svg>
+
+<h3 class="sub">⚠️ 唯一のクセ：「桁落ち」への対策も内蔵しています</h3>
+<p>実はこの計算には、数値計算特有の落とし穴があります。ブレーキパッドや鉄板のように<span class="hl-amber">減衰が軽い（損失係数ηが小さい）構造では、2つのモードの差を表す数値が非常に小さくなり</span>、Excel内部の計算で「大きい数同士を引き算して小さい答えを出す」時に生じる誤差（<ruby>桁落<rt>けたお</rt></ruby>ち）で、符号が逆転してしまうことがあります。</p>
+
+<div class="card amber">
+<h4 class="subsub" style="margin-top:0;">🧮 桁落ちってどんな現象？（レジのたとえ）</h4>
+<p>1万円札を2枚持っている人が、10,000.03円の買い物と9,999.98円の買い物をしたとします。差額は0.05円のはずですが、レジがもし「円未満は四捨五入」する電卓だったら、10,000円－10,000円＝0円になってしまい、本当の差（0.05円）が消えてしまいます。これが桁落ちです。今回の計算でも「かなり近い2つの大きな数を引き算して、ごく小さい答え（＝2モードの損失係数の差）を求める」場面があり、同じ現象が起こり得ます。</p>
+</div>
+
+<p>この対策として、本ワークブックの「モード分離結果」シートでは、<span class="hl-green">先に精度良く計算できる（桁落ちしない）方の根を求め、ヴィエタの公式（方程式の解と係数の関係）を使って残り2つの根を「引き算」ではなく「掛け算・割り算」で求め直す</span>という手順（<ruby>次数下げ<rt>じすうさげ</rt></ruby>／deflation）を組み込んでいます。Python(NumPy)による60桁の高精度計算と突き合わせて、この対策で実用上十分な精度が出ることを検証済みです。 <span class="badge b-ok">🟢検証済み（高精度計算との突合せ）</span></p>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p5">
+<h2 class="sec">第5部｜使い方（5ステップ・シートごとの解説）</h2>
+
+<p>ファイル名：<code>双子モード分離_RFP法カーブフィット.xlsx</code>　全6シート構成です。</p>
+
+<h3 class="sub">🗂 シート構成の全体図</h3>
+<svg viewBox="0 0 700 260" width="100%">
+  <rect x="0" y="0" width="700" height="260" fill="#0f151d" rx="8"/>
+  <g font-size="12" fill="#dbe2ea">
+    <rect x="20" y="20" width="140" height="46" rx="6" fill="#1a212b" stroke="#8fd3ff"/>
+    <text x="90" y="48" text-anchor="middle">① 使い方</text>
+
+    <rect x="180" y="20" width="140" height="46" rx="6" fill="#1a212b" stroke="#ffb454"/>
+    <text x="250" y="42" text-anchor="middle">② 設定</text>
+    <text x="250" y="57" text-anchor="middle" font-size="10" fill="#9aa7b5">(黄色セルに入力)</text>
+
+    <rect x="340" y="20" width="150" height="46" rx="6" fill="#1a212b" stroke="#ffb454"/>
+    <text x="415" y="42" text-anchor="middle">③ データ入力</text>
+    <text x="415" y="57" text-anchor="middle" font-size="10" fill="#9aa7b5">(FRFを貼り付け)</text>
+
+    <rect x="510" y="20" width="170" height="46" rx="6" fill="#1a212b" stroke="#5ad4ff"/>
+    <text x="595" y="42" text-anchor="middle">④ RFP計算</text>
+    <text x="595" y="57" text-anchor="middle" font-size="10" fill="#9aa7b5">(自動・触らない)</text>
+
+    <path d="M 90 66 L 90 100 L 250 100 L 250 66" fill="none" stroke="#5ad4ff" stroke-width="1.5"/>
+    <path d="M 250 66 L 250 100" fill="none" stroke="#5ad4ff" stroke-width="1.5" marker-end="url(#a5)"/>
+    <path d="M 320 43 L 340 43" fill="none" stroke="#5ad4ff" stroke-width="1.5" marker-end="url(#a5)"/>
+    <path d="M 490 43 L 510 43" fill="none" stroke="#5ad4ff" stroke-width="1.5" marker-end="url(#a5)"/>
+
+    <rect x="510" y="120" width="170" height="46" rx="6" fill="#1a212b" stroke="#5ee6a0" stroke-width="2"/>
+    <text x="595" y="142" text-anchor="middle" fill="#5ee6a0">⑤ モード分離結果</text>
+    <text x="595" y="157" text-anchor="middle" font-size="10" fill="#5ee6a0">★答えはここ</text>
+    <path d="M 595 66 L 595 120" fill="none" stroke="#5ad4ff" stroke-width="1.5" marker-end="url(#a5)"/>
+
+    <rect x="510" y="190" width="170" height="46" rx="6" fill="#1a212b" stroke="#c792ea"/>
+    <text x="595" y="212" text-anchor="middle">⑥ 検算</text>
+    <text x="595" y="227" text-anchor="middle" font-size="10" fill="#9aa7b5">(答え合わせ)</text>
+    <path d="M 595 166 L 595 190" fill="none" stroke="#c792ea" stroke-width="1.5" marker-end="url(#a5)"/>
+  </g>
+  <defs>
+    <marker id="a5" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#5ad4ff"/>
+    </marker>
+  </defs>
+</svg>
+
+<h3 class="sub">📝 5ステップ</h3>
+<ol class="step-list">
+<li><strong>STEP1｜設定シート</strong>：黄色いセルに、基準周波数fref（帯域のだいたい中心）と、貼り付けるデータの形式（実部虚部／振幅位相）を設定します。fref はドロップダウンではなく数値を直接入力、データ形式はドロップダウンリストから選べます。</li>
+<li><strong>STEP2｜データ入力シート</strong>：双子モードの周波数帯を含むFRFデータ（周波数・実部・虚部　または　周波数・振幅・位相）を、4行目の下から貼り付けます。20〜80点程度、山が2つきちんと収まる帯域を選んでください。</li>
+<li><strong>STEP3｜再計算</strong>：LibreOffice Calcなら <code>Ctrl+Shift+F9</code>（完全再計算）。Microsoft Excelなら通常は自動で再計算されます。</li>
+<li><strong>STEP4｜モード分離結果シートを見る</strong>：一番上の緑色の★セルに、モードA（低い方）とモードB（高い方）の fn・η が表示されます。</li>
+<li><strong>STEP5｜検算シートで確認</strong>：初めて開いた直後（サンプルデータのまま）は、検算シートの総合判定が「🟢 OK」になっているか確認してから、ご自身のデータに貼り替えてください。</li>
+</ol>
+
+<h3 class="sub">🎨 色のルール（既存ファイルと共通）</h3>
+<table>
+<tr><th>色</th><th>意味</th></tr>
+<tr><td><span style="background:#3a3a1f; color:#e6e6e6; padding:2px 10px; border-radius:4px;">黄色</span></td><td>あなたが入力する場所（ここだけ触る）</td></tr>
+<tr><td><span style="background:#1f3a2a; color:#b8f0c0; padding:2px 10px; border-radius:4px; font-weight:bold;">緑色（太字）</span></td><td>★答え（最終結果）</td></tr>
+<tr><td><span style="background:#1f3a2a; color:#e6e6e6; padding:2px 10px; border-radius:4px;">緑色（普通）</span></td><td>計算結果・数式（触らないこと）</td></tr>
+<tr><td><span style="background:#1e1e1e; color:#9aa4b2; padding:2px 10px; border-radius:4px;">濃いグレー</span></td><td>補足の説明・注記</td></tr>
+</table>
+
+<h3 class="sub">🔎 シート別・詳しい役割</h3>
+<div class="card">
+<div class="kv">
+<div><span class="sheetbadge">使い方</span></div><div>今読んでいるこのHTMLガイドの要約版。ファイル単体でも迷わないための最終手段。</div>
+<div><span class="sheetbadge">設定</span></div><div>基準周波数fref・入力データ形式・判定のしきい値。全シート共通の前提条件。</div>
+<div><span class="sheetbadge">データ入力</span></div><div>あなたが実際に貼り付ける場所。最大80点。実部虚部⇔振幅位相の変換も自動で行います。</div>
+<div><span class="sheetbadge">RFP計算</span></div><div>実部の式80行＋虚部の式80行＝160本の連立方程式をMMULT・MINVERSEで解き、有理多項式の係数(b0〜b3, a0〜a3)を求めます。</div>
+<div><span class="sheetbadge">モード分離結果</span></div><div>a0〜a3から、フェラリ法（数式のみ）で2つのモードのfn・ηを算出。★答えはここ。</div>
+<div><span class="sheetbadge">検算</span></div><div>出荷時サンプルデータでの期待値と、実際の計算結果を自動で突き合わせるセルフチェック。</div>
+</div>
+</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p6">
+<h2 class="sec">第6部｜計算の中身（数式の意味を手取り足取り）</h2>
+
+<p>ワークブックは既に数式が入っていて自動で計算されますが、「何をしているか」を理解しておくと、判定が「要確認」になったときに落ち着いて対応できます。ここでは実際にワークブックに入っている数式を、意味つきで解説します。</p>
+
+<h3 class="sub">6-1｜RFP計算シート：連立方程式を作る</h3>
+<p>FRF（周波数応答関数）H(jΩ) を「分子の多項式 ÷ 分母の多項式」の形で表し、測定データの各点について「実部の式」と「虚部の式」をそれぞれ1行ずつ作ります（データ入力シートの点数×2行）。</p>
+<div class="formula">H(jΩ) = [b0+b1(jΩ)+b2(jΩ)²+b3(jΩ)³] / [a0+a1(jΩ)+a2(jΩ)²+a3(jΩ)³+(jΩ)⁴]</div>
+<p>分母を4次にするのがポイントです。4次方程式の根（解）が4つ出て、複素共役のペアが2組＝モードが2つ、という対応関係になります。</p>
+
+<h4 class="subsub">🧮 Excelでの実際の式（データ入力シートの1行目の場合）</h4>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-rfprow', this)">📋 コピー（貼り付け用）</button>
+<table>
+<tr><th>セル（RFP計算シート）</th><th>式</th><th>意味</th></tr>
+<tr><td>実部行のb0係数</td><td class="num">=IF(データ入力!$A$5="",0,1)</td><td>定数項（データが無い行は0にして式を無害化）</td></tr>
+<tr><td>実部行のb2係数</td><td class="num">=IF(データ入力!$A$5="",0,-(データ入力!$F$5^2))</td><td>-Ω²（括弧が無いと符号が化けるので要注意）</td></tr>
+<tr><td>実部行のa0係数</td><td class="num">=IF(データ入力!$A$5="",0,-データ入力!$D$5)</td><td>-Re(H)</td></tr>
+<tr><td>実部行のRHS（右辺）</td><td class="num">=IF(データ入力!$A$5="",0,データ入力!$F$5^4*データ入力!$D$5)</td><td>Ω⁴×Re(H)</td></tr>
+</table>
+</div>
+<div class="note-box">💡 実際のワークブックでは80点×2(実部・虚部)＝160行分、これと同じパターンの式がすでに入っています。あなたが打ち直す必要はありません。</div>
+
+<h3 class="sub">6-2｜最小二乗法で解く（MMULT・MINVERSE）</h3>
+<p>160行×8列の連立方程式を、行列 <strong>A</strong>（160×8）と <strong>c</strong>（160×1）として、最小二乗法（誤差の二乗が一番小さくなる解）で解きます。式はこの3つだけです。</p>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-mmult', this)">📋 コピー（貼り付け用）</button>
+<table>
+<tr><th>セル範囲</th><th>式</th><th>意味</th></tr>
+<tr><td>AᵀA（8×8）</td><td class="num">=MMULT(TRANSPOSE(C5:J164),C5:J164)</td><td>配列数式（Excel365は普通にEnter、それ以外はCtrl+Shift+Enter）</td></tr>
+<tr><td>(AᵀA)⁻¹（8×8）</td><td class="num">=MINVERSE(AtAの範囲)</td><td>逆行列</td></tr>
+<tr><td>Aᵀc（8×1）</td><td class="num">=MMULT(TRANSPOSE(C5:J164),K5:K164)</td><td></td></tr>
+<tr><td>係数（8×1）</td><td class="num">=MMULT((AᵀA)⁻¹の範囲, Aᵀcの範囲)</td><td>答え＝[b0,b1,b2,b3,a0,a1,a2,a3]</td></tr>
+</table>
+</div>
+
+<h3 class="sub">6-3｜4次方程式を2つの2次式に分解する（フェラリ法）</h3>
+<p>求まった a0,a1,a2,a3 を使い、s⁴+a3s³+a2s²+a1s+a0 = (s²+p1s+q1)(s²+p2s+q2) の形に分解します。実際の計算順序は次の通りです。</p>
+
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-ferrari', this)">📋 コピー（貼り付け用・簡略版）</button>
+<table style="font-size:.85em;">
+<tr><th>手順</th><th>式（セルB列に、上から順に）</th><th>意味</th></tr>
+<tr><td>①3次の項を消す</td><td class="num">p=a2-3*a3^2/8</td><td>s=z-a3/4 と置いた後の係数</td></tr>
+<tr><td></td><td class="num">q=a1-a2*a3/2+a3^3/8</td><td></td></tr>
+<tr><td></td><td class="num">r=a0-a1*a3/4+a2*a3^2/16-3*a3^4/256</td><td></td></tr>
+<tr><td>②隠れた3次式(レゾルベント)</td><td class="num">Ac2=2*p　Ac1=p^2-4*r　Ac0=-(q^2)</td><td>u³+Ac2u²+Ac1u+Ac0=0</td></tr>
+<tr><td>③3次方程式を解く</td><td class="num">P=Ac1-Ac2^2/3　Q=2*Ac2^3/27-Ac2*Ac1/3+Ac0</td><td>3次方程式の「解の公式」（三角関数を使う形）</td></tr>
+<tr><td></td><td class="num">m=2*SQRT(-P/3)　θ=ACOS(3Q/(Pm))/3</td><td></td></tr>
+<tr><td></td><td class="num">u1=m*COS(θ)-Ac2/3　（他2つも同様、位相を2π/3ずつずらす）</td><td>3つの根の候補</td></tr>
+<tr><td>④桁落ち対策</td><td class="num">u_safe=3つのうち絶対値最大のもの</td><td>精度良く計算できる根だけ直接採用</td></tr>
+<tr><td></td><td class="num">B'=Ac2+u_safe　C'=-Ac0/u_safe</td><td>ヴィエタの公式（残り2根の和と積）</td></tr>
+<tr><td></td><td class="num">u_big=(-B'-SIGN(B')*SQRT(B'^2-4C'))/2</td><td>桁落ちしない側の根</td></tr>
+<tr><td></td><td class="num">u_small=C'/u_big</td><td>割り算で求めるので桁落ちしない</td></tr>
+<tr><td>⑤2次式に戻す</td><td class="num">u=MAX(u_big,u_small,u_safe,0)　α=SQRT(u)</td><td></td></tr>
+<tr><td></td><td class="num">p1=a3/2+α　q1=a3^2/16+a3*α/4+β</td><td>1つ目の2次式 s²+p1s+q1=0</td></tr>
+<tr><td></td><td class="num">p2=a3/2-α　q2=a3^2/16-a3*α/4+γ</td><td>2つ目の2次式 s²+p2s+q2=0</td></tr>
+<tr><td>⑥物理量に変換</td><td class="num">ωn=SQRT(q)　ζ=p/(2ωn)</td><td>正規化した固有角周波数・減衰比</td></tr>
+<tr><td></td><td class="num">fn=ωn×fref　η=2ζ</td><td>★答え：固有振動数[Hz]・損失係数</td></tr>
+</table>
+</div>
+<p style="font-size:.88em; color:var(--sub);">※ 実際のワークブックの「モード分離結果」シートには、この手順1行ずつがそのままセルに入っています（B13〜B65あたり）。数式を1つずつ辿って確認できます。</p>
+
+<div class="card red">
+<h4 class="subsub" style="margin-top:0;">⚠️ Excel特有の落とし穴：単項マイナスと累乗の優先順位</h4>
+<p>Excelでは <code>-2^2</code> が <code>(-2)^2=4</code> と計算されます（<code>-(2^2)=-4</code> ではありません）。これは多くのプログラミング言語や数学の慣習と<span class="hl-red">逆</span>です。「マイナスの2乗」を書きたい時は、必ず <code>-(B5^2)</code> のように括弧で囲んでください。本ワークブックの開発時にも、この落とし穴で一度符号が反転するバグが発生し、Pythonでの二重計算との突き合わせで発見・修正しました。 <span class="badge b-ok">🟢検証済み（LibreOffice実機で=-2^2を検証）</span></p>
+</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p7">
+<h2 class="sec">第7部｜判定が「要確認」になったときの対処</h2>
+
+<p>モード分離結果シートの「判定」セルには、3種類の「要確認」メッセージが出る可能性があります。それぞれの意味と対処法です。</p>
+
+<div class="card red">
+<h4 class="subsub" style="margin-top:0;">① 「前提条件(P&lt;0)が成立していません」</h4>
+<p><strong>意味：</strong>レゾルベント3次方程式が、今回使っている三角関数の解法（実根3つのケース）の前提から外れています。これは、貼り付けた帯域に本当は山が1つしか無い、または3つ以上ある、あるいはノイズでデータが大きく乱れている場合に起こり得ます。</p>
+<p><strong>対処：</strong>①グラフに描画して、本当に山が2つあるか目視確認。②既存ガイド4-5節のExcel Solver法（GRG非線形）で同じデータを解いてみて、結果を比較。</p>
+</div>
+
+<div class="card amber">
+<h4 class="subsub" style="margin-top:0;">② 「2モードの損失係数が非常に近く、分離が数値的に不安定な境界です」</h4>
+<p><strong>意味：</strong>2つのモードの損失係数(η)がほぼ同じ値である、まれな境界条件です。数式の性質上、この境界の非常に近くでは計算が不安定になります。</p>
+<p><strong>対処：</strong>①測定の分解能Δfをさらに細かくして再測定（記録時間Tを伸ばす）。②既存ガイド4-5節のSolver法で照合。③実務上は「2つのモードのηはほぼ同じ」という結果自体が、既に有用な情報である場合も多い点にご留意ください。</p>
+</div>
+
+<div class="card red">
+<h4 class="subsub" style="margin-top:0;">③ 「負の値が生じています」</h4>
+<p><strong>意味：</strong>計算過程でq1またはq2が負の値になり、固有角周波数(ωn=√q)が計算できません。基準周波数frefの設定が帯域から大きくズレている、またはデータ帯域に山が正しく収まっていない可能性が高いです。</p>
+<p><strong>対処：</strong>①設定シートのfrefを、貼り付けた帯域のだいたい中心に設定し直す。②データ入力シートで、2つの山がきちんと帯域内に収まっているかグラフで確認。</p>
+</div>
+
+<h3 class="sub">🩺 判定が「OK」でも、念のため確認したいこと</h3>
+<ul class="step-list">
+<li>2つのfnの差が、測定の周波数分解能Δfの10倍以上あるか（近すぎるとそもそも別モードとして測定しきれていない可能性）。</li>
+<li>RFP計算シートのAᵀA行列に極端に大きい／小さい数値が無いか（正規化がうまくいっているかの目安）。</li>
+<li>検算シートを一度確認し、ワークブック自体が正しく動作する状態からスタートしているか。</li>
+</ul>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p8">
+<h2 class="sec">第8部｜よくあるミス 総まとめ</h2>
+<ul class="step-list">
+<li><span class="hl-red">振幅（絶対値）だけのデータを貼り付ける</span>：この方法は実部・虚部（＝位相の情報）が必須です。振幅だけのデータでは2つの山を分離できません。</li>
+<li><span class="hl-red">帯域に山が1つ、または3つ以上入っている</span>：この方法は「帯域内にちょうど2つの山」が前提です。グラフで必ず目視確認してから使ってください。</li>
+<li><span class="hl-red">基準周波数frefを帯域からかけ離れた値にする</span>：正規化が効かなくなり、数値誤差で分離に失敗します。必ず帯域のだいたい中心に設定。</li>
+<li><span class="hl-red">データ点数が少なすぎる（10点未満など）</span>：連立方程式の情報量が足りず、fnは合っていてもηの誤差が大きくなります。20点以上を目安に。</li>
+<li><span class="hl-red">半値幅法やこれまでの1自由度フィットの結果と、今回のRFP法の結果を単純比較して「値が違う」と慌てる</span>：双子モードでは、1自由度フィットの結果自体が2つの山の重なりで歪んだ値になっているため、RFP法の値の方が物理的に正しいはずです（第1部・第2部参照）。</li>
+<li><span class="hl-red">Excelで「-B5^2」のようにマイナスと累乗を組み合わせる時、括弧を付け忘れる</span>：第6部で解説した通り、Excelでは単項マイナスが累乗より優先されるため、符号が反転します。本ワークブックの数式は全て検証済みですが、ご自身で数式を書き足す場合は必ず括弧で確認してください。</li>
+<li><span class="hl-red">Ctrl+Shift+Enterを忘れる（古いExcelの場合）</span>：MMULT・MINVERSEを含む配列数式は、Excel 2019以前や一部の環境では選択範囲全体を選んでからCtrl+Shift+Enterで確定する必要があります（Excel365・本ワークブック添付の状態では通常不要）。</li>
+</ul>
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p9">
+<h2 class="sec">第9部｜出典・参考文献</h2>
+
+<p>比較表の番号に対応します。可能な限り、クリックして確認できる一次情報のURLを付けています。</p>
+
+<ul class="step-list" style="font-size:.92em;">
+<li>[1] Kennedy, C.C. &amp; Pancu, C.D., "Use of Vectors in Vibration Measurement and Analyses", <em>Journal of the Aeronautical Sciences</em>, Vol.14, No.11, 1947. － サークルフィット法の原典。 <span class="badge b-est">🟡原典URL未確認（Ewins等の教科書経由で広く引用）</span></li>
+<li>[2] Dobson, B.J., "A straight-line technique for extracting modal properties from frequency response data", <em>Mechanical Systems and Signal Processing</em>, Vol.1, No.1, pp.29-40, 1987. DOI: <a href="https://doi.org/10.1016/0888-3270(87)90081-1" target="_blank" rel="noopener">10.1016/0888-3270(87)90081-1</a> － 既存の1自由度ワークブックが採用する「逆FRF」系手法の発展形。</li>
+<li>[3] Richardson, M.H. &amp; Formenti, D.L., "Parameter Estimation from Frequency Response Measurements using Rational Fraction Polynomials", Proc. 1st International Modal Analysis Conference (IMAC), Orlando, pp.167-186, 1982. － <a href="https://studylib.net/doc/18547336/parameter-estimation-from-frequency-response" target="_blank" rel="noopener">全文（ミラー）</a>　<span class="hl-cyan">RFP法の原典</span>。 <span class="badge b-ok">🟢一次情報で全文確認済み</span></li>
+<li>[4] Van der Auweraer, H. &amp; Leuridan, J., "Multiple input orthogonal polynomial parameter estimation", <em>Mechanical Systems and Signal Processing</em>, Vol.1, No.3, pp.259-272, 1987. － 直交多項式法（RFP法の数値的ill-conditioning対策版）の原典。</li>
+<li>[5] Brown, D.L., Allemang, R.J., Zimmerman, R., Mergeay, M., "Parameter Estimation Techniques for Modal Analysis", SAE Technical Paper 790221, <em>SAE Transactions</em>, Vol.88, pp.828-846, 1979. DOI: 10.4271/790221 － LSCE法の主要な原典の1つ。</li>
+<li>[6] Ibrahim, S.R. &amp; Mikulcik, E.C., "A method for the direct identification of vibration parameters from the free response", <em>Shock and Vibration Bulletin</em>, Vol.47, pp.183-196, 1977. － Ibrahim Time Domain(ITD)法の原典。</li>
+<li>[7] Peeters, B., Van der Auweraer, H., Guillaume, P., Leuridan, J., "The PolyMAX Frequency-Domain Method: A New Standard for Modal Parameter Estimation?", <em>Shock and Vibration</em>, Vol.11, No.3-4, pp.395-409, 2004. DOI: <a href="https://doi.org/10.1155/2004/523692" target="_blank" rel="noopener">10.1155/2004/523692</a>（オープンアクセス） － PolyMAX法の原典。 <span class="badge b-ok">🟢一次情報で全文確認済み</span></li>
+<li>[8] Zrayka, A.K. &amp; Mucchi, E., "A comparison among modal parameter extraction methods", <em>SN Applied Sciences</em>, Vol.1, Article 781, 2019. DOI: <a href="https://doi.org/10.1007/s42452-019-0806-8" target="_blank" rel="noopener">10.1007/s42452-019-0806-8</a>（オープンアクセス） － ギアボックス実測データによる5手法比較。RFP法の優位性の実証データ。 <span class="badge b-ok">🟢一次情報で全文確認済み</span></li>
+</ul>
+
+<div class="card">
+<p style="font-size:.9em;">また、本ガイドの内容はプロジェクト内の既存資料と整合するよう作成しています：SA-01/SA-01A2/SA-01A4 ハードウェアマニュアル（伝達関数の振幅・位相出力を確認）、既存ガイド「カーブフィット_窓関数_Excel解析ガイド.html」（RFP法の初出・Solver版実装）。数式は全てPython(NumPy)・SymPy（数式処理）・mpmath（60桁高精度計算）による二重・三重検算を行っています。</p>
+</div>
+
+</section>
+
+</div>
+
+<footer class="end">
+  <p>このファイルだけで、最初から最後まで再現できるように作られています。</p>
+</footer>
+
+<script>
+function copyTSV(id, btn){
+  var wrap = btn.closest('.tbl-wrap') || btn.parentElement;
+  var table = wrap.querySelector('table');
+  if(!table){ return; }
+  var rows = table.querySelectorAll('tr');
+  var lines = [];
+  rows.forEach(function(r){
+    var cells = r.querySelectorAll('th,td');
+    var vals = [];
+    cells.forEach(function(c){ vals.push(c.textContent.trim()); });
+    lines.push(vals.join('\t'));
+  });
+  var text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(function(){
+    btn.classList.add('copied');
+    var orig = btn.textContent;
+    btn.textContent = '✅ コピーしました';
+    setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
+  }).catch(function(){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✅ コピーしました';
+    setTimeout(function(){ btn.textContent = '📋 コピー'; }, 1600);
+  });
+}
+</script>
+
+</body>
+</html>
