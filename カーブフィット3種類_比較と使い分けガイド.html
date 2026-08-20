@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>カーブフィット3種類 比較と使い分けガイド</title>
+
+<style>
+  :root{
+    --bg:#0d1117; --bg2:#151b23; --card:#1a212b; --line:#2a3441;
+    --text:#dbe2ea; --sub:#9aa7b5; --cyan:#5ad4ff; --amber:#ffb454;
+    --green:#5ee6a0; --yellow:#f4e04d; --red:#ff7a7a; --purple:#c792ea;
+  }
+  *{box-sizing:border-box;}
+  body{
+    background:var(--bg); color:var(--text); font-family:"Hiragino Sans","Yu Gothic",-apple-system,sans-serif;
+    line-height:1.85; margin:0; padding:0 0 80px 0;
+  }
+  .wrap{max-width:980px; margin:0 auto; padding:28px 20px;}
+  header.top{
+    background:linear-gradient(160deg,#101820,#182230);
+    border-bottom:1px solid var(--line); padding:36px 20px 30px;
+  }
+  header.top h1{
+    font-size:1.5em; margin:0 0 8px; color:var(--cyan);
+    letter-spacing:.02em;
+  }
+  header.top p{color:var(--sub); margin:4px 0;}
+  nav.toc{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:18px 22px; margin:22px 0;
+  }
+  nav.toc h2{font-size:1em; color:var(--amber); margin:0 0 10px;}
+  nav.toc ol{margin:0; padding-left:1.4em; columns:2; -webkit-columns:2;}
+  nav.toc a{color:var(--text); text-decoration:none; border-bottom:1px dotted var(--sub);}
+  nav.toc a:hover{color:var(--cyan);}
+  section{margin:44px 0;}
+  h2.sec{
+    font-size:1.25em; color:var(--cyan); border-left:4px solid var(--cyan);
+    padding:4px 0 4px 14px; margin:0 0 18px;
+  }
+  h3.sub{font-size:1.05em; color:var(--amber); margin:28px 0 10px;}
+  h4.subsub{font-size:.98em; color:var(--purple); margin:20px 0 8px;}
+  p{margin:12px 0;}
+  .card{
+    background:var(--card); border:1px solid var(--line); border-radius:10px;
+    padding:18px 20px; margin:16px 0;
+  }
+  .card.amber{border-left:4px solid var(--amber);}
+  .card.green{border-left:4px solid var(--green);}
+  .card.red{border-left:4px solid var(--red);}
+  .card.cyan{border-left:4px solid var(--cyan);}
+  .card.purple{border-left:4px solid var(--purple);}
+  .badge{
+    display:inline-block; font-size:.78em; padding:2px 9px; border-radius:20px;
+    margin-left:6px; white-space:nowrap;
+  }
+  .b-ok{background:#123d2a; color:var(--green); border:1px solid #1f6b47;}
+  .b-est{background:#403a10; color:var(--yellow); border:1px solid #7a6a1a;}
+  .b-check{background:#3d1a1a; color:var(--red); border:1px solid #7a2a2a;}
+  ruby rt{color:var(--sub); font-size:.62em;}
+  .hl-cyan{color:var(--cyan); font-weight:600;}
+  .hl-amber{color:var(--amber); font-weight:600;}
+  .hl-green{color:var(--green); font-weight:600;}
+  .hl-red{color:var(--red); font-weight:600;}
+  .hl-purple{color:var(--purple); font-weight:600;}
+  table{border-collapse:collapse; width:100%; margin:14px 0; font-size:.92em;}
+  th,td{border:1px solid var(--line); padding:8px 10px; text-align:left; vertical-align:top;}
+  th{background:#1e2733; color:var(--amber);}
+  td.num{font-family:"SF Mono",Consolas,monospace; color:var(--cyan);}
+  .formula{
+    font-family:"SF Mono",Consolas,monospace; background:#0f151d; border:1px solid var(--line);
+    border-radius:6px; padding:10px 14px; color:var(--green); margin:10px 0; overflow-x:auto;
+  }
+  .tbl-wrap{position:relative;}
+  .copybtn{
+    background:#1e2733; color:var(--cyan); border:1px solid var(--line); border-radius:6px;
+    padding:5px 12px; font-size:.82em; cursor:pointer; margin:6px 0 2px;
+  }
+  .copybtn:hover{background:#28323f;}
+  .copybtn.copied{color:var(--green); border-color:var(--green);}
+  svg{display:block; margin:18px auto; max-width:100%;}
+  .step-list{padding-left:1.3em;}
+  .step-list li{margin:10px 0;}
+  .note-box{
+    background:#151b23; border:1px dashed var(--sub); border-radius:8px;
+    padding:14px 18px; margin:14px 0; font-size:.94em; color:var(--sub);
+  }
+  .flow-svg-caption{text-align:center; color:var(--sub); font-size:.85em; margin-top:-6px;}
+  code{background:#1e2733; padding:1px 6px; border-radius:4px; color:var(--cyan); font-size:.92em;}
+  hr.sep{border:none; border-top:1px solid var(--line); margin:36px 0;}
+  .kv{display:grid; grid-template-columns:170px 1fr; gap:6px 14px; margin:10px 0;}
+  .kv div:nth-child(odd){color:var(--sub);}
+  footer.end{
+    text-align:center; color:var(--sub); font-size:.85em; margin-top:60px;
+    border-top:1px solid var(--line); padding-top:20px;
+  }
+  .sheetbadge{display:inline-block; background:#1e2733; color:var(--purple); border:1px solid var(--line);
+    border-radius:6px; padding:1px 8px; font-size:.85em; font-family:"SF Mono",Consolas,monospace;}
+
+  /* ここから今回追加のスタイル */
+  .grid3{display:grid; grid-template-columns:1fr; gap:16px;}
+  @media(min-width:760px){ .grid3{grid-template-columns:1fr 1fr 1fr;} }
+  .filecard{background:var(--card); border:1px solid var(--line); border-radius:12px; padding:18px; border-top:4px solid var(--line);}
+  .filecard.fc-tetsu{border-top-color:var(--cyan);}
+  .filecard.fc-futago{border-top-color:var(--green);}
+  .filecard.fc-car{border-top-color:var(--purple);}
+  .filecard h4{margin:0 0 6px; font-size:.98em;}
+  .filecard .fname{font-family:"SF Mono",Consolas,monospace; font-size:.78em; color:var(--sub); word-break:break-all;}
+  .filecard .tagline{font-size:.85em; color:var(--sub); margin-top:4px;}
+  .tag-tetsu{color:var(--cyan);}
+  .tag-futago{color:var(--green);}
+  .tag-car{color:var(--purple);}
+  table.maintbl th.col-tetsu{color:var(--cyan); border-bottom:2px solid var(--cyan);}
+  table.maintbl th.col-futago{color:var(--green); border-bottom:2px solid var(--green);}
+  table.maintbl th.col-car{color:var(--purple); border-bottom:2px solid var(--purple);}
+  table.maintbl th.col-item{color:var(--text); background:#151b23;}
+  table.maintbl td.item{background:#151b23; color:var(--sub); font-size:.88em; font-weight:600; white-space:nowrap;}
+  .starpick{background:#123d2a; border:1px solid #1f6b47; border-radius:6px; padding:1px 8px; font-size:.78em; color:var(--green); margin-left:6px;}
+  .scorebar{display:inline-block; font-family:"SF Mono",Consolas,monospace;}
+</style>
+
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap" style="padding:0;">
+    <h1>🔬 カーブフィット3種類　比較と使い分けガイド</h1>
+    <p><code>双子モード分離_RFP法カーブフィット.xlsx</code>／<code>鉄板ハンマリング_ピーク自動検出_損失係数カーブフィット.xlsx</code>／<code>カー.xlsx</code></p>
+    <p>3つのファイルを実際に全部開いて中身（シート・数式・設定項目）を確認したうえで比較しています。憶測では書いていません。</p>
+  </div>
+</header>
+
+<div class="wrap">
+
+<nav class="toc">
+  <h2>📖 目次</h2>
+  <ol>
+    <li><a href="#p1">結論：どれが一番いいの？（3行＋早見表）</a></li>
+    <li><a href="#p2">この3つ、なぜ3つもあるの？（生まれた経緯）</a></li>
+    <li><a href="#p3">比較表（特徴・利点・欠点・使いやすさ　他）</a></li>
+    <li><a href="#p4">双子モードへの対応の違い（手取り足取り）</a></li>
+    <li><a href="#p5">小さいピークは拾えるか</a></li>
+    <li><a href="#p6">窓の設定パターン別：指数・指数／フォース・指数</a></li>
+    <li><a href="#p7">ステンレスなど他の材料で測るときの設定</a></li>
+    <li><a href="#p8">3ファイルの最短手順まとめ</a></li>
+    <li><a href="#p9">よくある間違い　総まとめ</a></li>
+    <li><a href="#p10">出典・参考文献</a></li>
+  </ol>
+</nav>
+
+<!-- ============================================================ -->
+<section id="p1">
+<h2 class="sec">第1部｜結論：どれが一番いいの？（3行＋早見表）</h2>
+
+<div class="card cyan">
+<p style="font-size:1.05em;">
+① <span class="hl-cyan">「1本の孤立した山」がたくさん並ぶ広い周波数レンジを、自動でザーッと処理したい</span>→<b>鉄板ハンマリング</b><br>
+② <span class="hl-green">「これは山が2つ重なっている（双子モード）」と分かっていて、固有振動数fn・損失係数ηだけを早く確実に知りたい</span>→<b>双子モード分離</b>（★本命）<br>
+③ <span class="hl-purple">モード形状（レジデュー）まで欲しい／ME'scopeと数式を照合したい／コヒーレンスでデータ品質を先に篩いたい／理屈から手を動かして学びたい</span>→<b>カー.xlsx</b>
+</p>
+</div>
+
+<p>結論だけ先に言うと、<b>「どれが一番偉いか」ではなく「今どの作業をしているか」で選ぶファイルが変わります。</b>3つとも同じ人（あなた）が同じ目的（ブレーキパッドの<ruby>鳴<rt>な</rt></ruby>き＝squealの予測）のために、違う場面用に作った道具です。詳しい経緯は第2部で説明します。</p>
+
+<h3 class="sub">🎯 状況別・早見表</h3>
+<table>
+<tr><th>今の状況</th><th>おすすめ</th><th>理由（ひとこと）</th></tr>
+<tr><td>測定した山が<b>1本だけ</b>（孤立ピーク）</td><td class="tag-tetsu">鉄板ハンマリング</td><td>自動ピーク検出が本領発揮。1回の貼り付けで最大40山を一括処理</td></tr>
+<tr><td>山が<b>2本、重なって</b>いる（双子モード）。<b>fn・ηだけ</b>早く欲しい</td><td class="tag-futago">双子モード分離 <span class="starpick">★本命</span></td><td>Solver不要・反復計算なし。数式だけで必ず答えが出る</td></tr>
+<tr><td>山が2本重なっていて、<b>モード形状</b>も欲しい／<b>コヒーレンス</b>で点を選別したい</td><td class="tag-car">カー.xlsx</td><td>レジデュー抽出・ME'scope互換・コヒーレンス列まで完備</td></tr>
+<tr><td>RFP法の<b>理屈を最初から学びたい</b>／半値幅法との違いを目で確認したい</td><td class="tag-car">カー.xlsx</td><td>用語集・手法比較・よくあるミスが1冊にまとまった教科書仕立て</td></tr>
+<tr><td>山が<b>3本以上</b>重なっている</td><td style="color:var(--red);">どれも非対応</td><td>分母4次のRFPでは表現しきれない。帯域を分割するかPython(scipy)へ</td></tr>
+</table>
+
+<h3 class="sub">🧭 判断フローチャート</h3>
+<svg viewBox="0 0 760 430" width="100%">
+  <rect x="0" y="0" width="760" height="430" fill="#0f151d" rx="8"/>
+  <text x="380" y="26" fill="#5ad4ff" font-size="13" text-anchor="middle">測定したFRFを見て…その周波数帯に山は何本ある？</text>
+
+  <rect x="300" y="42" width="160" height="44" rx="8" fill="#1a212b" stroke="#5ad4ff" stroke-width="1.5"/>
+  <text x="380" y="69" fill="#dbe2ea" font-size="12" text-anchor="middle">山の本数は？</text>
+
+  <path d="M 380 86 L 150 130" stroke="#5ad4ff" stroke-width="1.5" fill="none" marker-end="url(#af1)"/>
+  <path d="M 380 86 L 380 130" stroke="#5ad4ff" stroke-width="1.5" fill="none" marker-end="url(#af1)"/>
+  <path d="M 380 86 L 630 130" stroke="#5ad4ff" stroke-width="1.5" fill="none" marker-end="url(#af1)"/>
+
+  <text x="150" y="122" fill="#9aa7b5" font-size="11" text-anchor="middle">1本（孤立）</text>
+  <text x="380" y="122" fill="#9aa7b5" font-size="11" text-anchor="middle">2本（双子）</text>
+  <text x="630" y="122" fill="#9aa7b5" font-size="11" text-anchor="middle">3本以上</text>
+
+  <rect x="60" y="130" width="180" height="70" rx="8" fill="#1a212b" stroke="#5ad4ff" stroke-width="1.5"/>
+  <text x="150" y="156" fill="#dbe2ea" font-size="12" text-anchor="middle">広いレンジを自動で</text>
+  <text x="150" y="174" fill="#dbe2ea" font-size="12" text-anchor="middle">たくさん処理したい</text>
+
+  <path d="M 150 200 L 150 235" stroke="#5ad4ff" stroke-width="1.5" fill="none" marker-end="url(#af1)"/>
+  <rect x="60" y="235" width="180" height="46" rx="8" fill="#0f2733" stroke="#5ad4ff" stroke-width="2"/>
+  <text x="150" y="263" fill="#5ad4ff" font-size="13" text-anchor="middle">鉄板ハンマリング</text>
+
+  <rect x="290" y="130" width="180" height="70" rx="8" fill="#1a212b" stroke="#5ee6a0" stroke-width="1.5"/>
+  <text x="380" y="150" fill="#dbe2ea" font-size="12" text-anchor="middle">fn・ηだけを</text>
+  <text x="380" y="168" fill="#dbe2ea" font-size="12" text-anchor="middle">早く確実に知りたい</text>
+  <text x="380" y="186" fill="#9aa7b5" font-size="10" text-anchor="middle">（ふだんの測定作業）</text>
+
+  <path d="M 380 200 L 380 235" stroke="#5ee6a0" stroke-width="1.5" fill="none" marker-end="url(#af1)"/>
+  <rect x="290" y="235" width="180" height="46" rx="8" fill="#123d2a" stroke="#5ee6a0" stroke-width="2"/>
+  <text x="380" y="263" fill="#5ee6a0" font-size="13" text-anchor="middle">双子モード分離 ★</text>
+
+  <path d="M 470 258 L 560 258" stroke="#9aa7b5" stroke-width="1.2" stroke-dasharray="3,3" fill="none" marker-end="url(#af1)"/>
+  <text x="565" y="248" fill="#9aa7b5" font-size="10">モード形状/</text>
+  <text x="565" y="262" fill="#9aa7b5" font-size="10">コヒーレンスも</text>
+  <text x="565" y="276" fill="#9aa7b5" font-size="10">欲しいなら→</text>
+
+  <rect x="540" y="130" width="180" height="70" rx="8" fill="#1a212b" stroke="#c792ea" stroke-width="1.5"/>
+  <text x="630" y="150" fill="#dbe2ea" font-size="12" text-anchor="middle">モード形状/理屈も</text>
+  <text x="630" y="168" fill="#dbe2ea" font-size="12" text-anchor="middle">じっくり押さえたい</text>
+  <text x="630" y="186" fill="#9aa7b5" font-size="10" text-anchor="middle">（3本以上もここへ）</text>
+
+  <path d="M 630 200 L 630 235" stroke="#c792ea" stroke-width="1.5" fill="none" marker-end="url(#af1)"/>
+  <rect x="540" y="235" width="180" height="46" rx="8" fill="#2a1e38" stroke="#c792ea" stroke-width="2"/>
+  <text x="630" y="263" fill="#c792ea" font-size="13" text-anchor="middle">カー.xlsx</text>
+
+  <rect x="60" y="320" width="660" height="70" rx="8" fill="#3d1a1a" stroke="#ff7a7a" stroke-width="1.5"/>
+  <text x="390" y="345" fill="#ff7a7a" font-size="12" text-anchor="middle">山が3本以上重なっている場合、この3ファイルはどれも「分母4次」までしか対応していません</text>
+  <text x="390" y="365" fill="#dbe2ea" font-size="11" text-anchor="middle">→ 帯域を2本ずつに区切って個別処理するか、Python（scipy）や本物のポリリファレンス法へ</text>
+
+  <defs>
+    <marker id="af1" markerWidth="10" markerHeight="10" refX="8" refY="3" orient="auto">
+      <path d="M0,0 L8,3 L0,6 Z" fill="#5ad4ff"/>
+    </marker>
+  </defs>
+</svg>
+<p class="flow-svg-caption">緑＝双子モード分離（本命）／シアン＝鉄板ハンマリング／紫＝カー.xlsx</p>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p2">
+<h2 class="sec">第2部｜この3つ、なぜ3つもあるの？（生まれた経緯）</h2>
+
+<p>「どれが一番いいの？」に正しく答えるには、<span class="hl-cyan">それぞれが「いつ・何に困って」作られたか</span>を知っておくと納得しやすくなります。過去のやり取りを確認したところ、次のような順番で生まれていました。</p>
+
+<svg viewBox="0 0 760 380" width="100%">
+  <rect x="0" y="0" width="760" height="380" fill="#0f151d" rx="8"/>
+  <line x1="120" y1="40" x2="120" y2="345" stroke="#2a3441" stroke-width="2"/>
+
+  <circle cx="120" cy="55" r="7" fill="#5ad4ff"/>
+  <text x="145" y="45" fill="#5ad4ff" font-size="12">それ以前から</text>
+  <rect x="145" y="52" width="560" height="52" rx="8" fill="#1a212b" stroke="#5ad4ff" stroke-width="1.5"/>
+  <text x="160" y="72" fill="#dbe2ea" font-size="12">鉄板ハンマリング_ピーク自動検出_損失係数カーブフィット.xlsx</text>
+  <text x="160" y="90" fill="#9aa7b5" font-size="11">孤立ピーク専用として先に確立・検証済み（双子モードは別系統の課題として後から浮上）</text>
+
+  <circle cx="120" cy="130" r="7" fill="#8fd3ff"/>
+  <text x="145" y="120" fill="#8fd3ff" font-size="12">7/27 朝</text>
+  <rect x="145" y="127" width="560" height="52" rx="8" fill="#1a212b" stroke="#8fd3ff" stroke-width="1.5"/>
+  <text x="160" y="147" fill="#dbe2ea" font-size="12">カーブフィット_窓関数_Excel解析ガイド.html　誕生</text>
+  <text x="160" y="165" fill="#9aa7b5" font-size="11">「双子モードは1自由度フィットでは分けられない」という気づき→RFP法の考え方＋Excel Solverでの分離法を解説</text>
+
+  <circle cx="120" cy="205" r="7" fill="#c792ea"/>
+  <text x="145" y="195" fill="#c792ea" font-size="12">7/27 夜</text>
+  <rect x="145" y="202" width="560" height="66" rx="8" fill="#2a1e38" stroke="#c792ea" stroke-width="1.5"/>
+  <text x="160" y="222" fill="#dbe2ea" font-size="12">カー.xlsx　誕生（19シート・13,184式）</text>
+  <text x="160" y="240" fill="#dbe2ea" font-size="11">「せっかくだから存分に」の要望で全部盛りに。ニュートン法・レジデュー抽出・</text>
+  <text x="160" y="256" fill="#dbe2ea" font-size="11">ME&#39;scope互換・用語集・比較表・測定記録まで一式を実装</text>
+
+  <circle cx="120" cy="295" r="7" fill="#5ee6a0"/>
+  <text x="145" y="285" fill="#5ee6a0" font-size="12">8/20（直近）</text>
+  <rect x="145" y="292" width="560" height="66" rx="8" fill="#123d2a" stroke="#5ee6a0" stroke-width="2"/>
+  <text x="160" y="312" fill="#dbe2ea" font-size="12">双子モード分離_RFP法カーブフィット.xlsx　誕生</text>
+  <text x="160" y="330" fill="#dbe2ea" font-size="11">「結局どの手法が一番いいか」を再検討し、カー.xlsxのニュートン法（反復）を</text>
+  <text x="160" y="346" fill="#dbe2ea" font-size="11">フェラリ法（閉形式・一発で解が出る）に置き換えて6シートに凝縮した実務版</text>
+
+  </svg>
+<p class="flow-svg-caption">同じRFP法（有理多項式法）の「考え方」を、教科書版（カー.xlsx）→実務版（双子モード分離）の順に磨き込んだ、という関係です</p>
+
+<div class="card">
+<p><b>つまり系統は2つ</b>あります。</p>
+<ul>
+<li><span class="hl-cyan">系統A（孤立ピーク・広帯域自動検出）</span>＝鉄板ハンマリング。1本ずつ孤立した山をたくさん自動で拾う、という別の課題に対する道具です。</li>
+<li><span class="hl-purple">系統B（双子モード・RFP法）</span>＝カー.xlsx→双子モード分離。同じ「山が2つ重なっている問題」を、<span class="hl-purple">最初は全部入りの教科書として</span>（カー.xlsx）、<span class="hl-green">次に日々の作業用に絞り込んだ版として</span>（双子モード分離）作った、親子関係にある2つです。</li>
+</ul>
+</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p3">
+<h2 class="sec">第3部｜比較表（特徴・利点・欠点・使いやすさ　他）</h2>
+
+<p>ご指定の10項目で、3ファイルを並べた表です。表だけだと説明不足になる項目（双子モード対応・小さいピーク・窓の設定・ステンレス）は、この表のあとの第4〜7部で<ruby>手取<rt>てと</rt></ruby>り<ruby>足取<rt>あしと</rt></ruby>りに深掘りしています。</p>
+
+<div class="grid3">
+  <div class="filecard fc-tetsu">
+    <h4 class="tag-tetsu">① 鉄板ハンマリング</h4>
+    <div class="fname">鉄板ハンマリング_ピーク自動検出_<br>損失係数カーブフィット.xlsx</div>
+    <div class="tagline">孤立ピーク専用・広帯域自動検出（全5シート）</div>
+  </div>
+  <div class="filecard fc-futago">
+    <h4 class="tag-futago">② 双子モード分離 <span class="starpick">★本命</span></h4>
+    <div class="fname">双子モード分離_RFP法<br>カーブフィット.xlsx</div>
+    <div class="tagline">双子モード専用・閉形式解・全自動（全6シート）</div>
+  </div>
+  <div class="filecard fc-car">
+    <h4 class="tag-car">③ カー.xlsx</h4>
+    <div class="fname">カー.xlsx</div>
+    <div class="tagline">RFP法の全部盛り教科書＋実装（全19シート）</div>
+  </div>
+</div>
+
+<div style="overflow-x:auto;">
+<table class="maintbl">
+<tr>
+  <th class="col-item">項目</th>
+  <th class="col-tetsu">① 鉄板ハンマリング</th>
+  <th class="col-futago">② 双子モード分離 ★</th>
+  <th class="col-car">③ カー.xlsx</th>
+</tr>
+<tr>
+  <td class="item">特徴</td>
+  <td>1自由度・逆FRF2次多項式フィット（LINEST1回）。広い周波数帯から<b>最大40山を自動検出</b>し、山ごとに一括処理。指数窓の減衰上乗せを自動補正。材料・寸法から曲げ固有振動数を予測する参考シート付き。</td>
+  <td>RFP法（有理多項式法）を<b>フェラリ法（4次方程式の閉形式代数解）</b>で解く。MMULT・MINVERSE等の標準関数のみ、<b>Solver不要・反復計算なし</b>＝原理的に発散しない。出力はfn・ηのみ（モード形状は出さない）。</td>
+  <td>同じRFP法を<b>ニュートン法（反復数値解法）</b>で解く。モード数確認→半値幅法(初期値)→設計行列→最小二乗(リッジ正則化)→極分離→<b>レジデュー抽出（ME&#39;scope Application Note 13準拠）</b>→合成FRF照合、まで一気通貫。コヒーレンス・単位換算・測定記録・用語集・手法比較・ミス集まで内蔵。</td>
+</tr>
+<tr>
+  <td class="item">こんな時に使う</td>
+  <td>1回の測定で<b>広い周波数レンジを一括スイープ</b>し、たくさんの孤立ピークのfn・ηを能率よく出したい時。モード探索の初期段階。</td>
+  <td>「ここは双子（2山）だ」と<b>分かっている帯域だけ</b>を、日常の測定作業として<b>素早く確実に</b>fn・ηへ落とし込みたい時。</td>
+  <td><b>モード形状（レジデュー）</b>まで欲しい時、ME&#39;scopeの計算結果と突き合わせたい時、<b>コヒーレンス</b>で点を選別してから解析したい時、RFP法の中身をじっくり学びたい時。</td>
+</tr>
+<tr>
+  <td class="item">利点</td>
+  <td>・自動検出だから山の見落としが少ない<br>・1山あたりの計算は最速・最安定<br>・理論値参考で「どの山がどのモードか」当たりが付く</td>
+  <td>・重なった山を<b>数式ごと</b>分離できる<br>・<b>閉形式なので必ず答えが出る</b>（収束しない、が起きない）<br>・データ形式ドロップダウンでミス防止<br>・自己検算シート内蔵</td>
+  <td>・重なった山を数式ごと分離＋<b>モード形状まで復元</b><br>・帯域外モードの影響を残余項で吸収<br>・コヒーレンスでデータ品質を先に篩える<br>・用語集/比較表/ミス集が1冊にまとまっている</td>
+</tr>
+<tr>
+  <td class="item">欠点</td>
+  <td>・<b>双子モードは分離できない</b>（「要確認」フラグのみ）<br>・平均なし1発打ちなので<b>コヒーレンス非対応</b><br>・設定項目が多く、ドロップダウンが無いため<b>単位の打ち間違いに気づきにくい</b></td>
+  <td>・<b>ちょうど2山の帯域専用</b>（1山/3山以上は非対応）<br>・モード形状（レジデュー）は出さない<br>・SISO専用（複数加振点には非対応）</td>
+  <td>・<b>手順が長い</b>（19シート、04→08への手動転記が必須）<br>・反復法（ニュートン法）なので理論上は収束しない入力もありうる<br>・慣れるまでは情報量が多く感じる</td>
+</tr>
+<tr>
+  <td class="item">使いやすさ</td>
+  <td>◎（4ステップ）。ただし設定セルが約20個あり、<b>ドロップダウンによる入力規制が無い</b>ため過去に単位設定ミスの実例あり</td>
+  <td>◎◎（5ステップ、貼って再計算するだけ）。<b>入力形式はドロップダウンで選ぶだけ</b>なので一番ミスが起きにくい</td>
+  <td>○（「最短ルート」なら実質5手：03に貼る→05で山を読む→08に打つ→09で読む→11で確認）。ただし19シートを見渡すと最初は圧倒される</td>
+</tr>
+</table>
+</div>
+
+<div class="note-box">💡 表の続き（双子モード対応・小さいピーク・窓の設定・ステンレス）は、このあとの各部で表よりも詳しく、たとえ話つきで説明します。</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p4">
+<h2 class="sec">第4部｜双子モードへの対応の違い（手取り足取り）</h2>
+
+<div class="card cyan">
+<h4 class="subsub" style="margin-top:0;">🧸 そもそも「双子モード」って何？（小学生にもわかる例え）</h4>
+<p>2人の一卵性双生児が、同じ声の高さで「あー」と同時に歌ったら、あなたの耳には「1人が歌っている、少し<ruby>太<rt>ふと</rt></ruby>い声」に聞こえてしまいますよね。実際は2人（＝2つの<ruby>固有振動数<rt>こゆうしんどうすう</rt></ruby>fn）いるのに、周波数が近すぎて1つの山に見えてしまう現象が<ruby>双子<rt>ふたご</rt></ruby>モード（<ruby>縮退<rt>しゅくたい</rt></ruby>モード）です。ブレーキパッドでは、穴のせいで本来あった<ruby>対称性<rt>たいしょうせい</rt></ruby>が崩れることでこの「双子」が生まれます。</p>
+</div>
+
+<h3 class="sub">🔍 3ファイルの対応方針の違い</h3>
+<table>
+<tr><th>ファイル</th><th>方針</th><th>解ける式</th><th>答えが出ない、が起きるか</th></tr>
+<tr>
+  <td class="tag-tetsu">鉄板ハンマリング</td>
+  <td>分離を<b>あきらめる</b>。「1山専用」の前提で計算し、近すぎる山には<span style="color:var(--red);">「要確認」</span>フラグだけ立てて目視確認を促す</td>
+  <td>2次多項式（1モード分）</td>
+  <td>非該当（そもそも分離を試みない）</td>
+</tr>
+<tr>
+  <td class="tag-futago">双子モード分離</td>
+  <td>4次方程式を<b>フェラリ法</b>で厳密に2つの2次式へ因数分解する。<ruby>桁落<rt>けたお</rt></ruby>ち対策（<ruby>次数下<rt>じすうさ</rt></ruby>げ／deflation）も内蔵</td>
+  <td>4次方程式（2モード分）</td>
+  <td><span class="hl-green">原理的に起きない</span>（代数の公式なので必ず解が求まる。ただし「答えの意味」が境界的になる稀なケースは「要確認」表示）</td>
+</tr>
+<tr>
+  <td class="tag-car">カー.xlsx</td>
+  <td>同じ4次方程式を<b>ニュートン法</b>（反復計算）で解く。04シートで読んだ2つの山の周波数を初期値として与える</td>
+  <td>4次方程式（2モード分）</td>
+  <td><span class="hl-amber">理論上はありうる</span>が、検証時は4回の反復で残差1e-15まで収束済み <span class="badge b-ok">🟢実測で収束確認</span></td>
+</tr>
+</table>
+
+<h3 class="sub">⚙️ 「閉形式」と「反復法」の違い（電卓のたとえ）</h3>
+<div class="card">
+<p><span class="hl-green">閉形式（双子モード分離のフェラリ法）</span>は、<b>「解の公式」に数字をあてはめるだけ</b>——中学校で習った2次方程式の解の公式と同じで、一発で正解が出ます。試行錯誤も「もう少し」もありません。</p>
+<p><span class="hl-amber">反復法（カー.xlsxのニュートン法）</span>は、<b>目をつぶって的に石を投げ、当たった場所から「あと何センチ右」と毎回修正して的の中心に近づける</b>やり方です。何回か投げれば必ず中心近くに行きますが、①最初にどこを狙うか（初期値）と②何回投げるか（反復回数）に答えの精度が左右されます。カー.xlsxでは04・05シートで「だいたいこのへん」と山の位置を読み取って初期値を与えるので、精度は実用上問題ありません。</p>
+</div>
+
+<h3 class="sub">📊 分離度（どれくらい重なっているか）の目安</h3>
+<p>カー.xlsxの09シートには「分離度＝2モードの周波数差 ÷ 半値幅」という判定値があり、双子モード分離.xlsxにも同じ考え方が根底にあります。</p>
+<table>
+<tr><th>分離度</th><th>状態</th><th>どうする</th></tr>
+<tr><td class="num">2以上</td><td>ほぼ分離した2本の山</td><td>半値幅法とRFP法の答えが近いはず。両方出して照合すると安心</td></tr>
+<tr><td class="num">0.5〜2</td><td>重なった双子モード</td><td class="hl-green">RFP法（このファイル群の本領）が必須の領域</td></tr>
+<tr><td class="num">0.5未満</td><td>ほぼ完全な縮退</td><td>1点加振では信頼性が落ちる。加振点を変えた2組目のデータ（疑似MIMO）を検討</td></tr>
+</table>
+
+<div class="note-box">💡 検算用サンプルデータは2ファイルとも同じ考え方の数値（fn≈3480Hz/η≈0.0060 と fn≈3520Hz/η≈0.0080、周波数差40Hz）で検証されています。同じ「双子」を、教科書版（カー.xlsx）と実務版（双子モード分離）の両方で解けることを確認済みという意味です。</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p5">
+<h2 class="sec">第5部｜小さいピークは拾えるか</h2>
+
+<p>これは「①広い帯域から自動で山を見つける話」と「②見つけた双子の片方が小さい場合の話」の<b>2つの別の問題</b>が混ざりやすいので、分けて説明します。</p>
+
+<h3 class="sub">① 広い帯域から自動で「小さい山」を見つける（検出感度）</h3>
+<div class="card">
+<p><span class="tag-tetsu">鉄板ハンマリング</span>だけが、この意味での「小さいピーク対応」の仕組みを持っています。設定シートに次の2つのつまみがあります。</p>
+<table>
+<tr><th>設定項目</th><th>初期値</th><th>意味</th></tr>
+<tr><td>しきい値 [dB]（最大から下）</td><td class="num">-45dB</td><td>一番高い山を基準に、そこから何dB下まで「山」として拾うか。線形値に直すと<b>最大ピークの約0.56%の高さ</b>まで拾える設定</td></tr>
+<tr><td>必要な突出量 [dB]</td><td class="num">6dB</td><td><ruby>麓<rt>ふもと</rt></ruby>（谷）よりこの値以上高くないと「本物の山」と認めない。ノイズの小波を弾くためのフィルター</td></tr>
+</table>
+<p>この2つを<span class="hl-amber">しきい値を下げる（例：-60dB）</span>ほど小さい山まで拾えますが、下げすぎるとノイズまで「山」と誤検出します。設定シートには<code>検出されたピーク数</code>という自動集計セルがあり、「多すぎ/少なすぎなら m・M・しきい値・突出量 を調整」と明記されています。</p>
+</div>
+
+<h3 class="sub">② 見つけた双子の「片方が小さい」場合（RFP計算の頑健さ）</h3>
+<div class="card">
+<p><span class="tag-futago">双子モード分離</span>と<span class="tag-car">カー.xlsx</span>には、そもそも「検出しきい値」という概念がありません。<b>すでに人間が「ここに2つ山がある」と選んだ狭い帯域（20〜80点）だけ</b>を扱うからです。したがって：</p>
+<ul>
+<li>片方の山が小さくても、<b>グラフで見えている＝データとして拾えている</b>なら、計算式そのものは問題なく解けます（フェラリ法もニュートン法も、山の大小を判定条件に使っていません）</li>
+<li>ただし当然ながら、<b>小さい山ほどノイズに埋もれやすく、信号対雑音比（SN比）が悪化</b>します。これは手法に関わらず物理的な限界です</li>
+<li>カー.xlsxの07シートは<ruby>逆行列<rt>ぎゃくぎょうれつ</rt></ruby>が作れないほど数値が不安定な場合に備えて<b>リッジ正則化</b>（対角にごく小さな数を足す保険）を組み込んでおり、この意味では双子モード分離よりわずかに数値的な頑健さの余地があります <span class="badge b-est">🟡設計上の特徴・実測比較はしていません</span></li>
+</ul>
+</div>
+
+<div class="note-box">💡 まとめると：<b>「広範囲から小さい山を見つける」のは鉄板ハンマリングの仕事</b>、<b>「見つけた双子を正しい比率で分離する」のは双子モード分離／カー.xlsxの仕事</b>です。両方が必要な場面（広く探して、見つけた双子を分離する）では、鉄板ハンマリングで見当をつけてから、その帯域だけを双子モード分離に貼り替える、という2段階の使い方になります。</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p6">
+<h2 class="sec">第6部｜窓の設定パターン別：指数・指数／フォース・指数</h2>
+
+<p>RION SA-01A4には窓関数の組み合わせが複数あり、<b>「解析モード」がFFTかFFT&amp;1/Nオクターブかで選べる窓が変わります</b>。ここが分かっていないと「あれ、フォース・指数が選べない」と迷うポイントなので、先に整理します。</p>
+
+<div class="card red">
+<p><span class="badge b-ok">🟢RIONソフトウェアマニュアル記載</span>　解析モードが「FFT」のとき、<b>［フォース・指数］は選択できません</b>。［FFT&amp;1/Nオクターブ］モード選択時のみ選択可能です。FFTモードでは<b>［指数・指数］</b>を使うことになります。</p>
+</div>
+
+<h3 class="sub">6-1｜FFT・指数・指数・手動設定で入力する時は</h3>
+<p>これは「解析モード＝FFT」「窓＝指数・指数」「平均＝無し」という、<span class="tag-tetsu">鉄板ハンマリング</span>が最初から前提にしている測定条件そのものです。使い方シートにも明記されています。</p>
+<table>
+<tr><th>ファイル</th><th>この設定への対応</th><th>データの貼り方</th></tr>
+<tr>
+  <td class="tag-tetsu">鉄板ハンマリング</td>
+  <td class="hl-green">前提条件そのもの（想定ど真ん中）</td>
+  <td>データシートのA列＝周波数[Hz]、B列＝振幅をそのまま貼るだけ。指数窓による損失係数の水増し分Δη=1/(π・fn・τ)を自動で差し引き</td>
+</tr>
+<tr>
+  <td class="tag-futago">双子モード分離</td>
+  <td class="hl-amber">使えるが要変換</td>
+  <td>振幅・位相（または実部・虚部）の<b>複素数データ</b>が必要。設定シートのドロップダウンで「振幅位相／dB」を選べば自動変換される</td>
+</tr>
+<tr>
+  <td class="tag-car">カー.xlsx</td>
+  <td class="hl-amber">使えるが要変換</td>
+  <td>03シートに周波数・実部Re(H)・虚部Im(H)の3列で貼る。02シートで指数窓の補正量Δηを自動計算</td>
+</tr>
+</table>
+
+<h3 class="sub">6-2｜フォース・指数の設定で入力する時は</h3>
+<p>フォース・指数窓（基準ch＝ハンマーにフォース窓、応答chに指数窓）を使うのは、<b>「解析モード＝FFT&amp;1/Nオクターブ」でオフライン（波形記録＆リプレイ）測定をしていて、かつフレーム終端で揺れが収まりきらない</b>時です。</p>
+
+<div class="card purple">
+<p>3ファイルのうち、<b>この判断と補正を明示的に自動化しているのはカー.xlsxだけ</b>です。</p>
+<ul>
+<li><b>01シート</b>：「窓は必要？」の判定セルが自動計算され、記録時間Tが必要時間t以上なら<code>不要（窓＝［無し］でOK）</code>、足りなければ<code>必要（フォース・指数窓へ）</code>と表示されます</li>
+<li><b>02シート</b>：フォース窓とは何か（ハンマーの力信号だけに使う窓。打撃前後以外は物理的に本当にゼロなので切っても嘘にならない）を解説したうえで、指数窓側の減衰上乗せΔηを計算する式が入っています</li>
+</ul>
+<p><span class="badge b-est">🟡推定</span>　フォース窓は「打撃位置を基準に範囲を切る」操作のため、記録済み波形が必要＝オフライン系モード限定、という理屈と整合します（実機での最終確認は未実施）。</p>
+</div>
+
+<p>鉄板ハンマリングと双子モード分離は、フォース・指数窓を使った場合の<b>専用の補正機能は持っていません</b>（鉄板ハンマリングは指数・指数窓を前提に設計、双子モード分離は窓の種類を問わず複素FRFさえ入れば計算できますが、フォース窓特有の話は考慮していません）。フォース・指数窓のデータを使う場合は、<b>カー.xlsxの02シートで補正量を計算してから</b>、双子モード分離や鉄板ハンマリングに数値を移す、という流れが安全です。</p>
+
+<h3 class="sub">📐 窓の要・不要をざっくり判定する式</h3>
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-window', this)">📋 コピー（貼り付け用）</button>
+<table>
+<tr><th>セル</th><th>式</th><th>意味</th></tr>
+<tr><td>A1</td><td class="num">3500</td><td>予想される固有振動数 fn [Hz]</td></tr>
+<tr><td>A2</td><td class="num">0.008</td><td>予想される損失係数 η（ブレーキパッド摩擦材の目安：0.005〜0.02）</td></tr>
+<tr><td>A3</td><td class="num">60</td><td>目標の減衰量 [dB]（60dB＝振幅が1/1000。ここまで小さくなればゼロ扱い）</td></tr>
+<tr><td>A4</td><td class="num">=(A3*LN(10)/20)/(PI()*A1*A2)</td><td>必要な最低記録時間 t [秒]</td></tr>
+</table>
+</div>
+<p>記録時間TがA4の答え以上なら窓は不要（＝指数・指数もフォース・指数も不要）、足りなければ窓が必要、という判定です（カー.xlsxの01シートが自動でやってくれる計算と同じ式です）。</p>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p7">
+<h2 class="sec">第7部｜ステンレスなど他の材料で測るときの設定</h2>
+
+<div class="card cyan">
+<p>結論：<b>3ファイルの中で「材料（ヤング率・密度）」を入力する欄があるのは、鉄板ハンマリングの「理論値参考」シートだけ</b>です。双子モード分離とカー.xlsxには材料を入力する欄がそもそもありません（測定データから直接fn・ηを計算するだけで、材料の物性値を必要としないからです）。</p>
+</div>
+
+<h3 class="sub">🤔 なぜ「理論値参考」シートだけに材料の欄があるの？</h3>
+<p>3つのファイルがやっていることの違いを、<ruby>天気予報<rt>てんきよほう</rt></ruby>で例えると分かりやすいです。</p>
+<ul>
+<li><span class="hl-amber">理論値参考シート（鉄板ハンマリング）</span>＝「明日の天気予報」。<b>まだ測る前に</b>、材料と寸法から「だいたいこの周波数に山が出るはず」と<b>予想</b>する計算です。予想には材料の性質（ヤング率E・密度ρ）が必要です。</li>
+<li><span class="hl-green">ピーク一覧シート／モード分離結果シート／09シート</span>＝「今日の実際の天気（実況）」。<b>測った後の</b>データそのものからfn・ηを読み取るだけなので、材料が鉄だろうとステンレスだろうと式は変わりません。</li>
+</ul>
+
+<h3 class="sub">✅ ステンレス試験体を測るときにやること</h3>
+<ol class="step-list">
+<li><b>本体の計算（ピーク一覧・モード分離結果・09シート）</b>：何もしなくてOK。試験体がステンレスでも鉄でも、測定データさえ正しく貼れば、fn・ηはそのまま正しく計算されます。</li>
+<li><b>「理論値参考」シートで、どの山がどのモードか当たりを付けたい場合だけ</b>：鉄板ハンマリングの「理論値参考」シートのB5（ヤング率E）とB6（密度ρ）を、鉄の代表値からステンレスの代表値に書き換えます。</li>
+</ol>
+
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-material', this)">📋 コピー（貼り付け用）</button>
+<table>
+<tr><th>セル（理論値参考シート）</th><th>鉄（初期値）</th><th>ステンレスSUS304の目安</th><th>単位</th></tr>
+<tr><td>B5：ヤング率 E</td><td class="num">206000000000</td><td class="num">193000000000</td><td>Pa（＝193GPa）</td></tr>
+<tr><td>B6：密度 ρ</td><td class="num">7850</td><td class="num">7900</td><td>kg/m³</td></tr>
+</table>
+</div>
+<p><span class="badge b-est">🟡目安</span> SUS304（18Cr-8Ni系、いわゆる18-8ステンレス）のヤング率は<b>約193GPa</b>、密度は<b>約7.9g/cm³（7900kg/m³前後、文献により7.84〜7.93g/cm³の幅あり）</b>という値が、材料便覧・鋼材メーカー資料など複数の情報源で一致して報告されています。<b>正確な値は、実際に使う鋼種・ロットのミルシート（材料証明書）で確認するのが確実</b>です（SUS316やSUS430など他のステンレス鋼種ではこの値からさらにズレます）。</p>
+
+<h3 class="sub">🔢 具体例：同じ寸法でも鉄とステンレスでは周波数がどれだけ変わる？</h3>
+<p>理論値参考シートの式は <code>f ∝ h × √(E/ρ)</code>（厚みhに比例、E/ρの平方根に比例）という形をしているので、E・ρを両方書き換えると、その板の予想周波数が自動でスライドします。実際に数字で確認してみましょう。</p>
+
+<div class="tbl-wrap">
+<button class="copybtn" onclick="copyTSV('tsv-freqcalc', this)">📋 コピー（貼り付け用）</button>
+<table>
+<tr><th>セル</th><th>式・値</th><th>意味</th></tr>
+<tr><td>A1</td><td class="num">206000000000</td><td>鉄のヤング率 E [Pa]</td></tr>
+<tr><td>B1</td><td class="num">7850</td><td>鉄の密度 ρ [kg/m³]</td></tr>
+<tr><td>C1</td><td class="num">=SQRT(A1/B1)</td><td>鉄の √(E/ρ) → 約5122.7 m/s</td></tr>
+<tr><td>A2</td><td class="num">193000000000</td><td>SUS304のヤング率 E [Pa]</td></tr>
+<tr><td>B2</td><td class="num">7900</td><td>SUS304の密度 ρ [kg/m³]</td></tr>
+<tr><td>C2</td><td class="num">=SQRT(A2/B2)</td><td>SUS304の √(E/ρ) → 約4942.7 m/s</td></tr>
+<tr><td>D1</td><td class="num">=C2/C1</td><td>比率 → 約0.9649</td></tr>
+</table>
+</div>
+
+<div class="card green">
+<p>厚み・寸法が全く同じ板なら、<b>SUS304の板はほぼ同じ形の鉄の板より、共振周波数が約3.5%低く出る</b>、という計算結果になります（例：理論値参考シートの初期寸法 L=0.2m, w=0.1m, h=0.005m の1次曲げモードだと、鉄の658.2Hzに対しSUS304は約635.1Hz） <span class="badge b-ok">🟢Python(NumPy)で数値検算済み</span>。ステンレスの試験体で理論値参考シートの数字が実測より少し高めに出ているように見えたら、材料をステンレスに直し忘れている可能性がまず疑われます。</p>
+</div>
+
+<div class="note-box">💡 なお、支持方法（ピアノ線）やハンマーチップの材質としてのステンレス（例：SUS304-WPBのステンレスばね鋼線）は、これとは別の話です。それは試験体の材質ではなく<b>治具側の材質</b>の選定なので、ここで説明した「理論値参考シートの材料入力」とは関係ありません。</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p8">
+<h2 class="sec">第8部｜3ファイルの最短手順まとめ</h2>
+
+<div class="grid3">
+
+<div class="filecard fc-tetsu">
+<h4 class="tag-tetsu">① 鉄板ハンマリング（4ステップ）</h4>
+<ol class="step-list" style="padding-left:1.1em; font-size:.92em;">
+<li>設定シートの黄色いセルに測定条件（レンジ・点数・指数窓の減衰値・単位）を入力</li>
+<li>データシートのA列＝周波数[Hz]、B列＝振幅にSA-01のCSVを2行目から貼り付け</li>
+<li>再計算（LibreOffice：Ctrl+Shift+F9）</li>
+<li>ピーク一覧シートのY列(fn)・AB列(η)を読む</li>
+</ol>
+</div>
+
+<div class="filecard fc-futago">
+<h4 class="tag-futago">② 双子モード分離（5ステップ）</h4>
+<ol class="step-list" style="padding-left:1.1em; font-size:.92em;">
+<li>設定シートで基準周波数fref（帯域の中心）とデータ形式を設定</li>
+<li>データ入力シートに双子モードを含む帯域のFRFデータを20〜80点、4行目から貼付</li>
+<li>再計算</li>
+<li>モード分離結果シート最上部の緑★セルを読む</li>
+<li>検算シートで判定を確認（サンプルデータのままの時だけ有効）</li>
+</ol>
+</div>
+
+<div class="filecard fc-car">
+<h4 class="tag-car">③ カー.xlsx（最短ルート・5手）</h4>
+<ol class="step-list" style="padding-left:1.1em; font-size:.92em;">
+<li>03シートにFRF（f, Re(H), Im(H)）を貼る</li>
+<li>05シートで山の周波数をだいたい読む</li>
+<li>その2つの周波数を08シートに手入力</li>
+<li>09シートで答え（fn・η・Q値など）を読む</li>
+<li>11シートのグラフで実測と合成FRFが重なっているか目視確認</li>
+</ol>
+</div>
+
+</div>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p9">
+<h2 class="sec">第9部｜よくある間違い　総まとめ</h2>
+
+<table>
+<tr><th>間違い</th><th>何が起きるか</th><th>対策・対象ファイル</th></tr>
+<tr>
+  <td>貼り付けた振幅の単位（dB／リニア）の設定を間違える</td>
+  <td>10^20倍やdBの計算がずれ、fn・ηがまるで違う値になる</td>
+  <td class="tag-tetsu">鉄板ハンマリング：設定シートの単位セルはドロップダウンではないので、<b>目視で必ず二重確認</b>する（実際に過去に発生した既知の間違い）</td>
+</tr>
+<tr>
+  <td>半値幅法（または鉄板ハンマリングの1自由度フィット）を、そのまま双子モードに使う</td>
+  <td>2つの山の合成幅を1本ぶんと誤読し、ηが数倍ズレる</td>
+  <td>全ファイル共通：山が2本重なっていたら、必ず<span class="tag-futago">双子モード分離</span>か<span class="tag-car">カー.xlsx</span>を使う</td>
+</tr>
+<tr>
+  <td>周波数を正規化せず、生のHzのまま計算する</td>
+  <td>行列の条件数が10⁹級になり、双子の分離に失敗する</td>
+  <td class="tag-futago">双子モード分離：設定シートのfrefを帯域の中心に設定（自動正規化）／<span class="tag-car">カー.xlsx：03シートが自動で正規化</span></td>
+</tr>
+<tr>
+  <td>帯域に山が3本以上入っている</td>
+  <td>分母4次のRFPでは表現できず、答えが不安定になる</td>
+  <td>両RFPファイル共通：帯域を「分けたい2本＋その裾」だけに絞り込む（20〜80点が目安）</td>
+</tr>
+<tr>
+  <td>合成FRFのグラフ確認を省略し、数字だけ信じる</td>
+  <td>モード数を間違えていても「それらしい数字」は必ず出てしまう</td>
+  <td class="tag-car">カー.xlsx：11シートのグラフを必ず目視／<span class="tag-futago">双子モード分離：検算シートで既知サンプルと突き合わせ</span></td>
+</tr>
+<tr>
+  <td>指数窓による損失係数の水増しを補正し忘れる</td>
+  <td>ηを大幅に過大評価（例：真値0.006→測定0.009）</td>
+  <td>両RFPファイル・鉄板ハンマリング共通：Δη=1/(π・fn・τ)の自動補正セルが効いているか確認</td>
+</tr>
+<tr>
+  <td>ハンマーの二度打ちが混ざったデータを使う</td>
+  <td>FRFに周期的なうねりが乗り、カーブフィットが全部狂う</td>
+  <td>全ファイル共通：時間波形を目視し、力信号の山が1つだけか確認してから貼る</td>
+</tr>
+<tr>
+  <td>半値幅内のデータ点数が不足している</td>
+  <td>ηが当てにならない</td>
+  <td class="tag-tetsu">鉄板ハンマリング：3dB幅内に最低10点必要。設定シートの「分解能チェック」で確認</td>
+</tr>
+</table>
+
+</section>
+
+<hr class="sep">
+
+<!-- ============================================================ -->
+<section id="p10">
+<h2 class="sec">第10部｜出典・参考文献</h2>
+
+<h3 class="sub">RFP法・双子モード分離まわり</h3>
+<ul>
+<li>Richardson, M.H. &amp; Formenti, D.L. (1982) "Parameter Estimation from Frequency Response Measurements using Rational Fraction Polynomials" Proc. 1st IMAC, pp.167-186 ― RFP法の原典</li>
+<li>Kennedy, C.C. &amp; Pancu, C.D. (1947) "Use of Vectors in Vibration Measurement and Analyses" J. Aeronautical Sciences 14(11) ― サークルフィットの原典</li>
+<li>Peeters, B. et al. (2004) "The PolyMAX Frequency-Domain Method" Shock and Vibration 11(3-4):395-409, DOI:10.1155/2004/523692 ― PolyMAXの原典</li>
+<li>Zrayka, A.K. &amp; Mucchi, E. (2019) "A comparison among modal parameter extraction methods" SN Applied Sciences 1:781, DOI:10.1007/s42452-019-0806-8 ― 手法比較の実測検証</li>
+<li>ME&#39;scope Application Note 13（vibetech.com）― カー.xlsxのレジデュー抽出手順の準拠元</li>
+<li>Harris, F.J. (1978) "On the Use of Windows for Harmonic Analysis with the Discrete Fourier Transform" Proc. IEEE 66(1) ― 窓関数の性能比較値の準拠元</li>
+</ul>
+
+<h3 class="sub">測定条件・窓関数まわり</h3>
+<ul>
+<li>RION SA-01/SA-01A2/SA-01A4 ハードウェアマニュアル・ソフトウェアマニュアル（プロジェクト添付）― FFT解析点数、サンプリング係数、指数窓の定義、フォース・指数窓の選択条件（FFT&amp;1/Nオクターブ限定）の一次情報</li>
+</ul>
+
+<h3 class="sub">ステンレス鋼（SUS304）の材料定数（今回の検索で確認）</h3>
+<ul>
+<li><a href="http://kentiku-kouzou.jp/koukouzou-sus304yanguritu.html" style="color:var(--cyan);" target="_blank" rel="noopener">SUS304のヤング率は193000N/mm2｜ポアソン比0.3と降伏点</a> ― ヤング率193GPa（一般鋼205GPaよりやや小さい）</li>
+<li><a href="https://www.tokkin.co.jp/search/stainless-steels/austenitic/304/" style="color:var(--cyan);" target="_blank" rel="noopener">SUS304｜精密金属材料の特殊金属エクセル(TOKKIN)</a> ― 密度7.90g/cm³、ヤング率193GPa</li>
+<li><a href="http://www.sts-shimomura.com/products/pdf/austenite_pv.pdf" style="color:var(--cyan);" target="_blank" rel="noopener">代表的な鋼種の物理特性値（ステンレス協会『ステンレス鋼データブック』抜粋）</a> ― SUS304：密度7.84g/cm³、ヤング率193kN/mm²</li>
+</ul>
+<p class="note-box" style="margin-top:14px;">🟡 密度は情報源により7.84〜7.93g/cm³の幅があります（版・測定条件による差）。本ガイドでは代表値として7900kg/m³を使用しました。精密な計算が必要な場合は、使用する鋼材のミルシートを優先してください。</p>
+
+</section>
+
+<footer class="end">
+  <p>このガイドは、実際の3ファイルをopenpyxlで開いて中身（シート構成・数式・データ検証規則）を確認したうえで作成しています。</p>
+  <p>迷ったら、まず第1部の早見表とフローチャートに戻ってください。</p>
+</footer>
+
+</div>
+
+<script>
+function copyTSV(id, btn){
+  var wrap = btn.closest('.tbl-wrap') || btn.parentElement;
+  var table = wrap.querySelector('table');
+  if(!table){ return; }
+  var rows = table.querySelectorAll('tr');
+  var lines = [];
+  rows.forEach(function(r){
+    var cells = r.querySelectorAll('th,td');
+    var vals = [];
+    cells.forEach(function(c){ vals.push(c.textContent.trim()); });
+    lines.push(vals.join('\t'));
+  });
+  var text = lines.join('\n');
+  navigator.clipboard.writeText(text).then(function(){
+    btn.classList.add('copied');
+    var orig = btn.textContent;
+    btn.textContent = '✅ コピーしました';
+    setTimeout(function(){ btn.textContent = orig; btn.classList.remove('copied'); }, 1600);
+  }).catch(function(){
+    var ta = document.createElement('textarea');
+    ta.value = text;
+    document.body.appendChild(ta);
+    ta.select();
+    document.execCommand('copy');
+    document.body.removeChild(ta);
+    btn.textContent = '✅ コピーしました';
+    setTimeout(function(){ btn.textContent = '📋 コピー'; }, 1600);
+  });
+}
+</script>
+
+</body>
+</html>
