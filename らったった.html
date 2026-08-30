@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.17.00</title>
+<title>記録台帳＋MDメモ Ver1.19.08</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -1014,6 +1014,28 @@ margin:0; background:var(--bg); color:var(--ink);
 #app-db .tgp-add input[type=text]{flex:1 1 auto; min-width:0}
 #app-db .tgp-acts{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center}
 #app-db .tgp-acts .sp{flex:1 1 auto}
+/* ---- Ver1.19.08 D-03 案②: 決定ボタンの行を画面の下に貼り付ける ----
+   .tgp-modal には max-height を足さない。足すと中身を包む div が要り、
+   タグ選択画面を組み立てている JS まで触ることになるため。
+   スクロールしているのは .tgp-back（960行 overflow:auto）なので、
+   その中で sticky にすれば、モーダルが画面より高くてもボタンは残る。 */
+#app-db .tgp-acts{
+    position:sticky; bottom:0; z-index:3;
+    background:var(--panel); border-top:1px solid var(--line2);
+    padding:10px 0 12px; margin-bottom:-16px;
+  }
+/* ---- Ver1.19.08 D-02 案①: 長い注意書きを畳む ----
+   ★class="card" は付けていない。付けると #app-db details.card を拾う
+   アコーディオン（S-03）に巻き込まれ、他の節を開くと勝手に閉じる。 */
+#app-db details.hintfold{ margin:6px 0 0 }
+#app-db details.hintfold > summary{
+    cursor:pointer; color:var(--sub); font-size:12px; font-weight:700;
+    list-style:none; padding:2px 0; user-select:none;
+  }
+#app-db details.hintfold > summary::-webkit-details-marker{ display:none }
+#app-db details.hintfold > summary:hover{ color:var(--accent) }
+#app-db details.hintfold[open] > summary{ margin-bottom:4px }
+#app-db details.hintfold > div{ font-size:11.5px; color:var(--sub); line-height:1.6 }
 #app-db .tgp-modal input[type=text]{
     background:var(--input-bg); color:var(--ink); border:1px solid var(--line);
     border-radius:6px; padding:6px 8px; font-family:inherit; font-size:13px;
@@ -2217,7 +2239,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.17.00</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.08</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2322,11 +2344,14 @@ summary:focus-visible,
   <div class="meta">
     <span id="rcaption">　</span><span id="rcount"></span>
     <span style="flex:1"></span>
+    <button class="ghost small" onclick="openResultSetSave(this)" title="いま表に出ている行の集合に名前を付けて取っておきます">📌 この結果を保存</button>
+    <button class="ghost small" onclick="openResultSets(this)" title="取っておいた検索結果を呼び出します">📁 保存した結果</button>
     <button class="ghost small" onclick="exportCsv()">⇩ CSVで書き出す</button>
     <button class="ghost small" onclick="exportTxt()">⇩ TXTで書き出す</button>
   </div>
-  <p class="hint">▶ 色つきセルはクリックして直接編集（フォーカスを外すと自動保存）。長文の列（内容・知識・条件メモ・備考など）は<strong>Markdownで表示</strong>され、クリックすると編集できます（Ctrl+Enterで確定 / Escで取り消し）。セル右上の「📝 メモで開く」を押すと、そのセルを<strong>Markdownメモの画面で編集</strong>でき、入力内容は自動でこの表に反映されます。各行の「削除」で行を消せます。入力欄にフォーカスが無いとき、Ctrl+Zで元に戻す／Ctrl+Yでやり直しができます。<br>
-  ▶ <strong>日付・時刻の列</strong>はクリックするとカレンダー／時計が開きます（そのまま手で打つこともできます）。「終日」の列はクリックで☑／☐が切り替わります。</p>
+  <details class="hint hintfold"><summary>▶ セルの編集について（クリックで開く）</summary>
+  <div>▶ 色つきセルはクリックして直接編集（フォーカスを外すと自動保存）。長文の列（内容・知識・条件メモ・備考など）は<strong>Markdownで表示</strong>され、クリックすると編集できます（Ctrl+Enterで確定 / Escで取り消し）。セル右上の「📝 メモで開く」を押すと、そのセルを<strong>Markdownメモの画面で編集</strong>でき、入力内容は自動でこの表に反映されます。各行の「削除」で行を消せます。入力欄にフォーカスが無いとき、Ctrl+Zで元に戻す／Ctrl+Yでやり直しができます。<br>
+  ▶ <strong>日付・時刻の列</strong>はクリックするとカレンダー／時計が開きます（そのまま手で打つこともできます）。「終日」の列はクリックで☑／☐が切り替わります。</div></details>
   <p class="legend" id="nowLegend" style="display:none">
     <span><i class="now"></i>いま進行中</span>
     <span><i class="today"></i>今日の予定</span>
@@ -2379,6 +2404,17 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.08 で増えたこと（長い説明を畳めるように・タグ選択の決定ボタンが常に見える）：</strong>記録台帳の表の上にあった<b>「▶ 色つきセルは…」の長い説明</b>を、<b>畳んだ状態</b>にしました。見出しの「<b>▶ セルの編集について（クリックで開く）</b>」を押すと開きます。説明の中身は1文字も減っていません（日付・時刻の列の話も、そのまま中に入っています）。ふだんは表がその分だけ上に来るので、行が多いときに見やすくなります。もうひとつ、<b>タグ選択の画面</b>で、タグをたくさん選ぶと<b>「決定」のボタンが画面の外に出てしまい押せなくなる</b>ことがありました。ボタンの並びを<b>画面の下に貼り付く形</b>に変えたので、タグが何十個あっても、いつでも押せます。（畳む説明とタグ選択の決定ボタン）</p>
+      <p><strong>Ver1.19.07 で増えたこと（「操作」が画面別に2つに分かれた）：</strong>これまで18件が1つにまとまっていた「操作」の見出しを、<b>どの画面でも使うもの</b>（上書き保存・名前を付けて保存・DBファイルを開く・元に戻す・やり直す・ダーク／ライト切替・控えの一覧・自己点検の8件）と、<b>記録台帳でだけ使うもの</b>（タグや列の管理、CSV／TXTの書き出しなど10件）に分けました。後者は「<b>台帳の操作</b>」という新しい見出しになります。<b>項目は1件も減っていません（合計62件のまま）。</b>Markdownメモの画面では「台帳の操作」が下のほうへ回るので、メモを書いているときに記録台帳専用の操作が上に混ざらなくなります。（記録台帳でだけ使うものを別の見出しに分けた）</p>
+      <p><strong>Ver1.19.06 で増えたこと（コマンドパレットが「いまの画面」を先頭に出す）：</strong>［Ctrl+K］のコマンドパレットを、<b>何も打たずに開いたとき</b>だけ、<b>いま見ている画面で使えるグループが上に来る</b>ようになりました。メモ画面なら「メモ（Markdown）」が、DB画面なら「項目（テーブル）」や「検索」が先頭です。<b>項目は1件も隠していません。</b>並べ順が変わるだけなので、他の画面の操作もすべて下に残っています。「⭐ よく使う」はこれまでどおり、いちばん上に出ます。言葉を打ち始めると、これまでどおり「当たった順」になります。
+      <p><strong>Ver1.19.05 で増えたこと（コマンドパレットからメモの書式操作が使える）：</strong>［Ctrl+K］のコマンドパレットに、<b>「メモ（Markdown）」のグループが増えました</b>。太字・見出し・箇条書き・引用・表など、これまでツールバーのボタンとキーでしか呼べなかった操作を、<b>名前で探して実行できます</b>。とくに<b>「見出しを1段大きく／小さくする」「見出し4～6」「書式を消す」</b>はツールバーにボタンが無く、これまでキーを覚えるしかありませんでした。DB画面で選んだときは、<b>自動でメモ画面に切り替わってから</b>実行されます。右端には、いま割り当たっているキーが出ます（⚙設定で変えると、ここの表示も一緒に変わります）。なおこの版では、DB画面でもメモ画面でも同じ項目が並びます。画面ごとの並べ替えは次の版で入ります。</p>
+      <p><strong>Ver1.19.04 で増えたこと（保存した結果からも「戻る・巡回」ができる）：</strong>「📁 保存した結果」から<b>「保存したときのまま」「変わった行だけ」</b>で開いた一覧でも、<b>［Alt+G］で次のヒットへ、［Alt+Shift+G］で前のヒットへ</b>移れるようになりました。行に飛んだあと<b>［Ctrl+Shift+G］を押すと、その保存した一覧に戻ります</b>（生の横断検索に戻ってしまうことはありません）。これまでは「追い直す」で開いたときだけ巡回でき、ほかの2つは一覧を開き直す必要がありました。なお「変わった行だけ」で開いて<b>0件だったとき</b>に［Alt+G］を押すと、<b>「たどれる横断検索の結果がありません」</b>と出ます（前に探した別の検索結果を巡回しはじめる、といったことは起きません）。戻ったときは、そのつど保存の条件で並べ直すので、<b>保存したあとに消された行は一覧から消えます</b>。</p>
+      <p><strong>Ver1.19.03 で増えたこと（横断検索のヒットを順にたどれる）：</strong>「🔎 全項目を横断検索」の結果から行に飛んだあと、<b>［Alt+G］で次のヒットへ、［Alt+Shift+G］で前のヒットへ</b>、一覧を開き直さずに移れます。20件の結果を 1件ずつ確かめるときに、飛ぶ → 次 → 次 → 次、と押していけます。順番は画面に出ていた並びとひとつで、<b>最後のヒットで「次」を押すと先頭に戻ります</b>（何周でも見られます）。飛び先の行がすでに削除されていたときは、<b>その行を自動で飛ばして次へ進み</b>、何件飛ばしたかを画面下の帯に出します。帯には［3 / 20 件目］のように、<b>いま何件目を見ているか</b>も出ます。まだ一度も飛んでいないときに「次」を押すと先頭のヒットへ、「前」を押すと末尾へ飛びます。キーは「⚙ 設定 ＞ ショートカットキー」の<b>「横断検索の次のヒットへ」</b>で振り直せます。なおこの版でたどれるのは生の横断検索の結果で、「📁 保存した結果」から開いた一覧は次の版で対応します。</p>
+      <p><strong>Ver1.19.02 で増えたこと（横断検索の結果一覧へ戻れる）：</strong>「🔎 全項目を横断検索」の結果から行をクリックして飛んだあと、<b>［Ctrl+Shift+G］を押すと、さっきの結果一覧がそのまま戻ります。</b>探し直しは要りません。探した言葉・正規表現・1項目あたりの上限・選んだ項目も、すべて押したときのまま復元されます。戻った一覧では、<b>直前に見ていた行に色が付く</b>ので、どこまで見たかが分かります。20件の結果を1件ずつ確かめたいときに、飛ぶ → 戻る → 次を押す、と往復できます。まだ一度も横断検索をしていないときは「戻れる結果がありません」と出ます。キーは「⚙ 設定 ＞ ショートカットキー」の<b>「横断検索の結果一覧へ戻る」</b>で振り直せます。</p>
+      <p><strong>Ver1.19.01 で増えたこと（横断検索の結果も保存できる）：</strong>「🔎 全項目を横断検索」で探したあと、結果の上に出る「<b>📌 この結果を保存</b>」を押すと、<b>いくつもの項目にまたがった結果を、まるごと1件として</b>取っておけます。保存されるのは行だけでなく、<b>そのときに画面に出ていた抜粋の文</b>も含みます。あとから「開く」を選ぶと、保存したときの抜粋がそのまま出るので、<b>「あのとき何が書いてあったか」の証跡</b>として使えます。出し方は単体の保存と同じ3つです。<b>開く</b>＝保存したときのまま。<b>追い直す</b>＝保存した言葉でもう一度横断検索。<b>変わった行</b>＝保存より後に書き換えられた行だけ（「変」の印が付きます）。「📁 保存した結果」の一覧では <b>🔎 全項目を横断</b> と表示されるので、単体の保存と見分けられます。削除された行があれば、その数も出ます。保存の中身は work.sqlite の中にあります。</p>
+      <p><strong>Ver1.19.00 で増えたこと（検索結果そのものを保存できる）：</strong>検索結果の見出しの右にある「📌 この結果を保存」を押すと、<b>いま表に出ている行の集合</b>に名前を付けて取っておけます。お気に入りが保存するのは「検索の条件」ですが、こちらが保存するのは<b>あのとき出ていた行そのもの</b>です。「📁 保存した結果」から呼び出すとき、出し方を3つ選べます。<b>開く</b>＝保存したときの行をそのまま。<b>追い直す</b>＝保存した条件をもう一度走らせて、いまの最新の姿。<b>変わった行</b>＝保存した行のうち、保存より後に書き換えられたものだけ（Ver1.18.00 の「行ごとの更新時刻」を使っています）。なお更新時刻は分単位で記録しているため、<b>保存したのと同じ分に書き換えた行は「変わった行」に出ません</b>。削除された行があれば、その数も画面の下の帯に出ます。保存は <b>30件まで</b>で、あふれると古いものから消えます。消したくないものは 📍 を押して固定してください。保存の中身は <b>work.sqlite の中</b>にあるので、DBファイルを持ち運べば会社PCと自宅PCで同じ保存が使えます。</p>
+      <p><strong>Ver1.18.01 で増えたこと（一覧に「更新日時」の列を出せる）：</strong>「⚙ 設定 ＞ 🖥 表示 ＞ 検索結果の表に『更新日時』の列を出す」をONにすると、検索結果の表のいちばん右に<b>その行を最後に書き換えた時刻</b>が出ます。<b>既定はOFF</b>です。この列は表の中に作られるわけではなく、表示のときだけ足しているので、OFFに戻せば見た目は元どおりになります。見出しをクリックすれば「最近直した順」に並べ替えられ、CSV／TXTの書き出しにも入ります。ただしこの列だけは「⇩ この並びを既定にする」には登録できません（表の中の列ではないためです）。</p>
+      <p><strong>Ver1.18.00 で増えたこと（行ごとに「最後に触った時刻」を覚える）：</strong>行を追加したり書き換えたりすると、その時刻が自動で記録されるようになりました。表のかたちは変わりません（見出しは増えません）。記録は <code>.sqlite</code> の中に入るので、ファイルを持ち運べば会社のPCにも付いてきます。この記録は、あとで「検索結果を保存して呼び出す」機能の土台になります。</p>
       <p><strong>Ver1.17.00 で増えたこと（日本語入力中は、文字カーソルの色が変わる）：</strong>
         <br>・<b>日本語入力で変換を始めると、文字カーソル（縦棒）の色が変わります。</b>
         <br>
@@ -3207,6 +3243,51 @@ function ensureMetaTables(){
     `);
   }catch(e){ /* 作れなくても検索そのものは動く */ }
 
+  /* --- Ver1.19.00 (案C-3): 検索結果そのもの（行の集合）を保存する ---
+     お気に入りが保存するのは「検索の条件」。こちらが保存するのは
+     「あのとき出ていた行」そのもの。条件の保存は既に3つあるので、
+     ここでは行の集合を凍結する。
+
+     ★row_id は必ず INTEGER にすること。
+       利用者の表は id INTEGER PRIMARY KEY で作られ、行ごとの更新時刻を持つ
+       表の row_id も INTEGER。TEXT にすると SQLite は '12' = 12 を偽と判定し、
+       突き合わせが1件も当たらないのに【エラーは出ない】。
+
+     ★at0 は「保存した時点で、その行が持っていた更新時刻」。
+       「保存後に変わった行」を出すのに、保存時刻との大小比較は使わない。
+       行ごとの更新時刻はローカル時刻・分精度の 'YYYY-MM-DD HH:MM' なので、
+       別の形式（ISO文字列など）と比べると【エラーも出ずに常に偽】になる。
+       at0 と今の値が「違うかどうか」だけを見れば、形式にも時差にも依存しない。
+     ★作れなければ、この機能だけ黙って休む（検索そのものは動く）。 */
+  try{
+    db.run(`
+      CREATE TABLE IF NOT EXISTS _meta_result_set(
+        sid TEXT PRIMARY KEY, name TEXT, kind TEXT,
+        table_key TEXT, cond TEXT, at TEXT, n INTEGER,
+        pinned INTEGER DEFAULT 0, order_no INTEGER DEFAULT 0
+      );
+      CREATE TABLE IF NOT EXISTS _meta_result_row(
+        sid TEXT, table_key TEXT, row_id INTEGER, at0 TEXT, ex TEXT,
+        PRIMARY KEY(sid, table_key, row_id)
+      );
+    `);
+  }catch(e){ /* 作れなければ、この機能だけ黙って休む */ }
+
+  /* --- Ver1.19.01 (案③-B): 前の版で作られた DB に ex 列を足す ---
+       CREATE TABLE IF NOT EXISTS は「表があれば何もしない」ので、
+       Ver1.19.00 で作られた work.sqlite は ex 列を持たないままになる。
+       ALTER TABLE ... ADD COLUMN は列が既にあると例外になるので、
+       先に PRAGMA table_info で確かめてから足す。
+       既にある行の ex は NULL のまま（保存し直せば入る）。 */
+  try{
+    var _rsHasEx = false;
+    var _rsCols = db.exec("PRAGMA table_info(_meta_result_row)");
+    if(_rsCols && _rsCols[0] && _rsCols[0].values){
+      _rsCols[0].values.forEach(function(v){ if(String(v[1]) === 'ex') _rsHasEx = true; });
+    }
+    if(!_rsHasEx) db.run('ALTER TABLE _meta_result_row ADD COLUMN ex TEXT');
+  }catch(e){ /* 足せなくても、抜粋が出ないだけで保存そのものは動く */ }
+
   /* --- Ver1.7.00: タグの組み合わせ（コンボ／自動履歴）をDBファイル内に持つ ---
      お気に入りと同じ考え方。work.sqlite を持ち運べば会社PCと自宅PCで同じコンボが使える。
      tags_key : 並べ替え＋小文字化した照合用キー。"点検|ポンプ" と "ポンプ|点検" を同一とみなす。
@@ -3474,6 +3555,195 @@ function seedSampleData(){
     [r[0],r[1],r[2],r[3],r[4],r[5], nowStr()]
   ));
 }
+/* ==================================================================
+   Ver1.18.00 (案D-3 / 案④) 行ごとの「最後に触った時刻」を持つ
+   ------------------------------------------------------------------
+   なぜ必要か
+     検索結果を保存して後から呼び出すとき（案C-3）、保存したあとに
+     書き換えられた行だけを拾い直したい。そのためには行ごとに
+     「最後に更新した時刻」が要る。
+
+   なぜユーザーの表に列を足さないのか（案③ ではなく 案④ を選んだ理由）
+     一覧は SELECT * の結果をそのまま見出しにしているので、列を1本足すと
+     全部の項目の表に見慣れない見出しが増える。表のかたちを変えずに済む
+     この形なら、既存の .sqlite を開いても見た目が1ドットも変わらない。
+
+   なぜ JS 側の書き込み経路を直さないのか
+     ユーザーの表へ書き込む場所は 13 か所ある（実測）。手で足すと、
+     将来 db.run を1本足したときに静かに記録が漏れる。SQLite の
+     トリガーに任せれば、DB4S で直接編集しても記録される。
+
+   実測して確かめたこと（SQLite 3.49.1 / sql.js）
+     ・datetime('now') は UTC。'localtime' を付けると JST になる
+     ・strftime('%Y-%m-%d %H:%M', ...) は本体の nowStr() と書式が一致する
+     ・ALTER TABLE の ADD COLUMN / DROP COLUMN の後もトリガーは生き残る
+     ・DROP TABLE でトリガーは自動的に消えるが、記録は孤児として残る
+       → だから rowTouchSweep() で掃除する
+     ・db.export() で保存し直してもトリガーは残る（持ち運べる）
+     ・1000行の一括追加でも 35ms（実用上の負担にならない）
+
+   置き場所
+     loadMeta() の末尾から rowTouchSync() を1回呼ぶだけ。loadMeta() は
+     項目の作成・削除・列の増減・DBの開き直し・元に戻すのすべての後で
+     呼ばれているので、ここ1か所で漏れなく追従できる。
+   ================================================================== */
+
+/* 記録の書式。本体の nowStr() と同じ 'YYYY-MM-DD HH:MM' に揃えてある。
+   揃えておくと created_at と文字列のまま大小比較できる。 */
+var ROW_TOUCH_TS = "strftime('%Y-%m-%d %H:%M','now','localtime')";
+
+/* この項目に、もう記録が1つでもあるか。種まきを1度だけにするための判定。 */
+function rowTouchHasAny(key){
+  try{
+    const st = db.prepare('SELECT 1 FROM _meta_row_touch WHERE table_key=? LIMIT 1');
+    st.bind([key]);
+    const ok = st.step();
+    st.free();
+    return ok;
+  }catch(e){ return false; }
+}
+
+/* 追加・更新・削除の3つのトリガーを張る。すでにあれば何も起きない。
+   key は _meta_tables.key（英数字と _ のみ）。safeIdent で必ず確かめる。 */
+function rowTouchBind(key){
+  if(!safeIdent(key)) return;
+  const T = '_meta_row_touch';
+  db.run('CREATE TRIGGER IF NOT EXISTS trg_touch_' + key + '_i AFTER INSERT ON ' + key
+       + ' BEGIN INSERT OR REPLACE INTO ' + T + " (table_key,row_id,at)"
+       + " VALUES('" + key + "', NEW.id, " + ROW_TOUCH_TS + '); END');
+  db.run('CREATE TRIGGER IF NOT EXISTS trg_touch_' + key + '_u AFTER UPDATE ON ' + key
+       + ' BEGIN INSERT OR REPLACE INTO ' + T + " (table_key,row_id,at)"
+       + " VALUES('" + key + "', NEW.id, " + ROW_TOUCH_TS + '); END');
+  db.run('CREATE TRIGGER IF NOT EXISTS trg_touch_' + key + '_d AFTER DELETE ON ' + key
+       + ' BEGIN DELETE FROM ' + T + " WHERE table_key='" + key + "' AND row_id=OLD.id; END");
+}
+
+/* 既にある .sqlite を開いたときの移行。
+   トリガーを張る前からあった行には記録が無いので、created_at を初期値として入れる。
+   created_at が無い表（自分で作った項目など）は空文字にしておく。
+   ※ ALTER TABLE ADD COLUMN の既定値に datetime(...) は使えない（行があると
+      SQLite が拒否する）ことを実測済み。だから SELECT で流し込む形にしてある。 */
+function rowTouchSeed(key){
+  if(!safeIdent(key)) return;
+  if(rowTouchHasAny(key)) return;
+  let hasCreated = false;
+  try{
+    const info = db.exec('PRAGMA table_info(' + key + ')');
+    const names = info.length ? info[0].values.map(v => v[1]) : [];
+    hasCreated = names.indexOf('created_at') >= 0;
+  }catch(e){ return; }
+  const src = hasCreated ? "COALESCE(created_at,'')" : "''";
+  db.run('INSERT OR IGNORE INTO _meta_row_touch (table_key,row_id,at) '
+       + "SELECT '" + key + "', id, " + src + ' FROM ' + key);
+}
+
+/* 消えた項目の記録を片づける。
+   項目を削除すると DROP TABLE でトリガーは消えるが、記録だけが残るため。 */
+function rowTouchSweep(keys){
+  if(!keys.length){ db.run('DELETE FROM _meta_row_touch'); return; }
+  const ph = keys.map(() => '?').join(',');
+  db.run('DELETE FROM _meta_row_touch WHERE table_key NOT IN (' + ph + ')', keys);
+}
+
+/* 入口。loadMeta() から1回だけ呼ぶ。 */
+function rowTouchSync(){
+  if(!db) return;
+  try{
+    db.run('CREATE TABLE IF NOT EXISTS _meta_row_touch('
+         + ' table_key TEXT, row_id INTEGER, at TEXT,'
+         + ' PRIMARY KEY(table_key, row_id))');
+  }catch(e){ return; /* 作れなければ、この機能だけ黙って休む */ }
+  let keys = [];
+  try{
+    const r = db.exec('SELECT key FROM _meta_tables ORDER BY order_no');
+    if(r.length) keys = r[0].values.map(v => String(v[0]));
+  }catch(e){ return; }
+  keys.forEach(k => {
+    try{ rowTouchBind(k); }catch(e){}
+    try{ rowTouchSeed(k); }catch(e){}
+  });
+  try{ rowTouchSweep(keys); }catch(e){}
+  /* window.WDT は、このブロックよりずっと後ろ（15198行あたり）で作られる。
+     読み込み時点で登録しようとしても空振りするので、loadMeta から呼ばれる
+     ここで毎回入れ直す。 */
+  try{ if(window.WDT){ WDT.rowTouchSync = rowTouchSync; WDT.rowTouchGet = rowTouchGet;
+                       WDT.rowTouchMap = rowTouchMap; } }catch(e){}
+}
+
+/* 1行ぶんの更新時刻を読む。無ければ空文字。 */
+function rowTouchGet(key, id){
+  try{
+    const st = db.prepare('SELECT at FROM _meta_row_touch WHERE table_key=? AND row_id=?');
+    st.bind([key, id]);
+    const v = st.step() ? String(st.get()[0] || '') : '';
+    st.free();
+    return v;
+  }catch(e){ return ''; }
+}
+/* ==================================================================
+   Ver1.18.01 (案A+) 一覧に「更新日時」の列を出す
+   ------------------------------------------------------------------
+   Ver1.18.00 で _meta_row_touch に「行ごとの最後に触った時刻」を
+   ためるところまでできた。ここではそれを一覧に見せる。
+
+   なぜ「仮想の列」なのか
+     更新時刻はユーザーの表の中ではなく別表(_meta_row_touch)にある。
+     SELECT * の結果には出てこないので、描画の直前に JS 側で1本足す。
+     lastCols に足すと、一覧・列パネル・CSV書き出しの3つが同時に
+     片付く（この3つはどれも lastCols を見ているため）。
+
+   ★実測して分かった落とし穴（2026-08-19 / sql.js SQLite 3.49.1）
+     見出しは safeIdent(cn) が真なら「並べ替えできる列」になる。
+     '__touch__' は safeIdent を通ってしまうので、そのままだと
+        ORDER BY COALESCE("__touch__", '') DESC
+     が投げられる。これは【エラーにならない】。SQLite の DQS により
+     二重引用符が文字列リテラルに読み替えられ、並べ替えが「黙って
+     効かない」形になる（押しても何も起きないのに「並べ替えました」
+     とだけ出る）。だから gridOrderByExpr() に専用の分岐を置き、
+     _meta_row_touch を引く相関サブクエリに差し替えている。
+
+   ★性能（1000行で実測）
+     1行ずつ rowTouchGet() を呼ぶ … 386ms
+     まとめて1回で読む(rowTouchMap) …   9ms（43倍）
+     一覧の描画では必ず rowTouchMap() を使うこと。
+   ================================================================== */
+var ROW_TOUCH_COL   = '__touch__';   /* 一覧に足す仮想の列名 */
+var ROW_TOUCH_LABEL = '更新日時';    /* その見出しに出す文字 */
+var ROW_TOUCH_OPT   = 'rowTouchShow';/* 設定の名前（st ＝ _meta_opts の中） */
+
+/* その項目の更新時刻を、1回のクエリでまとめて読む。{行ID: 時刻} を返す。 */
+function rowTouchMap(key){
+  const m = {};
+  if(!db || !safeIdent(key)) return m;
+  try{
+    const s = db.prepare('SELECT row_id, at FROM _meta_row_touch WHERE table_key=?');
+    s.bind([key]);
+    while(s.step()){ const r = s.get(); m[r[0]] = (r[1] == null ? '' : String(r[1])); }
+    s.free();
+  }catch(e){ /* 表がまだ無いときは空のまま返す */ }
+  return m;
+}
+
+/* 一覧に「更新日時」を出す設定がONかどうか。
+   設定の実体は WDT 側（15200行あたりで作られる）にある。このブロックは
+   それより前に読み込まれるが、この関数が呼ばれるのは描画のときなので、
+   そのときには window.WDT が必ずできている。 */
+function rowTouchShowOn(){
+  try{
+    return (window.WDT && typeof window.WDT.getOpt === 'function')
+             ? (window.WDT.getOpt(ROW_TOUCH_OPT) === true) : false;
+  }catch(e){ return false; }
+}
+
+/* 設定をOFFに戻したときの後始末。
+   「更新日時」で並べ替えたまま列を消すと、見えない列で並んだ状態が残る。 */
+function clearRowTouchSort(){
+  try{
+    Object.keys(gridSort).forEach(function(k){
+      if(gridSort[k] && gridSort[k].col === ROW_TOUCH_COL) delete gridSort[k];
+    });
+  }catch(e){}
+}
 function loadMeta(){
   metaTables = [];
   const r = db.exec('SELECT key,label,icon,order_no,order_by FROM _meta_tables ORDER BY order_no');
@@ -3501,6 +3771,10 @@ function loadMeta(){
   if((!currentTable || !metaTables.find(t => t.key === currentTable)) && metaTables.length){
     currentTable = metaTables[0].key;
   }
+  /* Ver1.18.00 (案④): 行ごとの更新時刻のトリガーを張り直し、移行と掃除をする。
+     loadMeta() は項目の作成・削除・列の増減・DB復元のすべての後で呼ばれるので、
+     ここ1か所に置けば書き込み経路を1つも触らずに漏れなく追従できる。 */
+  try{ rowTouchSync(); }catch(e){}
   // Ver1.5.00: お気に入りバーを描き直す（DBを開き直したときも自動で追従する）
   try{ if(window.WDT && WDT.onDbReady) WDT.onDbReady(); }catch(e){}
 }
@@ -4193,7 +4467,9 @@ function renderColPanel(){
   const metaByName = {}; currentCols().forEach(c => { metaByName[c.col_name] = c; });
   const vis = getColumnVisibility(currentTable);
   el.innerHTML = lastCols.map(cn => {
-    const label = cn === 'id' ? 'ID' : (cn === 'created_at' ? '登録日時' : ((metaByName[cn] && metaByName[cn].label) || cn));
+    const label = cn === 'id' ? 'ID' : (cn === 'created_at' ? '登録日時'
+                : (cn === ROW_TOUCH_COL ? ROW_TOUCH_LABEL
+                : ((metaByName[cn] && metaByName[cn].label) || cn)));
     const checked = vis[cn] === false ? '' : 'checked';
     return `<label class="colchk"><input type="checkbox" ${checked} onchange="setColumnVisible('${currentTable}','${cn}', this.checked); rerenderCurrent();"> ${escapeHtml(label)}</label>`;
   }).join('');
@@ -5263,6 +5539,14 @@ function mvrRender(){
      ・1つの項目あたりの上限を決めて、重くなり過ぎないようにする。
    ================================================================== */
 const xsState = {kw: '', regex: false, only: null, perTable: 200,
+                 last: null,   /* Ver1.19.02 C3-1: 直前に飛んだ行 {tkey,id} */
+                 /* Ver1.19.03 C3-2: いま #xsRes に出ている一覧の実体。
+                    src:'live'  … 生の横断検索（list は hits そのもの）
+                    src:'saved' … 保存済み（Ver1.19.04 C3-3 で使う）
+                    list: [{tkey,id}, …] 画面の上から順。
+                    ★ hits を新しく作り直すとここが古い配列を
+                       指したままになるので、検索の先頭で必ず null に戻す。 */
+                 view: null,
                  bound: false, ran: false, hits: [], cut: false, note: '', took: 0};
 
 function xsEscLike(s){
@@ -5304,6 +5588,7 @@ function xsWanted(key){
 }
 function runCrossSearch(){
   xsState.hits = []; xsState.cut = false; xsState.note = ''; xsState.ran = true;
+  xsState.view = null;   /* Ver1.19.03 C3-2: 古い hits を指したままにさせない */
   const kw    = String(xsState.kw || '').trim();
   const useRe = !!xsState.regex;
   if(!kw){ xsState.ran = false; xsState.note = '探したい言葉を入れてください。'; xsRenderRes(); return; }
@@ -5379,6 +5664,10 @@ function runCrossSearch(){
     });
   });
   xsState.took = Date.now() - t0;
+  /* Ver1.19.03 C3-2: 「いま画面に出ている一覧」を登録する。
+     hits と同じ並び（metaTables 順 × id DESC）なので、
+     添字 i がそのまま「画面の i+1 行目」になる。 */
+  xsState.view = {src: 'live', sid: '', mode: '', list: xsState.hits};
   xsRenderRes();
   try{ if(window.WDT && WDT.noteSearch) WDT.noteSearch(kw, useRe, '*'); }catch(e){}
 }
@@ -5408,6 +5697,204 @@ function openCrossSearch(presetKw){
 function closeCrossSearch(){
   const b = document.getElementById('xsBack');
   if(b) b.classList.remove('show');
+}
+
+/* ==================================================================
+   Ver1.19.02 (案C3-1) 横断検索の結果一覧へ戻る
+   ------------------------------------------------------------------
+   なぜ再検索しないか
+     closeCrossSearch() は show を外すだけで xsState を壊さない。
+     openCrossSearch() は xsRenderBody() -> xsRenderRes() と進んで
+     xsState.hits から結果を組み直す。だから開き直すだけで戻る。
+     DB を引かないので、1000件でも一瞬で開く。
+   戻れないとき
+     一度も探していない／結果0件のときは、空の画面を出さずに理由を伝える。
+     空の画面が出ると「壊れた」と誤解されるため。
+   印
+     直前に見ていた行に .sel を付ける（この CSS は既に 1837 行目にあり、
+     これまで使われていなかった。新しい CSS は足していない）。
+   ================================================================== */
+/* Ver1.19.04 C3-3 (R-1): いま居る行に印を付け直す。
+   生の検索から戻るときも、保存済みから戻るときも同じ処理なので切り出した。 */
+function xsHiliteLast(){
+  setTimeout(function(){
+    try{
+      const box = document.getElementById('xsRes');
+      if(box){
+        Array.prototype.forEach.call(box.querySelectorAll('.xs-hit.sel'),
+          function(x){ x.classList.remove('sel'); });
+      }
+      if(xsState.last){
+        const all = document.querySelectorAll('.xs-hit');
+        for(let i = 0; i < all.length; i++){
+          if(String(all[i].getAttribute('data-tk')) === String(xsState.last.tkey)
+          && String(all[i].getAttribute('data-id')) === String(xsState.last.id)){
+            all[i].classList.add('sel');
+            try{ all[i].scrollIntoView({block:'center'}); }catch(e){}
+            break;
+          }
+        }
+      }
+    }catch(e){}
+  }, 0);
+}
+function xsReopen(){
+  /* Ver1.19.04 C3-3 (R-1): 保存済みの一覧から飛んでいたときは、同じ一覧を出し直す。
+     rsOpenCross() は入口で器を空にし、描き終わった所で立て直すので、
+     呼んだ後の xsState.view は新しい内容になっている。 */
+  const v = xsState.view;
+  if(v && v.src === 'saved' && v.sid){
+    let done = false;
+    try{ done = rsOpenCross(v.sid, v.mode); }catch(e){ done = false; }
+    if(!done){
+      setStatus('保存した結果を出し直せませんでした。', 'err');
+      return false;
+    }
+    xsHiliteLast();
+    return true;
+  }
+  if(!xsState.ran || !xsState.hits || !xsState.hits.length){
+    setStatus('戻れる横断検索の結果がありません。先に「\u{1F50E} 全項目を横断検索」で探してください。', 'err');
+    return false;
+  }
+  openCrossSearch();
+  xsHiliteLast();
+  return true;
+}
+/* 落とし穴 #21: WDT は 15991 行目で作られる。ここで window に直接載せる。 */
+if(typeof window !== 'undefined'){
+  window.xsReopen     = xsReopen;
+  window.xsHiliteLast = xsHiliteLast;
+}
+
+/* ==================================================================
+   Ver1.19.03 (案C3-2) 次／前のヒットへ巡回
+   ------------------------------------------------------------------
+   なぜ「添字」を状態として持たないか
+     添字を持つと、再検索や保存済み一覧をはさんだときに中身が
+     入れ替わり、同じ添字が「別の行」を指すようになる。エラーは
+     出ないので黙って違う行へ飛ぶ。だから真実は xsState.last
+     （どの行にいるか）だけにして、位置は毎回引き直す。
+     1000件でも 1000回の文字列比較なので体感できる遅さは出ない。
+   なぜ view という器を作るか
+     いま画面に出ている一覧は「生の横断検索」とは限らない。
+     Ver1.19.04 で「保存した結果」も同じ器に載せる。器を1つに
+     しておかないと「いまの一覧」が2か所にでき、必ず食い違う。
+   ================================================================== */
+
+/* いま画面に出ている一覧。無ければ生の検索結果で代用する。 */
+function xsViewList(){
+  const v = xsState.view;
+  /* Ver1.19.04 C3-3c: 器が立っていれば【0件でも】それが真実。
+     落とし穴 #37/#38: ここで .length を見ていると、保存済みの結果が 0 件だった
+     ときに下の hits へ落ちて、【前回の生の検索結果】を黙って巡回してしまう。 */
+  if(v && v.list) return v.list;
+  if(xsState.ran && xsState.hits && xsState.hits.length) return xsState.hits;
+  return [];
+}
+
+/* いる場所を毎回引き直す。見つからなければ -1。 */
+function xsIndexOfLast(list){
+  if(!xsState.last) return -1;
+  const tk = String(xsState.last.tkey), id = String(xsState.last.id);
+  for(let i = 0; i < list.length; i++){
+    if(String(list[i].tkey) === tk && String(list[i].id) === id) return i;
+  }
+  return -1;
+}
+
+/* その行がまだ残っているか。判定できないときは「残っている」側に倒す
+   （消えたと決めつけて飛ばしてしまう方が害が大きいため）。
+   落とし穴 #29: id は列との比較なので TEXT×INTEGER でも正しく当たる。 */
+function xsRowAlive(tkey, id){
+  if(!db) return true;
+  if(!metaTables.some(function(t){ return t.key === tkey; })) return false;
+  try{ if(typeof safeIdent === 'function' && !safeIdent(tkey)) return false; }catch(e){}
+  let st = null;
+  try{
+    st = db.prepare('SELECT 1 FROM "' + tkey + '" WHERE id=? LIMIT 1');
+    st.bind([id]);
+    const found = st.step();
+    st.free(); st = null;
+    return !!found;
+  }catch(e){
+    try{ if(st) st.free(); }catch(e2){}
+    return true;
+  }
+}
+
+/* いま db.xsNext / db.xsPrev に割り当たっているキーの表示名（案内文用）。
+   落とし穴 #36: id からキーを引くのは combosFor()。keyLabel(id) は誤り。 */
+function xsStepKeyLabel(dir){
+  const id = (dir > 0) ? 'db.xsNext' : 'db.xsPrev';
+  let k = (dir > 0) ? 'Alt+G' : 'Alt+Shift+G';
+  try{
+    const cs = (window.WDT && window.WDT.combosFor) ? window.WDT.combosFor(id) : null;
+    if(cs && cs.length){
+      k = (window.RTTKEY && window.RTTKEY.keyLabel) ? window.RTTKEY.keyLabel(cs[0]) : cs[0];
+    }
+  }catch(e){}
+  return k;
+}
+
+/* xsGoto() が出した「N件」「戻れます」を消さないよう、後ろに継ぎ足す。 */
+function xsStepNote(i, n, skipped){
+  try{
+    const stEl = document.getElementById('status');
+    const prev = stEl ? (stEl.textContent || '') : '';
+    const kind = (stEl && stEl.className === 'err') ? 'err' : 'ok';
+    setStatus((prev ? prev + '  ' : '')
+      + '\uFF3B' + (i + 1) + ' / ' + n + ' \u4EF6\u76EE\uFF3D'
+      + (skipped ? '\uFF08' + skipped + ' \u4EF6\u306F\u524A\u9664\u6E08\u307F\u306E\u305F\u3081\u98DB\u3070\u3057\u307E\u3057\u305F\uFF09' : ''),
+      kind);
+  }catch(e){}
+}
+
+/* dir: +1 なら次、-1 なら前。末尾／先頭では巡回する（利用者の選択 (b)①）。 */
+function xsStep(dir){
+  const d = (dir < 0) ? -1 : 1;
+  const list = xsViewList();
+  const n = list.length;
+  if(!n){
+    setStatus('\u305F\u3069\u308C\u308B\u6A2A\u65AD\u691C\u7D22\u306E\u7D50\u679C\u304C\u3042\u308A\u307E\u305B\u3093\u3002'
+            + '\u5148\u306B\u300C\u{1F50E} \u5168\u9805\u76EE\u3092\u6A2A\u65AD\u691C\u7D22\u300D\u3067\u63A2\u3057\u3066\u304F\u3060\u3055\u3044\u3002', 'err');
+    return false;
+  }
+  const cur = xsIndexOfLast(list);
+  /* まだ一度も飛んでいない: 次なら先頭、前なら末尾から始める */
+  let j = (cur < 0) ? ((d > 0) ? 0 : n - 1) : (((cur + d) % n) + n) % n;
+  let tried = 0, skipped = 0;
+  while(tried < n){
+    const x = list[j];
+    if(x && xsRowAlive(x.tkey, x.id)){
+      xsGoto(x.tkey, x.id);
+      xsStepNote(j, n, skipped);
+      return true;
+    }
+    skipped++; tried++;
+    j = (((j + d) % n) + n) % n;
+  }
+  setStatus('\u305F\u3069\u308C\u308B\u884C\u304C\u6B8B\u3063\u3066\u3044\u307E\u305B\u3093\uFF08'
+          + n + ' \u4EF6\u306F\u3059\u3079\u3066\u524A\u9664\u3055\u308C\u3066\u3044\u307E\u3059\uFF09\u3002', 'err');
+  return false;
+}
+/* 落とし穴 #21: WDT はずっと後で作られる。ここで window に直接載せる。 */
+if(typeof window !== 'undefined'){
+  window.xsStep      = xsStep;
+  window.xsViewList  = xsViewList;
+  window.xsRowAlive  = xsRowAlive;
+}
+
+/* いま db.xsBack に割り当たっているキーの表示名を返す（案内文用） */
+function xsBackKeyLabel(){
+  let k = 'Ctrl+Shift+G';
+  try{
+    const cs = (window.WDT && window.WDT.combosFor) ? window.WDT.combosFor('db.xsBack') : null;
+    if(cs && cs.length){
+      k = (window.RTTKEY && window.RTTKEY.keyLabel) ? window.RTTKEY.keyLabel(cs[0]) : cs[0];
+    }
+  }catch(e){}
+  return k;
 }
 function xsPull(){
   const k = document.getElementById('xsKw');  if(k) xsState.kw = k.value;
@@ -5519,6 +6006,17 @@ function xsRenderRes(){
   h += '<div class="wdtx-hint" style="margin-top:8px">合計 <b>' + xsState.hits.length + ' 件</b>'
      + '（' + Object.keys(byT).length + ' 項目・' + xsState.took + ' ミリ秒）'
      + (xsState.cut ? '<span class="mv-badge warn">\u26A0 上限で打ち切った項目があります</span>' : '') + '</div>';
+  h += '<div class="wdtx-hint" style="margin-top:2px">'
+     + '\u21C5 ' + escapeHtml(xsStepKeyLabel(1)) + ' で次のヒットへ、'
+     + escapeHtml(xsStepKeyLabel(-1)) + ' で前のヒットへ。'
+     + '<span class="why" style="margin-left:6px">末尾の次は先頭に戻ります</span></div>';
+  /* Ver1.19.01 (案③-B): いま出ている横断の結果そのものを保存する */
+  h += '<div style="display:flex;gap:6px;align-items:center;margin:6px 0 2px">'
+     + '<input type="text" id="xsSaveName" placeholder="名前（省略すると「横断検索: 言葉」）"'
+     + ' style="flex:1;min-width:0">'
+     + '<button type="button" class="primary" id="xsSaveBtn" onclick="xsSavePrompt()"'
+     + ' title="いま出ている横断の結果を、抜粋ごと取っておきます">'
+     + '\uD83D\uDCCC この結果を保存</button></div>';
   h += '<div class="xs-res">';
   metaTables.forEach(function(t){
     const list = byT[t.key];
@@ -5588,6 +6086,16 @@ function xsGoto(tkey, id){
   try{ runSearch(); }catch(e){ try{ showAll(tkey); }catch(e2){} }
   try{ const sec = document.getElementById('secSearch'); if(sec && !sec.open) sec.open = true; }catch(e){}
   xsFocusRow(tkey, id);
+  /* Ver1.19.02 C3-1: どこから来たかを覚え、戻り方をその場で伝える。
+     runSearch() が出した「N件」を消さないよう、後ろに継ぎ足す。 */
+  xsState.last = {tkey: tkey, id: String(id)};
+  try{
+    const stEl = document.getElementById('status');
+    const prev = stEl ? (stEl.textContent || '') : '';
+    const kind = (stEl && stEl.className === 'err') ? 'err' : 'ok';
+    setStatus((prev ? prev + '  ' : '')
+      + '［' + xsBackKeyLabel() + '］で横断検索の結果一覧に戻れます。', kind);
+  }catch(e){}
 }
 
 /* ==================================================================
@@ -5611,18 +6119,32 @@ try{ todayFocusOn = (localStorage.getItem('wdt_todayfocus') === '1'); }catch(e){
 function gridColLabel(tableKey, cn){
   if(cn === 'id') return 'ID';
   if(cn === 'created_at') return '登録日時';
+  if(cn === ROW_TOUCH_COL) return ROW_TOUCH_LABEL;   /* Ver1.18.01 (案A+) */
   const m = (metaColumnsByTable[tableKey] || []).find(function(c){ return c.col_name === cn; });
   return (m && m.label) || cn;
 }
 function gridDefaultDir(tableKey, cn){
   /* 日付・登録日時・IDは「新しい順」から始めたほうが自然 */
-  if(cn === 'id' || cn === 'created_at') return 'DESC';
+  if(cn === 'id' || cn === 'created_at' || cn === ROW_TOUCH_COL) return 'DESC';
   const m = (metaColumnsByTable[tableKey] || []).find(function(c){ return c.col_name === cn; });
   const t = (m && m.col_type) || '';
   return (t === 'date' || t === 'datetime') ? 'DESC' : 'ASC';
 }
 function gridOrderByExpr(tableKey, col, dir){
   const d = (dir === 'ASC') ? 'ASC' : 'DESC';
+  /* Ver1.18.01 (案A+) 「更新日時」は表の中に無い仮想の列。
+     ★ORDER BY COALESCE("__touch__", '') はエラーにならず、SQLite の DQS で
+       文字列リテラルに読み替えられて「黙って効かない」（2026-08-19 実測）。
+       だから _meta_row_touch を引く相関サブクエリに差し替える。
+     tableKey は safeIdent 済みのものしか来ないが、ここでも念のため確かめる。
+     作れないときは '' を返す＝applyGridSort が既定の並びのままにする。 */
+  if(col === ROW_TOUCH_COL){
+    if(!safeIdent(tableKey)) return '';
+    const sub = "(SELECT at FROM _meta_row_touch WHERE table_key='" + tableKey
+              + "' AND row_id=" + tableKey + ".id)";
+    return '(CASE WHEN ' + sub + ' IS NULL OR ' + sub + " = '' THEN 1 ELSE 0 END) ASC, "
+         + 'COALESCE(' + sub + ", '') COLLATE NOCASE " + d + ', id DESC';
+  }
   const q = '"' + col + '"';
   const m = (metaColumnsByTable[tableKey] || []).find(function(c){ return c.col_name === col; });
   const t = (m && m.col_type) || '';
@@ -5689,6 +6211,15 @@ function saveSortAsDefault(){
   if(!db || !currentTable) return;
   const st = gridSort[currentTable];
   if(!st){ setStatus('先に列の見出しをクリックして、並べ替えてください。', 'err'); return; }
+  /* Ver1.18.01 (案A+) 「更新日時」は仮想の列。ここで既定にすると
+     _meta_tables.order_by に相関サブクエリが焼き付いてしまい、設定をOFFに
+     戻しても並び順だけが残る。並べ替え自体はいつでも見出しから使える。 */
+  if(st.col === ROW_TOUCH_COL){
+    setStatus('「' + ROW_TOUCH_LABEL + '」は既定の並びにできません。'
+            + 'この列は表の中ではなく別の記録から作っているためです。'
+            + '並べ替えそのものは、見出しをクリックすればいつでも使えます。', 'err');
+    return;
+  }
   const expr = gridOrderByExpr(currentTable, st.col, st.dir);
   /* 保存する前に、その並びが本当に動くか試す（壊れたSQLを保存しない） */
   try{
@@ -5835,6 +6366,19 @@ function renderQuery(sql, params, caption, tableKey){
       }
     }
   }catch(e){ /* 並べ替えに失敗しても、元の並びでそのまま表示する */ }
+  /* Ver1.18.01 (案A+) 設定がONのときだけ「更新日時」の仮想列を末尾に1本足す。
+     末尾に足すので、既存の lastCols 利用箇所（今日へ移動・CSV・列パネル・
+     タグ列の診断・getLastResult）の添字は1つもずれない。 */
+  try{
+    if(rowTouchShowOn() && safeIdent(tableKey)
+       && metaTables.some(function(t){ return t.key === tableKey; })
+       && cols.indexOf('id') >= 0 && cols.indexOf(ROW_TOUCH_COL) < 0){
+      const _tIdx = cols.indexOf('id');
+      const _tMap = rowTouchMap(tableKey);
+      cols = cols.concat([ROW_TOUCH_COL]);
+      rows = rows.map(function(r){ return r.concat([_tMap[r[_tIdx]] || '']); });
+    }
+  }catch(e){ /* 仮想列を足せなくても、表そのものは今までどおり出す */ }
   lastCols = cols; lastRows = rows;
   lastQuery = {sql: rawSql, params, caption, table: tableKey};
   const metaByName = {}; (metaColumnsByTable[tableKey] || []).forEach(c => { metaByName[c.col_name] = c; });
@@ -5858,7 +6402,8 @@ function renderQuery(sql, params, caption, tableKey){
   cols.forEach(cn => {
     if(visibility[cn] === false) return;
     const m = metaByName[cn];
-    const label = cn === 'id' ? 'ID' : (cn === 'created_at' ? '登録日時' : (m ? m.label : cn));
+    const label = cn === 'id' ? 'ID' : (cn === 'created_at' ? '登録日時'
+                : (cn === ROW_TOUCH_COL ? ROW_TOUCH_LABEL : (m ? m.label : cn)));
     /* ▲▼は data 属性だけ付けて、印そのものはCSSで出す。
        見出しの文字が変わらないので、列幅アドオンが覚えた幅が消えない。 */
     const mark = (curSort && curSort.col === cn) ? (' data-sortdir="' + (curSort.dir === 'ASC' ? 'asc' : 'desc') + '"') : '';
@@ -6196,6 +6741,652 @@ function runTagFilter(){
   closeTagFilter();
   renderQuery('SELECT * FROM ' + currentTable + ' WHERE id IN (' + inList + ') ORDER BY ' + meta.order_by + ' LIMIT 1000',
               [], 'タグで絞り込み（' + label + '）', currentTable);
+}
+
+/* ==================================================================
+   Ver1.19.00  (案C-3) 検索結果の保存
+   ------------------------------------------------------------------
+   ■ 何をするものか
+     いま画面に出ている検索結果の「行の集合」に名前を付けて取っておき、
+     あとで呼び出す。呼び出し方は3通り。
+
+       凍結のまま     … 保存したときの行をそのまま出す
+       条件で追い直す … 保存した検索条件をもう一度走らせる（最新の姿）
+       変わった行だけ … 保存した行のうち、保存より後に書き換えられたもの
+
+   ■ 既存機能との住み分け
+     _meta_favorites       … ふつうの検索の「条件」
+     _meta_adv_favorites   … くわしい検索の「条件」
+     _meta_search_history  … 検索の「履歴」（条件）
+     _meta_result_set      … 「結果（行の集合）」← これが今回
+
+   ■ 「変わった行」を時刻の大小比較で出してはいけない
+     行ごとの更新時刻は strftime('%Y-%m-%d %H:%M','now','localtime')。
+     ローカル時刻・分精度の 'YYYY-MM-DD HH:MM' である。
+     ここに ISO 文字列 '2026-08-20T14:30:05.123Z' を持ってきて比べると、
+     11文字目が ' '(0x20) と 'T'(0x54) なので【常に偽】になり、
+     エラーも出ないまま結果が永久に0件になる。さらに UTC とローカルで
+     時差ぶんずれる。
+     だから保存したときの値を at0 に控え、「今の値と違うかどうか」だけを
+     見る。形式にも時差にも依存しない。
+     ※ ただし更新時刻が分精度なので、「保存したのと同じ分に書き換えた行」は
+       拾えない。ヘルプにもそのとおり書いてある。
+
+   ■ 呼び出しSQLの形（並べ替えを効かせるため、この形を崩さないこと）
+       SELECT * FROM <表> WHERE id IN (…) ORDER BY <既定の並び> LIMIT 1000
+     applyGridSort() は「^SELECT * FROM <表>」で始まり ORDER BY を持つSQLしか
+     並べ替えできない。崩すと、見出しを押してもエラーは出ないまま
+     並べ替えだけが効かなくなる。
+
+   ■ 上限
+     集合は 30 件（📌 を付けたものは減らさない）。1つの集合の行は 5000 行。
+   ================================================================== */
+var RS_MAX_SET = 30;      /* 保存できる集合の数 */
+var RS_MAX_ROW = 5000;    /* 1つの集合に入れられる行の数 */
+
+const rsPop = {el: null, bound: false};
+
+/* --- DBの小道具。ブロックをまたぐ qq/rr に頼らず、この場で閉じる --- */
+function rsQ(sql, params){
+  if(!db) return [];
+  const out = [];
+  try{
+    const s = db.prepare(sql);
+    s.bind(params || []);
+    while(s.step()) out.push(s.getAsObject());
+    s.free();
+  }catch(e){ return []; }
+  return out;
+}
+function rsR(sql, params){
+  if(!db) return false;
+  try{ db.run(sql, params || []); return true; }catch(e){ return false; }
+}
+function rsNewId(){
+  return 'rs' + Date.now().toString(36) + Math.floor(Math.random() * 46656).toString(36);
+}
+function rsAutosave(){
+  try{ if(typeof scheduleAutosave === 'function') scheduleAutosave(); }catch(e){}
+}
+
+/* 表として使えるか。SQLに名前を直接埋めるので、ここは必ず通す。 */
+function rsTableOk(key){
+  if(!key || !safeIdent(key)) return false;
+  try{ return metaTables.some(function(t){ return t.key === key; }); }catch(e){ return false; }
+}
+function rsOrderBy(key){
+  let m = null;
+  try{ m = metaTables.find(function(t){ return t.key === key; }); }catch(e){}
+  return (m && m.order_by) ? m.order_by : 'id DESC';
+}
+function rsLabelOf(key){
+  let m = null;
+  try{ m = metaTables.find(function(t){ return t.key === key; }); }catch(e){}
+  return (m && m.label) ? m.label : String(key || '');
+}
+
+/* --- 読み出し --- */
+function rsList(){
+  return rsQ('SELECT * FROM _meta_result_set ORDER BY pinned DESC, at DESC, rowid DESC');
+}
+function rsGet(sid){
+  const r = rsQ('SELECT * FROM _meta_result_set WHERE sid=?', [sid]);
+  return r.length ? r[0] : null;
+}
+function rsRowIds(sid, tkey){
+  const r = rsQ('SELECT row_id FROM _meta_result_row WHERE sid=? AND table_key=? ORDER BY row_id',
+                [sid, tkey]);
+  const out = [];
+  for(let i = 0; i < r.length; i++){
+    const v = Number(r[i].row_id);
+    if(isFinite(v)) out.push(v);
+  }
+  return out;
+}
+
+/* 上限を超えた集合を古い順に落とす。📌 が付いているものは残す。 */
+function rsTrim(){
+  rsR('DELETE FROM _meta_result_set WHERE pinned=0 AND sid NOT IN'
+    + ' (SELECT sid FROM _meta_result_set ORDER BY pinned DESC, at DESC, rowid DESC LIMIT ?)',
+      [RS_MAX_SET]);
+  rsR('DELETE FROM _meta_result_row WHERE sid NOT IN (SELECT sid FROM _meta_result_set)');
+}
+
+/* 消された項目（テーブル）にぶら下がっている集合を片づける。
+   行ごとの更新時刻の片づけ（rowTouchSweep）と同じ考え方。 */
+function rsSweep(){
+  let keys = [];
+  try{ keys = metaTables.map(function(t){ return t.key; }); }catch(e){ return; }
+  if(!keys.length){
+    rsR('DELETE FROM _meta_result_set');
+    rsR('DELETE FROM _meta_result_row');
+    return;
+  }
+  const ph = keys.map(function(){ return '?'; }).join(',');
+  rsR('DELETE FROM _meta_result_set WHERE table_key NOT IN (' + ph + ')', keys);
+  rsR('DELETE FROM _meta_result_row WHERE sid NOT IN (SELECT sid FROM _meta_result_set)');
+}
+
+/* --- 保存 --- */
+function rsSaveCurrent(name){
+  if(!db){ setStatus('データベースがまだ開いていません。', 'err'); return false; }
+  const tkey = currentTable;
+  if(!rsTableOk(tkey)){ setStatus('この画面では検索結果を保存できません。', 'err'); return false; }
+  if(!lastRows || !lastRows.length){
+    setStatus('保存できる検索結果がありません。先に検索するか全件表示してください。', 'err');
+    return false;
+  }
+  /* 更新日時の仮想列(__touch__)が混ざっていることがあるので、
+     id の位置は決め打ちせず必ず名前で引く。 */
+  const ci = (lastCols || []).indexOf('id');
+  if(ci < 0){ setStatus('ID の列が無いので保存できません。', 'err'); return false; }
+
+  const ids = [];
+  const seen = {};
+  let cut = false;
+  for(let i = 0; i < lastRows.length; i++){
+    const v = Number(lastRows[i][ci]);
+    if(!isFinite(v)) continue;
+    if(seen[v]) continue;
+    if(ids.length >= RS_MAX_ROW){ cut = true; break; }
+    seen[v] = 1;
+    ids.push(v);
+  }
+  if(!ids.length){ setStatus('保存できる行がありませんでした。', 'err'); return false; }
+
+  /* 保存した時点の更新時刻を、行ごとに控える。
+     1行ずつ引くと1000行で386msかかるので、まとめて1回だけ引く。 */
+  let tmap = {};
+  try{ tmap = rowTouchMap(tkey) || {}; }catch(e){ tmap = {}; }
+
+  let cond = '';
+  try{
+    cond = JSON.stringify({
+      sql:     (lastQuery && lastQuery.sql) || '',
+      params:  (lastQuery && lastQuery.params) || [],
+      caption: (lastQuery && lastQuery.caption) || ''
+    });
+  }catch(e){ cond = ''; }
+
+  const nm = String(name == null ? '' : name).trim()
+           || ((lastQuery && lastQuery.caption) || '名前なし');
+  const sid = rsNewId();
+  const at  = nowStr();   /* 行ごとの更新時刻と同じ 'YYYY-MM-DD HH:MM' */
+
+  if(!rsR('INSERT INTO _meta_result_set (sid,name,kind,table_key,cond,at,n,pinned,order_no)'
+        + ' VALUES (?,?,?,?,?,?,?,0,0)',
+          [sid, nm, 'normal', tkey, cond, at, ids.length])){
+    setStatus('保存できませんでした。', 'err');
+    return false;
+  }
+  for(let i = 0; i < ids.length; i++){
+    rsR('INSERT OR IGNORE INTO _meta_result_row (sid,table_key,row_id,at0) VALUES (?,?,?,?)',
+        [sid, tkey, ids[i], tmap[ids[i]] == null ? '' : String(tmap[ids[i]])]);
+  }
+  rsTrim();
+  rsAutosave();
+  setStatus('「' + nm + '」として ' + ids.length + ' 行を保存しました。'
+          + (cut ? '（上限 ' + RS_MAX_ROW + ' 行で打ち切りました）' : ''), 'ok');
+  return true;
+}
+
+/* --- Ver1.19.01 (案③-B): 横断検索の結果を、抜粋つきで丸ごと保存する ---
+     ■ なぜ表を作り直さなくてよいか
+       _meta_result_row の主キーは (sid, table_key, row_id) の3本立てなので、
+       1つの sid が複数の項目（テーブル）の行をまとめて持てる。
+     ■ 単表の保存との見分け方
+       _meta_result_set.kind を 'normal' ではなく 'cross' にする。
+       table_key は1つに決められないので '' を入れる。
+       ★'' は rsTableOk() が必ず false を返すので、集合そのものは検査に通さない。
+         代わりに「行の側の table_key」を1つずつ rsTableOk() で確かめる。
+     ■ 時刻の扱い（落とし穴 #28）
+       保存した時点の更新時刻を at0 に控えるだけ。大小比較は一切しない。
+       'YYYY-MM-DD HH:MM'（ローカル・分精度）と ISO 文字列は永久に一致しない。 */
+function rsSaveCross(name){
+  if(!db){ setStatus('データベースがまだ開いていません。', 'err'); return false; }
+  var st = (typeof xsState !== 'undefined' && xsState) ? xsState : null;
+  var hits = (st && st.hits) ? st.hits : null;
+  if(!hits || !hits.length){
+    setStatus('保存できる横断検索の結果がありません。先に横断検索をしてください。', 'err');
+    return false;
+  }
+
+  /* 項目ごとにまとめる。同じ行が二度出てきたら、先に出たほうを採る。 */
+  var byTable = {}, order = [], total = 0, cut = false;
+  for(var i = 0; i < hits.length; i++){
+    var h = hits[i] || {};
+    var tk = String(h.tkey || '');
+    if(!rsTableOk(tk)) continue;
+    var rid = Number(h.id);
+    if(!isFinite(rid)) continue;
+    if(!byTable[tk]){ byTable[tk] = {seen: {}, rows: []}; order.push(tk); }
+    if(byTable[tk].seen[rid]) continue;
+    if(total >= RS_MAX_ROW){ cut = true; break; }
+    byTable[tk].seen[rid] = 1;
+    byTable[tk].rows.push({id: rid, ex: String(h.ex == null ? '' : h.ex)});
+    total++;
+  }
+  if(!total){ setStatus('保存できる行がありませんでした。', 'err'); return false; }
+
+  /* 更新時刻は項目ごとに1回だけまとめて引く（1行ずつだと1000行で386ms かかる）。 */
+  var tmaps = {};
+  order.forEach(function(tk){
+    try{ tmaps[tk] = rowTouchMap(tk) || {}; }catch(e){ tmaps[tk] = {}; }
+  });
+
+  var cond = '';
+  try{
+    cond = JSON.stringify({
+      kw:       String(st.kw || ''),
+      regex:    !!st.regex,
+      only:     st.only || {},
+      perTable: Number(st.perTable) || 200,
+      caption:  '横断検索: ' + String(st.kw || '')
+    });
+  }catch(e){ cond = ''; }
+
+  var nm  = String(name == null ? '' : name).trim()
+          || ('横断検索: ' + String(st.kw || '名前なし'));
+  var sid = rsNewId();
+  var at  = nowStr();
+
+  if(!rsR('INSERT INTO _meta_result_set (sid,name,kind,table_key,cond,at,n,pinned,order_no)'
+        + ' VALUES (?,?,?,?,?,?,?,0,0)',
+          [sid, nm, 'cross', '', cond, at, total])){
+    setStatus('保存できませんでした。', 'err');
+    return false;
+  }
+  order.forEach(function(tk){
+    var tm = tmaps[tk] || {};
+    byTable[tk].rows.forEach(function(r){
+      rsR('INSERT OR IGNORE INTO _meta_result_row (sid,table_key,row_id,at0,ex)'
+        + ' VALUES (?,?,?,?,?)',
+          [sid, tk, r.id, tm[r.id] == null ? '' : String(tm[r.id]), r.ex]);
+    });
+  });
+  rsTrim();
+  rsAutosave();
+  setStatus('「' + nm + '」として ' + order.length + ' 項目 ' + total + ' 行を保存しました。'
+          + (cut ? '（上限 ' + RS_MAX_ROW + ' 行で打ち切りました）' : ''), 'ok');
+  return true;
+}
+
+/* 保存した横断結果を、項目ごとに読み出す（抜粋つき）。 */
+function rsCrossRows(sid){
+  return rsQ('SELECT table_key, row_id, at0, ex FROM _meta_result_row'
+           + ' WHERE sid=? ORDER BY table_key, row_id', [sid]);
+}
+
+/* Ver1.19.01 (案③-B): 保存ボタンの受け口。名前欄の中身を渡すだけ。 */
+function xsSavePrompt(){
+  const inp = document.getElementById('xsSaveName');
+  if(rsSaveCross(inp ? inp.value : '')){
+    if(inp) inp.value = '';
+    try{ rsRender(); }catch(e){}
+  }
+}
+
+/* Ver1.19.01 (案③-B): 保存した横断結果を出す。
+     frozen  = 保存したときの行を、保存したときの抜粋つきで出す
+     refresh = 保存した条件でもう一度横断検索する（いまの最新の姿）
+     changed = 保存より後に書き換えられた行だけを出す
+   ★時刻は大小比較しない（落とし穴 #28）。
+     at0（保存時の値）と、いまの _meta_row_touch.at が「違うか」だけを見る。 */
+function rsOpenCross(sid, mode){
+  const r = rsGet(sid);
+  if(!r){ setStatus('その保存は見つかりませんでした。', 'err'); return false; }
+  /* Ver1.19.04 C3-3c: 落とし穴 #37/#38。
+     ★器の中身は【いま #xsRes に描かれている一覧】と一致していなければならない。
+     この行より下は必ず画面を描き直すので、ここで器を空にする。
+     逆に すぐ上の『保存が見つからない』道は画面をまったく触らないので、
+     そこで器を消すと【画面は前のまま・器だけ空】という食い違いが起きる
+     （2026-08-23 のプローブ 6-2 で実測）。
+     残り3本の早期 return はこの下にあり、どれも画面と一致する:
+       ・保存された行が無い → openCrossSearch() が生の結果を描き直す
+                              （器 null → xsViewList が hits に落ちて一致）
+       ・枠が無い           → 描けないので null のままが正しい
+       ・0件                → saved の空器を立てる（下の③で対応） */
+  xsState.view = null;
+  let cond = {};
+  try{ cond = JSON.parse(r.cond || '{}'); }catch(e){ cond = {}; }
+
+  try{ rsClose(); }catch(e){}
+  try{ openCrossSearch(); }catch(e){}
+
+  /* 追い直す: 保存した条件を xsState に戻して、もう一度走らせる。 */
+  if(mode === 'refresh'){
+    try{
+      xsState.kw       = String(cond.kw || '');
+      xsState.regex    = !!cond.regex;
+      xsState.only     = cond.only || {};
+      xsState.perTable = Number(cond.perTable) || 200;
+      xsBind();
+      runCrossSearch();
+      setStatus('「' + (r.name || '') + '」を追い直しました。', 'ok');
+    }catch(e){ setStatus('追い直せませんでした。', 'err'); return false; }
+    return true;
+  }
+
+  /* frozen / changed: 保存してある行を読み出して並べる。 */
+  const saved = rsCrossRows(sid);
+  if(!saved.length){ setStatus('保存された行がありませんでした。', 'err'); return false; }
+
+  /* 項目ごとに「いま生きている行」と「いまの更新時刻」を1回ずつ引く。 */
+  const alive = {}, touch = {};
+  saved.forEach(function(x){
+    const tk = String(x.table_key || '');
+    if(alive[tk] || !rsTableOk(tk)) return;
+    alive[tk] = {};
+    try{
+      const q = db.exec('SELECT id FROM "' + tk + '"');
+      if(q && q[0]) q[0].values.forEach(function(v){ alive[tk][Number(v[0])] = 1; });
+    }catch(e){}
+    try{ touch[tk] = rowTouchMap(tk) || {}; }catch(e){ touch[tk] = {}; }
+  });
+
+  let gone = 0;
+  const show = [];
+  saved.forEach(function(x){
+    const tk  = String(x.table_key || '');
+    const rid = Number(x.row_id);
+    if(!alive[tk]){ return; }
+    if(!alive[tk][rid]){ gone++; return; }
+    const now0 = (touch[tk] && touch[tk][rid] != null) ? String(touch[tk][rid]) : '';
+    const was0 = (x.at0 == null) ? '' : String(x.at0);
+    const changed = (now0 !== was0);
+    if(mode === 'changed' && !changed) return;
+    show.push({tkey: tk, id: String(rid), ex: String(x.ex == null ? '' : x.ex),
+               changed: changed});
+  });
+
+  /* xsState には触らず、結果の枠だけを直接描く（追い直しと混ざらないように）。 */
+  const box = document.getElementById('xsRes');
+  if(!box){ setStatus('横断検索の画面が見つかりませんでした。', 'err'); return false; }
+  const label = (mode === 'changed') ? '変わった行' : '保存したときのまま';
+  const byT = {};
+  show.forEach(function(x){ (byT[x.tkey] = byT[x.tkey] || []).push(x); });
+
+  let h = '<div class="wdtx-hint" style="margin-top:8px">\uD83D\uDCC1 <b>'
+        + escapeHtml(r.name || '') + '</b>（' + escapeHtml(label) + '）… '
+        + show.length + ' 件 / ' + Object.keys(byT).length + ' 項目'
+        + '<span class="why" style="margin-left:6px">保存 ' + escapeHtml(String(r.at || '')) + '</span>'
+        + (gone ? '<span class="mv-badge warn">\u26A0 ' + gone + ' 行は削除されています</span>' : '')
+        + '</div>';
+  if(!show.length){
+    h += '<div class="xs-empty">'
+       + (mode === 'changed' ? '保存したあとに書き換えられた行はありませんでした。'
+                             : '出せる行がありませんでした。') + '</div>';
+    box.innerHTML = h;
+    /* Ver1.19.04 C3-3c: 0件でも器を立てる。立てないと xsViewList が hits に落ちる。 */
+    xsState.view = {src: 'saved', sid: String(sid), mode: String(mode || ''), list: show};
+    setStatus('「' + (r.name || '') + '」… 0 件でした。', 'ok');
+    return true;
+  }
+  h += '<div class="xs-res">';
+  metaTables.forEach(function(t){
+    const list = byT[t.key];
+    if(!list || !list.length) return;
+    h += '<div class="xs-grp">' + escapeHtml((t.icon || '\u{1F5C2}') + ' ' + t.label)
+       + '<span class="n">' + list.length + ' 件</span></div>';
+    list.forEach(function(x){
+      h += '<div class="xs-hit" data-tk="' + escapeAttr(x.tkey) + '" data-id="' + escapeAttr(x.id) + '"'
+         + ' title="クリックすると、この項目を開きます">'
+         + '<div class="rid">#' + escapeHtml(x.id)
+         + (x.changed ? ' <span class="mv-badge warn">変</span>' : '') + '</div>'
+         + '<div class="col"></div>'
+         + '<div class="ex">' + x.ex + '</div></div>';
+    });
+  });
+  h += '</div>';
+  box.innerHTML = h;
+  /* Ver1.19.04 C3-3c: 「いま画面に出ている一覧」を登録する。
+     show は上の metaTables.forEach と同じ並びで描いてあるので、
+     添字 i がそのまま「画面の i+1 行目」になる（生の検索と同じ約束）。 */
+  xsState.view = {src: 'saved', sid: String(sid), mode: String(mode || ''), list: show};
+  setStatus('「' + (r.name || '') + '」を ' + label + ' で出しました（' + show.length + ' 件）。'
+          + (gone ? ' ' + gone + ' 行は削除されています。' : ''), 'ok');
+  return true;
+}
+
+/* --- 消す・📌 --- */
+function rsDelete(sid){
+  rsR('DELETE FROM _meta_result_row WHERE sid=?', [sid]);
+  rsR('DELETE FROM _meta_result_set WHERE sid=?', [sid]);
+  rsAutosave();
+}
+function rsTogglePin(sid){
+  const r = rsGet(sid);
+  if(!r) return;
+  rsR('UPDATE _meta_result_set SET pinned=? WHERE sid=?', [Number(r.pinned) ? 0 : 1, sid]);
+  rsAutosave();
+}
+
+/* いま生きている行の数（保存した行のうち、まだ削除されていないもの） */
+function rsAliveCount(sid, tkey){
+  if(!rsTableOk(tkey)) return 0;
+  const r = rsQ('SELECT COUNT(*) AS n FROM ' + tkey
+              + ' WHERE id IN (SELECT row_id FROM _meta_result_row'
+              + ' WHERE sid=? AND table_key=?)', [sid, tkey]);
+  return r.length ? (Number(r[0].n) || 0) : 0;
+}
+
+/* --- 呼び出し ---------------------------------------------------
+   mode: 'frozen'  保存したときの行をそのまま
+         'refresh' 保存した条件をもう一度走らせる
+         'changed' 保存した行のうち、保存より後に書き換えられたものだけ
+   ---------------------------------------------------------------- */
+function rsOpenSet(sid, mode){
+  const set = rsGet(sid);
+  if(!set){ setStatus('その保存はもうありません。', 'err'); return false; }
+  const tkey = String(set.table_key || '');
+  if(!rsTableOk(tkey)){
+    setStatus('この保存の項目（' + tkey + '）が見つかりません。', 'err');
+    return false;
+  }
+  rsClose();
+
+  if(mode === 'refresh'){
+    let c = null;
+    try{ c = JSON.parse(set.cond || 'null'); }catch(e){ c = null; }
+    if(c && c.sql){
+      try{
+        renderQuery(c.sql, c.params || [], '追い直し：' + set.name, tkey);
+        setStatus('「' + set.name + '」の条件で引き直しました（いまの最新の姿です）。', 'ok');
+        return true;
+      }catch(e){ /* 列を消した後などは失敗する。凍結のまま出す */ }
+    }
+    setStatus('条件が残っていないので、保存したときのまま出します。', 'err');
+    mode = 'frozen';
+  }
+
+  const total = rsRowIds(sid, tkey).length;
+  if(!total){ setStatus('この保存には行が入っていません。', 'err'); return false; }
+  const gone = total - rsAliveCount(sid, tkey);
+  const ob = rsOrderBy(tkey);
+
+  if(mode === 'changed'){
+    /* 保存したときの値(at0)と今の値が「違う」行だけ。
+       大小比較ではないので、時刻の形式にも時差にも依存しない。 */
+    const sql = 'SELECT * FROM ' + tkey + ' WHERE id IN ('
+              + ' SELECT r.row_id FROM _meta_result_row r'
+              + ' LEFT JOIN _meta_row_touch m'
+              + '   ON m.table_key = r.table_key AND m.row_id = r.row_id'
+              + ' WHERE r.sid = ? AND r.table_key = ?'
+              + "   AND IFNULL(m.at,'') <> IFNULL(r.at0,'')"
+              + ') ORDER BY ' + ob + ' LIMIT 1000';
+    renderQuery(sql, [sid, tkey], '保存後に変わった行：' + set.name, tkey);
+    const n = (lastRows && lastRows.length) || 0;
+    setStatus('「' + set.name + '」を保存した ' + set.at + ' より後に'
+            + '書き換えられた行は ' + n + ' 行です。'
+            + (gone > 0 ? '（' + gone + ' 行は削除されています）' : ''), 'ok');
+    return true;
+  }
+
+  const sql = 'SELECT * FROM ' + tkey
+            + ' WHERE id IN (SELECT row_id FROM _meta_result_row'
+            + ' WHERE sid=? AND table_key=?)'
+            + ' ORDER BY ' + ob + ' LIMIT 1000';
+  renderQuery(sql, [sid, tkey], '保存した結果：' + set.name, tkey);
+  setStatus('「' + set.name + '」を保存したときのまま出しました。'
+          + (gone > 0 ? '保存した ' + total + ' 行のうち '
+                      + gone + ' 行は削除されています。' : ''), 'ok');
+  return true;
+}
+
+/* --- ポップアップ（タグで絞り込む と同じ作り。CSSは .wdtx-pop を流用） --- */
+function rsPopEl(){
+  if(rsPop.el && rsPop.el.isConnected) return rsPop.el;
+  const p = document.createElement('div');
+  p.className = 'wdtx-pop';
+  p.id = 'rsPop';
+  document.body.appendChild(p);
+  rsPop.el = p;
+
+  p.addEventListener('click', function(e){
+    const b = e.target.closest ? e.target.closest('button[data-rs]') : null;
+    if(!b) return;
+    const a = b.dataset.rs;
+    const sid = b.dataset.sid || '';
+    if(a === 'close'){ rsClose(); return; }
+    if(a === 'save'){
+      const inp = document.getElementById('rsName');
+      if(rsSaveCurrent(inp ? inp.value : '')){ if(inp) inp.value = ''; rsRender(); }
+      return;
+    }
+    /* Ver1.19.01 (案③-B): 横断の保存は table_key が '' なので rsOpenSet に渡せない。
+       （rsTableOk('') は必ず false になる）kind を見て行き先を分ける。 */
+    if(a === 'open' || a === 'refresh' || a === 'changed'){
+      let kind = '';
+      try{ const g = rsGet(sid); kind = g ? String(g.kind || '') : ''; }catch(e){}
+      const md = (a === 'open') ? 'frozen' : a;
+      if(kind === 'cross') rsOpenCross(sid, md);
+      else                 rsOpenSet(sid, md);
+      return;
+    }
+    if(a === 'pin'){     rsTogglePin(sid); rsRender(); return; }
+    if(a === 'del'){     rsDelete(sid);    rsRender(); return; }
+  });
+  p.addEventListener('keydown', function(e){
+    if(e.key !== 'Enter') return;
+    if(!e.target || e.target.id !== 'rsName') return;
+    e.preventDefault();
+    if(rsSaveCurrent(e.target.value)){ e.target.value = ''; rsRender(); }
+  });
+
+  if(!rsPop.bound){
+    rsPop.bound = true;
+    document.addEventListener('mousedown', function(e){
+      if(!rsPop.el || !rsPop.el.classList.contains('show')) return;
+      if(rsPop.el.contains(e.target)) return;
+      rsClose();
+    });
+    document.addEventListener('keydown', function(e){
+      if(e.key !== 'Escape') return;
+      if(rsPop.el && rsPop.el.classList.contains('show')) rsClose();
+    });
+    window.addEventListener('resize', function(){ rsClose(); });
+  }
+  return p;
+}
+function rsClose(){ if(rsPop.el) rsPop.el.classList.remove('show'); }
+
+function rsRender(){
+  const p = rsPopEl();
+  const n = (lastRows && lastRows.length) || 0;
+  const canSave = !!(n && rsTableOk(currentTable));
+  let h = '<div class="ph"><b>\uD83D\uDCC1 検索結果の保存</b>'
+        + '<button type="button" data-rs="close" title="閉じる">\u2715</button></div>';
+
+  h += '<div style="display:flex;gap:6px;align-items:center;margin-bottom:8px">'
+     + '<input type="text" id="rsName" placeholder="名前（省略すると検索の見出し）"'
+     + ' style="flex:1;min-width:0"' + (canSave ? '' : ' disabled') + '>'
+     + '<button type="button" class="primary" data-rs="save"'
+     + (canSave ? '' : ' disabled')
+     + ' title="いま表に出ている行の集合に名前を付けて取っておきます">'
+     + '\uD83D\uDCCC ' + n + ' 行を保存</button></div>';
+  if(!canSave){
+    h += '<div class="afsub" style="margin:-4px 0 8px">'
+       + '保存できる検索結果がありません。先に検索するか全件表示してください。</div>';
+  }
+
+  const list = rsList();
+  if(!list.length){
+    h += '<div id="rsEmpty" style="color:#8b93a0;font-size:12px;padding:10px 2px">'
+       + 'まだ保存はありません。</div>';
+  }else{
+    h += list.map(function(r){
+      const sid = escapeAttr(r.sid);
+      const on  = !!Number(r.pinned);
+      return '<div class="afitem" data-sid="' + sid + '">'
+        + '<button type="button" data-rs="pin" data-sid="' + sid + '"'
+        + ' title="' + (on ? '固定をやめる' : '固定して自動で消えないようにする') + '"'
+        + ' style="opacity:' + (on ? '1' : '.4') + '">'
+        + (on ? '\uD83D\uDCCD' : '\uD83D\uDCCC') + '</button>'
+        + '<div class="afmain">'
+        + '<b>' + escapeHtml(r.name || '') + '</b>'
+        + '<div class="afsub">'
+        + escapeHtml(String(r.kind) === 'cross' ? '\uD83D\uDD0E 全項目を横断'
+                                               : rsLabelOf(r.table_key))
+        + ' / ' + (Number(r.n) || 0) + ' 行 / ' + escapeHtml(String(r.at || '')) + '</div>'
+        + '<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:5px">'
+        + '<button type="button" data-rs="open" data-sid="' + sid + '"'
+        + ' title="保存したときの行をそのまま出します">開く</button>'
+        + '<button type="button" data-rs="refresh" data-sid="' + sid + '"'
+        + ' title="保存した検索条件をもう一度走らせて、いまの最新の姿を出します">追い直す</button>'
+        + '<button type="button" data-rs="changed" data-sid="' + sid + '"'
+        + ' title="保存した行のうち、保存より後に書き換えられたものだけを出します">変わった行</button>'
+        + '<button type="button" data-rs="del" data-sid="' + sid + '"'
+        + ' title="この保存を消します">\uD83D\uDDD1</button>'
+        + '</div></div></div>';
+    }).join('');
+    h += '<div class="afsub" style="margin-top:8px">'
+       + '\u25B6 保存は ' + RS_MAX_SET + ' 件まで。あふれると古いものから消えます'
+       + '（\uD83D\uDCCD を付けたものは消えません）。</div>';
+  }
+  p.innerHTML = h;
+}
+
+function rsPlace(anchor){
+  const p = rsPop.el;
+  if(!p) return;
+  const r = (anchor && anchor.getBoundingClientRect) ? anchor.getBoundingClientRect() : null;
+  const w = p.offsetWidth || 320, h = p.offsetHeight || 260;
+  let left = r ? r.left : Math.max(10, (window.innerWidth - w) / 2);
+  let top  = r ? (r.bottom + 6) : 80;
+  if(left + w > window.innerWidth - 8) left = Math.max(8, window.innerWidth - w - 8);
+  if(top + h > window.innerHeight - 8) top = Math.max(8, window.innerHeight - h - 8);
+  p.style.left = Math.round(left) + 'px';
+  p.style.top  = Math.round(top) + 'px';
+}
+
+function openResultSets(anchor, focusName){
+  if(!db){ setStatus('データベースがまだ開いていません。', 'err'); return; }
+  try{ rsExpose(); }catch(e){}
+  try{ rsSweep(); }catch(e){}
+  const p = rsPopEl();
+  rsRender();
+  p.classList.add('show');
+  rsPlace(anchor);
+  if(focusName){
+    const inp = document.getElementById('rsName');
+    if(inp && !inp.disabled){ try{ inp.focus(); }catch(e){} }
+  }
+}
+function openResultSetSave(anchor){ openResultSets(anchor, true); }
+
+/* 公開窓口。window.WorkDB はこのブロックより後（7283行あたり）で作られるので、
+   読み込み時点で代入しても空振りする。開いたときに入れ直す。
+   ※ WDT_API という窓口は存在しない。正しくは window.WorkDB。 */
+function rsExpose(){
+  try{
+    if(window.WorkDB){
+      window.WorkDB.saveResultSet  = function(name){ return rsSaveCurrent(name); };
+      window.WorkDB.saveCrossResultSet = function(name){ return rsSaveCross(name); };
+      window.WorkDB.crossResultRows    = function(sid){ return rsCrossRows(sid); };
+      window.WorkDB.listResultSets = function(){ return rsList(); };
+      window.WorkDB.openResultSet  = function(sid, mode){ return rsOpenSet(sid, mode || 'frozen'); };
+    }
+  }catch(e){}
 }
 
 /* ==================================================================
@@ -7760,7 +8951,9 @@ function exportRows(kind){
   const metaByName = {}; currentCols().forEach(c => { metaByName[c.col_name] = c; });
   const visibility = getColumnVisibility(currentTable);
   const visibleCols = lastCols.filter(cn => visibility[cn] !== false);
-  const headers = visibleCols.map(cn => cn === 'id' ? 'ID' : (cn === 'created_at' ? '登録日時' : ((metaByName[cn] && metaByName[cn].label) || cn)));
+  const headers = visibleCols.map(cn => cn === 'id' ? 'ID' : (cn === 'created_at' ? '登録日時'
+                : (cn === ROW_TOUCH_COL ? ROW_TOUCH_LABEL
+                : ((metaByName[cn] && metaByName[cn].label) || cn))));
   const sep = kind === 'csv' ? ',' : '\t';
   const esc = v => {
     v = (v === null || v === undefined) ? '' : String(v);
@@ -7843,6 +9036,12 @@ document.addEventListener('keydown', e => {
       return;
     }
     if(W.matches(e, 'db.saveAs')){ e.preventDefault(); saveDbAs(); return; }
+    /* Ver1.19.02 C3-1: 入力欄の中でも効かせる。結果から飛んだ直後は
+       検索キーワード欄にフォーカスが載っていることがあるため。 */
+    if(W.matches(e, 'db.xsBack')){ e.preventDefault(); xsReopen(); return; }
+    /* Ver1.19.03 C3-2: 戻ると同じく入力欄の中でも効かせる。 */
+    if(W.matches(e, 'db.xsNext')){ e.preventDefault(); xsStep(1);  return; }
+    if(W.matches(e, 'db.xsPrev')){ e.preventDefault(); xsStep(-1); return; }
   }
   const tag = (e.target.tagName || '').toLowerCase();
   const isEditable = tag === 'input' || tag === 'textarea' || e.target.isContentEditable;
@@ -11150,6 +12349,21 @@ const DEFAULT_TOOLBAR = [
   {id:'outdent',   label:'|←',  title:'字上げ (Shift+Tab / Ctrl+])', on:true},
 ];
 
+/* Ver1.19.05 R3'-D: コマンドパレット（Ctrl+K）に出す、ツールバーに無いメモ操作。
+   DEFAULT_TOOLBAR は「画面に出すボタン」の表なので、キーでしか呼べない7件
+   （見出し4〜6 / 見出しを外す / 1段上げ下げ / 書式消し）はここに書きます。
+   ★ここに書いた id は TOOLBAR_ACTIONS に実体が無ければ黙って捨てられます
+     （listActions() が typeof で確かめます）。表だけ足しても動きません。 */
+const MD_PAL_EXTRA = [
+  {id:'h4',       title:'見出し4'},
+  {id:'h5',       title:'見出し5'},
+  {id:'h6',       title:'見出し6'},
+  {id:'h0',       title:'見出しを外してふつうの文に戻す'},
+  {id:'headUp',   title:'見出しを1段大きくする'},
+  {id:'headDown', title:'見出しを1段小さくする'},
+  {id:'clearfmt', title:'書式（太字・斜体など）を消す'}
+];
+
 let settings = loadJSON('mdeditor_settings', {
   toolbar: Object.fromEntries(DEFAULT_TOOLBAR.map(b=>[b.id,b.on])),
   indentWidth: 2,
@@ -13324,6 +14538,40 @@ window.MDEditor = {
     const ta = document.getElementById('editorTextarea');
     if(ta) mduRun(()=>wrapSelectionRaw(ta, text));
   },
+  /* ---- Ver1.19.05 R3'-D: コマンドパレット（Ctrl+K）から使う窓口 ---- */
+  /* パレットに出せるメモ操作の一覧 [{id, label}] を返します。
+     ★末尾の「(Ctrl+B)」のようなキー表示は外します。割り当ては ⚙設定 で
+       変えられるので、固定のキー名をラベルに焼き付けると嘘になるためです
+       （いま割り当たっているキーは、パレット側が combosFor で引きます）。
+     ★アドオンが addToolbarButton で足したボタンも自動で入ります。 */
+  listActions(){
+    const seen = {}, out = [];
+    const add = (id, title) => {
+      if(!id || seen[id]) return;
+      if(typeof TOOLBAR_ACTIONS[id] !== 'function') return;   /* 実体が無いものは出さない */
+      seen[id] = 1;
+      out.push({
+        id: id,
+        label: String(title || id).replace(/\s*[（(][^（）()]*[)）]\s*$/, '')
+      });
+    };
+    DEFAULT_TOOLBAR.forEach(b => add(b.id, b.title || b.label));
+    MD_PAL_EXTRA.forEach(b => add(b.id, b.title));
+    return out;
+  },
+  /* メモ操作を1つ実行します。できたら true、できなければ false。
+     ★ツールバーのボタンと同じく mduRun でまとめ、Ctrl+Z 1回で戻せるようにします。
+     ★編集欄が無い（メモ画面を開いていない）ときは false を返すだけで、
+       例外は投げません。呼び出し側が案内を出せるようにするためです。 */
+  runAction(id){
+    const f = TOOLBAR_ACTIONS[id];
+    if(typeof f !== 'function') return false;
+    const ta = document.getElementById('editorTextarea');
+    if(!ta) return false;
+    try{ ta.focus(); }catch(e){}
+    mduRun(()=>{ f(ta); });
+    return true;
+  },
   addToolbarButton({id, label, title, onClick}){
     if(!id || !onClick) return;
     TOOLBAR_ACTIONS[id] = onClick;
@@ -15093,6 +16341,15 @@ var SC = [
   {id:'db.undo',        label:'元に戻す',                    where:'DB',    def:['Ctrl+Z'],
    emacs:['Ctrl+Z','Ctrl+/']},
   {id:'db.redo',        label:'やり直す',                    where:'DB',    def:['Ctrl+Y','Ctrl+Shift+Z']},
+  /* ---- Ver1.19.02 案C3-1: 横断検索で飛んだあと、結果一覧へ戻るキー。
+         Ctrl+Shift+F（検索欄へ移動）の隣に置いて覚えやすくしています。
+         ⚙設定 → ショートカットキー から振り直せます。 ---- */
+  {id:'db.xsBack',      label:'横断検索の結果一覧へ戻る',    where:'DB',    def:['Ctrl+Shift+G']},
+  /* ---- Ver1.19.03 案C3-2: ヒットを順にたどるキー。
+         Ctrl+Shift+G（戻る）と同じ G に揃えています。
+         accesskey 属性は本体に 0 件なので Alt+文字 と衝突しません。 ---- */
+  {id:'db.xsNext',      label:'横断検索の次のヒットへ',    where:'DB',    def:['Alt+G']},
+  {id:'db.xsPrev',      label:'横断検索の前のヒットへ',    where:'DB',    def:['Alt+Shift+G']},
   {id:'db.search',      label:'検索キーワード欄へ移動',      where:'DB',    def:['Ctrl+Shift+F'],
    emacs:['Ctrl+Alt+S']},
   {id:'db.saveAs',      label:'名前を付けて保存',            where:'DB',    def:['Ctrl+Shift+S']},
@@ -15308,6 +16565,10 @@ function defaults(){
     imeCaretKeepOff: false,
     imeCaretOff    : '#4ade80',
     imeCaretOn     : '#fbbf24',
+    /* ---- Ver1.18.01 (案A+) 一覧に「更新日時」の列を出すか ----
+       既定は false。Ver1.18.00 は「表のかたちを変えない」ことを狙って
+       作ったので、出すかどうかは利用者が決める。 */
+    rowTouchShow   : false,
     addons     : { mobilefix:'auto', bigtap:false, quickbar:false, autofocus:false,
                    stickyhead:true, oneopen:false, cmdrank:true }
   };
@@ -16321,6 +17582,21 @@ function buildSettings(){
      + 'このソフトは<b>変換が始まったら日本語入力中とみなし、確定したあとも色を保ちます</b>。'
      + '半角に戻したときは、<b>1文字目を打った時点で</b>色が戻ります。'
      + '<br>※ 変換中の下線や候補の窓の色は変えられません（カーソルの色だけです）。</div>';
+  /* ---- Ver1.18.01 (案A+) ---- */
+  h += '<h3>検索結果の表に「更新日時」の列を出す</h3>';
+  h += '<div class="wdtx-row"><span class="lbl">更新日時の列</span><span>'
+     + '<label><input type="checkbox" id="wdtRowTouchShow"'
+     + (st.rowTouchShow ? ' checked' : '') + '> 一覧のいちばん右に出す</label>'
+     + '</span></div>';
+  h += '<div class="wdtx-hint" style="margin:-2px 0 8px 210px">'
+     + '行を追加・書き換えた時刻です。<b>この列は表の中には作られません</b>。'
+     + '表示のときだけ足しているので、OFFに戻せば元の見た目にそのまま戻ります。'
+     + '<br>・見出しをクリックすれば<b>「最近直した順」に並べ替えられます</b>。'
+     + '<br>・「⚙ 表示する列」で個別に隠すこともできます。CSV／TXTの書き出しにも入ります。'
+     + '<br>※ この列だけは「⇩ この並びを既定にする」に登録できません'
+     + '（表の中の列ではないためです）。'
+     + '<br>※ Ver1.18.00 より前に作った行は、記録が無いので'
+     + '<b>「登録日時」を初期値として入れてあります</b>。</div>';
   h += '<h3>Markdownメモ専用の設定</h3>';
   h += '<div class="wdtx-row"><button type="button" id="wdtOpenMdSet">📝 メモの設定を開く（ツールバー・自動保存・プラグイン）</button></div>';
   h += '</div>';
@@ -16853,6 +18129,14 @@ function bindSettings(){
     if(t.id === 'wdtImeKeepOff'){  st.imeCaretKeepOff = t.checked; save(); applyDynStyle(); return; }
     if(t.id === 'wdtImeOffCol'){   st.imeCaretOff = imeHex(t.value, '#4ade80'); save(); applyDynStyle(); return; }
     if(t.id === 'wdtImeOnCol'){    st.imeCaretOn  = imeHex(t.value, '#fbbf24'); save(); applyDynStyle(); return; }
+    /* ---- Ver1.18.01 (案A+) 一覧の「更新日時」列 ---- */
+    if(t.id === 'wdtRowTouchShow'){
+      st.rowTouchShow = t.checked; save();
+      /* OFFに戻すときは、その列での並べ替えも一緒に解除する */
+      try{ if(!t.checked && typeof window.clearRowTouchSort === 'function') window.clearRowTouchSort(); }catch(e){}
+      try{ if(typeof window.rerenderCurrent === 'function') window.rerenderCurrent(); }catch(e){}
+      return;
+    }
     /* ---- Ver1.12.00: コマンドモード関連 ---- */
     if(t.name === 'wdtKeyPreset'){
       st.keyPreset = t.value; save(); renderKeyTable(); refreshKeyUi(); return;
@@ -16988,6 +18272,9 @@ function refreshKeyUi(){
 
 return {
   matches: matches,
+  /* Ver1.19.02 C3-1: id からいま割り当たっているキーの配列を返す。
+     案内文に実際のキーを出すため。振り直しても正しく出る。 */
+  combosFor: combosFor,
   /* Ver1.16.12: そのキーを使っている項目を「全部」返す（調査・テスト用）。
      WDT.whoUsesAll('Ctrl+K') → [{id:'app.palette',…},{id:'md.link',…}] */
   whoUsesAll: whoUsesAll,
@@ -18099,6 +19386,40 @@ function isDbMode(){ return window.currentAppMode !== 'md'; }
 function toDb(){
   if(!isDbMode() && typeof window.setAppMode === 'function'){ window.setAppMode('db'); }
 }
+
+/* Ver1.19.05 R3'-D: メモ画面へ切り替える。toDb() の対になるもの。 */
+function toMd(){
+  if(isDbMode() && typeof window.setAppMode === 'function'){ window.setAppMode('md'); }
+}
+/* Ver1.19.05 R3'-D: いま id に割り当たっているキーの表示名を返す。
+   ★落とし穴 #36: id からキーを引くのは combosFor()。keyLabel(id) は誤り。
+   割り当てが無ければ空文字を返す（パレットのヒント欄が出ないだけ）。 */
+function mdKeyHint(id){
+  try{
+    var cs = (window.WDT && window.WDT.combosFor) ? window.WDT.combosFor(id) : null;
+    if(cs && cs.length){
+      return (window.RTTKEY && window.RTTKEY.keyLabel) ? window.RTTKEY.keyLabel(cs[0]) : cs[0];
+    }
+  }catch(e){}
+  return '';
+}
+/* Ver1.19.05 R3'-D: メモ操作を実行する。DB画面にいたら先にメモ画面へ移る。
+   ★画面を切り替えた直後は editorTextarea がまだ無いことがあるので、
+     少し待ってから実行する。すぐ呼ぶと false が返って「使えません」に化ける。 */
+function runMdAction(act, label){
+  var go = function(){
+    var done = false;
+    try{
+      if(window.MDEditor && typeof window.MDEditor.runAction === 'function'){
+        done = !!window.MDEditor.runAction(act);
+      }
+    }catch(e){ done = false; }
+    if(!done) say('メモを開いてから使ってください: ' + (label || act), 'err');
+  };
+  if(!isDbMode()){ go(); return; }
+  toMd();
+  setTimeout(go, 120);
+}
 function say(msg, kind){
   try{ if(typeof window.setStatus === 'function') window.setStatus(msg, kind || 'ok'); }catch(e){}
 }
@@ -18413,13 +19734,13 @@ function buildCommands(showHidden){
             kw:'undo modosu もどす', run:call('undo')});
   out.push({id:'db.redo', group:'操作', icon:'\u21B7', label:'やり直す', hint:'Ctrl+Y',
             kw:'redo yarinaosu やりなおす', run:call('redo')});
-  out.push({id:'sec.openAll', group:'操作', icon:'\u25BC', label:'すべてのセクションを開く',
+  out.push({id:'sec.openAll', group:'台帳の操作', icon:'\u25BC', label:'すべてのセクションを開く',
             kw:'zenbu hiraku ひらく ぜんぶ', run:function(){ allSections(true); }});
-  out.push({id:'sec.closeAll', group:'操作', icon:'\u25B2', label:'すべてのセクションを折りたたむ',
+  out.push({id:'sec.closeAll', group:'台帳の操作', icon:'\u25B2', label:'すべてのセクションを折りたたむ',
             kw:'zenbu tojiru とじる ぜんぶ', run:function(){ allSections(false); }});
   out.push({id:'db.theme', group:'操作', icon:'\uD83C\uDF19', label:'ダーク／ライトを切り替え',
             kw:'dark light theme いろ てーま', run:call('toggleTheme')});
-  out.push({id:'db.tags', group:'操作', icon:'\uD83C\uDFF7', label:'タグの管理',
+  out.push({id:'db.tags', group:'台帳の操作', icon:'\uD83C\uDFF7', label:'タグの管理',
             kw:'tag tagu たぐ', run:function(){
               toDb();
               if(typeof window.openTagManager === 'function'){
@@ -18428,7 +19749,7 @@ function buildCommands(showHidden){
                 try{ window.openTagManager(t, ''); }catch(e){ say('タグの管理を開けませんでした', 'err'); }
               }
             }});
-  out.push({id:'db.cols', group:'操作', icon:'\u2699', label:'表示する列を選ぶ',
+  out.push({id:'db.cols', group:'台帳の操作', icon:'\u2699', label:'表示する列を選ぶ',
             kw:'retsu column hyouji れつ', run:function(){ gotoSection('secSearch'); setTimeout(call('toggleColPanel'), 380); }});
   /* --- Ver1.10.00 で足した機能 --- */
   out.push({id:'db.advsearch', group:'検索', icon:'\uD83E\uDDEE', label:'くわしい検索（AND / OR / NOT・最大5段）',
@@ -18445,7 +19766,7 @@ function buildCommands(showHidden){
   out.push({id:'db.xsearch', group:'検索', icon:'\uD83D\uDD0E', label:'全項目（全テーブル）を横断検索',
             kw:'oudan yokodan zenbu zenkomoku cross search ゆこうだん おうだん すべて さがす',
             run:function(){ toDb(); if(typeof window.openCrossSearch === 'function') window.openCrossSearch(); }});
-  out.push({id:'db.moverules', group:'操作', icon:'\u27A1', label:'項目間の「移動ルール」を設定する',
+  out.push({id:'db.moverules', group:'台帳の操作', icon:'\u27A1', label:'項目間の「移動ルール」を設定する',
             kw:'idou rule ru-ru いどう るーる うつす',
             run:function(){
               toDb();
@@ -18457,16 +19778,16 @@ function buildCommands(showHidden){
   out.push({id:'db.backups', group:'操作', icon:'\uD83D\uDD50', label:'控え（バックアップ）の一覧',
             kw:'backup hikae modosu ひかえ もどす ばっくあっぷ',
             run:function(){ toDb(); if(typeof window.openBackupList === 'function') window.openBackupList(); }});
-  out.push({id:'db.newrow', group:'操作', icon:'\u2795', label:'新しい行を登録する（入力欄へ移動）',
+  out.push({id:'db.newrow', group:'台帳の操作', icon:'\u2795', label:'新しい行を登録する（入力欄へ移動）',
             kw:'atarashii tuika touroku あたらしい ついか とうろく にゅうりょく',
             run:function(){ toDb(); if(typeof window.gotoNewEntry === 'function') window.gotoNewEntry(); }});
-  out.push({id:'db.csv', group:'操作', icon:'\u21E9', label:'CSVで書き出す',
+  out.push({id:'db.csv', group:'台帳の操作', icon:'\u21E9', label:'CSVで書き出す',
             kw:'csv export kakidashi かきだし', run:call('exportCsv')});
-  out.push({id:'db.txt', group:'操作', icon:'\u21E9', label:'TXTで書き出す',
+  out.push({id:'db.txt', group:'台帳の操作', icon:'\u21E9', label:'TXTで書き出す',
             kw:'txt export kakidashi かきだし', run:call('exportTxt')});
-  out.push({id:'db.mdcell', group:'操作', icon:'\uD83D\uDCDD', label:'長文列のMarkdown表示を切り替え',
+  out.push({id:'db.mdcell', group:'台帳の操作', icon:'\uD83D\uDCDD', label:'長文列のMarkdown表示を切り替え',
             kw:'markdown md hyouji ちょうぶん', run:call('toggleGridMarkdown')});
-  out.push({id:'db.colwidth', group:'操作', icon:'\u2194', label:'表の列幅をリセット',
+  out.push({id:'db.colwidth', group:'台帳の操作', icon:'\u2194', label:'表の列幅をリセット',
             kw:'haba width reset はば', run:function(){ if(window.RTT19 && RTT19.resetWidths) RTT19.resetWidths(); }});
   out.push({id:'db.selfcheck', group:'操作', icon:'\uD83D\uDD12', label:'自己点検（ファイルが書き換えられていないか）',
             kw:'check tenken sha256 てんけん', run:function(){ if(window.RTT19 && RTT19.panel) RTT19.panel(); }});
@@ -18500,6 +19821,26 @@ function buildCommands(showHidden){
   out.push({id:'key.setting', group:'キー操作', icon:'\uD83D\uDEE0', label:'単独キー（コマンドモード）を変える',
             kw:'key setting warikate \u30ad\u30fc \u3078\u3093\u3053\u3046 \u3057\u3066\u3044',
             run:function(){ try{ if(window.RTTKEY) window.RTTKEY.setting(); }catch(e){} }});
+
+  /* --- メモ（Markdown）Ver1.19.05 R3'-D --- */
+  /* ★中身は window.MDEditor ごしに取ります。メモ編集は別の <script> ブロックに
+     あるので、TOOLBAR_ACTIONS を直接見ることはできません。
+     ★openPalette() は開くたび buildCommands() を呼び直すので、
+     アドオンがボタンを足した直後でもここに反映されます。 */
+  var mdActs = [];
+  try{
+    if(window.MDEditor && typeof window.MDEditor.listActions === 'function'){
+      mdActs = window.MDEditor.listActions() || [];
+    }
+  }catch(e){ mdActs = []; }
+  for(i = 0; i < mdActs.length; i++){
+    (function(a){
+      out.push({id:'md.pal.' + a.id, group:'メモ（Markdown）',
+                icon:'\uD83D\uDCDD', label:a.label, hint:mdKeyHint('md.' + a.id),
+                kw:'md memo markdown めも ' + a.id,
+                run:function(){ runMdAction(a.id, a.label); }});
+    })(mdActs[i]);
+  }
 
   /* --- ここで「呼び出し語」と「非表示」を反映する --- */
   var al = aliasMap(), hid = hiddenList(), res = [], c;
@@ -18573,6 +19914,63 @@ function onPalKey(e){
   if(e.key === 'Enter'){ e.preventDefault(); runPalItem(palSel); return; }
 }
 
+/* ------------------------------------------------------------
+   Ver1.19.06 R3'-E: コマンドパレットの「画面別の並べ替え」（案C＝群ごと上げる）
+   ------------------------------------------------------------
+   ・グループ単位で scr（'db' / 'md' / 'both'）を持つ。
+   ・表に無いグループは 'both' とみなす（既存36件に書き足さなくて済む）。
+   ・いまの画面のグループが先頭、次に both、最後にもう一方の画面のグループ。
+   ・★件数は1件も増減しない。隠さない。並び順だけを変える。
+   ・並べ替えは「無入力のときだけ」。言葉を打っている間は当たり順のまま。
+   ★buildCommands() は「操作」と「検索」を交互に push しているため、
+     これまで同じ見出しが2回出ていた。並べ替えると1回にまとまる。 */
+var PAL_GROUP_SCR = {
+  '\u753b\u9762':'both', '\u64cd\u4f5c':'both', '\u8a2d\u5b9a':'both',
+  '\u30ad\u30fc\u64cd\u4f5c':'both',
+  '\u30bb\u30af\u30b7\u30e7\u30f3\u3078\u79fb\u52d5':'db',
+  '\u9805\u76ee\uff08\u30c6\u30fc\u30d6\u30eb\uff09':'db',
+  '\u691c\u7d22':'db', '\u30a2\u30c9\u30aa\u30f3':'db',
+  '\u53f0\u5e33\u306e\u64cd\u4f5c':'db',
+  '\u30e1\u30e2\uff08Markdown\uff09':'md'
+};
+function palScrOf(g){ var v = PAL_GROUP_SCR[g]; return v ? v : 'both'; }
+
+/* いまの画面を返す。isDbMode() は既存（新規に作らない）。 */
+function palNowScr(){ return isDbMode() ? 'db' : 'md'; }
+
+function palSortByScreen(list){
+  var now = palNowScr(), firstAt = {}, rankOf = {}, i, g, s, dec;
+  for(i = 0; i < list.length; i++){
+    g = list[i].group;
+    if(!(g in firstAt)){
+      firstAt[g] = i;
+      s = palScrOf(g);
+      rankOf[g] = (s === now) ? 0 : (s === 'both' ? 1 : 2);
+    }
+  }
+  /* 並べ替えの安定性に頼らず、元の位置を明示的な最後の物差しにする。
+     ★Ver1.19.07 で firstAt は【現役】になった。「台帳の操作」と「検索」は
+       どちらも db で同じランクに入り、buildCommands() の中で互い違いに
+       push されている。firstAt が無いと「台帳の操作」の見出しが2回出る。
+       （Ver1.19.06 時点では一度も通らない保険だった。abc.md 落とし穴 #45）
+       いまの PAL_GROUP_SCR では「操作」を割っている「検索」が別のランクに移るため、
+       firstAt が無くても操作は勝手にひとまとまりになる。
+       将来「検索」を both にしたときだけ効く道で、
+       黒箱テストでは落ちない（2026-08-26 の壊し検証Dで実測）。消さないこと。 */
+  dec = [];
+  for(i = 0; i < list.length; i++){ dec.push({c:list[i], k:i}); }
+  dec.sort(function(a, b){
+    var ra = rankOf[a.c.group], rb = rankOf[b.c.group];
+    if(ra !== rb) return ra - rb;
+    var fa = firstAt[a.c.group], fb = firstAt[b.c.group];
+    if(fa !== fb) return fa - fb;
+    return a.k - b.k;
+  });
+  var out = [];
+  for(i = 0; i < dec.length; i++){ out.push(dec[i].c); }
+  return out;
+}
+
 function normalize(s){
   return String(s == null ? '' : s).toLowerCase().replace(/\s+/g, '');
 }
@@ -18607,6 +20005,11 @@ function renderPalette(){
       }
     });
   }
+
+  /* Ver1.19.06 R3'-E: 無入力のときだけ、いまの画面のグループを先頭へ寄せる（案C）。
+     ★「よく使う」より【先に】走らせる（案イ）。
+       あとから rank.concat() されるので、よく使うは常にいちばん上に残る。 */
+  if(!terms.length && palItems.length){ palItems = palSortByScreen(palItems); }
 
   /* 何も打っていないときは「よく使う」を先頭に出す（設定でOFFにできる） */
   if(!terms.length && !bodyHas('wdt-nocmdrank') && palItems.length){
