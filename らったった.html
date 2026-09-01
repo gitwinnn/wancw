@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.08</title>
+<title>記録台帳＋MDメモ Ver1.19.10</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -1860,10 +1860,131 @@ body.wdt-mobfix #app-db .sectbl{ display:none; }
 .xs-hit .col{ flex:0 0 152px; color:#c7ccd4; font-size:11.5px; font-weight:600; word-break:break-all; }
 .xs-hit .ex{ flex:1; min-width:0; color:#cfd4dc; font-size:12px; line-height:1.5; word-break:break-all;
   white-space:pre-wrap; }
-.xs-hit .ex mark{ background:#4a3a12; color:#ffd479; border-radius:3px; padding:0 2px; }
+.xs-hit .ex mark{ background:var(--xs-dan1-bg); color:var(--xs-dan1-fg); border-radius:3px; padding:0 2px; }
 .xs-hit .rid{ flex:0 0 auto; color:#6f757e; font-size:11px; }
 .xs-empty{ color:#8b93a0; font-size:12.5px; padding:16px 12px; text-align:center; }
 .xs-note{ color:#ffd479; font-size:11.5px; margin-top:6px; }
+
+/* ==================================================================
+   Ver1.19.09 (D-08 前半) 横断検索を最大5段にする — 色の器
+   ------------------------------------------------------------------
+   【考え方】段は「色相」で、系統（AND / OR / NOT）は「線の形」で分ける。
+     目が使う手がかりを2種類に割ることで、5段 × 3系統 = 15通りの
+     掛け算を、5 + 3 の足し算に変えている（決-26）。
+     さらに色に頼らなくても段が分かるよう、<mark> の右肩に段番号を出す（決-27 丙案）。
+
+   【D-08 の配色は実測で確定ずみ】背景 #191c22 の上で W3C の相対輝度の式で
+     計算した値。全段が文字/帯 7.10 以上 ＝ WCAG の AAA（7:1）を満たす。
+     .xs-hit .ex は 12px と小さいので、ここのコントラストは削らないこと。
+
+       段 名     通常の帯   NOT の帯   文字      文字/帯  帯/行
+        1 琥珀   #4a3a12    #3a2d0e    #ffd479    7.84    1.55
+        2 空     #123a4e    #0e2d3d    #8fd0ff    7.26    1.41
+        3 若草   #173a1f    #122d18    #9ae6a8    8.58    1.35
+        4 藤     #2f2a5c    #252148    #c4b5ff    7.10    1.31
+        5 珊瑚   #4d2222    #3c1b1b    #ffaba2    7.40    1.27
+
+     NOT の帯は通常の帯の 0.78 倍。倍率は掃引して決めた。
+     0.72 以下だと帯が行の地（#191c22）に溶けて見えなくなり、
+     0.85 だと通常の帯との差が 1.11〜1.15 しかなく NOT だと分からない。
+
+   【1段目は継承】.xs-hit .ex mark の素の色は、Ver1.19.08 まで直書きだった
+     #4a3a12 / #ffd479 とまったく同じ。変数に移しただけで見た目は変わらない。
+
+   【明るい配色にしたくなったら】(決-29)
+     色の値は下の :root 1か所にしか無い。あとから1ブロック足すだけで差し替えられる。
+     ★ただし #xsBack は #app-db の【外】にある（2261行で開き 2801行あたりで閉じる。
+       2192行の :root のコメントも「モーダルは外」と書いている）。
+       したがって #app-db[data-theme="light"] .xs-… では届かない。
+       明るい配色を足すときは :root:has(#app-db[data-theme="light"]){ … } か、
+       <body> にクラスを付ける形にすること。
+   ================================================================== */
+:root{
+  /* 1段目 = Ver1.19.08 までの色をそのまま継承 */
+  --xs-dan1-bg:#4a3a12; --xs-dan1-nbg:#3a2d0e; --xs-dan1-fg:#ffd479;
+  --xs-dan2-bg:#123a4e; --xs-dan2-nbg:#0e2d3d; --xs-dan2-fg:#8fd0ff;
+  --xs-dan3-bg:#173a1f; --xs-dan3-nbg:#122d18; --xs-dan3-fg:#9ae6a8;
+  --xs-dan4-bg:#2f2a5c; --xs-dan4-nbg:#252148; --xs-dan4-fg:#c4b5ff;
+  --xs-dan5-bg:#4d2222; --xs-dan5-nbg:#3c1b1b; --xs-dan5-fg:#ffaba2;
+  /* Ver1.19.10 (案C3・決-35) 2つ以上の段が同じ文字で重なった所。
+     段の色は使わず、中立な灰の【縞】で表す。組み合わせごとに色を作ると
+     2段の重なりだけで10通り、3段まで含めると26通りになるため。
+     背景 #191c22 での実測: 文字/濃 9.69 ・ 文字/淡 7.33。
+     どちらも WCAG の AAA（7:1）以上で、既存5段と同じ基準を満たす。 */
+  --xs-mix-a:#3a3f47; --xs-mix-b:#4a515b; --xs-mix-fg:#f2f5f9;
+}
+/* --- 段（色相） --- */
+.xs-hit .ex mark.xsdan1{ background:var(--xs-dan1-bg); color:var(--xs-dan1-fg); }
+.xs-hit .ex mark.xsdan2{ background:var(--xs-dan2-bg); color:var(--xs-dan2-fg); }
+.xs-hit .ex mark.xsdan3{ background:var(--xs-dan3-bg); color:var(--xs-dan3-fg); }
+.xs-hit .ex mark.xsdan4{ background:var(--xs-dan4-bg); color:var(--xs-dan4-fg); }
+.xs-hit .ex mark.xsdan5{ background:var(--xs-dan5-bg); color:var(--xs-dan5-fg); }
+/* --- 系統（線の形）。text-decoration は一括で書き、style を確実に上書きする --- */
+.xs-hit .ex mark.xsop-and{ text-decoration:underline solid; }
+.xs-hit .ex mark.xsop-or{ text-decoration:underline dotted; }
+.xs-hit .ex mark.xsop-not{ text-decoration:line-through solid; }
+/* --- NOT は帯だけを 0.78倍に暗くする（文字色はそのまま） ---
+       クラス2つぶん詳細度が高いので、上の段の指定に必ず勝つ。 */
+.xs-hit .ex mark.xsop-not.xsdan1{ background:var(--xs-dan1-nbg); }
+.xs-hit .ex mark.xsop-not.xsdan2{ background:var(--xs-dan2-nbg); }
+.xs-hit .ex mark.xsop-not.xsdan3{ background:var(--xs-dan3-nbg); }
+.xs-hit .ex mark.xsop-not.xsdan4{ background:var(--xs-dan4-nbg); }
+.xs-hit .ex mark.xsop-not.xsdan5{ background:var(--xs-dan5-nbg); }
+/* --- 重なり（案C3・決-35）。色相ではなく【縞という形】で表すので、
+       色が見分けにくくても「重なっている」と分かる。右肩には
+       重なっている段の番号をすべて並べる（1,2 のように）。
+     ★系統の線（xsop-*）は付けない。重なった所は複数の段のものなので、
+       どれか1つの系統の線を引くと嘘になる。 --- */
+.xs-hit .ex mark.xsmix{
+  background:repeating-linear-gradient(135deg,
+    var(--xs-mix-a) 0 5px, var(--xs-mix-b) 5px 10px);
+  color:var(--xs-mix-fg);
+}
+/* --- 右肩の段番号（色が見えない人でも段が分かるように。決-27 丙案） ---
+   ★display:inline-block は飾りではない。NOT の段は親の <mark> に
+     line-through が掛かっており、CSS の仕様では【子孫は先祖の装飾を
+     打ち消せない】。text-decoration:none と書いても効かず、段番号の上を
+     打ち消し線が横切る。原子的インライン（inline-block / inline-table 等）
+     には装飾が伝わらない、という仕様の逃げ道を使っている。
+     2026-08-31 実測: getComputedStyle(sup).textDecorationLine は
+     inline でも inline-block でも 'none' を返す。つまりこの値では
+     「引きずっているか」を判定できない（落とし穴 #55）。 */
+.xs-hit .ex mark > sup{
+  font-size:9px; line-height:1; margin-left:1px; vertical-align:super;
+  opacity:.85; font-weight:700; display:inline-block;
+}
+
+/* ------------------------------------------------------------------
+   2〜5段目の入力行（案B3: 既定では畳んでおく）
+   ★#app-db .advrow{…}（1790行）は #app-db の中でしか効かないので、
+     ここで .xs- 接頭辞のものを書き下ろす。流用しないこと。
+   ------------------------------------------------------------------ */
+.xs-dans{ margin:2px 0 6px; }
+.xs-dans > summary{
+  cursor:pointer; color:#9aa4b2; font-size:12px; padding:2px 0;
+  list-style:none; user-select:none;
+}
+.xs-dans > summary::-webkit-details-marker{ display:none; }
+.xs-dans > summary:hover{ color:#cfd4dc; }
+.xs-dans > summary::before{ content:'\25B6'; display:inline-block; margin-right:5px;
+  transition:transform .12s; font-size:10px; }
+.xs-dans[open] > summary::before{ transform:rotate(90deg); }
+.xs-dan-row{ display:flex; gap:7px; align-items:center; flex-wrap:wrap; margin:5px 0 0; }
+.xs-dan-row .no{ width:52px; flex:0 0 auto; color:#9aa4b2; font-size:11.5px; font-weight:700; }
+.xs-dan-row .sw{ width:11px; height:11px; border-radius:2px; flex:0 0 auto;
+  border:1px solid #3d4046; }
+.xs-dan-row select{ width:auto; flex:0 0 auto; padding:5px 7px; font-size:12.5px; }
+.xs-dan-row input[type=text]{ flex:1 1 200px; min-width:140px; width:auto; }
+.xs-dan-row label{
+  display:inline-flex; align-items:center; gap:4px; margin:0;
+  font-size:12px; color:#e6e9ef; white-space:nowrap;
+}
+.xs-dan-row label input{ width:auto; margin:0; }
+.xs-dan-sw1{ background:var(--xs-dan1-bg); }
+.xs-dan-sw2{ background:var(--xs-dan2-bg); }
+.xs-dan-sw3{ background:var(--xs-dan3-bg); }
+.xs-dan-sw4{ background:var(--xs-dan4-bg); }
+.xs-dan-sw5{ background:var(--xs-dan5-bg); }
 
 /* ---- 列の対応表（移動ダイアログ・ルール編集の共通） ---- */
 .mv-map th.st{ width:52px; text-align:center; white-space:nowrap; }
@@ -2239,7 +2360,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.08</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.10</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2404,6 +2525,8 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.10 で増えたこと（重なった言葉を1つの抜粋にまとめました）：</strong>「🔎 全項目を横断検索」で言葉を2つ以上入れたとき、これまでは<b>同じ一文が段の数だけ繰り返して</b>出ていました。これを<b>1本にまとめ、その中に段ごとの色を並べて</b>出すようにしました。たとえば1段目に「予約」、2段目に「議事録」と入れると、以前は同じ文が2回出ていましたが、これからは1回だけ出て、その中で「予約」が琥珀、「議事録」が空色に光ります。<b>ふだんの使い方は何も変わりません。</b>なお「会議」と「議室」のように<b>言葉どうしが同じ文字を含んでいる</b>ときは、その重なった文字だけ<b>斜めの網目</b>で表示し、右肩に「1,2」のように<b>重なっている段の番号をすべて</b>並べます。1つの文字を2つの色で同時に塗ることはできないための工夫です。段を1つだけ使うときの見え方は、Ver1.19.09 までとまったく同じです。以前に保存した横断検索の結果も、これまでどおり開けます。（横断検索の抜粋をまとめる）</p>
+      <p><strong>Ver1.19.09 で増えたこと（横断検索を最大5段にしました）：</strong>「🔎 全項目を横断検索」で、これまでは<b>言葉を1つ</b>しか入れられませんでした。これを<b>最大5段</b>まで積めるようにしました。段どうしは「<b>かつ</b>（両方に当てはまる）」「<b>または</b>（どちらかに当てはまる）」でつなげ、段ごとに「<b>NOT</b>（この言葉を含む行を除く）」も指定できます。<b>ふだんの使い方は何も変わりません。</b>2段目から下は「<b>▶ 条件を増やす</b>」の中に畳んであるので、1つの言葉で探すときは今までとまったく同じ見た目です。さらに、結果の抜粋の色を<b>段ごとに変えました</b>（1段目＝琥珀／2段目＝空／3段目＝若草／4段目＝藤／5段目＝珊瑚）。つなぎ方も線の形で分かります（<b>かつ＝実線の下線</b>／<b>または＝点線の下線</b>／<b>NOT＝打ち消し線</b>）。色が見分けにくいときのために、印の右肩に<b>段の番号</b>も小さく出しています。「なぜこの行が出てきたのか」を、抜粋を上から読むだけでたどれます。なお NOT の打ち消し線は「<b>または</b>」でつないだときに見えます（「かつ」でつなぐと、その言葉を含む行はそもそも結果から外れるためです）。以前に保存した横断検索の結果も、これまでどおり開けます。（横断検索の5段化と色分け）</p>
       <p><strong>Ver1.19.08 で増えたこと（長い説明を畳めるように・タグ選択の決定ボタンが常に見える）：</strong>記録台帳の表の上にあった<b>「▶ 色つきセルは…」の長い説明</b>を、<b>畳んだ状態</b>にしました。見出しの「<b>▶ セルの編集について（クリックで開く）</b>」を押すと開きます。説明の中身は1文字も減っていません（日付・時刻の列の話も、そのまま中に入っています）。ふだんは表がその分だけ上に来るので、行が多いときに見やすくなります。もうひとつ、<b>タグ選択の画面</b>で、タグをたくさん選ぶと<b>「決定」のボタンが画面の外に出てしまい押せなくなる</b>ことがありました。ボタンの並びを<b>画面の下に貼り付く形</b>に変えたので、タグが何十個あっても、いつでも押せます。（畳む説明とタグ選択の決定ボタン）</p>
       <p><strong>Ver1.19.07 で増えたこと（「操作」が画面別に2つに分かれた）：</strong>これまで18件が1つにまとまっていた「操作」の見出しを、<b>どの画面でも使うもの</b>（上書き保存・名前を付けて保存・DBファイルを開く・元に戻す・やり直す・ダーク／ライト切替・控えの一覧・自己点検の8件）と、<b>記録台帳でだけ使うもの</b>（タグや列の管理、CSV／TXTの書き出しなど10件）に分けました。後者は「<b>台帳の操作</b>」という新しい見出しになります。<b>項目は1件も減っていません（合計62件のまま）。</b>Markdownメモの画面では「台帳の操作」が下のほうへ回るので、メモを書いているときに記録台帳専用の操作が上に混ざらなくなります。（記録台帳でだけ使うものを別の見出しに分けた）</p>
       <p><strong>Ver1.19.06 で増えたこと（コマンドパレットが「いまの画面」を先頭に出す）：</strong>［Ctrl+K］のコマンドパレットを、<b>何も打たずに開いたとき</b>だけ、<b>いま見ている画面で使えるグループが上に来る</b>ようになりました。メモ画面なら「メモ（Markdown）」が、DB画面なら「項目（テーブル）」や「検索」が先頭です。<b>項目は1件も隠していません。</b>並べ順が変わるだけなので、他の画面の操作もすべて下に残っています。「⭐ よく使う」はこれまでどおり、いちばん上に出ます。言葉を打ち始めると、これまでどおり「当たった順」になります。
@@ -5538,7 +5661,19 @@ function mvrRender(){
        当たってしまうのを防ぐ）。
      ・1つの項目あたりの上限を決めて、重くなり過ぎないようにする。
    ================================================================== */
-const xsState = {kw: '', regex: false, only: null, perTable: 200,
+/* Ver1.19.09 (D-08 前半) 段の数。くわしい検索の ADV_MAX と同じ 5。 */
+const XS_DAN_MAX = 5;
+function xsDansDefault(){
+  const a = [];
+  for(let i = 0; i < XS_DAN_MAX; i++) a.push({op: 'and', not: false, kw: '', re: false});
+  return a;
+}
+const xsState = {only: null, perTable: 200,
+                 /* Ver1.19.09 (D-08 前半): 5段ぶんの条件。
+                    {op:'and'|'or', not:真偽, kw:文字列, re:真偽} が5つ。
+                    1段目の op は使わない（つなぐ相手がいないため）。
+                    ★runAdvSearch() の advGet().rows とわざと同じ形にしてある。 */
+                 dans: xsDansDefault(),
                  last: null,   /* Ver1.19.02 C3-1: 直前に飛んだ行 {tkey,id} */
                  /* Ver1.19.03 C3-2: いま #xsRes に出ている一覧の実体。
                     src:'live'  … 生の横断検索（list は hits そのもの）
@@ -5548,6 +5683,42 @@ const xsState = {kw: '', regex: false, only: null, perTable: 200,
                        指したままになるので、検索の先頭で必ず null に戻す。 */
                  view: null,
                  bound: false, ran: false, hits: [], cut: false, note: '', took: 0};
+
+/* ==================================================================
+   Ver1.19.09 (D-08 前半) xsState.kw / xsState.regex は
+   【1段目の別名として振る舞う】アクセサです。実体は dans[0] にしかありません。
+   ------------------------------------------------------------------
+   なぜ写しではなく別名にしたか（決定の記録は やることリスト §7）
+     ・xsState.kw を読み書きしている場所が本体に13か所ある。
+       写し（両方に書く）にすると、次に触った人が同期を1か所忘れた瞬間に
+       「画面は2文字目まで、検索は1文字目まで」のような、目で気づけない
+       食い違いが生まれる。abc.md が何度も記録してきた事故の型。
+     ・別名なら、実体が1つしか無いので【ズレようがない】。
+     ・おまけに旧形式の保存との互換がタダで付いてくる。
+       7000行台の rsOpenCross() が `xsState.kw = cond.kw` と書いているが、
+       これがそのまま「1段目の AND として読み替える」動きになる。
+       互換のためのコードを1行も足していない。
+
+   ★注意（読んだ人が驚かないように）
+     xsState.kw はプロパティに見えて、実際は関数（get / set）です。
+     JSON.stringify(xsState) は本体のどこでも使っていないことを確認ずみ
+     （保存の cond は rsSaveCross() が手で組み立てている）。
+     この道具で Object.defineProperty を使うのは、ここが初めてです。
+   ================================================================== */
+Object.defineProperty(xsState, 'kw', {
+  enumerable: true, configurable: true,
+  get: function(){ return xsState.dans[0].kw; },
+  set: function(v){ xsState.dans[0].kw = String(v == null ? '' : v); }
+});
+Object.defineProperty(xsState, 'regex', {
+  enumerable: true, configurable: true,
+  get: function(){ return xsState.dans[0].re; },
+  set: function(v){ xsState.dans[0].re = !!v; }
+});
+/* 段のうち「キーワードが入っているもの」だけを、上から順に返す。 */
+function xsDansUsed(){
+  return xsState.dans.filter(function(r){ return r && String(r.kw).trim() !== ''; });
+}
 
 function xsEscLike(s){
   return String(s).replace(/[\\%_]/g, function(m){ return '\\' + m; });
@@ -5571,35 +5742,132 @@ function xsMatcher(kw, useRe){
     return i < 0 ? null : {i: i, len: low.length};
   };
 }
-function xsExcerpt(text, hit){
+/* Ver1.19.09 (D-08 前半): <mark> に付ける組（段＝色相 / 系統＝線の形）。
+   ・段は 0 始まりの添字で受け、画面には 1 始まりで出す。
+   ・1段目には「つなぎ方」が無い（つなぐ相手がいない）ので and 扱い。
+   ・NOT は op より強い。打ち消し線＋暗い帯になる。 */
+function xsMarkCls(i, d){
+  const op = (d && d.not) ? 'not' : ((i === 0 || !d) ? 'and' : (d.op === 'or' ? 'or' : 'and'));
+  return 'xsdan' + (i + 1) + ' xsop-' + op;
+}
+function xsExcerpt(text, hit, i, d){
   const s = String(text);
   const BEFORE = 26, AFTER = 60;
   const a = Math.max(0, hit.i - BEFORE);
   const b = Math.min(s.length, hit.i + hit.len + AFTER);
+  /* i を渡さずに呼ばれたら、Ver1.19.08 までと同じ素の <mark> を出す。
+     ★保存ずみの抜粋（旧形式）も素の <mark> なので、素の見た目は
+       1段目の色になるよう CSS 側で受けてある。 */
+  const open  = (typeof i === 'number') ? ('<mark class="' + xsMarkCls(i, d) + '">') : '<mark>';
+  const close = (typeof i === 'number') ? ('<sup>' + (i + 1) + '</sup></mark>') : '</mark>';
   const h = (a > 0 ? '\u2026' : '')
           + escapeHtml(s.slice(a, hit.i))
-          + '<mark>' + escapeHtml(s.slice(hit.i, hit.i + hit.len)) + '</mark>'
+          + open + escapeHtml(s.slice(hit.i, hit.i + hit.len)) + close
           + escapeHtml(s.slice(hit.i + hit.len, b))
           + (b < s.length ? '\u2026' : '');
+  return h.replace(/\r\n|\r|\n/g, ' \u23CE ');
+}
+/* Ver1.19.10 (D-08 案C3・決-35) 1つの抜粋の中に複数の段の色を混ぜる。
+   ------------------------------------------------------------------
+   【重なりの規則】境目ですべて切り、断片ごとに持ち主（段）を数える。
+       持ち主が1つ     → その段の色（xsMarkCls をそのまま流用）
+       持ち主が2つ以上 → 網目1種類 ＋ 右肩に "1,2" と番号を並べる
+
+   【なぜ切るしかないか】段1が [0,2)、段2が [1,3) のような【たすき掛け】は
+     入れ子のタグでは表せない。HTML の仕組みの制約で、
+     切り分けるか片方を捨てるかの二択しかない（決-35 で切る側を選んだ）。
+
+   【窓】最初の印の BEFORE 字前から、最後の印の AFTER 字後まで。
+     印どうしが遠いと抜粋が際限なく伸びるので SPAN で頭を止め、
+     はみ出した印は落とす。ただし先頭の印だけは必ず残す。
+
+   【印が1つのときは xsExcerpt と1文字も違わない出力になる】
+     窓の式も組み立ても同じにしてある。1段だけの検索の見え方を
+     変えないための保険で、pw_d08c3.py の 1-1〜1-6 が機械で照合する。
+     ★ここが崩れると、保存ずみの結果との見た目の連続性も崩れる。 */
+function xsExcerptMulti(text, marks){
+  const s = String(text);
+  const BEFORE = 26, AFTER = 60, SPAN = 240;
+  const ms = marks.slice().sort(function(p, q){ return (p.i - q.i) || (p.len - q.len); });
+  const a  = Math.max(0, ms[0].i - BEFORE);
+  const keep = ms.filter(function(m, n){ return n === 0 || (m.i + m.len) <= (a + SPAN); });
+  const zz = keep[keep.length - 1];
+  const b  = Math.min(s.length, Math.min(zz.i + zz.len + AFTER, a + SPAN));
+  /* 境目を全部集めて重複を除く。ここで切ると、どの断片も
+     「持ち主の集合が変わらない」区間になる。 */
+  const cut = [];
+  keep.forEach(function(m){ cut.push(m.i); cut.push(m.i + m.len); });
+  const pts = cut.filter(function(v, n){ return cut.indexOf(v) === n; })
+                 .sort(function(p, q){ return p - q; });
+  let h = (a > 0 ? '\u2026' : ''), k = a;
+  for(let n = 0; n + 1 < pts.length; n++){
+    const x = pts[n], y = pts[n + 1];
+    const own = keep.filter(function(m){ return m.i <= x && y <= (m.i + m.len); });
+    if(!own.length) continue;
+    h += escapeHtml(s.slice(k, x));
+    const nos = own.map(function(m){ return m.dan + 1; }).sort(function(p, q){ return p - q; });
+    const cl  = (own.length === 1) ? xsMarkCls(own[0].dan, own[0].d) : 'xsmix';
+    h += '<mark class="' + cl + '">' + escapeHtml(s.slice(x, y))
+       + '<sup>' + nos.join(',') + '</sup></mark>';
+    k = y;
+  }
+  h += escapeHtml(s.slice(k, b)) + (b < s.length ? '\u2026' : '');
   return h.replace(/\r\n|\r|\n/g, ' \u23CE ');
 }
 function xsWanted(key){
   return !(xsState.only && xsState.only[key] === false);
 }
+/* ==================================================================
+   Ver1.19.09 (D-08 前半) 横断検索を最大5段にする
+   ------------------------------------------------------------------
+   【SQL の組み立て】1つの段は「どれかの列に入っていれば当たり」。
+     それを【段ごとに作って左から順に結ぶ】。かっこは使わない。
+         （1段目 → 2段目）→ 3段目 …
+     ★runAdvSearch()（7500行台）とまったく同じ向き。読み比べられるように
+       わざと同じ書き方にしてある。
+
+   【COALESCE を足した理由】NOT を使うと NULL が毒になる。
+     NOT (NULL LIKE '%x%') は真ではなく NULL なので、その列が空欄の行が
+     黙って消える。COALESCE("col",'') でそろえると正しく残る。
+     肯定側（NOT なし）の結果は、足しても足さなくても変わらない。
+
+   【JS 側の当て直し】SQL は行を選ぶだけ。どこがどう当たったかは
+     JS で段ごとに当て直す。段の数だけ照合器（xsMatcher）を作る。
+
+   【抜粋の本数（案C2）】
+     使う段が1つ  → 1段につき最大2本（＝Ver1.19.08 までと同じ見え方）
+     使う段が2つ以上 → 1段につき最大1本（＝最大5本。段ごとに必ず1本出る）
+
+   【NOT の段も走査する理由】「A または NOT B」では、A で残った行が
+     B を含んでいることがある。そこに打ち消し線を出すのが 決-26 の狙い。
+     「A かつ NOT B」では B を含む行がそもそも残らないので出ない。
+     これは不具合ではなく、NOT の意味そのもの。
+   ================================================================== */
 function runCrossSearch(){
   xsState.hits = []; xsState.cut = false; xsState.note = ''; xsState.ran = true;
   xsState.view = null;   /* Ver1.19.03 C3-2: 古い hits を指したままにさせない */
-  const kw    = String(xsState.kw || '').trim();
-  const useRe = !!xsState.regex;
-  if(!kw){ xsState.ran = false; xsState.note = '探したい言葉を入れてください。'; xsRenderRes(); return; }
+  const used = xsDansUsed();
+  if(!used.length){ xsState.ran = false; xsState.note = '探したい言葉を入れてください。'; xsRenderRes(); return; }
   if(!db){ xsState.note = 'データベースがまだ開いていません。'; xsRenderRes(); return; }
-  if(useRe){
-    ensureRegexp();
-    try{ new RegExp(kw); }
-    catch(e){ xsState.note = '正規表現が正しくありません: ' + e.message; xsRenderRes(); return; }
+  /* 段ごとに正規表現を確かめる。どこが悪いのかを段の番号で伝える。 */
+  for(let i = 0; i < used.length; i++){
+    if(!used[i].re) continue;
+    try{ new RegExp(String(used[i].kw)); }
+    catch(e){
+      xsState.note = (i + 1) + '段目の正規表現が正しくありません: ' + e.message;
+      xsRenderRes(); return;
+    }
   }
-  const match = xsMatcher(kw, useRe);
-  const like  = '%' + xsEscLike(kw) + '%';
+  if(used.some(function(r){ return r.re; })) ensureRegexp();
+
+  /* 段ごとの「照合器」と「LIKE の材料」を先に作っておく。 */
+  const dan = used.map(function(r){
+    const k = String(r.kw).trim();
+    return {kw: k, re: !!r.re, not: !!r.not, op: (r.op === 'or' ? 'or' : 'and'),
+            i: xsState.dans.indexOf(r),
+            match: xsMatcher(k, !!r.re), like: '%' + xsEscLike(k) + '%'};
+  });
+  const exPerDan = (dan.length === 1) ? 2 : 1;
   const lim   = Math.max(10, Math.min(2000, Number(xsState.perTable) || 200));
   const t0    = Date.now();
 
@@ -5609,10 +5877,18 @@ function runCrossSearch(){
     if(!real.length) return;
     const use = mvSrcCols(t.key).filter(function(c){ return real.indexOf(c.col_name) >= 0; });
     if(!use.length) return;
-    const where = use.map(function(c){
-      return useRe ? ('"' + c.col_name + '" REGEXP ?') : ('"' + c.col_name + '" LIKE ? ESCAPE \'\\\'');
-    }).join(' OR ');
-    const params = use.map(function(){ return useRe ? kw : like; });
+    /* ★段ごとに作って左から順に結ぶ。かっこは使わない。 */
+    const params = [];
+    let where = '';
+    dan.forEach(function(d, n){
+      const one = '(' + use.map(function(c){
+        params.push(d.re ? d.kw : d.like);
+        return 'COALESCE("' + c.col_name + '",\'\') '
+             + (d.re ? 'REGEXP ?' : 'LIKE ? ESCAPE \'\\\'');
+      }).join(' OR ') + ')';
+      const pred = d.not ? ('NOT ' + one) : one;
+      where = (n === 0) ? pred : ('(' + where + ' ' + (d.op === 'or' ? 'OR' : 'AND') + ' ' + pred + ')');
+    });
     const sql = 'SELECT * FROM ' + t.key + ' WHERE (' + where + ') ORDER BY id DESC LIMIT ' + (lim + 1);
     let names = [], rows = [];
     try{
@@ -5635,20 +5911,38 @@ function runCrossSearch(){
     const idIdx = names.indexOf('id');
     rows.forEach(function(r){
       const cols = [], exs = [];
-      use.forEach(function(c){
-        const ci = names.indexOf(c.col_name);
-        if(ci < 0) return;
-        const h = match(r[ci]);
-        if(!h) return;
-        cols.push(c.label || c.col_name);
-        if(exs.length < 2) exs.push(xsExcerpt(r[ci], h));
+      /* ★Ver1.19.10 (案C3・決-35): 段ごとではなく【列ごと】に印を集める。
+         同じ列に当たった段どうしだけが1本の抜粋にまとまり、
+         列が違えば本文が違うので、これまでどおり別の抜粋になる。
+         ★並ぶ順は変えていない。列がはじめて出てきた順は、
+           案C2 のときの抜粋の順とまったく同じになる。 */
+      const cOrd = [], cBox = {};
+      dan.forEach(function(d){
+        let n = 0;
+        for(let k = 0; k < use.length; k++){
+          if(n >= exPerDan) break;
+          const ci = names.indexOf(use[k].col_name);
+          if(ci < 0) continue;
+          const h = d.match(r[ci]);
+          if(!h) continue;
+          const lab = use[k].label || use[k].col_name;
+          if(cols.indexOf(lab) < 0) cols.push(lab);
+          const cn = use[k].col_name;
+          if(!cBox[cn]){ cBox[cn] = {tx: r[ci], mk: []}; cOrd.push(cn); }
+          cBox[cn].mk.push({i: h.i, len: h.len, dan: d.i, d: d});
+          n++;
+        }
       });
+      cOrd.forEach(function(cn){ exs.push(xsExcerptMulti(cBox[cn].tx, cBox[cn].mk)); });
+
       if(!cols.length){
         /* SQL 側だけが拾った珍しい場合（大文字小文字の扱いの差など）の保険 */
         for(let k = 0; k < use.length; k++){
           const ci = names.indexOf(use[k].col_name);
           if(ci >= 0 && r[ci] !== null && r[ci] !== undefined && String(r[ci]) !== ''){
             cols.push(use[k].label || use[k].col_name);
+            /* ★段を渡さない＝素の <mark>。NOT だけの条件で残った行や、
+               大文字小文字の扱いの差で JS が当てられなかった行が通る道。 */
             exs.push(xsExcerpt(r[ci], {i: 0, len: 0}));
             break;
           }
@@ -5669,7 +5963,12 @@ function runCrossSearch(){
      添字 i がそのまま「画面の i+1 行目」になる。 */
   xsState.view = {src: 'live', sid: '', mode: '', list: xsState.hits};
   xsRenderRes();
-  try{ if(window.WDT && WDT.noteSearch) WDT.noteSearch(kw, useRe, '*'); }catch(e){}
+  /* 9番: 検索の記録には【1段目】を残す。5段ぶんの残し方は D-08 後半で決める。 */
+  try{
+    if(window.WDT && WDT.noteSearch){
+      WDT.noteSearch(String(xsState.dans[0].kw || '').trim(), !!xsState.dans[0].re, '*');
+    }
+  }catch(e){}
 }
 function openCrossSearch(presetKw){
   if(!db){ setStatus('データベースがまだ開いていません。', 'err'); return; }
@@ -5897,9 +6196,28 @@ function xsBackKeyLabel(){
   return k;
 }
 function xsPull(){
-  const k = document.getElementById('xsKw');  if(k) xsState.kw = k.value;
-  const r = document.getElementById('xsRe');  if(r) xsState.regex = !!r.checked;
+  /* Ver1.19.09 (D-08 前半): 5段ぶんをまとめて読む。
+     ★1段目の入れ物の識別名は xsKw / xsRe のまま。改名しないこと
+       （pw_c3 / pw_c3b / pw_c3c が握っている）。
+       ★この行に id=" と書かないこと。abc.md #51 のとおり、説明文が
+         検算の件数を汚す（2026-08-31 に実際に踏んだ）。
+     2段目以降は data-xsd="kw|re|op|not" data-xsi="1..4" で拾う。 */
+  const back = document.getElementById('xsBack');
+  const k = document.getElementById('xsKw');  if(k) xsState.dans[0].kw  = k.value;
+  const r = document.getElementById('xsRe');  if(r) xsState.dans[0].re  = !!r.checked;
+  const n0 = document.getElementById('xsNot1'); if(n0) xsState.dans[0].not = !!n0.checked;
   const p = document.getElementById('xsPer'); if(p) xsState.perTable = parseInt(p.value, 10) || 200;
+  if(!back) return;
+  Array.prototype.forEach.call(back.querySelectorAll('[data-xsd]'), function(el){
+    const i = parseInt(el.getAttribute('data-xsi'), 10);
+    if(!(i >= 1 && i < XS_DAN_MAX)) return;
+    const what = el.getAttribute('data-xsd');
+    const d = xsState.dans[i];
+    if(what === 'kw')  d.kw  = el.value;
+    if(what === 're')  d.re  = !!el.checked;
+    if(what === 'not') d.not = !!el.checked;
+    if(what === 'op')  d.op  = (el.value === 'or') ? 'or' : 'and';
+  });
 }
 function xsSetAll(on){
   if(!xsState.only) xsState.only = {};
@@ -5931,7 +6249,21 @@ function xsBind(){
   back.addEventListener('change', function(e){
     const t = e.target;
     if(!t) return;
-    if(t.id === 'xsRe'){ xsState.regex = !!t.checked; return; }
+    if(t.id === 'xsRe'){ xsState.dans[0].re = !!t.checked; return; }
+    if(t.id === 'xsNot1'){ xsState.dans[0].not = !!t.checked; return; }
+    /* Ver1.19.09 (D-08 前半): 2〜5段目。ひとつの受け口でまとめて拾う。
+       ハードコードの if を段の数だけ増やさない（手順書 §5）。 */
+    if(t.getAttribute && t.getAttribute('data-xsd')){
+      const i = parseInt(t.getAttribute('data-xsi'), 10);
+      if(i >= 1 && i < XS_DAN_MAX){
+        const what = t.getAttribute('data-xsd');
+        const d = xsState.dans[i];
+        if(what === 're')  d.re  = !!t.checked;
+        if(what === 'not') d.not = !!t.checked;
+        if(what === 'op')  d.op  = (t.value === 'or') ? 'or' : 'and';
+      }
+      return;
+    }
     if(t.id === 'xsPer'){ xsState.perTable = parseInt(t.value, 10) || 200; return; }
     if(t.classList && t.classList.contains('xstchk')){
       if(!xsState.only) xsState.only = {};
@@ -5942,7 +6274,11 @@ function xsBind(){
   });
   back.addEventListener('keydown', function(e){
     if(e.key === 'Escape'){ e.preventDefault(); closeCrossSearch(); return; }
-    if(e.key === 'Enter' && e.target && e.target.id === 'xsKw'){
+    /* Ver1.19.09 (D-08 前半): どの段のキーワード欄でも Enter で探せる。 */
+    const tg = e.target;
+    const isKw = tg && (tg.id === 'xsKw'
+                 || (tg.getAttribute && tg.getAttribute('data-xsd') === 'kw'));
+    if(e.key === 'Enter' && isKw){
       /* 日本語入力の変換確定の Enter では検索しない */
       if(e.isComposing || e.keyCode === 229) return;
       e.preventDefault();
@@ -5958,7 +6294,7 @@ function xsRenderBody(){
      + '結果の行をクリックすると、<b>その項目を同じ言葉で絞り込んだ状態</b>で開き、その行まで画面が動きます。</div>';
   h += '<div class="xs-form">'
      + '<div class="fld"><span>探す言葉</span>'
-     + '<input type="text" id="xsKw" value="' + escapeAttr(xsState.kw || '') + '"'
+     + '<input type="text" id="xsKw" value="' + escapeAttr(xsState.dans[0].kw || '') + '"'
      + ' placeholder="例: ベアリング　／　不具合|故障（正規表現）" autocomplete="off" spellcheck="false"></div>'
      + '<div class="fld"><span>1項目あたりの上限</span>'
      + '<select id="xsPer">'
@@ -5967,9 +6303,14 @@ function xsRenderBody(){
        }).join('')
      + '</select></div>'
      + '<label style="display:inline-flex;align-items:center;gap:6px;margin:0 0 4px;font-size:12.5px;color:#e6e9ef">'
-     + '<input type="checkbox" id="xsRe" style="width:auto"' + (xsState.regex ? ' checked' : '') + '> 正規表現で探す</label>'
+     + '<input type="checkbox" id="xsRe" style="width:auto"' + (xsState.dans[0].re ? ' checked' : '') + '> 正規表現で探す</label>'
+     + '<label title="この言葉を含む行を【除きます】" style="display:inline-flex;align-items:center;gap:6px;margin:0 0 4px;font-size:12.5px;color:#e6e9ef">'
+     + '<input type="checkbox" id="xsNot1" style="width:auto"' + (xsState.dans[0].not ? ' checked' : '') + '> NOT</label>'
      + '<button type="button" class="primary" id="xsRun">\u{1F50E} 探す</button>'
      + '</div>';
+  /* Ver1.19.09 (D-08 前半・案B3): 2〜5段目は既定で畳んでおく。
+     いつもの1語検索の見た目を変えないため。開くと最大5段まで組める。 */
+  h += xsRenderDans();
   h += '<div class="wdtx-hint" style="margin-top:2px">探す項目'
      + '<button type="button" id="xsAll" style="margin-left:8px">全部選ぶ</button>'
      + '<button type="button" id="xsNone">全部外す</button></div>';
@@ -5985,6 +6326,49 @@ function xsRenderBody(){
   h += '<div class="wdtx-actions"><button type="button" id="xsClose">閉じる</button></div>';
   body.innerHTML = h;
   xsRenderRes();
+}
+/* ==================================================================
+   Ver1.19.09 (D-08 前半・案B3) 2〜5段目の入力欄
+   ------------------------------------------------------------------
+   ★renderAdvPanel() の .advrow をそのまま持ってきてはいけない。
+     あちらの CSS は `#app-db .advrow{…}` で、#xsBack は #app-db の
+     【外】にある（2026-08-31 に Playwright で実測）。効かない。
+     ここでは .xs-dan-row（.xs- 接頭辞で書き下ろしたもの）を使う。
+   ★段の色見本 .sw を左に置く。結果のハイライトと同じ色なので、
+     「2段目＝空色」が入力欄の時点で分かる。
+   ================================================================== */
+function xsRenderDans(){
+  const n = xsDansUsed().length;
+  let h = '<details class="xs-dans"' + (n > 1 ? ' open' : '') + '>'
+        + '<summary>条件を増やす（かつ・または・NOT ／ 最大' + XS_DAN_MAX + '段）'
+        + (n > 1 ? '　<b>' + n + '段を使用中</b>' : '')
+        + '</summary>';
+  for(let i = 1; i < XS_DAN_MAX; i++){
+    const d = xsState.dans[i];
+    h += '<div class="xs-dan-row">'
+       + '<span class="sw xs-dan-sw' + (i + 1) + '" title="' + (i + 1) + '段目の色"></span>'
+       + '<span class="no">' + (i + 1) + '段目</span>'
+       + '<select data-xsd="op" data-xsi="' + i + '" title="1つ上までの結果と、どうつなぐか">'
+       + '<option value="and"' + (d.op === 'and' ? ' selected' : '') + '>かつ (AND)</option>'
+       + '<option value="or"'  + (d.op === 'or'  ? ' selected' : '') + '>または (OR)</option>'
+       + '</select>'
+       + '<label title="この条件に当てはまる行を除きます">'
+       + '<input type="checkbox" data-xsd="not" data-xsi="' + i + '"'
+       + (d.not ? ' checked' : '') + '>NOT</label>'
+       + '<input type="text" data-xsd="kw" data-xsi="' + i + '"'
+       + ' value="' + escapeAttr(d.kw || '') + '"'
+       + ' placeholder="キーワード（空欄ならこの段は無視）" autocomplete="off" spellcheck="false">'
+       + '<label title="正規表現で調べます">'
+       + '<input type="checkbox" data-xsd="re" data-xsi="' + i + '"'
+       + (d.re ? ' checked' : '') + '>正規表現</label>'
+       + '</div>';
+  }
+  h += '<div class="wdtx-hint" style="margin-top:6px">かっこは使いません。'
+     + '上の段から順に「（1段目 → 2段目）→ 3段目」の向きでつなぎます。'
+     + '　★NOT の打ち消し線は「または」でつないだときに見えます'
+     + '（「かつ」だと、その語を含む行はそもそも結果から外れるためです）。</div>';
+  h += '</details>';
+  return h;
 }
 function xsRenderRes(){
   const box = document.getElementById('xsRes');
