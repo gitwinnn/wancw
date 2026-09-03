@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.10</title>
+<title>記録台帳＋MDメモ Ver1.19.11</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -2360,7 +2360,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.10</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.11</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2525,6 +2525,7 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.11 で増えたこと（「開いたら今日へ」が効かない不具合を直しました）：</strong>チェックを入れておいた「開いたら今日へ」が、次に開いたときに<b>効かないことがありました</b>。原因は<b>設定のしまい場所</b>です。これまではブラウザ側の保存領域に入れていましたが、この場所は<b>会社のパソコンのようにファイルを直接開く使い方では、黙って失敗する</b>ことがあります。しかも失敗しても知らせずに「設定されていない」ものとして扱っていたため、<b>チェックは入っているのに今日へ飛ばない</b>という状態になっていました。そこで、しまい場所を<b>作業記録DBの中（`.sqlite` と一緒に持ち運べる場所）</b>へ移しました。これで、どのパソコン・どの開き方でも設定が残ります。<b>使い方は何も変わりません。</b>チェックの位置も見た目もそのままです。なお、これまでの設定は引き継がれないので、<b>一度だけチェックを入れ直してください</b>。（開いたら今日へ・保存先の付け替え）</p>
       <p><strong>Ver1.19.10 で増えたこと（重なった言葉を1つの抜粋にまとめました）：</strong>「🔎 全項目を横断検索」で言葉を2つ以上入れたとき、これまでは<b>同じ一文が段の数だけ繰り返して</b>出ていました。これを<b>1本にまとめ、その中に段ごとの色を並べて</b>出すようにしました。たとえば1段目に「予約」、2段目に「議事録」と入れると、以前は同じ文が2回出ていましたが、これからは1回だけ出て、その中で「予約」が琥珀、「議事録」が空色に光ります。<b>ふだんの使い方は何も変わりません。</b>なお「会議」と「議室」のように<b>言葉どうしが同じ文字を含んでいる</b>ときは、その重なった文字だけ<b>斜めの網目</b>で表示し、右肩に「1,2」のように<b>重なっている段の番号をすべて</b>並べます。1つの文字を2つの色で同時に塗ることはできないための工夫です。段を1つだけ使うときの見え方は、Ver1.19.09 までとまったく同じです。以前に保存した横断検索の結果も、これまでどおり開けます。（横断検索の抜粋をまとめる）</p>
       <p><strong>Ver1.19.09 で増えたこと（横断検索を最大5段にしました）：</strong>「🔎 全項目を横断検索」で、これまでは<b>言葉を1つ</b>しか入れられませんでした。これを<b>最大5段</b>まで積めるようにしました。段どうしは「<b>かつ</b>（両方に当てはまる）」「<b>または</b>（どちらかに当てはまる）」でつなげ、段ごとに「<b>NOT</b>（この言葉を含む行を除く）」も指定できます。<b>ふだんの使い方は何も変わりません。</b>2段目から下は「<b>▶ 条件を増やす</b>」の中に畳んであるので、1つの言葉で探すときは今までとまったく同じ見た目です。さらに、結果の抜粋の色を<b>段ごとに変えました</b>（1段目＝琥珀／2段目＝空／3段目＝若草／4段目＝藤／5段目＝珊瑚）。つなぎ方も線の形で分かります（<b>かつ＝実線の下線</b>／<b>または＝点線の下線</b>／<b>NOT＝打ち消し線</b>）。色が見分けにくいときのために、印の右肩に<b>段の番号</b>も小さく出しています。「なぜこの行が出てきたのか」を、抜粋を上から読むだけでたどれます。なお NOT の打ち消し線は「<b>または</b>」でつないだときに見えます（「かつ」でつなぐと、その言葉を含む行はそもそも結果から外れるためです）。以前に保存した横断検索の結果も、これまでどおり開けます。（横断検索の5段化と色分け）</p>
       <p><strong>Ver1.19.08 で増えたこと（長い説明を畳めるように・タグ選択の決定ボタンが常に見える）：</strong>記録台帳の表の上にあった<b>「▶ 色つきセルは…」の長い説明</b>を、<b>畳んだ状態</b>にしました。見出しの「<b>▶ セルの編集について（クリックで開く）</b>」を押すと開きます。説明の中身は1文字も減っていません（日付・時刻の列の話も、そのまま中に入っています）。ふだんは表がその分だけ上に来るので、行が多いときに見やすくなります。もうひとつ、<b>タグ選択の画面</b>で、タグをたくさん選ぶと<b>「決定」のボタンが画面の外に出てしまい押せなくなる</b>ことがありました。ボタンの並びを<b>画面の下に貼り付く形</b>に変えたので、タグが何十個あっても、いつでも押せます。（畳む説明とタグ選択の決定ボタン）</p>
@@ -3900,6 +3901,12 @@ function loadMeta(){
   try{ rowTouchSync(); }catch(e){}
   // Ver1.5.00: お気に入りバーを描き直す（DBを開き直したときも自動で追従する）
   try{ if(window.WDT && WDT.onDbReady) WDT.onDbReady(); }catch(e){}
+  /* Ver1.19.11 (B-03): 「開いたら今日へ」をDBから読み直す。
+     rowTouchSync と同じ理由でここに置く … loadMeta() は起動・DB復元・
+     項目の増減のすべての後で呼ばれるので、ここ1か所で漏れなく追従できる。
+     ★boot() では loadMeta() → updateTodayFocusBox() → openTab() の順に走るので、
+       チェックボックスの表示にも、起動直後のジャンプにも間に合う。 */
+  try{ loadTodayFocusOpt(); }catch(e){}
 }
 function currentMeta(){ return metaTables.find(t => t.key === currentTable); }
 function currentCols(){ return metaColumnsByTable[currentTable] || []; }
@@ -6498,7 +6505,12 @@ function xsGoto(tkey, id){
 const gridSort = {};        /* 項目ごとの一時的な並び順 {col, dir, saved} */
 let wantTodayFocus = false; /* 次の描画で「今日」へ飛ぶかどうか */
 let todayFocusOn = false;
-try{ todayFocusOn = (localStorage.getItem('wdt_todayfocus') === '1'); }catch(e){ todayFocusOn = false; }
+/* Ver1.19.11 (B-03): 「開いたら今日へ」の保存先を _meta_opts へ移した。
+   ★以前はここでブラウザの保存領域から読んでいた。会社PCの file:// では例外になり、
+     catch で false に落ちるため「チェックは入っているのに効かない」という症状に
+     なっていた（abc.md §6 の設計上の約束違反。2026-09-03 に probe_b03.py で実測）。
+   ★ここは script の読み込み時に走るので、db も window.WDT もまだ無い。
+     読むのは loadTodayFocusOpt() … loadMeta() の末尾から呼ぶ（落とし穴 #21）。 */
 
 function gridColLabel(tableKey, cn){
   if(cn === 'id') return 'ID';
@@ -6684,9 +6696,40 @@ function focusTodayRow(quiet){
   return true;
 }
 function jumpToToday(){ focusTodayRow(false); }
+/* ==================================================================
+   Ver1.19.11 (B-03)  「開いたら今日へ」の保存先
+   ------------------------------------------------------------------
+   棚は 'shell'、名前は 'todayfocus'。WDT の OPT_SCOPE と同じ棚だが、
+   名前は 'all'（設定をまるごと1行に入れているもの）と別なのでぶつからない。
+   ================================================================== */
+var TODAYFOCUS_SCOPE = 'shell';
+var TODAYFOCUS_NAME  = 'todayfocus';
+
+/* DBから読む。loadMeta() の末尾から呼ぶので、DBを開き直すたびに自動で追従する。 */
+function loadTodayFocusOpt(){
+  var W = window.WDT;
+  if(!W || typeof W.dbOptGet !== 'function') return false;  /* まだWDTが無い → 既定の false のまま */
+  var raw = null;
+  try{ raw = W.dbOptGet(TODAYFOCUS_SCOPE, TODAYFOCUS_NAME); }catch(e){ return false; }
+  todayFocusOn = (raw === '1');
+  return true;
+}
+
+/* DBへ書く。★scheduleAutosave() を呼ばないと SQLite のメモリ上だけ変わって
+   IndexedDB に落ちず、結局次回に消える（mdeSessionFlush と同じ作法）。 */
+function saveTodayFocusOpt(){
+  var W = window.WDT;
+  if(!W || typeof W.dbOptSet !== 'function') return false;
+  var ok = false;
+  try{ ok = !!W.dbOptSet(TODAYFOCUS_SCOPE, TODAYFOCUS_NAME, todayFocusOn ? '1' : '0'); }
+  catch(e){ return false; }
+  if(ok){ try{ if(typeof window.scheduleAutosave === 'function') window.scheduleAutosave(); }catch(e){} }
+  return ok;
+}
+
 function toggleTodayFocus(on){
   todayFocusOn = !!on;
-  try{ localStorage.setItem('wdt_todayfocus', todayFocusOn ? '1' : '0'); }catch(e){}
+  saveTodayFocusOpt();
   setStatus(todayFocusOn
     ? 'この項目を開いたとき、今日の行まで自動で移動します。'
     : '自動で今日へ移動する設定をやめました。', 'ok');
