@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.09</title>
+<title>記録台帳＋MDメモ Ver1.19.10</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -1906,6 +1906,12 @@ body.wdt-mobfix #app-db .sectbl{ display:none; }
   --xs-dan3-bg:#173a1f; --xs-dan3-nbg:#122d18; --xs-dan3-fg:#9ae6a8;
   --xs-dan4-bg:#2f2a5c; --xs-dan4-nbg:#252148; --xs-dan4-fg:#c4b5ff;
   --xs-dan5-bg:#4d2222; --xs-dan5-nbg:#3c1b1b; --xs-dan5-fg:#ffaba2;
+  /* Ver1.19.10 (案C3・決-35) 2つ以上の段が同じ文字で重なった所。
+     段の色は使わず、中立な灰の【縞】で表す。組み合わせごとに色を作ると
+     2段の重なりだけで10通り、3段まで含めると26通りになるため。
+     背景 #191c22 での実測: 文字/濃 9.69 ・ 文字/淡 7.33。
+     どちらも WCAG の AAA（7:1）以上で、既存5段と同じ基準を満たす。 */
+  --xs-mix-a:#3a3f47; --xs-mix-b:#4a515b; --xs-mix-fg:#f2f5f9;
 }
 /* --- 段（色相） --- */
 .xs-hit .ex mark.xsdan1{ background:var(--xs-dan1-bg); color:var(--xs-dan1-fg); }
@@ -1924,6 +1930,16 @@ body.wdt-mobfix #app-db .sectbl{ display:none; }
 .xs-hit .ex mark.xsop-not.xsdan3{ background:var(--xs-dan3-nbg); }
 .xs-hit .ex mark.xsop-not.xsdan4{ background:var(--xs-dan4-nbg); }
 .xs-hit .ex mark.xsop-not.xsdan5{ background:var(--xs-dan5-nbg); }
+/* --- 重なり（案C3・決-35）。色相ではなく【縞という形】で表すので、
+       色が見分けにくくても「重なっている」と分かる。右肩には
+       重なっている段の番号をすべて並べる（1,2 のように）。
+     ★系統の線（xsop-*）は付けない。重なった所は複数の段のものなので、
+       どれか1つの系統の線を引くと嘘になる。 --- */
+.xs-hit .ex mark.xsmix{
+  background:repeating-linear-gradient(135deg,
+    var(--xs-mix-a) 0 5px, var(--xs-mix-b) 5px 10px);
+  color:var(--xs-mix-fg);
+}
 /* --- 右肩の段番号（色が見えない人でも段が分かるように。決-27 丙案） ---
    ★display:inline-block は飾りではない。NOT の段は親の <mark> に
      line-through が掛かっており、CSS の仕様では【子孫は先祖の装飾を
@@ -2344,7 +2360,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.09</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.10</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2509,6 +2525,7 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.10 で増えたこと（重なった言葉を1つの抜粋にまとめました）：</strong>「🔎 全項目を横断検索」で言葉を2つ以上入れたとき、これまでは<b>同じ一文が段の数だけ繰り返して</b>出ていました。これを<b>1本にまとめ、その中に段ごとの色を並べて</b>出すようにしました。たとえば1段目に「予約」、2段目に「議事録」と入れると、以前は同じ文が2回出ていましたが、これからは1回だけ出て、その中で「予約」が琥珀、「議事録」が空色に光ります。<b>ふだんの使い方は何も変わりません。</b>なお「会議」と「議室」のように<b>言葉どうしが同じ文字を含んでいる</b>ときは、その重なった文字だけ<b>斜めの網目</b>で表示し、右肩に「1,2」のように<b>重なっている段の番号をすべて</b>並べます。1つの文字を2つの色で同時に塗ることはできないための工夫です。段を1つだけ使うときの見え方は、Ver1.19.09 までとまったく同じです。以前に保存した横断検索の結果も、これまでどおり開けます。（横断検索の抜粋をまとめる）</p>
       <p><strong>Ver1.19.09 で増えたこと（横断検索を最大5段にしました）：</strong>「🔎 全項目を横断検索」で、これまでは<b>言葉を1つ</b>しか入れられませんでした。これを<b>最大5段</b>まで積めるようにしました。段どうしは「<b>かつ</b>（両方に当てはまる）」「<b>または</b>（どちらかに当てはまる）」でつなげ、段ごとに「<b>NOT</b>（この言葉を含む行を除く）」も指定できます。<b>ふだんの使い方は何も変わりません。</b>2段目から下は「<b>▶ 条件を増やす</b>」の中に畳んであるので、1つの言葉で探すときは今までとまったく同じ見た目です。さらに、結果の抜粋の色を<b>段ごとに変えました</b>（1段目＝琥珀／2段目＝空／3段目＝若草／4段目＝藤／5段目＝珊瑚）。つなぎ方も線の形で分かります（<b>かつ＝実線の下線</b>／<b>または＝点線の下線</b>／<b>NOT＝打ち消し線</b>）。色が見分けにくいときのために、印の右肩に<b>段の番号</b>も小さく出しています。「なぜこの行が出てきたのか」を、抜粋を上から読むだけでたどれます。なお NOT の打ち消し線は「<b>または</b>」でつないだときに見えます（「かつ」でつなぐと、その言葉を含む行はそもそも結果から外れるためです）。以前に保存した横断検索の結果も、これまでどおり開けます。（横断検索の5段化と色分け）</p>
       <p><strong>Ver1.19.08 で増えたこと（長い説明を畳めるように・タグ選択の決定ボタンが常に見える）：</strong>記録台帳の表の上にあった<b>「▶ 色つきセルは…」の長い説明</b>を、<b>畳んだ状態</b>にしました。見出しの「<b>▶ セルの編集について（クリックで開く）</b>」を押すと開きます。説明の中身は1文字も減っていません（日付・時刻の列の話も、そのまま中に入っています）。ふだんは表がその分だけ上に来るので、行が多いときに見やすくなります。もうひとつ、<b>タグ選択の画面</b>で、タグをたくさん選ぶと<b>「決定」のボタンが画面の外に出てしまい押せなくなる</b>ことがありました。ボタンの並びを<b>画面の下に貼り付く形</b>に変えたので、タグが何十個あっても、いつでも押せます。（畳む説明とタグ選択の決定ボタン）</p>
       <p><strong>Ver1.19.07 で増えたこと（「操作」が画面別に2つに分かれた）：</strong>これまで18件が1つにまとまっていた「操作」の見出しを、<b>どの画面でも使うもの</b>（上書き保存・名前を付けて保存・DBファイルを開く・元に戻す・やり直す・ダーク／ライト切替・控えの一覧・自己点検の8件）と、<b>記録台帳でだけ使うもの</b>（タグや列の管理、CSV／TXTの書き出しなど10件）に分けました。後者は「<b>台帳の操作</b>」という新しい見出しになります。<b>項目は1件も減っていません（合計62件のまま）。</b>Markdownメモの画面では「台帳の操作」が下のほうへ回るので、メモを書いているときに記録台帳専用の操作が上に混ざらなくなります。（記録台帳でだけ使うものを別の見出しに分けた）</p>
@@ -5750,6 +5767,53 @@ function xsExcerpt(text, hit, i, d){
           + (b < s.length ? '\u2026' : '');
   return h.replace(/\r\n|\r|\n/g, ' \u23CE ');
 }
+/* Ver1.19.10 (D-08 案C3・決-35) 1つの抜粋の中に複数の段の色を混ぜる。
+   ------------------------------------------------------------------
+   【重なりの規則】境目ですべて切り、断片ごとに持ち主（段）を数える。
+       持ち主が1つ     → その段の色（xsMarkCls をそのまま流用）
+       持ち主が2つ以上 → 網目1種類 ＋ 右肩に "1,2" と番号を並べる
+
+   【なぜ切るしかないか】段1が [0,2)、段2が [1,3) のような【たすき掛け】は
+     入れ子のタグでは表せない。HTML の仕組みの制約で、
+     切り分けるか片方を捨てるかの二択しかない（決-35 で切る側を選んだ）。
+
+   【窓】最初の印の BEFORE 字前から、最後の印の AFTER 字後まで。
+     印どうしが遠いと抜粋が際限なく伸びるので SPAN で頭を止め、
+     はみ出した印は落とす。ただし先頭の印だけは必ず残す。
+
+   【印が1つのときは xsExcerpt と1文字も違わない出力になる】
+     窓の式も組み立ても同じにしてある。1段だけの検索の見え方を
+     変えないための保険で、pw_d08c3.py の 1-1〜1-6 が機械で照合する。
+     ★ここが崩れると、保存ずみの結果との見た目の連続性も崩れる。 */
+function xsExcerptMulti(text, marks){
+  const s = String(text);
+  const BEFORE = 26, AFTER = 60, SPAN = 240;
+  const ms = marks.slice().sort(function(p, q){ return (p.i - q.i) || (p.len - q.len); });
+  const a  = Math.max(0, ms[0].i - BEFORE);
+  const keep = ms.filter(function(m, n){ return n === 0 || (m.i + m.len) <= (a + SPAN); });
+  const zz = keep[keep.length - 1];
+  const b  = Math.min(s.length, Math.min(zz.i + zz.len + AFTER, a + SPAN));
+  /* 境目を全部集めて重複を除く。ここで切ると、どの断片も
+     「持ち主の集合が変わらない」区間になる。 */
+  const cut = [];
+  keep.forEach(function(m){ cut.push(m.i); cut.push(m.i + m.len); });
+  const pts = cut.filter(function(v, n){ return cut.indexOf(v) === n; })
+                 .sort(function(p, q){ return p - q; });
+  let h = (a > 0 ? '\u2026' : ''), k = a;
+  for(let n = 0; n + 1 < pts.length; n++){
+    const x = pts[n], y = pts[n + 1];
+    const own = keep.filter(function(m){ return m.i <= x && y <= (m.i + m.len); });
+    if(!own.length) continue;
+    h += escapeHtml(s.slice(k, x));
+    const nos = own.map(function(m){ return m.dan + 1; }).sort(function(p, q){ return p - q; });
+    const cl  = (own.length === 1) ? xsMarkCls(own[0].dan, own[0].d) : 'xsmix';
+    h += '<mark class="' + cl + '">' + escapeHtml(s.slice(x, y))
+       + '<sup>' + nos.join(',') + '</sup></mark>';
+    k = y;
+  }
+  h += escapeHtml(s.slice(k, b)) + (b < s.length ? '\u2026' : '');
+  return h.replace(/\r\n|\r|\n/g, ' \u23CE ');
+}
 function xsWanted(key){
   return !(xsState.only && xsState.only[key] === false);
 }
@@ -5847,8 +5911,12 @@ function runCrossSearch(){
     const idIdx = names.indexOf('id');
     rows.forEach(function(r){
       const cols = [], exs = [];
-      /* ★段ごとに当て直す（案C2）。段の順に並ぶので、抜粋を上から読めば
-         「1段目がここ、2段目がここ」と、行が出た理由をたどれる。 */
+      /* ★Ver1.19.10 (案C3・決-35): 段ごとではなく【列ごと】に印を集める。
+         同じ列に当たった段どうしだけが1本の抜粋にまとまり、
+         列が違えば本文が違うので、これまでどおり別の抜粋になる。
+         ★並ぶ順は変えていない。列がはじめて出てきた順は、
+           案C2 のときの抜粋の順とまったく同じになる。 */
+      const cOrd = [], cBox = {};
       dan.forEach(function(d){
         let n = 0;
         for(let k = 0; k < use.length; k++){
@@ -5859,10 +5927,14 @@ function runCrossSearch(){
           if(!h) continue;
           const lab = use[k].label || use[k].col_name;
           if(cols.indexOf(lab) < 0) cols.push(lab);
-          exs.push(xsExcerpt(r[ci], h, d.i, d));
+          const cn = use[k].col_name;
+          if(!cBox[cn]){ cBox[cn] = {tx: r[ci], mk: []}; cOrd.push(cn); }
+          cBox[cn].mk.push({i: h.i, len: h.len, dan: d.i, d: d});
           n++;
         }
       });
+      cOrd.forEach(function(cn){ exs.push(xsExcerptMulti(cBox[cn].tx, cBox[cn].mk)); });
+
       if(!cols.length){
         /* SQL 側だけが拾った珍しい場合（大文字小文字の扱いの差など）の保険 */
         for(let k = 0; k < use.length; k++){
