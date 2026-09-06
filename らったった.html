@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.14</title>
+<title>記録台帳＋MDメモ Ver1.19.17</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -2360,7 +2360,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.14</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.17</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2526,6 +2526,9 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.17 で増えたこと（見た目は変わりません・部品に「動き」と「説明」を付けました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。画面の部品（保存・元に戻す・検索など）に、<b>「押したときの動き」「入力欄へ行く動き」「いま使えるか」「探すときの言葉（ローマ字・かな）」「1行の説明」</b>を、中に静かに付けました。<b>なぜ「いま使えるか」を持たせたか</b>…たとえば「元に戻す」は、DBファイルが開いていないと意味がありません。これまでは、その状態でキーを押しても<b>何も起きないだけ</b>で、「効かないのか、壊れているのか」が分かりませんでした。これからは<b>「いま使えない」とはっきり分かる</b>ようにします。<b>探すときの言葉</b>は、日本語入力に切り替えなくても <code>hozon</code> や <code>もどす</code> で見つけられるように、41個の部品ぶん一度に用意しました。※これらは、次の版で<b>キーボードだけで全部の部品に届く</b>ようにするための土台です。いまは動きにはつないでいません。</p>
+      <p><strong>Ver1.19.16 で増えたこと（見た目は変わりません・部品を隠せる仕組みを入れました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。画面の部品を<b>1つずつ表示したり非表示にしたりできる仕組み</b>を、中に静かに置きました。<b>ボタン1個</b>でも<b>パネルまるごと</b>でも、<b>同じ1つの指示</b>で切り替わります（将来これを<b>キー1つ</b>で瞬間に開閉できるようにします。エクセルの左側のツリーや、ブラウザのお気に入りバーを開いたり閉じたりする感覚です）。<b>設定は「隠したものだけ」を覚えます</b>…出しているものは記録しないので、<b>何も隠していないときは、これまでと1文字も変わりません</b>。<b>隠す・出すは、DBファイルの中に保存されます</b>ので、<b>会社のパソコンでも効きますし、.sqlite ファイルと一緒に持ち運べます</b>。※いまは切り替える画面がまだ無いので、この仕組みは開発用の準備です。</p>
+      <p><strong>Ver1.19.15 で増えたこと（見た目は変わりません・部品に「札」を付けました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。画面の部品41個ひとつひとつに、<b>「これは何か」を表す札（タグ）</b>を付けました。たとえば「上書き保存」のボタンには<code>ファイル 保存 上の帯 押せる</code>のような札が付いています。<b>なぜ札が要るのか</b>…将来スキン（画面構成を丸ごと切り替える機能）を入れると、「どの部品をどこへ置くか」を決める必要が出てきます。これを<b>部品の名前で1つずつ書く</b>と、部品を1つ足すたびに<b>スキン全部を書き直す</b>ことになります。札なら「<b>上の帯の札が付いているもの全部</b>」と書けるので、<b>札を付けるだけで、すべてのスキンに自動で出ます</b>。<b>組み合わせも書けます</b>…「上の帯 かつ 押せる」「検索 でない」のように、<b>かつ／または／でない／かっこ</b>の4つだけで指定できます。よく使う組み合わせには<b>名前</b>を付けてあるので（「ツールバー」「押せるもの」など）、記号を覚えなくても選ぶだけで使えます。※<b>札の打ち間違いは機械が見つけます</b>…存在しない札を書くとどの指定にも当たらず、その部品が黙って消えてしまうため、「知らない札が混ざっていないか」を毎回点検しています。</p>
       <p><strong>Ver1.19.14 で増えたこと（見た目は変わりません・画面を組み替えるための土台を入れました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。将来の「<b>スキン</b>（画面の構成を丸ごと切り替える機能）」のための土台だけを、中に静かに置きました。入れたのは3つです。<b>①部品を「木」の形で並べる仕組み</b>…「上の帯」「横の柱」「真ん中」などを<b>何段でも入れ子に</b>できます。これまでは段数が決まっていて、それ以上こまかく分けられませんでした。<b>②並べ方の登録簿</b>…「縦や横に並べる／仕切りで分ける／タブで切り替える／折り畳む／部品を1つ置く」の5種類を用意しました。新しい並べ方を思いついたら、<b>この登録簿に1行足すだけ</b>で増えます（並べる側のプログラムは1行も変わりません）。<b>③「栞（しおり）」</b>…部品を別の場所へ動かすとき、元の場所に<b>目印</b>を置いていきます。だから、いくら動かしても<b>元とまったく同じ位置へ戻せます</b>（「何番目だったか」を覚える方式だと、あいだに部品が1つ増えただけでずれてしまいます）。※<b>いまの画面は「標準」という設定</b>で、標準のあいだは<b>この仕組みは1行も動きません</b>。だから今までとまったく同じです。</p>
       <p><strong>Ver1.19.13 で増えたこと（会社のパソコンでも「コマンドの非表示」が保存されるようになりました）：</strong>コマンドパレット（<b>Ctrl+K</b>）の「呼び出し語（別名）」の画面では、使わないコマンドの「表示」のチェックを外して<b>一覧から隠す</b>ことができます。ところがこれまでは、その設定が<b>ブラウザの保存領域</b>に入っていたため、<b>ファイルを直接開く使い方（会社のパソコンなど）では保存されず、開き直すと元に戻って</b>いました。さらに実際に測ってみると、その環境では<b>チェックを外した直後ですら隠れていません</b>でした（画面には「表示 off」と出るのに、パレットには残ったまま）。Ver1.19.13 では、この設定を<b>DBファイルの中（<code>_meta_opts</code>）</b>へ移しました。これで<b>どのパソコンでも隠れたまま</b>になり、<b>.sqlite ファイルと一緒に持ち運べる</b>ようになります。「呼び出し語（別名）」も同じく持ち運べます。※これまでの設定は引き継ぎません（会社のパソコンでは、そもそも保存できていなかったためです）。※「⭐ よく使うコマンド」の回数だけは、これまでどおり<b>このブラウザの中だけ</b>に残ります。</p>
       <p><strong>Ver1.19.12 で増えたこと（見た目は変わりません・中に「点検スイッチ」を付けました）：</strong>画面の見た目や操作は<b>まったく変わりません</b>。中に、開発とテストのための<b>点検スイッチ</b>（<code>RTTCHECK</code>）を1つ入れました。<b>誰も押さなければ1行も動かない</b>ので、起動も操作も今までどおりです。これは「壊れても画面に何も出ない不具合」──たとえば<b>並べ替えた配置が、無くなった部品を指したまま黙って消える</b>ような事故──を、テストのときに見つけるための仕組みです。ふだんの使い方に影響はありません。</p>
@@ -20282,6 +20285,23 @@ var PART_AT = {};                       /* key → PARTS の位置 */
 
 function partElId(key){ return 'p-' + String(key).replace(/\./g, '-'); }
 
+/* タグを並びにそろえる（第5段 工程2）。
+   ★スペース区切りの文字列でも、並びでも受け取る。
+   ★グループ名を自動で足す … 部品は必ず group を持つので、
+     「その部品がどのグループか」を tags に書き直す必要が無い（#13 / #27）。 */
+function normTags(t, group){
+  var out = [], i, seen = {}, arr;
+  if(typeof t === 'string'){ arr = t.split(/\s+/); }
+  else if(t && t.length){ arr = t; }
+  else { arr = []; }
+  for(i = 0; i < arr.length; i++){
+    var s = String(arr[i] || '').trim();
+    if(s && !seen[s]){ seen[s] = 1; out.push(s); }
+  }
+  if(group && !seen[group]){ out.push(String(group)); }
+  return out;
+}
+
 function registerPart(def){
   if(!def || !def.key) return false;
   var d = { key  : String(def.key),
@@ -20291,7 +20311,12 @@ function registerPart(def){
             icon : def.icon  || '',
             elId : def.elId  || partElId(def.key),
             el   : (typeof def.el  === 'function') ? def.el  : null,
-            run  : (typeof def.run === 'function') ? def.run : null,
+            run  : (typeof def.run   === 'function') ? def.run   : null,
+            focus: (typeof def.focus === 'function') ? def.focus : null,  /* 工程4 */
+            when : (typeof def.when  === 'function') ? def.when  : null,  /* 工程4 */
+            kw   : def.kw   || '',      /* 工程4 … ローマ字・かな（パレットで探す）*/
+            desc : def.desc || '',      /* 工程4 … 1行の説明（ヘルプ・設定）*/
+            tags : normTags(def.tags, def.group),   /* 第5段 工程2 */
             from : def.from || '' };    /* どのアドオンが足したか */
   var i = PART_AT[d.key];
   if(i != null){ PARTS[i] = d; }        /* 同じ key は上書き（重複防止）*/
@@ -20369,60 +20394,375 @@ var GROUP_LABEL = {
   gridTools:'表の道具', sortSel:'並べ替え・選択', results:'表', help:'使い方'
 };
 
+/* ==================================================================
+   Ver1.19.15 (L-01 第5段 工程2)  タグの語彙の登録簿
+   ------------------------------------------------------------------
+   ★なぜタグが要るのか
+     いままでは「どの部品をどこへ置くか」を、部品の名前で1つずつ書いていました。
+     すると **部品を1つ足すたびに、スキン全部を書き換える**ことになります。
+     タグなら「toolbar のもの全部」と書けるので、**タグを付けるだけで
+     すべてのスキンに自動で出ます**。スキンは1行も変わりません。
+
+   ★語彙を登録簿にする理由
+     人は必ず打ち間違えます（`toolbar` を `toolbor` と書く）。
+     打ち間違えたタグは **どの式にも当たらないので、黙って消えるだけ**です。
+     語彙を登録簿にしておけば「知らないタグが混ざっている」と機械が言えます。
+
+   ★グループ名は自動で語彙に入ります（GROUP_LABEL から）。
+     同じ言葉を2か所に書かないため（落とし穴 #13 / #27）。
+   ================================================================== */
+var TAG_VOCAB = [];
+var TAG_AT = {};
+function registerTag(tag, note){
+  if(!tag) return false;
+  var d = {tag: String(tag), note: note || ''};
+  var i = TAG_AT[d.tag];
+  if(i != null){ TAG_VOCAB[i] = d; }
+  else { TAG_AT[d.tag] = TAG_VOCAB.length; TAG_VOCAB.push(d); }
+  return true;
+}
+
+/* --- 画面 --- */
+registerTag('db',       '記録台帳の部品');
+registerTag('md',       'Markdownメモの部品（将来）');
+/* --- 置き場 --- */
+registerTag('toolbar',  '上の帯に並ぶ小さなボタン');
+registerTag('section',  '畳める大きな箱（節）');
+registerTag('panel',    '開閉するパネル');
+registerTag('banner',   '一時的に出る帯');
+registerTag('status',   '状態の表示（押せない）');
+/* --- はたらき --- */
+registerTag('file',     'ファイル操作');
+registerTag('save',     '保存');
+registerTag('open',     '開く');
+registerTag('edit',     '編集');
+registerTag('history',  '元に戻す・やり直す');
+registerTag('search',   '検索まわり');
+registerTag('query',    '検索条件');
+registerTag('advanced', 'くわしい検索・横断検索');
+registerTag('date',     '日付での絞り込み');
+registerTag('columns',  '列の表示切替');
+registerTag('grid',     '表とその操作');
+registerTag('sort',     '並べ替え');
+registerTag('select',   '複数選択');
+registerTag('results',  '結果の表示');
+registerTag('tag',      'タグの管理');
+registerTag('theme',    'ダーク／ライト');
+registerTag('settings', '設定');
+registerTag('help',     '使い方・説明');
+registerTag('tabs',     'タブの帯');
+/* --- 扱い（★ここが工程4・工程5とつながる）--- */
+registerTag('action',   '押すと何かが起きる（run を持つ）');
+registerTag('input',    '入力欄（押すのでなく、そこへ行く＝focus）');
+registerTag('hidden',   '★既定で出さない（設計上いらないもの）');
+
+/* グループ名も語彙に入れる（GROUP_LABEL が正。ここに写さない）*/
+(function(){
+  var g;
+  for(g in GROUP_LABEL){
+    if(Object.prototype.hasOwnProperty.call(GROUP_LABEL, g)) registerTag(g, GROUP_LABEL[g]);
+  }
+})();
+
 /* ---- 部品の種（コード側の既定。DB へ移すのは決-39 で「しない」と決めた）--
    ★elId を書いていないものは p-<key の . を - にしたもの> を自動で使う。 */
+/* ★tags は【スペース区切りの文字列】で書きます（配列より短く、読みやすいため）。
+     registerPart() が並びに直します。★グループ名（group:）は自動でタグに入るので、
+     ここに書きません（同じ言葉を2か所に書かない・落とし穴 #13 / #27）。 */
 var PART_SEED = [
-  {key:'page.title',        group:'page',   label:'ページ見出し',   icon:'📇', elId:'app-db-title'},
-  {key:'page.reopenBanner', group:'page',   label:'前回のDBに戻す帯', icon:'↩', elId:'reopenBanner'},
-  {key:'status.msg',        group:'status', label:'状態メッセージ', icon:'ℹ', elId:'status'},
-  {key:'status.autosave',   group:'status', label:'自動保存の状態', icon:'💾', elId:'autosaveInfo'},
-  {key:'edit.undo',         group:'edit',   label:'↶ 元に戻す', icon:'↶', elId:'undoBtn'},
-  {key:'edit.redo',         group:'edit',   label:'↷ やり直す', icon:'↷', elId:'redoBtn'},
-  {key:'file.saveOver',     group:'file',   label:'上書き保存',     icon:'💾'},
-  {key:'file.saveAs',       group:'file',   label:'名前を付けて保存', icon:'💾'},
-  {key:'file.open',         group:'file',   label:'DBを開く',       icon:'📂'},
-  {key:'file.input',        group:'file',   label:'ファイル選択（隠し）', icon:'', elId:'fileInput'},
-  {key:'global.theme',      group:'global', label:'ダーク／ライト', icon:'🌙', elId:'themeBtn'},
-  {key:'global.tagMgr',     group:'global', label:'タグの管理',     icon:'🏷'},
-  {key:'global.settings',   group:'global', label:'設定',           icon:'⚙'},
-  {key:'tableMgr.body',     group:'tableMgr', label:'項目管理の本体', icon:'🗂', elId:'tableManager'},
-  {key:'inputForm.tabs',    group:'inputForm', label:'項目タブ',    icon:'', elId:'tabBar'},
-  {key:'inputForm.card',    group:'inputForm', label:'入力欄',      icon:'✏', elId:'formCard'},
-  {key:'tableSwitch.tabs',  group:'tableSwitch', label:'項目アイコン', icon:'', elId:'secSearchTabs'},
-  {key:'tableSwitch.now',   group:'tableSwitch', label:'いまの項目', icon:'', elId:'secSearchNow'},
-  {key:'query.col',         group:'queryCond', label:'対象の列',    icon:''},
-  {key:'query.kw',          group:'queryCond', label:'キーワード欄', icon:'🔎'},
-  {key:'query.regex',       group:'queryCond', label:'正規表現で検索', icon:''},
-  {key:'query.run',         group:'queryCond', label:'検索',        icon:'🔎'},
-  {key:'query.all',         group:'queryCond', label:'全件表示',    icon:''},
-  {key:'query.colPanel',    group:'queryCond', label:'表示する列',  icon:'⚙'},
-  {key:'query.mdCell',      group:'queryCond', label:'長文列の表示', icon:'📝'},
-  {key:'dateQuick.bar',     group:'dateQuick', label:'日付の絞り込み', icon:'📅', elId:'dateQuick'},
-  {key:'adv.bar',           group:'advSearch', label:'くわしい検索・横断検索', icon:'🧮'},
-  {key:'adv.colPanel',      group:'advSearch', label:'列の表示切替パネル', icon:'', elId:'colPanel'},
-  {key:'adv.advPanel',      group:'advSearch', label:'5段検索パネル', icon:'', elId:'advPanel'},
-  {key:'result.meta',       group:'resultHead', label:'結果の見出しと書き出し', icon:''},
-  {key:'cellHelp',          group:'cellHelp', label:'セルの編集について', icon:''},
-  {key:'now.legend',        group:'cellHelp', label:'色分けの凡例', icon:'🎨', elId:'nowLegend'},
-  {key:'grid.newEntry',     group:'gridTools', label:'新規登録（行を足す）', icon:'＋'},
-  {key:'grid.resetAll',     group:'gridTools', label:'全件に戻す',  icon:'↺'},
-  {key:'grid.today',        group:'gridTools', label:'今日へ',      icon:'📍'},
-  {key:'grid.todayFocus',   group:'gridTools', label:'開いたら今日へ', icon:''},
-  {key:'sort.bar',          group:'sortSel', label:'並べ替えの状態', icon:'', elId:'sortBar'},
-  {key:'bulk.bar',          group:'sortSel', label:'複数選択の操作', icon:'☑', elId:'bulkBar'},
-  {key:'results.table',     group:'results', label:'結果の表',      icon:'📋', elId:'results'},
-  {key:'search.hint',       group:'results', label:'検索のヒント',  icon:''},
-  {key:'help.card',         group:'help',   label:'このツールの使い方', icon:'📦', elId:'secHelp'}
+  {key:'page.title',        group:'page',   label:'ページ見出し',   icon:'📇', elId:'app-db-title', tags:'db section'},
+  {key:'page.reopenBanner', group:'page',   label:'前回のDBに戻す帯', icon:'↩', elId:'reopenBanner', tags:'db banner'},
+  {key:'status.msg',        group:'status', label:'状態メッセージ', icon:'ℹ', elId:'status', tags:'db status toolbar'},
+  {key:'status.autosave',   group:'status', label:'自動保存の状態', icon:'💾', elId:'autosaveInfo', tags:'db status save'},
+  {key:'edit.undo',         group:'edit',   label:'↶ 元に戻す', icon:'↶', elId:'undoBtn', tags:'db history toolbar action'},
+  {key:'edit.redo',         group:'edit',   label:'↷ やり直す', icon:'↷', elId:'redoBtn', tags:'db history toolbar action'},
+  {key:'file.saveOver',     group:'file',   label:'上書き保存',     icon:'💾', tags:'db save toolbar action'},
+  {key:'file.saveAs',       group:'file',   label:'名前を付けて保存', icon:'💾', tags:'db save toolbar action'},
+  {key:'file.open',         group:'file',   label:'DBを開く',       icon:'📂', tags:'db open toolbar action'},
+  /* ★これだけは最初から hidden。画面に出ない隠しの入力欄なので、
+     どのスキンにも出してはいけない（設計上いらないもの）。 */
+  {key:'file.input',        group:'file',   label:'ファイル選択（隠し）', icon:'', elId:'fileInput', tags:'db hidden'},
+  {key:'global.theme',      group:'global', label:'ダーク／ライト', icon:'🌙', elId:'themeBtn', tags:'db theme toolbar action'},
+  {key:'global.tagMgr',     group:'global', label:'タグの管理',     icon:'🏷', tags:'db tag toolbar action'},
+  {key:'global.settings',   group:'global', label:'設定',           icon:'⚙', tags:'db settings toolbar action'},
+  {key:'tableMgr.body',     group:'tableMgr', label:'項目管理の本体', icon:'🗂', elId:'tableManager', tags:'db section'},
+  {key:'inputForm.tabs',    group:'inputForm', label:'項目タブ',    icon:'', elId:'tabBar', tags:'db section tabs'},
+  {key:'inputForm.card',    group:'inputForm', label:'入力欄',      icon:'✏', elId:'formCard', tags:'db section input'},
+  {key:'tableSwitch.tabs',  group:'tableSwitch', label:'項目アイコン', icon:'', elId:'secSearchTabs', tags:'db search tabs'},
+  {key:'tableSwitch.now',   group:'tableSwitch', label:'いまの項目', icon:'', elId:'secSearchNow', tags:'db search status'},
+  {key:'query.col',         group:'queryCond', label:'対象の列',    icon:'', tags:'db search query input'},
+  {key:'query.kw',          group:'queryCond', label:'キーワード欄', icon:'🔎', tags:'db search query input'},
+  {key:'query.regex',       group:'queryCond', label:'正規表現で検索', icon:'', tags:'db search query'},
+  {key:'query.run',         group:'queryCond', label:'検索',        icon:'🔎', tags:'db search query action'},
+  {key:'query.all',         group:'queryCond', label:'全件表示',    icon:'', tags:'db search query action'},
+  {key:'query.colPanel',    group:'queryCond', label:'表示する列',  icon:'⚙', tags:'db search columns panel action'},
+  {key:'query.mdCell',      group:'queryCond', label:'長文列の表示', icon:'📝', tags:'db search query'},
+  {key:'dateQuick.bar',     group:'dateQuick', label:'日付の絞り込み', icon:'📅', elId:'dateQuick', tags:'db search date'},
+  {key:'adv.bar',           group:'advSearch', label:'くわしい検索・横断検索', icon:'🧮', tags:'db search advanced action'},
+  {key:'adv.colPanel',      group:'advSearch', label:'列の表示切替パネル', icon:'', elId:'colPanel', tags:'db search columns panel'},
+  {key:'adv.advPanel',      group:'advSearch', label:'5段検索パネル', icon:'', elId:'advPanel', tags:'db search advanced panel'},
+  {key:'result.meta',       group:'resultHead', label:'結果の見出しと書き出し', icon:'', tags:'db results status'},
+  {key:'cellHelp',          group:'cellHelp', label:'セルの編集について', icon:'', tags:'db help results'},
+  {key:'now.legend',        group:'cellHelp', label:'色分けの凡例', icon:'🎨', elId:'nowLegend', tags:'db help results'},
+  {key:'grid.newEntry',     group:'gridTools', label:'新規登録（行を足す）', icon:'＋', tags:'db grid action'},
+  {key:'grid.resetAll',     group:'gridTools', label:'全件に戻す',  icon:'↺', tags:'db grid action'},
+  {key:'grid.today',        group:'gridTools', label:'今日へ',      icon:'📍', tags:'db grid date action'},
+  {key:'grid.todayFocus',   group:'gridTools', label:'開いたら今日へ', icon:'', tags:'db grid date settings'},
+  {key:'sort.bar',          group:'sortSel', label:'並べ替えの状態', icon:'', elId:'sortBar', tags:'db grid sort status'},
+  {key:'bulk.bar',          group:'sortSel', label:'複数選択の操作', icon:'☑', elId:'bulkBar', tags:'db grid select'},
+  {key:'results.table',     group:'results', label:'結果の表',      icon:'📋', elId:'results', tags:'db results grid'},
+  {key:'search.hint',       group:'results', label:'検索のヒント',  icon:'', tags:'db help search'},
+  {key:'help.card',         group:'help',   label:'このツールの使い方', icon:'📦', elId:'secHelp', tags:'db help section'}
 ];
 
 /* ---- 読み口 … 将来ぜんぶ DB へ移すときは、この2つだけ直す ----------- */
+/* ==================================================================
+   Ver1.19.17 (L-01 第5段 工程4)  部品の「動き」の登録簿
+   ------------------------------------------------------------------
+   ★決-39 …「run() は関数なので DB には入らない。名前→関数の表がコード側に要る」。
+     それがこの PART_ACTION。部品の【何があるか・どこに置くか】は PART_SEED（データ）、
+     【押したら何をするか】はここ（コード）。分けて持つ（CLAUDE.md §5.2 決まり⑤）。
+
+   ★run の中身は、ほとんどがコマンドパレット buildCommands() に既にあるものと同じ。
+     window の関数を名前で呼ぶ（call() と同じ作法）。無い版でも落ちない。
+   ★when:'db' … DB が開いていないと意味がない部品（元に戻す・保存など）。
+     partCan() が false を返し、パレットで灰色・キーは鳴らない・理由も出せる。
+     ★これが「キーは効いたのに何も起きない」というバグの型を丸ごと消す。
+   ================================================================== */
+function winCall(name){
+  return function(){
+    try{
+      if(typeof window[name] === 'function'){ window[name](); return true; }
+    }catch(e){}
+    try{ if(typeof say === 'function') say('この機能はこの版にはありません（' + name + '）', 'err'); }
+    catch(e){}
+    return false;
+  };
+}
+function focusById(id){
+  return function(){
+    var el = document.getElementById(id);
+    if(el){ try{ el.focus(); if(el.select) el.select(); }catch(e){} }
+  };
+}
+var NEED_DB = function(){ try{ return !!(window.WDT && window.WDT.dbOptGet); }catch(e){ return false; } };
+
+var PART_ACTION = {
+  'edit.undo':       {run: winCall('undo'),            when: NEED_DB,
+                      kw:'undo modosu もどす もとにもどす', desc:'直前の変更を取り消します'},
+  'edit.redo':       {run: winCall('redo'),            when: NEED_DB,
+                      kw:'redo yarinaosu やりなおす', desc:'取り消した変更をやり直します'},
+  'file.saveOver':   {run: winCall('saveDbOverwrite'), when: NEED_DB,
+                      kw:'hozon save uwagaki ほぞん うわがき うわがきほぞん', desc:'開いているDBファイルに上書き保存します'},
+  'file.saveAs':     {run: winCall('saveDbAs'),        when: NEED_DB,
+                      kw:'hozon save namae ほぞん なまえ なまえをつけて', desc:'名前を付けて別のファイルに保存します'},
+  'file.open':       {run: winCall('openDbPicker'),
+                      kw:'hiraku open file ひらく ファイルをひらく', desc:'DBファイルを選んで開きます'},
+  'global.theme':    {run: winCall('toggleTheme'),
+                      kw:'dark light theme いろ てーま だーく らいと', desc:'ダークモードとライトモードを切り替えます'},
+  'global.tagMgr':   {run: function(){ try{ if(typeof window.openTagManager === 'function')
+                        window.openTagManager((window.currentTable || null), ''); }catch(e){} }, when: NEED_DB,
+                      kw:'tag tagu たぐ たぐのかんり', desc:'タグの並べ替え・カテゴリ分け・整理をします'},
+  'global.settings': {run: function(){ try{ if(window.WDT && window.WDT.openSettings) window.WDT.openSettings(); }catch(e){} },
+                      kw:'settei setting config せってい せっていをひらく', desc:'設定画面（ショートカット・表示・アドオン）を開きます'},
+  'query.run':       {run: winCall('runSearch'),       when: NEED_DB,
+                      kw:'kensaku search sagasu けんさく さがす', desc:'いまの条件で検索します'},
+  'query.all':       {run: function(){ try{ if(typeof window.showAll === 'function')
+                        window.showAll(window.currentTable); }catch(e){} }, when: NEED_DB,
+                      kw:'zenken all ぜんけん ぜんぶひょうじ', desc:'絞り込みを解除して全件を表示します'},
+  'query.colPanel':  {run: function(){ try{ if(typeof window.gotoSection === 'function') window.gotoSection('secSearch');
+                        setTimeout(function(){ try{ if(typeof window.toggleColPanel === 'function') window.toggleColPanel(); }catch(e){} }, 380);
+                      }catch(e){} },
+                      kw:'retsu column hyouji れつ ひょうじするれつ', desc:'表に出す列を選ぶパネルを開きます'},
+  'query.mdCell':    {run: winCall('toggleGridMarkdown'), when: NEED_DB,
+                      kw:'markdown md ちょうぶん まーくだうん', desc:'長文の列を Markdown で表示するかを切り替えます'},
+  'adv.bar':         {run: function(){ try{ if(typeof window.openCrossSearch === 'function') window.openCrossSearch(); }catch(e){} }, when: NEED_DB,
+                      kw:'kuwashii oudan and or not くわしい けんさく おうだん', desc:'くわしい検索・全項目の横断検索を開きます'},
+  'grid.newEntry':   {run: function(){ try{ if(typeof window.gotoNewEntry === 'function') window.gotoNewEntry(); }catch(e){} }, when: NEED_DB,
+                      kw:'atarashii tuika touroku あたらしい ついか しんきとうろく', desc:'新規登録の入力欄へ移動します'},
+  'grid.resetAll':   {run: function(){ try{ if(typeof window.showAll === 'function')
+                        window.showAll(window.currentTable); }catch(e){} }, when: NEED_DB,
+                      kw:'modosu zenken もどす ぜんけんにもどす', desc:'絞り込みを解除して全件表示に戻します'},
+  'grid.today':      {run: winCall('jumpToToday'),     when: NEED_DB,
+                      kw:'kyou today きょう きょうへ', desc:'日付の列を見て、今日の行まで画面を動かします'},
+
+  /* --- 入力欄（押すのでなく「そこへ行く」）--- */
+  'query.col':       {focus: focusById('q_col'),
+                      kw:'taisho retsu たいしょうのれつ', desc:'検索の対象にする列を選びます'},
+  'query.kw':        {focus: focusById('q_kw'),
+                      kw:'keyword kw キーワード けんさくご', desc:'検索キーワード／正規表現を入れる欄です'},
+  'inputForm.card':  {focus: function(){ var c = document.getElementById('formCard');
+                        var el = c ? c.querySelector('input,textarea,select') : null;
+                        if(el){ try{ el.focus(); }catch(e){} } },
+                      kw:'nyuryoku form にゅうりょく フォーム', desc:'新規登録の入力フォームへ移動します'}
+};
+
 var PARTS_SEEDED = false;
 function loadParts(){
-  var i;
+  var i, a;
   if(PARTS_SEEDED) return PARTS.length;
-  for(i = 0; i < PART_SEED.length; i++) registerPart(PART_SEED[i]);
+  for(i = 0; i < PART_SEED.length; i++){
+    a = PART_ACTION[PART_SEED[i].key];
+    /* ★動きの表を、種のデータへ重ねてから登録する（種は書き換えない）*/
+    registerPart(a ? mergeDef(PART_SEED[i], a) : PART_SEED[i]);
+  }
   PARTS_SEEDED = true;
   return PARTS.length;
+}
+function mergeDef(base, extra){
+  var o = {}, k;
+  for(k in base){ if(Object.prototype.hasOwnProperty.call(base, k)) o[k] = base[k]; }
+  for(k in extra){ if(Object.prototype.hasOwnProperty.call(extra, k)) o[k] = extra[k]; }
+  return o;
+}
+
+/* いま使えるか … when が無ければいつでも true。知らない部品は false（黙って true にしない）。 */
+function partCan(key){
+  var d = partDef(key);
+  if(!d) return false;
+  if(!d.when) return true;
+  try{ return !!d.when(); }catch(e){ return false; }
+}
+
+/* ==================================================================
+   Ver1.19.15 (L-01 第5段 工程2)  タグの式（pick）とコンボ
+   ------------------------------------------------------------------
+   使える記号は4つだけ:  &（かつ） |（または） !（でない） ()（かたまり）
+   `@名前` と書くと、コンボの登録簿から式を引いてきます。
+
+   ★答えは必ず {ok, keys, why} の形で返します。
+       ok:true  … 式は正しい。keys は当たった部品（**0件でも true**）
+       ok:false … 式が壊れている。why に理由
+   ★「当たらなかった 0件」と「式が壊れている」を混ぜないこと（落とし穴 #34 / #68）。
+     混ぜると、打ち間違えた式が黙って「何も出ない」になり、誰も気づけません。
+   ================================================================== */
+
+/* --- コンボ（式に名前を付ける）… 式を書けない人のための逃げ道 --- */
+var COMBOS = [];
+var COMBO_AT = {};
+function registerCombo(name, expr){
+  if(!name || !expr) return false;
+  var d = {name: String(name), expr: String(expr)};
+  var i = COMBO_AT[d.name];
+  if(i != null){ COMBOS[i] = d; }
+  else { COMBO_AT[d.name] = COMBOS.length; COMBOS.push(d); }
+  return true;
+}
+function comboOf(n){ var i = COMBO_AT[n]; return (i == null) ? null : COMBOS[i]; }
+
+registerCombo('ツールバー',     'db & toolbar');
+registerCombo('検索まわり',     'db & search & !panel');
+registerCombo('押せるもの',     'db & action');
+registerCombo('入力欄',         'db & input');
+registerCombo('出してよいもの', 'db & !hidden');
+
+/* --- 式を細かく切る。知らない文字が来たら null（黙って捨てない） --- */
+function pickTokens(s){
+  var out = [], i = 0, m, c;
+  /* 日本語のタグ名やコンボ名も通す（かな・カナ・漢字）*/
+  var WORD = /^[A-Za-z0-9_.@\-぀-ヿ一-龥]+/;
+  while(i < s.length){
+    c = s.charAt(i);
+    if(c === ' ' || c === '\t' || c === '\n'){ i++; continue; }
+    if(c === '&' || c === '|' || c === '!' || c === '(' || c === ')'){
+      out.push({t: c}); i++; continue;
+    }
+    m = WORD.exec(s.slice(i));
+    if(!m) return null;
+    out.push({t: 'w', v: m[0]});
+    i += m[0].length;
+  }
+  return out;
+}
+
+/* --- 切った式を「タグの集まりを受け取って真偽を返す関数」に組み立てる ---
+   優先順位は & が | より強い（ふつうの書き方と同じ）。
+   組み立てられなければ null（＝式が壊れている）。 */
+function pickParse(tk){
+  var i = 0;
+  function peek(){ return tk[i]; }
+  function factor(){
+    var f, e, t;
+    if(peek() && peek().t === '!'){
+      i++; f = factor();
+      return f ? function(s){ return !f(s); } : null;
+    }
+    if(peek() && peek().t === '('){
+      i++; e = expr();
+      if(!e) return null;
+      if(!(peek() && peek().t === ')')) return null;
+      i++;
+      return e;
+    }
+    t = peek();
+    if(t && t.t === 'w'){ i++; return (function(w){ return function(s){ return !!s[w]; }; })(t.v); }
+    return null;
+  }
+  function term(){
+    var a = factor(), b;
+    if(!a) return null;
+    while(peek() && peek().t === '&'){
+      i++; b = factor();
+      if(!b) return null;
+      a = (function(x, y){ return function(s){ return x(s) && y(s); }; })(a, b);
+    }
+    return a;
+  }
+  function expr(){
+    var a = term(), b;
+    if(!a) return null;
+    while(peek() && peek().t === '|'){
+      i++; b = term();
+      if(!b) return null;
+      a = (function(x, y){ return function(s){ return x(s) || y(s); }; })(a, b);
+    }
+    return a;
+  }
+  var fn = expr();
+  if(!fn) return null;
+  if(i !== tk.length) return null;      /* 余りが出た＝式が壊れている */
+  return fn;
+}
+
+function pickParts(e){
+  var s = String(e == null ? '' : e).trim(), name, c, tk, fn, keys = [], i, j, set, et;
+  if(!s) return {ok: false, keys: [], why: '式が空です'};
+  if(s.charAt(0) === '@'){
+    name = s.slice(1);
+    c = comboOf(name);
+    if(!c) return {ok: false, keys: [], why: 'そんな名前のコンボはありません: ' + name};
+    s = c.expr;
+  }
+  tk = pickTokens(s);
+  if(!tk) return {ok: false, keys: [], why: '使えない文字が入っています'};
+  if(!tk.length) return {ok: false, keys: [], why: '式が空です'};
+  fn = pickParse(tk);
+  if(!fn) return {ok: false, keys: [], why: '式の形が正しくありません（使えるのは & | ! ( ) の4つだけ）'};
+  loadParts();
+  for(i = 0; i < PARTS.length; i++){
+    set = {};
+    /* ★効いているタグ（コード側の tags ＋ 隠していれば hidden）。
+       これで式が開閉表に追従する（第5段 工程3）。 */
+    et = (typeof effTagsOf === 'function') ? effTagsOf(PARTS[i]) : PARTS[i].tags;
+    for(j = 0; j < et.length; j++) set[et[j]] = 1;
+    if(fn(set)) keys.push(PARTS[i].key);
+  }
+  return {ok: true, keys: keys, why: ''};
+}
+
+/* --- 語彙の外のタグ（＝打ち間違い）を集める -------------------------
+   ★打ち間違えたタグは【どの式にも当たらないので黙って消えるだけ】です。
+     ここで名指ししないと、誰も気づけません（落とし穴 #38 の型）。 */
+function unknownTags(){
+  var out = [], seen = {}, i, j, t;
+  loadParts();
+  for(i = 0; i < PARTS.length; i++){
+    for(j = 0; j < PARTS[i].tags.length; j++){
+      t = PARTS[i].tags[j];
+      if(TAG_AT[t] == null && !seen[t]){ seen[t] = 1; out.push(t); }
+    }
+  }
+  return out;
 }
 
 var LAYOUT_SCOPE = 'shell';
@@ -20453,6 +20793,7 @@ function loadLayout(){
   if(!o.groups || !o.groups.length) o.groups = defaultLayout().groups;
   if(!o.skin) o.skin = 'std';
   if(!o.areas) o.areas = {};
+  if(!o.show || typeof o.show !== 'object') o.show = {};   /* 第5段 工程3 */
   return o;
 }
 
@@ -20464,6 +20805,87 @@ function saveLayout(o){
   /* ★これを呼ばないとメモリ上だけ変わって IndexedDB に落ちない（B-03 と同じ作法）*/
   if(ok){ try{ if(typeof window.scheduleAutosave === 'function') window.scheduleAutosave(); }catch(e){} }
   return ok;
+}
+
+/* ==================================================================
+   Ver1.19.16 (L-01 第5段 工程3)  貼り札と開閉表
+   ------------------------------------------------------------------
+   ★利用者の希望（原文の要旨）
+     「エクセルのツリーサイドバーやブラウザのお気に入りサイドバーみたいに
+       表示したり非表示にしたい。しかもキーで。キーで瞬間の切り替えに対応したもの」
+
+   ★設計の芯（決-65）
+     開閉表を【1つだけ】持つ。鍵は「節の名前」でも「部品の名前」でもよい。
+       { 'global.theme': false, 'side': false }   ← 隠しているものだけ書く
+     パネルまるごとも、ボタン1つも、toggleShow(名前) という【同じ1つの関数】で
+     切り替わる。基礎板は「パネルなのか部品なのか」を知らない。
+
+   ★出すものは表に書かない … 表は「隠したものだけ」を持つ。
+     こうすると、何も隠していないとき表は空 {} で、applyShow() は何もしない。
+     「設定していないのに何か起きる」を構造で防ぐ。
+   ================================================================== */
+var showTableCache = null;
+
+function showTable(){
+  if(showTableCache) return showTableCache;
+  var o;
+  try{ o = loadLayout(); }catch(e){ o = null; }
+  showTableCache = (o && o.show && typeof o.show === 'object') ? o.show : {};
+  return showTableCache;
+}
+
+/* 出す？ … 表に false があるものだけが「隠す」。それ以外は既定で「出す」。
+   ★知らない名前でも落ちない（既定は true）。 */
+function isShown(key){
+  var t = showTable();
+  return t[key] !== false;
+}
+
+function setShow(key, on){
+  var o, t;
+  if(!key) return false;
+  try{ o = loadLayout(); }catch(e){ return false; }
+  t = o.show || (o.show = {});
+  if(on === false){ t[key] = false; }
+  else { delete t[key]; }        /* ★出すものは書かない（表を太らせない）*/
+  showTableCache = t;
+  saveLayout(o);
+  applyOne(key);
+  return true;
+}
+
+function toggleShow(key){ return setShow(key, !isShown(key)); }
+
+/* 1つだけ画面に反映する。★部品なら display で隠す（#78 … hidden に頼らない）。
+   部品でない名前（節・パネル）は、スキンが実行時に作る箱なので、
+   在れば data-node で拾って隠す。無ければ何もしない（工程7 以降で効き始める）。 */
+function applyOne(key){
+  var d = partDef(key), el, box;
+  if(d){
+    el = partEl(d);
+    if(el) showEl(el, isShown(key));
+    return;
+  }
+  try{ box = document.querySelector('[data-node="' + String(key).replace(/"/g, '\\"') + '"]'); }
+  catch(e){ box = null; }
+  if(box) showEl(box, isShown(key));
+}
+
+/* 全部いっぺんに反映する。★表が空なら1件も触らない。 */
+function applyShow(){
+  var t = showTable(), k;
+  for(k in t){
+    if(Object.prototype.hasOwnProperty.call(t, k)) applyOne(k);
+  }
+}
+
+/* 部品の「効いているタグ」… コード側の tags ＋（隠していれば hidden）。
+   ★これで pick('db & !hidden') が開閉表に追従する（貼り札が式に効く）。 */
+function effTagsOf(part){
+  if(!part) return [];
+  if(isShown(part.key)) return part.tags;
+  if(part.tags.indexOf('hidden') >= 0) return part.tags;
+  return part.tags.concat(['hidden']);
 }
 
 /* ---- 取り付け … 種類の登録簿に任せる（読む側に if を増やさない）----- */
@@ -20555,8 +20977,18 @@ function showEl(el, on){
     return true;
   }
   var keep = el.getAttribute('data-rtt-disp');
-  el.style.display = (keep === null) ? '' : keep;
+  /* ★私たちが隠していないなら、何もしない（2026-09-07 に工程3 で気づいた）。
+     ここで el.style.display = '' と書くと、元から style="display:none" だった
+     隠し欄（fileInput）が【設定していないのに出てきてしまう】。
+     data-rtt-disp が無い＝一度も隠していない、の印。 */
+  if(keep === null) return true;
+  el.style.display = keep;
   el.removeAttribute('data-rtt-disp');
+  /* ★el.style.display = '' は空の style="" 属性を残すことがある（実測）。
+     元が style 無しだったのに style="" が残ると、
+     「画面が1文字も変わらない」検査（innerHTML 比較）に引っかかる。
+     中身が空なら style 属性ごと消す。 */
+  if(el.getAttribute('style') === ''){ el.removeAttribute('style'); }
   return true;
 }
 
@@ -20796,6 +21228,23 @@ window.RTTPARTS = {
   applySkin     : applySkin,
   currentSkin   : currentSkin,
   skinBoot      : skinBoot,
+  /* ---- 第5段 工程4: 部品の口 ---- */
+  partCan       : partCan,
+  /* ---- 第5段 工程3: 貼り札と開閉表 ---- */
+  isShown       : isShown,
+  setShow       : setShow,
+  toggleShow    : toggleShow,
+  applyShow     : applyShow,
+  showTable     : function(){ var t = showTable(), o = {}, k;
+                              for(k in t){ if(Object.prototype.hasOwnProperty.call(t, k)) o[k] = t[k]; }
+                              return o; },
+  /* ---- 第5段 工程2: タグと式とコンボ ---- */
+  registerTag   : registerTag,
+  tags          : function(){ return TAG_VOCAB.slice(); },
+  unknownTags   : unknownTags,
+  pick          : pickParts,
+  registerCombo : registerCombo,
+  combos        : function(){ return COMBOS.slice(); },
   /* ---- 第5段 工程1: 木の登録簿と栞 ---- */
   registerNodeKind: registerNodeKind,
   renderNode    : renderNode,
@@ -20856,6 +21305,15 @@ try{
       return {ok: found, n: found ? 0 : 1,
               why: found ? '' : 'いまの見た目 "' + cur + '" が登録簿にありません'};
     }, 'いま使っている見た目が、登録簿にあるか');
+
+    /* ★第5段 工程2 … アドオンが足した部品のタグは【静的には見えない】。
+       打ち間違えたタグはどの式にも当たらないので、その部品は黙って画面から消える。
+       外からの invariant.py では届かないので、ここで見張る（決-63 の切り分け基準）。 */
+    window.RTTCHECK.registerCheck('tag.known', function(){
+      var bad = unknownTags();
+      return {ok: bad.length === 0, n: bad.length,
+              why: bad.length ? '語彙に無いタグ（打ち間違いの疑い）: ' + bad.join(' ') : ''};
+    }, '部品に付いたタグが、ぜんぶ語彙の登録簿にあるか（打ち間違いの検出）');
 
   }
 }catch(e){
