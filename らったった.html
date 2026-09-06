@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.11</title>
+<title>記録台帳＋MDメモ Ver1.19.14</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -2360,7 +2360,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.11</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.14</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2381,31 +2381,32 @@ summary:focus-visible,
 <div id="appBody" class="mode-db">
 <div id="app-db">
 
-<h1>📇 記録台帳</h1>
+<div id="app-db-title"><h1>📇 記録台帳</h1>
 <p class="lead">作業記録・測定データ目録にかぎらず、<b>好きな項目（テーブル）を自分で作って何でも記録できる台帳</b>です。SQLite（WebAssembly）をこのHTMLに埋め込んだ、1ファイル完結・オフラインのツール。項目（テーブル）や列は自由に追加・編集・削除でき、ダークモード・自動保存・元に戻す／やり直す・CSV/TXT書き出しに対応しています。<b>Ver1.4.00</b>から、日付はカレンダー・時刻は時計から選べるようになり、予定表として「いま進行中の予定」に色を付けられます。
 <b>Ver1.5.00</b>では「⚙ 設定」が付き、ショートカットキーの変更・ヘッダーの大きさ・アドオン（スマホ表示の修正など）を選べます。列はドラッグで並べ替えでき、検索キーワードはグループ＋ランクでお気に入り登録できます。</p>
 <p class="lead" style="margin:-6px 0 14px">
   <button class="ghost small" onclick="toggleAllSections(false)">▲ 全セクションを折りたたむ</button>
   <button class="ghost small" onclick="toggleAllSections(true)">▼ 全セクションを開く</button>
 </p>
+</div>
 
 <div id="reopenBanner" class="reopen-banner" style="display:none">
   <span>前回開いていたファイル「<b class="name"></b>」があります。</span>
   <button class="ghost small" id="reopenBtn">許可して開く</button>
 </div>
 
-<div class="card">
+<div class="card" id="secToolbar">
   <div class="toolbar">
     <span id="status">起動中…</span>
     <span style="flex:1"></span>
     <button id="undoBtn" class="ghost" onclick="undo()" disabled title="Ctrl+Z">↶ 元に戻す</button>
     <button id="redoBtn" class="ghost" onclick="redo()" disabled title="Ctrl+Y">↷ やり直す</button>
     <button id="themeBtn" class="ghost" onclick="toggleTheme()">🌙 ダーク</button>
-    <button class="ghost" onclick="openTagManager(currentTable, '')" title="コンボの並べ替え・カテゴリ分け・タグ名の整理">🏷 タグの管理</button>
-    <button class="ghost" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
-    <button class="ghost" onclick="saveDbOverwrite()">💾 上書き保存</button>
-    <button class="ghost" onclick="saveDbAs()">💾 名前を付けて保存</button>
-    <button class="ghost" onclick="openDbPicker()">📂 DBを開く</button>
+    <button class="ghost" id="p-global-tagMgr" onclick="openTagManager(currentTable, '')" title="コンボの並べ替え・カテゴリ分け・タグ名の整理">🏷 タグの管理</button>
+    <button class="ghost" id="p-global-settings" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
+    <button class="ghost" id="p-file-saveOver" onclick="saveDbOverwrite()">💾 上書き保存</button>
+    <button class="ghost" id="p-file-saveAs" onclick="saveDbAs()">💾 名前を付けて保存</button>
+    <button class="ghost" id="p-file-open" onclick="openDbPicker()">📂 DBを開く</button>
     <input id="fileInput" type="file" accept=".sqlite,.db,.sqlite3" style="display:none" onchange="if(this.files[0]) loadDb(this.files[0])">
   </div>
   <p class="hint" id="autosaveInfo" style="margin:10px 0 0">自動保存: -</p>
@@ -2428,11 +2429,11 @@ summary:focus-visible,
 <details class="card" id="secSearch" open>
   <summary><span id="secSearchTabs" class="sectbl"></span><h2 style="display:inline-flex">🔎 検索・表示・編集</h2><span id="secSearchNow" class="secnow">－</span></summary>
   <div class="search-grid" style="margin-top:8px">
-    <div>
+    <div id="p-query-col">
       <label>対象の列</label>
       <select id="q_col"></select>
     </div>
-    <div class="kw">
+    <div class="kw" id="p-query-kw">
       <div class="favlabelrow">
         <label for="q_kw">キーワード／正規表現</label>
         <span id="favGroupBar" class="favbar"></span>
@@ -2441,11 +2442,11 @@ summary:focus-visible,
       </div>
       <input type="text" id="q_kw" placeholder="例: 不具合｜故障　/　ベアリング" onkeydown="if(event.key==='Enter') runSearch()">
     </div>
-    <div class="check"><input type="checkbox" id="q_regex"><label for="q_regex" style="margin:0; color:var(--ink); font-size:13px">正規表現で検索</label></div>
-    <div><button onclick="runSearch()">検索</button></div>
-    <div><button class="ghost" onclick="showAll(currentTable)">全件表示</button></div>
-    <div><button class="ghost" onclick="toggleColPanel()">⚙ 表示する列</button></div>
-    <div><button class="ghost" id="btnMdCellToggle" onclick="toggleGridMarkdown()">📝 長文列: Markdown表示</button></div>
+    <div class="check" id="p-query-regex"><input type="checkbox" id="q_regex"><label for="q_regex" style="margin:0; color:var(--ink); font-size:13px">正規表現で検索</label></div>
+    <div id="p-query-run"><button onclick="runSearch()">検索</button></div>
+    <div id="p-query-all"><button class="ghost" onclick="showAll(currentTable)">全件表示</button></div>
+    <div id="p-query-colPanel"><button class="ghost" onclick="toggleColPanel()">⚙ 表示する列</button></div>
+    <div id="p-query-mdCell"><button class="ghost" id="btnMdCellToggle" onclick="toggleGridMarkdown()">📝 長文列: Markdown表示</button></div>
     <div id="dateQuick" class="dqbar" style="display:none">
       <button class="ghost small" onclick="quickDateFilter('today')">📅 今日</button>
       <button class="ghost small" onclick="quickDateFilter('week')">今週</button>
@@ -2456,21 +2457,21 @@ summary:focus-visible,
   </div>
   <div id="colPanel" class="colpanel" style="display:none"></div>
 
-  <div style="margin:8px 0 0">
+  <div style="margin:8px 0 0" id="p-adv-bar">
     <button class="ghost small" id="btnAdvToggle" onclick="toggleAdvSearch()" title="AND / OR / NOT を組み合わせて、最大5段まで条件を重ねられます">🧮 くわしい検索（AND/OR/NOT・最大5段）</button>
     <button class="ghost small xsopen" id="btnXsOpen" onclick="openCrossSearch()" title="いま開いている項目だけでなく、登録してあるすべての項目（テーブル）をまとめて探します">🔎 全項目を横断検索</button>
   </div>
   <div id="advPanel" class="advpanel" style="display:none"></div>
 
-  <div class="meta">
+  <div class="meta" id="p-result-meta">
     <span id="rcaption">　</span><span id="rcount"></span>
     <span style="flex:1"></span>
-    <button class="ghost small" onclick="openResultSetSave(this)" title="いま表に出ている行の集合に名前を付けて取っておきます">📌 この結果を保存</button>
-    <button class="ghost small" onclick="openResultSets(this)" title="取っておいた検索結果を呼び出します">📁 保存した結果</button>
-    <button class="ghost small" onclick="exportCsv()">⇩ CSVで書き出す</button>
-    <button class="ghost small" onclick="exportTxt()">⇩ TXTで書き出す</button>
+    <button class="ghost small" id="p-result-saveSet" onclick="openResultSetSave(this)" title="いま表に出ている行の集合に名前を付けて取っておきます">📌 この結果を保存</button>
+    <button class="ghost small" id="p-result-openSet" onclick="openResultSets(this)" title="取っておいた検索結果を呼び出します">📁 保存した結果</button>
+    <button class="ghost small" id="p-result-csv" onclick="exportCsv()">⇩ CSVで書き出す</button>
+    <button class="ghost small" id="p-result-txt" onclick="exportTxt()">⇩ TXTで書き出す</button>
   </div>
-  <details class="hint hintfold"><summary>▶ セルの編集について（クリックで開く）</summary>
+  <details class="hint hintfold" id="p-cellHelp"><summary>▶ セルの編集について（クリックで開く）</summary>
   <div>▶ 色つきセルはクリックして直接編集（フォーカスを外すと自動保存）。長文の列（内容・知識・条件メモ・備考など）は<strong>Markdownで表示</strong>され、クリックすると編集できます（Ctrl+Enterで確定 / Escで取り消し）。セル右上の「📝 メモで開く」を押すと、そのセルを<strong>Markdownメモの画面で編集</strong>でき、入力内容は自動でこの表に反映されます。各行の「削除」で行を消せます。入力欄にフォーカスが無いとき、Ctrl+Zで元に戻す／Ctrl+Yでやり直しができます。<br>
   ▶ <strong>日付・時刻の列</strong>はクリックするとカレンダー／時計が開きます（そのまま手で打つこともできます）。「終日」の列はクリックで☑／☐が切り替わります。</div></details>
   <p class="legend" id="nowLegend" style="display:none">
@@ -2480,10 +2481,10 @@ summary:focus-visible,
     <span>※30秒ごとに自動で見直します</span>
   </p>
   <div class="gridtools">
-    <button class="small" onclick="gotoNewEntry()" title="「✏️ 新規登録」へ移動して、そのまま入力を始めます">＋ 新規登録（行を足す）</button>
-    <button class="ghost small" onclick="if(currentTable) showAll(currentTable)" title="絞り込みを解除して全件表示に戻します">↺ 全件に戻す</button>
-    <button class="ghost small" onclick="jumpToToday()" title="日付の列を見て、今日の行まで画面を動かします">📍 今日へ</button>
-    <label class="hint" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer" title="この項目を開いたとき、自動で今日の行まで画面を動かします">
+    <button class="small" id="p-grid-newEntry" onclick="gotoNewEntry()" title="「✏️ 新規登録」へ移動して、そのまま入力を始めます">＋ 新規登録（行を足す）</button>
+    <button class="ghost small" id="p-grid-resetAll" onclick="if(currentTable) showAll(currentTable)" title="絞り込みを解除して全件表示に戻します">↺ 全件に戻す</button>
+    <button class="ghost small" id="p-grid-today" onclick="jumpToToday()" title="日付の列を見て、今日の行まで画面を動かします">📍 今日へ</button>
+    <label class="hint" id="p-grid-todayFocus" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer" title="この項目を開いたとき、自動で今日の行まで画面を動かします">
       <input type="checkbox" id="chkTodayFocus" onchange="toggleTodayFocus(this.checked)"> 開いたら今日へ
     </label>
     <span class="hint">▶ <b>列の見出しをクリック</b>で並べ替え（1回目＝順、2回目＝逆順、3回目＝解除）。タグのセルは <b>1回クリック＝編集</b> ／ <b>ダブルクリック＝絞り込み</b>。<br>
@@ -2500,7 +2501,7 @@ summary:focus-visible,
   </div>
   <div class="table-wrap"><div id="results"></div></div>
 
-  <details>
+  <details id="p-search-hint">
     <summary>検索のヒント（正規表現の例）</summary>
     <div class="body">
       <p>「正規表現で検索」をオフ＝普通の部分一致。オン＝正規表現。例:</p>
@@ -2513,7 +2514,7 @@ summary:focus-visible,
 </details>
 
 <!-- 使い方・配布方法 -->
-<div class="card">
+<div class="card" id="secHelp">
   <h2>📦 このツールの持ち運び方・使い方</h2>
   <details>
     <summary>クリックして詳細を表示／折りたたみ</summary>
@@ -2525,6 +2526,9 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.14 で増えたこと（見た目は変わりません・画面を組み替えるための土台を入れました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。将来の「<b>スキン</b>（画面の構成を丸ごと切り替える機能）」のための土台だけを、中に静かに置きました。入れたのは3つです。<b>①部品を「木」の形で並べる仕組み</b>…「上の帯」「横の柱」「真ん中」などを<b>何段でも入れ子に</b>できます。これまでは段数が決まっていて、それ以上こまかく分けられませんでした。<b>②並べ方の登録簿</b>…「縦や横に並べる／仕切りで分ける／タブで切り替える／折り畳む／部品を1つ置く」の5種類を用意しました。新しい並べ方を思いついたら、<b>この登録簿に1行足すだけ</b>で増えます（並べる側のプログラムは1行も変わりません）。<b>③「栞（しおり）」</b>…部品を別の場所へ動かすとき、元の場所に<b>目印</b>を置いていきます。だから、いくら動かしても<b>元とまったく同じ位置へ戻せます</b>（「何番目だったか」を覚える方式だと、あいだに部品が1つ増えただけでずれてしまいます）。※<b>いまの画面は「標準」という設定</b>で、標準のあいだは<b>この仕組みは1行も動きません</b>。だから今までとまったく同じです。</p>
+      <p><strong>Ver1.19.13 で増えたこと（会社のパソコンでも「コマンドの非表示」が保存されるようになりました）：</strong>コマンドパレット（<b>Ctrl+K</b>）の「呼び出し語（別名）」の画面では、使わないコマンドの「表示」のチェックを外して<b>一覧から隠す</b>ことができます。ところがこれまでは、その設定が<b>ブラウザの保存領域</b>に入っていたため、<b>ファイルを直接開く使い方（会社のパソコンなど）では保存されず、開き直すと元に戻って</b>いました。さらに実際に測ってみると、その環境では<b>チェックを外した直後ですら隠れていません</b>でした（画面には「表示 off」と出るのに、パレットには残ったまま）。Ver1.19.13 では、この設定を<b>DBファイルの中（<code>_meta_opts</code>）</b>へ移しました。これで<b>どのパソコンでも隠れたまま</b>になり、<b>.sqlite ファイルと一緒に持ち運べる</b>ようになります。「呼び出し語（別名）」も同じく持ち運べます。※これまでの設定は引き継ぎません（会社のパソコンでは、そもそも保存できていなかったためです）。※「⭐ よく使うコマンド」の回数だけは、これまでどおり<b>このブラウザの中だけ</b>に残ります。</p>
+      <p><strong>Ver1.19.12 で増えたこと（見た目は変わりません・中に「点検スイッチ」を付けました）：</strong>画面の見た目や操作は<b>まったく変わりません</b>。中に、開発とテストのための<b>点検スイッチ</b>（<code>RTTCHECK</code>）を1つ入れました。<b>誰も押さなければ1行も動かない</b>ので、起動も操作も今までどおりです。これは「壊れても画面に何も出ない不具合」──たとえば<b>並べ替えた配置が、無くなった部品を指したまま黙って消える</b>ような事故──を、テストのときに見つけるための仕組みです。ふだんの使い方に影響はありません。</p>
       <p><strong>Ver1.19.11 で増えたこと（「開いたら今日へ」が効かない不具合を直しました）：</strong>チェックを入れておいた「開いたら今日へ」が、次に開いたときに<b>効かないことがありました</b>。原因は<b>設定のしまい場所</b>です。これまではブラウザ側の保存領域に入れていましたが、この場所は<b>会社のパソコンのようにファイルを直接開く使い方では、黙って失敗する</b>ことがあります。しかも失敗しても知らせずに「設定されていない」ものとして扱っていたため、<b>チェックは入っているのに今日へ飛ばない</b>という状態になっていました。そこで、しまい場所を<b>作業記録DBの中（`.sqlite` と一緒に持ち運べる場所）</b>へ移しました。これで、どのパソコン・どの開き方でも設定が残ります。<b>使い方は何も変わりません。</b>チェックの位置も見た目もそのままです。なお、これまでの設定は引き継がれないので、<b>一度だけチェックを入れ直してください</b>。（開いたら今日へ・保存先の付け替え）</p>
       <p><strong>Ver1.19.10 で増えたこと（重なった言葉を1つの抜粋にまとめました）：</strong>「🔎 全項目を横断検索」で言葉を2つ以上入れたとき、これまでは<b>同じ一文が段の数だけ繰り返して</b>出ていました。これを<b>1本にまとめ、その中に段ごとの色を並べて</b>出すようにしました。たとえば1段目に「予約」、2段目に「議事録」と入れると、以前は同じ文が2回出ていましたが、これからは1回だけ出て、その中で「予約」が琥珀、「議事録」が空色に光ります。<b>ふだんの使い方は何も変わりません。</b>なお「会議」と「議室」のように<b>言葉どうしが同じ文字を含んでいる</b>ときは、その重なった文字だけ<b>斜めの網目</b>で表示し、右肩に「1,2」のように<b>重なっている段の番号をすべて</b>並べます。1つの文字を2つの色で同時に塗ることはできないための工夫です。段を1つだけ使うときの見え方は、Ver1.19.09 までとまったく同じです。以前に保存した横断検索の結果も、これまでどおり開けます。（横断検索の抜粋をまとめる）</p>
       <p><strong>Ver1.19.09 で増えたこと（横断検索を最大5段にしました）：</strong>「🔎 全項目を横断検索」で、これまでは<b>言葉を1つ</b>しか入れられませんでした。これを<b>最大5段</b>まで積めるようにしました。段どうしは「<b>かつ</b>（両方に当てはまる）」「<b>または</b>（どちらかに当てはまる）」でつなげ、段ごとに「<b>NOT</b>（この言葉を含む行を除く）」も指定できます。<b>ふだんの使い方は何も変わりません。</b>2段目から下は「<b>▶ 条件を増やす</b>」の中に畳んであるので、1つの言葉で探すときは今までとまったく同じ見た目です。さらに、結果の抜粋の色を<b>段ごとに変えました</b>（1段目＝琥珀／2段目＝空／3段目＝若草／4段目＝藤／5段目＝珊瑚）。つなぎ方も線の形で分かります（<b>かつ＝実線の下線</b>／<b>または＝点線の下線</b>／<b>NOT＝打ち消し線</b>）。色が見分けにくいときのために、印の右肩に<b>段の番号</b>も小さく出しています。「なぜこの行が出てきたのか」を、抜粋を上から読むだけでたどれます。なお NOT の打ち消し線は「<b>または</b>」でつないだときに見えます（「かつ」でつなぐと、その言葉を含む行はそもそも結果から外れるためです）。以前に保存した横断検索の結果も、これまでどおり開けます。（横断検索の5段化と色分け）</p>
@@ -3206,6 +3210,98 @@ document.addEventListener('DOMContentLoaded', function(){
   try{ if(window.WDT && WDT.startMode) m = WDT.startMode(); }catch(e){}
   setAppMode(m === 'md' ? 'md' : 'db');
 });
+
+/* ============================================================
+   RTTCHECK — 検査の登録簿（第4段・決-63）
+   ------------------------------------------------------------
+   ★これは「押しボタン式の点検スイッチ」です。
+     **誰も押さなければ、1行も走りません。**
+     起動は 1ミリ秒も遅くなりませんし、画面には何も出ません。
+
+   ★何のためにあるか
+     「壊れても画面上は何も起きない」ものを見張ります。たとえば
+       ・保存したレイアウトが、消えた部品を指している
+         （mountPart は黙って false を返すだけ。部品が1つ消えるが警告は出ない）
+       ・db.export() のたびに消える REGEXP が、いま生きているか
+     どちらも **中で動かしてみないと分からない**ので、外からの検査では届きません。
+
+   ★レゴの形（CLAUDE.md §5.2）
+     基礎板 … このブロック。**どんな検査があるかを知りません**
+     ブロック … registerCheck() で登録された検査1つ
+     抜き差し … 各ブロックが自分の見える範囲を1つ登録するだけ
+
+     検査はすべて同じ形の答えを返します ── {ok: 真偽, n: 数, why: 理由}
+
+   ★足場を抜くとき（#72 … 急いで外さない）
+     このブロックと、各所の registerCheck(...) を消すだけで元に戻ります。
+     本体の動きには一切つないでいません（呼ばれなければ何もしない）。
+
+   ★使い方（テストや調べもののときだけ）
+       window.RTTCHECK.summary()   … 全部走らせて要点を返す
+       window.RTTCHECK.runAll()    … 1件ずつの結果
+       window.RTTCHECK.list()      … 何が登録されているか
+   ============================================================ */
+window.RTTCHECK = (function(){
+  'use strict';
+  var CHECKS = [];
+
+  /* 検査を1つ登録する。fn() は {ok:…, n:…, why:…} を返すこと。
+     同じ名前で登録し直したら、あとのほうが勝つ（二重登録で増えない）。 */
+  function registerCheck(name, fn, note){
+    var i;
+    if(!name || typeof fn !== 'function') return 0;
+    for(i = 0; i < CHECKS.length; i++){
+      if(CHECKS[i].name === name){
+        CHECKS[i] = {name: name, run: fn, note: note || ''};
+        return CHECKS.length;
+      }
+    }
+    CHECKS.push({name: name, run: fn, note: note || ''});
+    return CHECKS.length;
+  }
+
+  /* 全部走らせる。★基礎板は中身を知らない（読む側に if を増やさない） */
+  function runAll(){
+    var out = [], i, r;
+    for(i = 0; i < CHECKS.length; i++){
+      try{ r = CHECKS[i].run(); }
+      catch(e){
+        /* ★測れなかったら 0 にしない。測れないこと自体が異常（落とし穴 #34 / #68） */
+        r = {ok: false, n: null,
+             why: '測れません（' + (e && e.name) + ': ' + (e && e.message) + '）'};
+      }
+      if(!r || typeof r !== 'object'){
+        r = {ok: false, n: null, why: '答えの形が違います（{ok,n,why} を返すこと）'};
+      }
+      out.push({name: CHECKS[i].name, ok: !!r.ok,
+                n: (typeof r.n === 'number') ? r.n : null,
+                why: r.why || '', note: CHECKS[i].note});
+    }
+    return out;
+  }
+
+  /* 要点だけ。★「測れない」を「合格」に混ぜない（落とし穴 #68） */
+  function summary(){
+    var rows = runAll(), ng = [], unk = [], i;
+    for(i = 0; i < rows.length; i++){
+      if(rows[i].n === null) unk.push(rows[i].name);
+      else if(!rows[i].ok)   ng.push(rows[i].name);
+    }
+    return {total: rows.length, ng: ng.length, unknown: unk.length,
+            ngNames: ng, unknownNames: unk, rows: rows};
+  }
+
+  function list(){
+    var out = [], i;
+    for(i = 0; i < CHECKS.length; i++){
+      out.push({name: CHECKS[i].name, note: CHECKS[i].note});
+    }
+    return out;
+  }
+
+  return {registerCheck: registerCheck, runAll: runAll,
+          summary: summary, list: list, version: '1.19.11+S4'};
+})();
 </script>
 <script data-rtt-fp="1">
 // ====== 内部で使う定数 ======
@@ -3907,6 +4003,11 @@ function loadMeta(){
      ★boot() では loadMeta() → updateTodayFocusBox() → openTab() の順に走るので、
        チェックボックスの表示にも、起動直後のジャンプにも間に合う。 */
   try{ loadTodayFocusOpt(); }catch(e){}
+  /* Ver1.19.11+ (L-01): 部品の登録簿を組み立て、スキンを適用する。
+     rowTouchSync / loadTodayFocusOpt と同じ理由でここに置く … loadMeta() は
+     起動・DB復元・項目の増減のすべての後で呼ばれるので、ここ1か所で漏れなく追従する。
+     ★既定スキン std は何もしないので、いまの見た目は1ミリも変わらない。 */
+  try{ if(window.RTTPARTS) window.RTTPARTS.skinBoot(); }catch(e){}
 }
 function currentMeta(){ return metaTables.find(t => t.key === currentTable); }
 function currentCols(){ return metaColumnsByTable[currentTable] || []; }
@@ -8664,6 +8765,30 @@ function openCellInMdEditor(td){
 }
 
 /* Markdownメモ側から作業記録DBを読み書きするための窓口 */
+/* ---- 検査を登録する（第4段・決-63）… ここは db が見える ------------------
+   ★RTTCHECK が無ければ、この if は素通りします（足場を抜くときはここを消すだけ）。
+   ★db.export() を呼ぶたびに REGEXP は消えます（落とし穴 #6）。
+     だから「包みのコードが在るか」ではなく、**いま実際に引けるか**を確かめます。
+     外からの検査（invariant.py）では、ここまでは届きません。 */
+try{
+  if(window.RTTCHECK){
+    window.RTTCHECK.registerCheck('regexp.alive', function(){
+      var s;
+      if(!db) return {ok: false, n: null, why: 'DB がまだ開いていません'};
+      try{ s = db.prepare("SELECT 'a' REGEXP 'a'"); s.step(); s.free(); }
+      catch(e){
+        return {ok: false, n: 0,
+                why: 'REGEXP が消えています（' + (e && e.message) + '）'};
+      }
+      return {ok: true, n: 1, why: ''};
+    }, 'db.export() のたびに消える REGEXP が、いま生きているか（落とし穴 #6）');
+  }
+}catch(e){
+  /* ★黙って飲み込まない。理由を言う（落とし穴 #61）。本体は止めない。 */
+  try{ if(window.console && console.warn) console.warn('RTTCHECK の登録に失敗:', e); }
+  catch(e2){}
+}
+
 window.WorkDB = {
   isReady(){ return !!db; },
   // 列名・テーブル名は必ず自分のメタ情報と突き合わせてから使う（不正なSQLを組み立てない）
@@ -18722,6 +18847,27 @@ return {
   /* ---- Ver1.14.01 (回0 前提工事) で増えた窓口 ----
      第6段階の他の機能（ひな型・フォーカス演出・並び順の記憶 など）が
      設定をDBに保存したいときは、この4つを使う。localStorage は使わない。 */
+  /* Ver1.19.11+ (L-01) 部品・スキンの登録簿（レゴの基礎板）。
+     ★中身は RTT20 ブロックの中に在り、window.RTTPARTS が窓口。
+       RTT20 は (function(){…})() で囲まれているので、直に呼ぶことはできない
+       （abc.md 落とし穴 #9）。ここは薄い取り次ぎだけ。
+     アドオンはここからボタンを足す。id は key から自動で作られる。
+       WDT.addPart({key:'addon.x', group:'global', label:'集計', icon:'📊'})
+       WDT.removePart('addon.x')
+       WDT.applySkin('s1')  /  WDT.currentSkin()  /  WDT.listParts() */
+  addPart:     function(d){ var R = window.RTTPARTS; try{ return !!(R && R.registerPart(d)); }catch(e){ return false; } },
+  removePart:  function(k){ var R = window.RTTPARTS; try{ return !!(R && R.unregisterPart(k)); }catch(e){ return false; } },
+  addSkin:     function(d){ var R = window.RTTPARTS; try{ return !!(R && R.registerSkin(d)); }catch(e){ return false; } },
+  addKind:     function(k, d){ var R = window.RTTPARTS; try{ return !!(R && R.registerKind(k, d)); }catch(e){ return false; } },
+  addArea:     function(k, l){ var R = window.RTTPARTS; try{ return !!(R && R.registerArea(k, l)); }catch(e){ return false; } },
+  applySkin:   function(k){ var R = window.RTTPARTS; try{ return !!(R && R.applySkin(k)); }catch(e){ return false; } },
+  currentSkin: function(){ var R = window.RTTPARTS; try{ return R ? R.currentSkin() : ''; }catch(e){ return ''; } },
+  listParts:   function(){ var R = window.RTTPARTS; try{ return R ? R.parts() : []; }catch(e){ return []; } },
+  listSkins:   function(){ var R = window.RTTPARTS; try{ return R ? R.skins() : []; }catch(e){ return []; } },
+  listAreas:   function(){ var R = window.RTTPARTS; try{ return R ? R.areas() : []; }catch(e){ return []; } },
+  getLayout:   function(){ var R = window.RTTPARTS; try{ return R ? R.loadLayout() : null; }catch(e){ return null; } },
+  setLayout:   function(o){ var R = window.RTTPARTS; try{ return !!(R && R.saveLayout(o)); }catch(e){ return false; } },
+  partElId:    function(k){ var R = window.RTTPARTS; try{ return R ? R.partElId(k) : ''; }catch(e){ return ''; } },
   dbOptGet: dbOptGet,          /* 読む   : WDT.dbOptGet('mde','font') */
   dbOptSet: dbOptSet,          /* 書く   : WDT.dbOptSet('mde','font','15') */
   dbOptDel: dbOptDel,          /* 消す   : WDT.dbOptDel('mde','font') */
@@ -19792,12 +19938,76 @@ var K_ALIAS = 'rtt20_alias_v1';   /* {コマンドid: '追加の言葉'} */
 var K_HIDE  = 'rtt20_hidden_v1';  /* [隠すコマンドid] */
 var K_USE   = 'rtt20_usage_v1';   /* {コマンドid: 使った回数} */
 
+/* ---- 保存先の登録簿（B-05・2026-09-06）--------------------------------
+   ★増やすときは registerStore を1行足すだけ。読み書きする側（jGet / jSet）は
+     1行も変わらない（CLAUDE.md §5.2 決まり②「読む側に if を増やさない」）。
+
+     where:'db' … _meta_opts へ入れる。.sqlite と一緒に持ち運べ、
+                   ★会社PC（file://）でブラウザの保存領域が塞がれていても効く。
+     where:'ls' … このブラウザの中だけ（lsGet / lsSet の側）。
+
+   ★なぜ移したか（2026-09-06 に pw_b05.py で実測）
+     保存領域を塞いだ環境では、非表示にしても【同じ画面の中ですら効いていなかった】。
+     jSet が黙って失敗し、読み戻しが空になるため。画面には「表示 off」と出るのに
+     何も起きない ── 嘘の成功に見える（落とし穴 #61）。
+   ★古い値は引き継がない（B-03 / 決-37 の C-1 と同じ）。会社PCでは元々
+     保存できていないので失う物が無く、引き継ぎコードを残すと
+     検算式が永久に空振りになる（落とし穴 #52）。 */
+var J_STORE = [];
+var J_STORE_AT = {};
+function registerStore(key, where, scope, name){
+  if(!key) return false;
+  var d = {key: String(key), where: (where === 'db') ? 'db' : 'ls',
+           scope: scope || '', name: name || ''};
+  var i = J_STORE_AT[d.key];
+  if(i != null){ J_STORE[i] = d; }                  /* 同じ鍵は上書き（重複防止）*/
+  else { J_STORE_AT[d.key] = J_STORE.length; J_STORE.push(d); }
+  return true;
+}
+function storeOf(key){ var i = J_STORE_AT[key]; return (i == null) ? null : J_STORE[i]; }
+
+registerStore(K_ALIAS, 'db', 'palette', 'alias');
+registerStore(K_HIDE,  'db', 'palette', 'hidden');
+/* ★使用回数だけは 'ls' のまま。⭐よく使う（cmdrank）のヘルプに
+     「回数の記録はこのブラウザの中だけに残ります」と書いてあるため。
+     動かすときは、ヘルプの文も一緒に直すこと。 */
+registerStore(K_USE,   'ls');
+
+function jRaw(key){
+  var s = storeOf(key), W = window.WDT;
+  if(s && s.where === 'db'){
+    if(W && typeof W.dbOptGet === 'function'){
+      try{ return W.dbOptGet(s.scope, s.name); }catch(e){ return null; }
+    }
+    return null;            /* ★DBがまだ開いていない。「0件」ではなく「無い」（#34 / #68）*/
+  }
+  return lsGet(key, null);
+}
+function jPut(key, str){
+  var s = storeOf(key), W = window.WDT;
+  if(s && s.where === 'db'){
+    if(W && typeof W.dbOptSet === 'function'){
+      try{
+        if(!W.dbOptSet(s.scope, s.name, str)) return false;
+        /* ★これを呼ばないとメモリ上だけ変わって IndexedDB に落ちない
+           （落とし穴 #18 ／ B-03 と同じ作法）*/
+        try{ if(typeof window.scheduleAutosave === 'function') window.scheduleAutosave(); }
+        catch(e){}
+        return true;
+      }catch(e){ return false; }
+    }
+    return false;
+  }
+  lsSet(key, str);
+  return true;
+}
+
 function jGet(key, def){
-  var raw = lsGet(key, null);
+  var raw = jRaw(key);
   if(raw === null) return def;
   try{ var v = JSON.parse(raw); return (v == null) ? def : v; }catch(e){ return def; }
 }
-function jSet(key, val){ lsSet(key, JSON.stringify(val)); }
+function jSet(key, val){ return jPut(key, JSON.stringify(val)); }
 function aliasMap(){ var m = jGet(K_ALIAS, {}); return (m && typeof m === 'object' && !Array.isArray(m)) ? m : {}; }
 function hiddenList(){ var a = jGet(K_HIDE, []); return Array.isArray(a) ? a : []; }
 function usageMap(){ var m = jGet(K_USE, {}); return (m && typeof m === 'object' && !Array.isArray(m)) ? m : {}; }
@@ -20044,6 +20254,617 @@ function allSections(open){
   }
 }
 
+/* ==================================================================
+   Ver1.19.11+ (L-01)  部品・スキンの登録簿 — 「レゴの基礎板」
+   ------------------------------------------------------------------
+   CLAUDE.md §5.2 の思想をコードにしたもの。
+     基礎板 … この節（登録簿を読んで回すだけ）。ブロックの中身を知らない
+     ブロック … 部品1個 ／ スキン1個。同じ形の定義を持つ
+   ★増やすときは登録簿に1行足すだけ。applySkin() は1行も変わらない。
+   ★決-39 … 部品の定義はコード側の配列、配置（グループ・並び）は DB(_meta_opts)。
+     読む口は loadParts() / loadLayout() の2つだけ。将来ぜんぶ DB へ移すときも
+     この2つを直せば済む。
+   ================================================================== */
+
+/* ---- ① 種類の登録簿 … その種類をどう画面に出すか --------------------
+   ★将来マクロを載せるのは【ここに1行】。applySkin は触らない。 */
+var PART_KINDS = {};
+function registerKind(kind, def){
+  if(!kind || !def || typeof def.mount !== 'function') return false;
+  PART_KINDS[kind] = def;
+  return true;
+}
+function kindOf(k){ return PART_KINDS[k] || PART_KINDS.dom || null; }
+
+/* ---- ② 部品の登録簿 ------------------------------------------------ */
+var PARTS = [];
+var PART_AT = {};                       /* key → PARTS の位置 */
+
+function partElId(key){ return 'p-' + String(key).replace(/\./g, '-'); }
+
+function registerPart(def){
+  if(!def || !def.key) return false;
+  var d = { key  : String(def.key),
+            kind : def.kind  || 'dom',
+            group: def.group || 'other',
+            label: def.label || String(def.key),
+            icon : def.icon  || '',
+            elId : def.elId  || partElId(def.key),
+            el   : (typeof def.el  === 'function') ? def.el  : null,
+            run  : (typeof def.run === 'function') ? def.run : null,
+            from : def.from || '' };    /* どのアドオンが足したか */
+  var i = PART_AT[d.key];
+  if(i != null){ PARTS[i] = d; }        /* 同じ key は上書き（重複防止）*/
+  else { PART_AT[d.key] = PARTS.length; PARTS.push(d); }
+  return true;
+}
+
+function unregisterPart(key){
+  var i = PART_AT[key], j;
+  if(i == null) return false;
+  PARTS.splice(i, 1);
+  PART_AT = {};
+  for(j = 0; j < PARTS.length; j++) PART_AT[PARTS[j].key] = j;
+  return true;
+}
+
+function partDef(key){ var i = PART_AT[key]; return (i == null) ? null : PARTS[i]; }
+
+function partEl(d){
+  if(!d) return null;
+  if(d.el){ try{ return d.el(); }catch(e){ return null; } }
+  return document.getElementById(d.elId);
+}
+
+/* 標準の種類 … すでに画面に在る要素を、そのまま運ぶ。
+   ★appendChild は【移動】であってコピーではない。id も onclick も入力中の値も残る。 */
+registerKind('dom', {
+  mount: function(def, box){
+    var el = partEl(def);
+    if(!el || !box) return false;
+    box.appendChild(el);
+    return true;
+  }
+});
+
+/* ---- ③ 領域の登録簿 … 画面のマス目 --------------------------------- */
+var AREAS = [];
+function registerArea(key, label){
+  var i;
+  if(!key) return false;
+  for(i = 0; i < AREAS.length; i++){
+    if(AREAS[i].key === key){ AREAS[i].label = label || key; return true; }
+  }
+  AREAS.push({key: String(key), label: label || String(key)});
+  return true;
+}
+registerArea('top',    '上の帯');
+registerArea('side',   '横の柱');
+registerArea('main',   '真ん中');
+registerArea('bottom', '下の帯');
+
+/* ---- ④ スキンの登録簿 ---------------------------------------------- */
+var SKINS = [];
+var SKIN_AT = {};
+function registerSkin(def){
+  if(!def || !def.key) return false;
+  var d = { key  : String(def.key),
+            label: def.label || String(def.key),
+            desc : def.desc  || '',
+            apply: (typeof def.apply === 'function') ? def.apply : null,
+            leave: (typeof def.leave === 'function') ? def.leave : null };
+  var i = SKIN_AT[d.key];
+  if(i != null){ SKINS[i] = d; }
+  else { SKIN_AT[d.key] = SKINS.length; SKINS.push(d); }
+  return true;
+}
+function skinDef(key){ var i = SKIN_AT[key]; return (i == null) ? null : SKINS[i]; }
+
+/* ---- グループの見出し（表示名）------------------------------------- */
+var GROUP_LABEL = {
+  page:'ページ見出し', status:'状態表示', edit:'編集履歴', file:'ファイル操作',
+  global:'全体設定', tableMgr:'項目管理', inputForm:'新規登録',
+  tableSwitch:'項目の切り替え', queryCond:'検索条件', dateQuick:'日付の絞り込み',
+  advSearch:'高度な検索', resultHead:'結果の見出し', cellHelp:'セルの説明',
+  gridTools:'表の道具', sortSel:'並べ替え・選択', results:'表', help:'使い方'
+};
+
+/* ---- 部品の種（コード側の既定。DB へ移すのは決-39 で「しない」と決めた）--
+   ★elId を書いていないものは p-<key の . を - にしたもの> を自動で使う。 */
+var PART_SEED = [
+  {key:'page.title',        group:'page',   label:'ページ見出し',   icon:'📇', elId:'app-db-title'},
+  {key:'page.reopenBanner', group:'page',   label:'前回のDBに戻す帯', icon:'↩', elId:'reopenBanner'},
+  {key:'status.msg',        group:'status', label:'状態メッセージ', icon:'ℹ', elId:'status'},
+  {key:'status.autosave',   group:'status', label:'自動保存の状態', icon:'💾', elId:'autosaveInfo'},
+  {key:'edit.undo',         group:'edit',   label:'↶ 元に戻す', icon:'↶', elId:'undoBtn'},
+  {key:'edit.redo',         group:'edit',   label:'↷ やり直す', icon:'↷', elId:'redoBtn'},
+  {key:'file.saveOver',     group:'file',   label:'上書き保存',     icon:'💾'},
+  {key:'file.saveAs',       group:'file',   label:'名前を付けて保存', icon:'💾'},
+  {key:'file.open',         group:'file',   label:'DBを開く',       icon:'📂'},
+  {key:'file.input',        group:'file',   label:'ファイル選択（隠し）', icon:'', elId:'fileInput'},
+  {key:'global.theme',      group:'global', label:'ダーク／ライト', icon:'🌙', elId:'themeBtn'},
+  {key:'global.tagMgr',     group:'global', label:'タグの管理',     icon:'🏷'},
+  {key:'global.settings',   group:'global', label:'設定',           icon:'⚙'},
+  {key:'tableMgr.body',     group:'tableMgr', label:'項目管理の本体', icon:'🗂', elId:'tableManager'},
+  {key:'inputForm.tabs',    group:'inputForm', label:'項目タブ',    icon:'', elId:'tabBar'},
+  {key:'inputForm.card',    group:'inputForm', label:'入力欄',      icon:'✏', elId:'formCard'},
+  {key:'tableSwitch.tabs',  group:'tableSwitch', label:'項目アイコン', icon:'', elId:'secSearchTabs'},
+  {key:'tableSwitch.now',   group:'tableSwitch', label:'いまの項目', icon:'', elId:'secSearchNow'},
+  {key:'query.col',         group:'queryCond', label:'対象の列',    icon:''},
+  {key:'query.kw',          group:'queryCond', label:'キーワード欄', icon:'🔎'},
+  {key:'query.regex',       group:'queryCond', label:'正規表現で検索', icon:''},
+  {key:'query.run',         group:'queryCond', label:'検索',        icon:'🔎'},
+  {key:'query.all',         group:'queryCond', label:'全件表示',    icon:''},
+  {key:'query.colPanel',    group:'queryCond', label:'表示する列',  icon:'⚙'},
+  {key:'query.mdCell',      group:'queryCond', label:'長文列の表示', icon:'📝'},
+  {key:'dateQuick.bar',     group:'dateQuick', label:'日付の絞り込み', icon:'📅', elId:'dateQuick'},
+  {key:'adv.bar',           group:'advSearch', label:'くわしい検索・横断検索', icon:'🧮'},
+  {key:'adv.colPanel',      group:'advSearch', label:'列の表示切替パネル', icon:'', elId:'colPanel'},
+  {key:'adv.advPanel',      group:'advSearch', label:'5段検索パネル', icon:'', elId:'advPanel'},
+  {key:'result.meta',       group:'resultHead', label:'結果の見出しと書き出し', icon:''},
+  {key:'cellHelp',          group:'cellHelp', label:'セルの編集について', icon:''},
+  {key:'now.legend',        group:'cellHelp', label:'色分けの凡例', icon:'🎨', elId:'nowLegend'},
+  {key:'grid.newEntry',     group:'gridTools', label:'新規登録（行を足す）', icon:'＋'},
+  {key:'grid.resetAll',     group:'gridTools', label:'全件に戻す',  icon:'↺'},
+  {key:'grid.today',        group:'gridTools', label:'今日へ',      icon:'📍'},
+  {key:'grid.todayFocus',   group:'gridTools', label:'開いたら今日へ', icon:''},
+  {key:'sort.bar',          group:'sortSel', label:'並べ替えの状態', icon:'', elId:'sortBar'},
+  {key:'bulk.bar',          group:'sortSel', label:'複数選択の操作', icon:'☑', elId:'bulkBar'},
+  {key:'results.table',     group:'results', label:'結果の表',      icon:'📋', elId:'results'},
+  {key:'search.hint',       group:'results', label:'検索のヒント',  icon:''},
+  {key:'help.card',         group:'help',   label:'このツールの使い方', icon:'📦', elId:'secHelp'}
+];
+
+/* ---- 読み口 … 将来ぜんぶ DB へ移すときは、この2つだけ直す ----------- */
+var PARTS_SEEDED = false;
+function loadParts(){
+  var i;
+  if(PARTS_SEEDED) return PARTS.length;
+  for(i = 0; i < PART_SEED.length; i++) registerPart(PART_SEED[i]);
+  PARTS_SEEDED = true;
+  return PARTS.length;
+}
+
+var LAYOUT_SCOPE = 'shell';
+var LAYOUT_NAME  = 'layout';
+
+/* 標準のグループ分け … 各部品の group: から組み立てる（コードに埋め込まない）*/
+function defaultLayout(){
+  var i, g, order = [], bag = {}, groups = [];
+  loadParts();
+  for(i = 0; i < PARTS.length; i++){
+    g = PARTS[i].group;
+    if(!bag[g]){ bag[g] = []; order.push(g); }
+    bag[g].push(PARTS[i].key);
+  }
+  for(i = 0; i < order.length; i++){
+    groups.push({key: order[i], label: GROUP_LABEL[order[i]] || order[i], parts: bag[order[i]]});
+  }
+  return {skin: 'std', groups: groups, areas: {}};
+}
+
+function loadLayout(){
+  var W = window.WDT, raw = null, o = null;
+  if(W && typeof W.dbOptGet === 'function'){
+    try{ raw = W.dbOptGet(LAYOUT_SCOPE, LAYOUT_NAME); }catch(e){ raw = null; }
+  }
+  if(raw){ try{ o = JSON.parse(raw); }catch(e){ o = null; } }
+  if(!o || typeof o !== 'object') o = defaultLayout();
+  if(!o.groups || !o.groups.length) o.groups = defaultLayout().groups;
+  if(!o.skin) o.skin = 'std';
+  if(!o.areas) o.areas = {};
+  return o;
+}
+
+function saveLayout(o){
+  var W = window.WDT, ok = false;
+  if(!o || !W || typeof W.dbOptSet !== 'function') return false;
+  try{ ok = !!W.dbOptSet(LAYOUT_SCOPE, LAYOUT_NAME, JSON.stringify(o)); }
+  catch(e){ return false; }
+  /* ★これを呼ばないとメモリ上だけ変わって IndexedDB に落ちない（B-03 と同じ作法）*/
+  if(ok){ try{ if(typeof window.scheduleAutosave === 'function') window.scheduleAutosave(); }catch(e){} }
+  return ok;
+}
+
+/* ---- 取り付け … 種類の登録簿に任せる（読む側に if を増やさない）----- */
+function mountPart(key, box){
+  var d = partDef(key), k;
+  if(!d) return false;
+  k = kindOf(d.kind);
+  if(!k) return false;
+  try{ return !!k.mount(d, box); }catch(e){ return false; }
+}
+
+/* ---- 適用 ----------------------------------------------------------- */
+var curSkinKey = 'std';
+function currentSkin(){ return curSkinKey; }
+
+function bodySkinClear(){
+  var cls, i;
+  try{
+    cls = String(document.body.className || '').split(/\s+/);
+    for(i = 0; i < cls.length; i++){
+      if(/^wdt-skin-/.test(cls[i])) document.body.classList.remove(cls[i]);
+    }
+  }catch(e){}
+}
+
+function applySkin(key){
+  var lay = loadLayout(), want, def, prev;
+  loadParts();
+  want = key || lay.skin || 'std';
+  def  = skinDef(want) || skinDef('std');
+  if(!def) return false;
+  prev = skinDef(curSkinKey);
+  if(prev && prev.leave){
+    try{ prev.leave({layout: lay, from: curSkinKey, to: def.key, mount: mountPart}); }catch(e){}
+  }
+  bodySkinClear();
+  try{ document.body.classList.add('wdt-skin-' + def.key); }catch(e){}
+  curSkinKey = def.key;
+  if(def.apply){
+    try{ def.apply({layout: lay, parts: PARTS, areas: AREAS, mount: mountPart}); }catch(e){}
+  }
+  return true;
+}
+
+/* ---- 標準スキン … ★何もしない（いまの見た目のまま）------------------
+   apply を持たないので applySkin('std') は body の class を張り替えるだけ。
+   これで既存の回帰テストは1件も動かない（04_フローチャート 危険 R-4 の一次対策）。 */
+registerSkin({key:'std', label:'標準（縦に並べる）',
+              desc:'いまの見た目。3つの節を上から順に置きます。'});
+
+/* ---- 起動時に1回だけ ------------------------------------------------ */
+function skinBoot(){
+  loadParts();
+  try{ applySkin(loadLayout().skin); }catch(e){}
+  return currentSkin();
+}
+
+/* ==================================================================
+   Ver1.19.13+ (L-01 第5段 工程1)  木の登録簿と栞
+   ------------------------------------------------------------------
+   設計の正: 改良/L-01_スキン/06_第5段の確定設計.md
+
+   ★なぜ「木」なのか
+     手順4までは 領域(4つ) → グループ → 部品 の【3段しか積めない】形でした。
+     段数がコードに埋まっていること自体が「拘束する仕組み」なので、
+     節（ノード）1種類だけにして、節が節を持てるようにします。段数の制限はありません。
+
+   ★基礎板は中身を知らない
+     renderNode() は「出し方の登録簿」を引くだけで、if を1つも持ちません。
+     新しい並べ方（格子・重ね・マクロ）は registerNodeKind に1行足すだけです。
+
+   ★既定スキン std は木を持たないので、この節は【1行も走りません】。
+     いまの見た目は1ピクセルも変わりません。
+   ================================================================== */
+
+/* ---- 表示・非表示 … ★el.hidden に頼らない（落とし穴 #78）------------
+   hidden はブラウザの既定の型紙で display:none にするだけなので、
+   要素に **直接** display が書いてあると負けます。しかもエラーは出ません。
+   実際に本体には display を直接持つ部品があります
+   （fileInput は display:none、ツールバーの中身は display:flex）。
+   そこで「元の display を控えておき、戻すときにその値へ戻す」形にします。 */
+function showEl(el, on){
+  if(!el || !el.style) return false;
+  if(on === false){
+    if(el.getAttribute('data-rtt-disp') === null){
+      el.setAttribute('data-rtt-disp', el.style.display || '');
+    }
+    el.style.display = 'none';
+    return true;
+  }
+  var keep = el.getAttribute('data-rtt-disp');
+  el.style.display = (keep === null) ? '' : keep;
+  el.removeAttribute('data-rtt-disp');
+  return true;
+}
+
+/* ---- 栞（しおり）… DOM を動かしても、元とまったく同じ場所へ帰す ------
+   ★「元は何番目だったか」を覚える形は、持ち出している間に兄弟が増減すると
+     黙ってずれます。栞は【場所そのもの】なのでずれません。
+   ★<template> は HTML の仕様で表示されず、中の script も動きません。
+     だから std のとき画面に1ピクセルも影響しません。 */
+var HOME_CLASS = 'rtt-home';
+
+function homeSelOf(key){
+  return 'template.' + HOME_CLASS + '[data-key="' + String(key).replace(/"/g, '\\"') + '"]';
+}
+
+function takeOut(el){
+  if(!el || !el.parentNode) return null;
+  var key = el.id || ('rtt-anon-' + Math.random().toString(36).slice(2));
+  if(!el.id) el.id = key;
+  if(document.querySelector(homeSelOf(key))) return el;   /* ★すでに持ち出し中 */
+  var home = document.createElement('template');
+  home.className = HOME_CLASS;
+  home.setAttribute('data-key', key);
+  el.parentNode.replaceChild(home, el);      /* ★入れ替え。位置は1ミリもずれない */
+  return el;
+}
+
+function putBack(el){
+  if(!el || !el.id) return false;
+  var home = document.querySelector(homeSelOf(el.id));
+  if(!home || !home.parentNode) return false;
+  home.parentNode.replaceChild(el, home);
+  return true;
+}
+
+function homesLeft(){
+  try{ return document.querySelectorAll('template.' + HOME_CLASS).length; }
+  catch(e){ return 0; }
+}
+
+/* 持ち出したものを全部帰す。★帰す順は関係ない（栞が場所を持っているため）*/
+function putBackAll(){
+  var homes, i, key, el, n = 0;
+  try{ homes = document.querySelectorAll('template.' + HOME_CLASS); }
+  catch(e){ return 0; }
+  for(i = homes.length - 1; i >= 0; i--){
+    key = homes[i].getAttribute('data-key');
+    el  = key ? document.getElementById(key) : null;
+    if(el && putBack(el)) n++;
+    else if(homes[i].parentNode) homes[i].parentNode.removeChild(homes[i]);
+  }
+  return n;
+}
+
+/* ---- 出し方の登録簿（kind）… ★増やすときは1行足すだけ --------------- */
+var NODE_KINDS = {};
+function registerNodeKind(kind, def){
+  if(!kind || !def || typeof def.render !== 'function') return false;
+  NODE_KINDS[String(kind)] = def;
+  return true;
+}
+function nodeKindOf(k){ return NODE_KINDS[k] || NODE_KINDS.stack || null; }
+
+/* 節1つを描く。★ここに if は1つも無い（読む側は登録簿を引くだけ）。
+   自分自身を渡すことで、子の出し方を親が知らなくても再帰できる。 */
+function renderNode(node, box){
+  if(!node || !box) return false;
+  var k = nodeKindOf(node.kind);
+  if(!k) return false;
+  try{ return !!k.render(node, box, renderNode); }catch(e){ return false; }
+}
+
+/* ---- 大きさ … ★既定は「伸びる」。数値はドラッグの結果だけ ------------
+   コードに数値を書かないこと。書いてしまうと「拘束する仕組み」になる。
+   不変量「スキンの木に固定の数字を書かない」がこれを見張ります。 */
+function applySize(el, node){
+  if(!el || !el.style) return;
+  if(node && typeof node.size === 'number' && node.size > 0){
+    el.style.flex = '0 0 ' + node.size + 'px';
+  }else{
+    el.style.flex = '1 1 0';                 /* ★既定 … 場所を分け合う */
+  }
+  if(node && typeof node.min === 'number' && node.min > 0){
+    el.style.minWidth = el.style.minHeight = node.min + 'px';
+  }
+}
+
+function nodeBox(node, cls){
+  var d = document.createElement('div');
+  d.className = 'rtt-node ' + cls;
+  if(node && node.key) d.setAttribute('data-node', node.key);
+  return d;
+}
+
+function kidsOf(node){
+  return (node && node.children && node.children.length) ? node.children : [];
+}
+
+/* ---- ① stack … 縦か横に、ただ並べる -------------------------------- */
+registerNodeKind('stack', {
+  render: function(node, box, draw){
+    var wrap = nodeBox(node, 'rtt-stack'), kids = kidsOf(node), i;
+    wrap.style.display = 'flex';
+    wrap.style.flexDirection = (node.dir === 'row') ? 'row' : 'column';
+    applySize(wrap, node);
+    for(i = 0; i < kids.length; i++) draw(kids[i], wrap);
+    box.appendChild(wrap);
+    return true;
+  }
+});
+
+/* ---- ② split … 並べて、間にドラッグできる仕切りを置く ---------------
+   ★仕切りの作法は #app-md .divider（1391行）と同じ形にそろえる。
+     ドラッグで決まった値は node.size に入り、DB へ落ちる（工程8）。 */
+registerNodeKind('split', {
+  render: function(node, box, draw){
+    var wrap = nodeBox(node, 'rtt-split'), kids = kidsOf(node), i, bar;
+    wrap.style.display = 'flex';
+    wrap.style.flexDirection = (node.dir === 'row') ? 'row' : 'column';
+    applySize(wrap, node);
+    for(i = 0; i < kids.length; i++){
+      if(i > 0){
+        bar = document.createElement('div');
+        bar.className = 'rtt-divider';
+        bar.setAttribute('data-at', String(i));
+        bar.style.flex = '0 0 5px';
+        bar.style.cursor = (node.dir === 'row') ? 'col-resize' : 'row-resize';
+        wrap.appendChild(bar);
+      }
+      draw(kids[i], wrap);
+    }
+    box.appendChild(wrap);
+    return true;
+  }
+});
+
+/* ---- ③ tabs … 子を1つずつ出し、上にタブの帯 ------------------------ */
+registerNodeKind('tabs', {
+  render: function(node, box, draw){
+    var wrap = nodeBox(node, 'rtt-tabs'), kids = kidsOf(node);
+    var bar = document.createElement('div'), body = document.createElement('div');
+    var panes = [], i;
+    wrap.style.display = 'flex';
+    wrap.style.flexDirection = 'column';
+    applySize(wrap, node);
+    bar.className = 'rtt-tabbar';
+    bar.style.display = 'flex';
+    bar.style.flex = '0 0 auto';
+    body.className = 'rtt-tabbody';
+    body.style.flex = '1 1 0';
+
+    function pick(at){
+      var j;
+      for(j = 0; j < panes.length; j++) showEl(panes[j], j === at);
+      for(j = 0; j < bar.children.length; j++){
+        bar.children[j].className = 'rtt-tab' + (j === at ? ' on' : '');
+      }
+    }
+
+    for(i = 0; i < kids.length; i++){
+      (function(kid, at){
+        var pane = document.createElement('div'), b = document.createElement('button');
+        pane.className = 'rtt-pane';
+        draw(kid, pane);
+        body.appendChild(pane);
+        panes.push(pane);
+        b.type = 'button';
+        b.className = 'rtt-tab';
+        b.textContent = kid.label || kid.part || kid.key || ('' + (at + 1));
+        b.addEventListener('click', function(){ pick(at); });
+        bar.appendChild(b);
+      })(kids[i], i);
+    }
+    wrap.appendChild(bar);
+    wrap.appendChild(body);
+    box.appendChild(wrap);
+    if(panes.length) pick(0);
+    return true;
+  }
+});
+
+/* ---- ④ fold … 子を折り畳める（details）----------------------------- */
+registerNodeKind('fold', {
+  render: function(node, box, draw){
+    var wrap = nodeBox(node, 'rtt-fold'), kids = kidsOf(node), i;
+    applySize(wrap, node);
+    for(i = 0; i < kids.length; i++){
+      (function(kid){
+        var d = document.createElement('details'), s = document.createElement('summary');
+        if(kid.open !== false) d.open = true;
+        s.textContent = kid.label || kid.part || kid.key || '';
+        d.appendChild(s);
+        draw(kid, d);
+        wrap.appendChild(d);
+      })(kids[i]);
+    }
+    box.appendChild(wrap);
+    return true;
+  }
+});
+
+/* ---- ⑤ slot … 葉。実際の部品を1つ差し込む -------------------------
+   ★ここだけが本物の DOM を動かします。必ず栞を置いてから運ぶこと。 */
+registerNodeKind('slot', {
+  render: function(node, box){
+    var d, el;
+    if(!node || !node.part) return false;
+    loadParts();
+    d = partDef(node.part);
+    if(!d) return false;                 /* ★消えた部品を指していても壊れない */
+    el = partEl(d);
+    if(!el) return false;
+    takeOut(el);                         /* ★帰り道を確保してから */
+    box.appendChild(el);
+    return true;
+  }
+});
+
+/* ---- 窓口 ----------------------------------------------------------
+   ★このブロック（RTT20）は (function(){…})() で囲まれているので、
+     中の関数は外から見えない（abc.md 落とし穴 #9 の型）。
+     window.RTT19 / window.RTT20 と同じ作法で、公開する物だけを窓口に出す。
+     window.WDT からはこの窓口を経由して呼ぶ（グローバル参照は window.◯◯ の形）。 */
+window.RTTPARTS = {
+  registerKind  : registerKind,
+  registerPart  : registerPart,
+  unregisterPart: unregisterPart,
+  registerArea  : registerArea,
+  registerSkin  : registerSkin,
+  partDef       : partDef,
+  partEl        : partEl,
+  partElId      : partElId,
+  mountPart     : mountPart,
+  loadParts     : loadParts,
+  loadLayout    : loadLayout,
+  saveLayout    : saveLayout,
+  defaultLayout : defaultLayout,
+  applySkin     : applySkin,
+  currentSkin   : currentSkin,
+  skinBoot      : skinBoot,
+  /* ---- 第5段 工程1: 木の登録簿と栞 ---- */
+  registerNodeKind: registerNodeKind,
+  renderNode    : renderNode,
+  takeOut       : takeOut,
+  putBack       : putBack,
+  putBackAll    : putBackAll,
+  homesLeft     : homesLeft,
+  showEl        : showEl,
+  /* ★中身（render の関数そのもの）は出さない。外から差し替えられると
+     「基礎板が中身を知らない」という約束が崩れるため。形だけを見せる。 */
+  nodeKinds     : function(){
+    var out = [], k;
+    for(k in NODE_KINDS){
+      if(Object.prototype.hasOwnProperty.call(NODE_KINDS, k)){
+        out.push({kind: k, hasRender: typeof NODE_KINDS[k].render === 'function'});
+      }
+    }
+    return out;
+  },
+  parts         : function(){ loadParts(); return PARTS.slice(); },
+  skins         : function(){ return SKINS.slice(); },
+  areas         : function(){ return AREAS.slice(); },
+  version       : '1.19.11+L01'
+};
+
+/* ---- 検査を登録する（第4段・決-63）--------------------------------------
+   ★RTTCHECK が無ければ、この if は素通りします（足場を抜くときはここを消すだけ）。
+   ここは RTTPARTS の中が見えるので、**外からは分からないこと**を見張れます。 */
+try{
+  if(window.RTTCHECK){
+
+    window.RTTCHECK.registerCheck('layout.ghost', function(){
+      var lay = loadLayout(), miss = [], i, j, g;
+      loadParts();
+      for(i = 0; i < (lay.groups || []).length; i++){
+        g = lay.groups[i] || {};
+        for(j = 0; j < (g.parts || []).length; j++){
+          if(!partDef(g.parts[j])) miss.push(g.parts[j]);
+        }
+      }
+      return {ok: miss.length === 0, n: miss.length,
+              why: miss.length ? '実在しない部品を指しています: ' + miss.join(' ') : ''};
+    }, '保存したレイアウトが、消えた部品を指していないか（mountPart は黙って false を返す）');
+
+    window.RTTCHECK.registerCheck('part.mount', function(){
+      var miss = [], i;
+      loadParts();
+      for(i = 0; i < PARTS.length; i++){
+        if(!document.getElementById(PARTS[i].elId)) miss.push(PARTS[i].key);
+      }
+      return {ok: miss.length === 0, n: miss.length,
+              why: miss.length ? '画面に見当たらない部品: ' + miss.join(' ') : ''};
+    }, '部品が名指しする画面の要素が、実際に画面に在るか');
+
+    window.RTTCHECK.registerCheck('skin.known', function(){
+      var cur = currentSkin(), i, found = false;
+      for(i = 0; i < SKINS.length; i++){ if(SKINS[i].key === cur) found = true; }
+      return {ok: found, n: found ? 0 : 1,
+              why: found ? '' : 'いまの見た目 "' + cur + '" が登録簿にありません'};
+    }, 'いま使っている見た目が、登録簿にあるか');
+
+  }
+}catch(e){
+  /* ★黙って飲み込まない。理由を言う（落とし穴 #61）。
+     ただし検査の登録に失敗しても、本体は止めない。 */
+  try{ if(window.console && console.warn) console.warn('RTTCHECK の登録に失敗:', e); }
+  catch(e2){}
+}
+
 /* 見出しの右側に小さな操作ボタンを付ける（貼り付いた見出しから直接押せる） */
 function decorateSummaries(){
   var i, sec, sum, box;
@@ -20122,9 +20943,10 @@ function buildCommands(showHidden){
             kw:'help tsukaikata つかいかた ヘルプ',
             run:function(){
               toDb();
-              var cards = document.querySelectorAll('#app-db > .card');
-              var last = cards.length ? cards[cards.length - 1] : null;
-              if(last){ try{ last.scrollIntoView({block:'start', behavior:'smooth'}); }catch(e){} }
+              /* Ver1.19.11+ (L-01): ヘルプを「#app-db の最後の子」で決めつけない。
+                 部品をスキンで動かすと最後の子が変わる。id で名指しする。 */
+              var help = document.getElementById('secHelp');
+              if(help){ try{ help.scrollIntoView({block:'start', behavior:'smooth'}); }catch(e){} }
             }});
 
   /* --- 項目（テーブル）ごと --- */
@@ -21453,6 +22275,9 @@ window.RTT20 = {
   alias   : openAlias,
   goto    : gotoSection,
   commands: buildCommands,
+  /* 保存先の登録簿（B-05）… どの設定がどこへ入るかを外から見えるようにする。
+     ★見えないものは守れない。pw_b05.py がここを見ています。 */
+  stores  : function(){ return J_STORE.slice(); },
   version : '1.9.10'
 };
 
