@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.22</title>
+<title>記録台帳＋MDメモ Ver1.19.23</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -2360,7 +2360,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.22</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.23</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2526,6 +2526,7 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.23 で増えたこと（項目管理・新規登録・検索を、タブか折りたたみで並べられるようになりました）：</strong>「⚙ 設定」から選べる新しい並べ方が2つ増えました（設定画面の選択肢はまだ次の版で出す予定で、いまは開発中の機能です）。<b>タブ切り替え</b>…「項目（テーブル）管理」「新規登録」「検索・表示・編集」の3つを、上のタブでカチッと切り替えられます。<b>階層（折りたたみ）</b>…同じ3つを、開閉できる階層として並べます。★いつもの「標準（縦に並べる）」を選んでいるあいだは<b>画面は1ピクセルも変わりません</b>。どちらの並べ方でも、検索・入力・保存はこれまでどおり使えます。「📖 アコーディオン（1つ開くと他が閉じる）」の設定は、タブ・階層の並べ方では自動的に働かなくなります（矛盾した動きを避けるためです）。</p>
       <p><strong>Ver1.19.22 で増えたこと（見た目は変わりません・複数の操作をまとめる土台を入れました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。将来「いくつかの操作をまとめて1回で実行する」機能（マクロ）を作るための土台だけを、中に静かに置きました。入れたのは2つです。<b>①動作の棚</b>…「上書き保存」「今日へ」のような既にある52個の部品の動きに、<b>名前で呼び出せる</b>ようにしました。<b>②マクロという新しい部品の種類</b>…「この動作、次にこの動作…」と<b>手順を並べるだけ</b>で、順番に実行してくれる部品を作れるようになりました。手順の途中で動かせないものがあれば、そこで<b>はっきり止めて知らせます</b>（黙って続けて中途半端に終わることはありません）。※いまはこの土台を使ってマクロを作る画面がまだ無いので、開発用の準備です。使い方も見た目も今までどおりです。</p>
       <p><strong>Ver1.19.21 で増えたこと（画面のボタンが、ぜんぶキーボードから届くようになりました）：</strong>これまで、上の段に並んだボタン（上書き保存・タグの管理・今日へ など）は<b>マウスで押すしかありません</b>でした。この版から、<b>それらが「部品」としてコマンドパレットに出ます</b>。<b>［Ctrl+K］を押して名前を打ち、Enter</b> で実行できます。「hozon」「ほぞん」のようにローマ字・かなでも探せます。<b>好きなキーを自分で割り当てられます</b>…「⚙ 設定 &gt; ショートカットキー」の一覧に部品が並ぶようになったので、「変更」を押して好きなキーを覚えさせてください。※<b>こちらから勝手に新しいキーを割り当てていません</b>。Ctrl と英字の組み合わせは残りが少なく、環境によってはブラウザや日本語入力に横取りされて「押しても効かない」が黙って残るためです。既定は<b>「（未割り当て）」</b>で、選ぶのはあなたです。※<b>使えないときは理由が出ます</b>…DBを開いていないのに「上書き保存」を呼ぶと、これまでは何も起きませんでしたが、これからは「いまは使えません」と出ます。※パレットの中身も整理しました。同じ操作が2か所に書かれていたものを<b>部品ひとつにまとめた</b>ので、片方だけ直して食い違うことがなくなります。隠したコマンド・付けた呼び出し語・使った回数の記録は<b>そのまま引き継がれます</b>。</p>
       <p><strong>Ver1.19.20 で増えたこと（部品を画面のどこへ置いても見た目が崩れなくなりました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。これまで、記録台帳の部品と Markdownメモの部品は、<b>それぞれの画面の中でしか正しく表示できません</b>でした。外へ出すと文字も色も枠も全部なくなってしまう作りだったのです。この版で、<b>置き場所に印（db-scope / md-scope）を付ければ、どこへ置いても同じ見た目になる</b>ようにしました。※あとで<b>「左に日付・上に題名・広い側に長文メモを Markdownメモで」</b>のように、2つの画面の部品を混ぜて並べられるようにするための土台です。※見え方が本当に1つも変わっていないことは、<b>画面の中の1518か所について41種類の値をすべて記録し、前後で照合</b>して確かめました。</p>
@@ -20641,7 +20642,12 @@ function registerSkin(def){
             label: def.label || String(def.key),
             desc : def.desc  || '',
             apply: (typeof def.apply === 'function') ? def.apply : null,
-            leave: (typeof def.leave === 'function') ? def.leave : null };
+            leave: (typeof def.leave === 'function') ? def.leave : null,
+            /* ---- 第5段 工程7（決-80）… ----
+               ★registerSkin も白名簿。ここに書いていない欄は【黙って捨てられる】
+                 （落とし穴 #94 と同じ型。工程7の実測で実際に踏んだ）。 */
+            tree     : def.tree || null,
+            noOneOpen: !!def.noOneOpen };
   var i = SKIN_AT[d.key];
   if(i != null){ SKINS[i] = d; }
   else { SKIN_AT[d.key] = SKINS.length; SKINS.push(d); }
@@ -20794,7 +20800,11 @@ var PART_SEED = [
   {key:'md.save',      group:'file',    label:'メモ：保存',     icon:'💾', elId:'btnSaveNow',  tags:'md save toolbar action'},
   {key:'md.undo',      group:'edit',    label:'メモ：元に戻す', icon:'↶', elId:'btnMdUndo',   tags:'md history toolbar action'},
   {key:'md.redo',      group:'edit',    label:'メモ：やり直す', icon:'↷', elId:'btnMdRedo',   tags:'md history toolbar action'},
-  {key:'md.settings',  group:'global',  label:'メモ：設定', icon:'⚙', elId:'btnSettings', tags:'md settings toolbar action'}
+  {key:'md.settings',  group:'global',  label:'メモ：設定', icon:'⚙', elId:'btnSettings', tags:'md settings toolbar action'},
+  /* ---- 第5段 工程7（決-80）… S1/S2 の木が指す3節。木の葉（slot）として使う ---- */
+  {key:'db.secSearch',       group:'global', label:'検索・表示・編集',   icon:'🔎', elId:'secSearch',       tags:'db section'},
+  {key:'db.secInputForm',    group:'global', label:'新規登録',           icon:'✏',  elId:'secInputForm',    tags:'db section'},
+  {key:'db.secTableManager', group:'global', label:'項目（テーブル）管理', icon:'🗂', elId:'secTableManager', tags:'db section'}
 ];
 
 /* ---- 読み口 … 将来ぜんぶ DB へ移すときは、この2つだけ直す ----------- */
@@ -21451,6 +21461,66 @@ function applySkin(key){
    これで既存の回帰テストは1件も動かない（04_フローチャート 危険 R-4 の一次対策）。 */
 registerSkin({key:'std', label:'標準（縦に並べる）',
               desc:'いまの見た目。3つの節を上から順に置きます。'});
+
+/* ==================================================================
+   Ver1.19.23 (L-01 第5段 工程7・決-80)  S1（タブ）／S2（階層）の木
+   ------------------------------------------------------------------
+   設計の正: 改良/L-01_スキン/06_第5段の確定設計.md §10 工程7
+   3節（検索・表示・編集／新規登録／項目（テーブル）管理）を、
+   木（tabs / fold）で並べ替える最初の2つの標準スキン。
+
+   ★マウントは【動的に作って動的に消す】（std は1ピクセルも変わらない約束を守るため）。
+     静的HTMLに空のdivを足すと、std のときも1個の要素が増えてしまい、
+     画面の中身を丸ごと比べる検査（cssnap 等）に差分が出る恐れがある。
+     だから apply のときだけ #secTableManager の直前に箱を作り、
+     leave のときに栞で全部帰してから箱ごと消す。
+   ================================================================== */
+var SKIN_TREE_MOUNT = null;
+
+function skinTreeApply(tree){
+  var anchor = document.getElementById('secTableManager'), mount;
+  if(!anchor || !anchor.parentNode || !tree) return false;
+  mount = document.createElement('div');
+  mount.className = 'rtt-skin-tree';
+  mount.id = 'skinTreeMount';
+  anchor.parentNode.insertBefore(mount, anchor);
+  SKIN_TREE_MOUNT = mount;
+  renderNode(tree, mount);
+  return true;
+}
+
+function skinTreeLeave(){
+  putBackAll();
+  if(SKIN_TREE_MOUNT && SKIN_TREE_MOUNT.parentNode){
+    SKIN_TREE_MOUNT.parentNode.removeChild(SKIN_TREE_MOUNT);
+  }
+  SKIN_TREE_MOUNT = null;
+}
+
+/* 同じ形のスキンを1行で作る（CLAUDE.md §5.2 決まり①）。
+   ★noOneOpen … S-03「📖 アコーディオン」との衝突を避ける（危険R-3の一次対策）。
+     bindOneOpen が currentSkin() 経由でこの1点だけを見る。 */
+function makeTreeSkin(key, label, desc, tree){
+  registerSkin({key: key, label: label, desc: desc, tree: tree, noOneOpen: true,
+    apply: function(){ skinTreeApply(tree); },
+    leave: function(){ skinTreeLeave(); }});
+}
+
+makeTreeSkin('s1', 'タブ切り替え（3節をタブで）',
+  '項目管理・新規登録・検索の3つを、上のタブで切り替えます。',
+  {key:'s1root', kind:'tabs', children:[
+    {key:'s1a', kind:'slot', part:'db.secSearch',       label:'🔎 検索・表示・編集'},
+    {key:'s1b', kind:'slot', part:'db.secInputForm',    label:'✏️ 新規登録'},
+    {key:'s1c', kind:'slot', part:'db.secTableManager', label:'🗂 項目（テーブル）管理'}
+  ]});
+
+makeTreeSkin('s2', '階層（折りたたみ）',
+  '項目管理・新規登録・検索の3つを、開閉できる階層で並べます。',
+  {key:'s2root', kind:'fold', children:[
+    {key:'s2a', kind:'slot', part:'db.secSearch',       label:'🔎 検索・表示・編集'},
+    {key:'s2b', kind:'slot', part:'db.secInputForm',    label:'✏️ 新規登録'},
+    {key:'s2c', kind:'slot', part:'db.secTableManager', label:'🗂 項目（テーブル）管理'}
+  ]});
 
 /* ---- 起動時に1回だけ ------------------------------------------------ */
 function skinBoot(){
@@ -23071,6 +23141,13 @@ function miniLauncherVisible(){
 
 /* セクションを1つだけ開く（アコーディオン）。設定でONにしたときだけ働く */
 var oneOpenGuard = false;
+/* ★工程7（決-80）… 「いまのスキンは、他を閉じる仕掛けと相性が悪いか」を
+   この1点だけで判定する。散らばった if を作らない（CLAUDE.md §5.2 決まり④）。 */
+function skinAllowsOneOpen(){
+  var d = skinDef(curSkinKey);
+  return !(d && d.noOneOpen);
+}
+
 function bindOneOpen(){
   var ds = document.querySelectorAll('#app-db details.card'), i;
   for(i = 0; i < ds.length; i++){
@@ -23079,6 +23156,9 @@ function bindOneOpen(){
     ds[i].addEventListener('toggle', function(){
       if(!this.open || oneOpenGuard) return;
       if(!bodyHas('wdt-oneopen')) return;
+      /* ★工程7（決-80・危険R-3の一次対策）… タブ/階層系スキンでは無視する。
+         判定は currentSkin() 経由でこの1点だけに集約する（ifを散らさない）。 */
+      if(!skinAllowsOneOpen()) return;
       oneOpenGuard = true;
       var all = document.querySelectorAll('#app-db details.card'), j;
       for(j = 0; j < all.length; j++){ if(all[j] !== this) all[j].open = false; }
