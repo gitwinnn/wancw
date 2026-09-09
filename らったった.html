@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.17</title>
+<title>記録台帳＋MDメモ Ver1.19.22</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -707,7 +707,7 @@ html,body{height:100%;margin:0;overflow:hidden}
 #appBody.mode-md #app-md{ display:flex; flex-direction:column; }
 
 /* ---- #app-db : CSS変数（スコープ限定） ---- */
-#app-db{
+:is(#app-db,.db-scope){
 --bg:#f5f6f8; --panel:#ffffff; --line:#d4d8de; --line2:#e7eaee;
     --ink:#1f2530; --sub:#5b6470; --accent:#2f6fdb; --accent2:#235bbd;
     --okbg:#e7f6ec; --okink:#1d7a3d; --errbg:#fdecec; --errink:#b3261e;
@@ -717,7 +717,7 @@ margin:0; background:var(--bg); color:var(--ink);
     font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic UI",Meiryo,system-ui,sans-serif;
     font-size:14px; line-height:1.6; padding:18px;
 }
-#app-db[data-theme="dark"]{
+:is(#app-db,.db-scope)[data-theme="dark"]{
 --bg:#14161a; --panel:#1b1e24; --line:#2b2f37; --line2:#262a31;
     --ink:#e6e9ef; --sub:#9aa4b2; --accent:#4c8dff; --accent2:#3f77df;
     --okbg:#123a24; --okink:#57d58a; --errbg:#3a1414; --errink:#ff8a80;
@@ -725,301 +725,301 @@ margin:0; background:var(--bg); color:var(--ink);
     --del:#ff8a80; --input-bg:#12141a; --code-bg:#20242c;
 }
 
-#app-db h1{font-size:18px; margin:0 0 4px}
-#app-db .lead{color:var(--sub); margin:0 0 14px; font-size:13px}
-#app-db .card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:0 0 14px}
-#app-db .card h2{font-size:15px; margin:0 0 10px; display:flex; align-items:center; gap:8px}
-#app-db .card h2 .tag{font-size:11px; color:var(--sub); background:var(--chip); border:1px solid var(--line2); border-radius:999px; padding:1px 9px; font-weight:600}
-#app-db label{display:block; font-size:12px; color:var(--sub); margin:8px 0 3px}
-#app-db input[type=text],
-#app-db textarea,
-#app-db select{
+:is(#app-db,.db-scope) h1{font-size:18px; margin:0 0 4px}
+:is(#app-db,.db-scope) .lead{color:var(--sub); margin:0 0 14px; font-size:13px}
+:is(#app-db,.db-scope) .card{background:var(--panel); border:1px solid var(--line); border-radius:10px; padding:14px 16px; margin:0 0 14px}
+:is(#app-db,.db-scope) .card h2{font-size:15px; margin:0 0 10px; display:flex; align-items:center; gap:8px}
+:is(#app-db,.db-scope) .card h2 .tag{font-size:11px; color:var(--sub); background:var(--chip); border:1px solid var(--line2); border-radius:999px; padding:1px 9px; font-weight:600}
+:is(#app-db,.db-scope) label{display:block; font-size:12px; color:var(--sub); margin:8px 0 3px}
+:is(#app-db,.db-scope) input[type=text],
+:is(#app-db,.db-scope) textarea,
+:is(#app-db,.db-scope) select{
     width:100%; padding:7px 9px; border:1px solid var(--line); border-radius:7px;
     font-family:inherit; font-size:13px; background:var(--input-bg); color:var(--ink);
   }
-#app-db textarea{resize:vertical; min-height:54px}
-#app-db .row{display:flex; gap:12px; flex-wrap:wrap}
-#app-db .row > div{flex:1 1 180px; min-width:160px}
-#app-db .row > div.full{flex:1 1 100%}
-#app-db button{
+:is(#app-db,.db-scope) textarea{resize:vertical; min-height:54px}
+:is(#app-db,.db-scope) .row{display:flex; gap:12px; flex-wrap:wrap}
+:is(#app-db,.db-scope) .row > div{flex:1 1 180px; min-width:160px}
+:is(#app-db,.db-scope) .row > div.full{flex:1 1 100%}
+:is(#app-db,.db-scope) button{
     font-family:inherit; font-size:13px; font-weight:600; cursor:pointer;
     border:1px solid var(--accent2); background:var(--accent); color:#fff;
     border-radius:7px; padding:8px 14px;
   }
-#app-db button:hover{background:var(--accent2)}
-#app-db button:disabled{opacity:.4; cursor:default}
-#app-db button.ghost{background:var(--panel); color:var(--accent2); border-color:var(--line)}
-#app-db button.ghost:hover{background:var(--head)}
-#app-db button.small{padding:4px 9px; font-size:12px}
-#app-db button.mini{padding:0 5px; font-size:11px; border-radius:5px; line-height:1.7; background:var(--panel); color:var(--sub); border-color:var(--line2)}
-#app-db button.mini:hover{background:var(--head)}
-#app-db .btns{margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center}
-#app-db .toolbar{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
-#app-db #status{font-size:12.5px; padding:8px 12px; border-radius:8px; background:var(--code-bg); color:var(--sub); border:1px solid var(--line2)}
-#app-db #status.ok{background:var(--okbg); color:var(--okink); border-color:#bfe4cc}
-#app-db #status.err{background:var(--errbg); color:var(--errink); border-color:#f3c5c1}
-#app-db .search-grid{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end}
-#app-db .search-grid > div{flex:0 0 auto}
-#app-db .search-grid .kw{flex:1 1 240px; min-width:200px}
-#app-db .check{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink); padding-bottom:7px}
-#app-db .check input{width:auto}
-#app-db .meta{font-size:12px; color:var(--sub); margin:10px 0 6px; display:flex; gap:12px; align-items:center; flex-wrap:wrap}
-#app-db .table-wrap{overflow:auto; border:1px solid var(--line); border-radius:8px; max-height:62vh}
-#app-db table.grid{border-collapse:collapse; width:100%; font-size:12.5px}
-#app-db table.grid th,
-#app-db table.grid td{
+:is(#app-db,.db-scope) button:hover{background:var(--accent2)}
+:is(#app-db,.db-scope) button:disabled{opacity:.4; cursor:default}
+:is(#app-db,.db-scope) button.ghost{background:var(--panel); color:var(--accent2); border-color:var(--line)}
+:is(#app-db,.db-scope) button.ghost:hover{background:var(--head)}
+:is(#app-db,.db-scope) button.small{padding:4px 9px; font-size:12px}
+:is(#app-db,.db-scope) button.mini{padding:0 5px; font-size:11px; border-radius:5px; line-height:1.7; background:var(--panel); color:var(--sub); border-color:var(--line2)}
+:is(#app-db,.db-scope) button.mini:hover{background:var(--head)}
+:is(#app-db,.db-scope) .btns{margin-top:12px; display:flex; gap:8px; flex-wrap:wrap; align-items:center}
+:is(#app-db,.db-scope) .toolbar{display:flex; gap:8px; align-items:center; flex-wrap:wrap}
+:is(#app-db,.db-scope) #status{font-size:12.5px; padding:8px 12px; border-radius:8px; background:var(--code-bg); color:var(--sub); border:1px solid var(--line2)}
+:is(#app-db,.db-scope) #status.ok{background:var(--okbg); color:var(--okink); border-color:#bfe4cc}
+:is(#app-db,.db-scope) #status.err{background:var(--errbg); color:var(--errink); border-color:#f3c5c1}
+:is(#app-db,.db-scope) .search-grid{display:flex; gap:12px; flex-wrap:wrap; align-items:flex-end}
+:is(#app-db,.db-scope) .search-grid > div{flex:0 0 auto}
+:is(#app-db,.db-scope) .search-grid .kw{flex:1 1 240px; min-width:200px}
+:is(#app-db,.db-scope) .check{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink); padding-bottom:7px}
+:is(#app-db,.db-scope) .check input{width:auto}
+:is(#app-db,.db-scope) .meta{font-size:12px; color:var(--sub); margin:10px 0 6px; display:flex; gap:12px; align-items:center; flex-wrap:wrap}
+:is(#app-db,.db-scope) .table-wrap{overflow:auto; border:1px solid var(--line); border-radius:8px; max-height:62vh}
+:is(#app-db,.db-scope) table.grid{border-collapse:collapse; width:100%; font-size:12.5px}
+:is(#app-db,.db-scope) table.grid th,
+:is(#app-db,.db-scope) table.grid td{
     border:1px solid var(--line2); padding:6px 9px; text-align:left;
     vertical-align:top; white-space:pre-wrap; word-break:break-word; max-width:420px;
   }
-#app-db table.grid th{background:var(--head); position:sticky; top:0; z-index:1; font-weight:700; white-space:nowrap}
-#app-db table.grid td.num{font-variant-numeric:tabular-nums; white-space:nowrap}
-#app-db table.grid td.path{font-family:ui-monospace,Consolas,Menlo,monospace; font-size:12px}
-#app-db table.grid tr:nth-child(even) td{background:var(--zebra)}
-#app-db table.grid td.edit{background:var(--edit); cursor:text}
-#app-db table.grid tr:nth-child(even) td.edit{background:var(--edit)}
-#app-db table.grid td.edit:focus{outline:2px solid var(--accent); outline-offset:-2px; background:var(--editfocus)}
-#app-db table.grid td.op{white-space:nowrap; text-align:center}
-#app-db table.grid td.wd{white-space:nowrap; text-align:center; color:var(--sub); font-size:12px}
+:is(#app-db,.db-scope) table.grid th{background:var(--head); position:sticky; top:0; z-index:1; font-weight:700; white-space:nowrap}
+:is(#app-db,.db-scope) table.grid td.num{font-variant-numeric:tabular-nums; white-space:nowrap}
+:is(#app-db,.db-scope) table.grid td.path{font-family:ui-monospace,Consolas,Menlo,monospace; font-size:12px}
+:is(#app-db,.db-scope) table.grid tr:nth-child(even) td{background:var(--zebra)}
+:is(#app-db,.db-scope) table.grid td.edit{background:var(--edit); cursor:text}
+:is(#app-db,.db-scope) table.grid tr:nth-child(even) td.edit{background:var(--edit)}
+:is(#app-db,.db-scope) table.grid td.edit:focus{outline:2px solid var(--accent); outline-offset:-2px; background:var(--editfocus)}
+:is(#app-db,.db-scope) table.grid td.op{white-space:nowrap; text-align:center}
+:is(#app-db,.db-scope) table.grid td.wd{white-space:nowrap; text-align:center; color:var(--sub); font-size:12px}
 
 /* ---- Markdown表示セル（長文列） ---- */
-#app-db table.grid td.mdcell{
+:is(#app-db,.db-scope) table.grid td.mdcell{
     background:var(--edit); cursor:pointer; white-space:normal;
     min-width:200px; max-width:520px; position:relative;
   }
-#app-db table.grid tr:nth-child(even) td.mdcell{background:var(--edit)}
-#app-db table.grid td.mdcell:hover{background:var(--editfocus)}
-#app-db table.grid td.mdcell.editing{background:var(--editfocus); cursor:default}
-#app-db .mdbody{max-height:210px; overflow:auto; line-height:1.6}
-#app-db .mdbody.plain{white-space:pre-wrap}
-#app-db .mdbody > *:first-child{margin-top:0}
-#app-db .mdbody > *:last-child{margin-bottom:0}
-#app-db .mdbody p{margin:.35em 0}
-#app-db .mdbody h1,#app-db .mdbody h2,#app-db .mdbody h3,
-#app-db .mdbody h4,#app-db .mdbody h5,#app-db .mdbody h6{
+:is(#app-db,.db-scope) table.grid tr:nth-child(even) td.mdcell{background:var(--edit)}
+:is(#app-db,.db-scope) table.grid td.mdcell:hover{background:var(--editfocus)}
+:is(#app-db,.db-scope) table.grid td.mdcell.editing{background:var(--editfocus); cursor:default}
+:is(#app-db,.db-scope) .mdbody{max-height:210px; overflow:auto; line-height:1.6}
+:is(#app-db,.db-scope) .mdbody.plain{white-space:pre-wrap}
+:is(#app-db,.db-scope) .mdbody > *:first-child{margin-top:0}
+:is(#app-db,.db-scope) .mdbody > *:last-child{margin-bottom:0}
+:is(#app-db,.db-scope) .mdbody p{margin:.35em 0}
+:is(#app-db,.db-scope) .mdbody h1,:is(#app-db,.db-scope) .mdbody h2,:is(#app-db,.db-scope) .mdbody h3,
+:is(#app-db,.db-scope) .mdbody h4,:is(#app-db,.db-scope) .mdbody h5,:is(#app-db,.db-scope) .mdbody h6{
     margin:.5em 0 .3em; line-height:1.35; border:0; padding:0;
     font-size:13.5px; color:var(--ink);
   }
-#app-db .mdbody h1{font-size:15px}
-#app-db .mdbody h2{font-size:14px}
-#app-db .mdbody ul,#app-db .mdbody ol{margin:.3em 0; padding-left:20px}
-#app-db .mdbody li{margin:.1em 0}
+:is(#app-db,.db-scope) .mdbody h1{font-size:15px}
+:is(#app-db,.db-scope) .mdbody h2{font-size:14px}
+:is(#app-db,.db-scope) .mdbody ul,:is(#app-db,.db-scope) .mdbody ol{margin:.3em 0; padding-left:20px}
+:is(#app-db,.db-scope) .mdbody li{margin:.1em 0}
 /* Ver1.9.10 修正: チェックリストが左にはみ出して切れないようにする。
    （ul.task-list の padding と li.task-item の負マージンが二重にかかっていた） */
-#app-db .mdbody ul.task-list{list-style:none; padding-left:2px; margin-left:0}
-#app-db .mdbody ul.task-list ul{padding-left:18px}
-#app-db .mdbody li.task-item{list-style:none; margin-left:0; display:flex; align-items:flex-start; gap:6px}
-#app-db .mdbody li.task-item > input[type=checkbox]{
+:is(#app-db,.db-scope) .mdbody ul.task-list{list-style:none; padding-left:2px; margin-left:0}
+:is(#app-db,.db-scope) .mdbody ul.task-list ul{padding-left:18px}
+:is(#app-db,.db-scope) .mdbody li.task-item{list-style:none; margin-left:0; display:flex; align-items:flex-start; gap:6px}
+:is(#app-db,.db-scope) .mdbody li.task-item > input[type=checkbox]{
     flex:0 0 auto; width:14px; height:14px; min-width:14px; margin:3px 0 0;
     cursor:pointer; accent-color:var(--accent);
   }
-#app-db .mdbody code{background:var(--code-bg); padding:1px 4px; border-radius:3px;
+:is(#app-db,.db-scope) .mdbody code{background:var(--code-bg); padding:1px 4px; border-radius:3px;
     font-family:ui-monospace,Consolas,Menlo,monospace; font-size:11.5px}
-#app-db .mdbody pre{background:var(--code-bg); padding:8px 10px; border-radius:6px;
+:is(#app-db,.db-scope) .mdbody pre{background:var(--code-bg); padding:8px 10px; border-radius:6px;
     overflow:auto; margin:.4em 0; border:1px solid var(--line2)}
-#app-db .mdbody pre code{background:none; padding:0}
-#app-db .mdbody blockquote{margin:.4em 0; padding:2px 10px; border-left:3px solid var(--line);
+:is(#app-db,.db-scope) .mdbody pre code{background:none; padding:0}
+:is(#app-db,.db-scope) .mdbody blockquote{margin:.4em 0; padding:2px 10px; border-left:3px solid var(--line);
     color:var(--sub)}
-#app-db .mdbody table{border-collapse:collapse; margin:.4em 0; font-size:11.5px}
-#app-db .mdbody table th,#app-db .mdbody table td{
+:is(#app-db,.db-scope) .mdbody table{border-collapse:collapse; margin:.4em 0; font-size:11.5px}
+:is(#app-db,.db-scope) .mdbody table th,:is(#app-db,.db-scope) .mdbody table td{
     border:1px solid var(--line); padding:3px 7px; max-width:none; position:static}
-#app-db .mdbody table th{background:var(--head)}
-#app-db .mdbody hr{border:0; border-top:1px solid var(--line); margin:.6em 0}
-#app-db .mdbody img{max-width:100%; border-radius:4px}
-#app-db .mdbody a{color:var(--accent2)}
-#app-db .mdcell-empty{color:var(--sub); font-style:italic; font-size:12px}
-#app-db .mdcell-tools{
+:is(#app-db,.db-scope) .mdbody table th{background:var(--head)}
+:is(#app-db,.db-scope) .mdbody hr{border:0; border-top:1px solid var(--line); margin:.6em 0}
+:is(#app-db,.db-scope) .mdbody img{max-width:100%; border-radius:4px}
+:is(#app-db,.db-scope) .mdbody a{color:var(--accent2)}
+:is(#app-db,.db-scope) .mdcell-empty{color:var(--sub); font-style:italic; font-size:12px}
+:is(#app-db,.db-scope) .mdcell-tools{
     display:flex; gap:6px; align-items:center; margin-top:6px;
     padding-top:6px; border-top:1px dashed var(--line2);
   }
-#app-db .mdcell-tools .hintk{color:var(--sub); font-size:11px; margin-left:auto}
-#app-db td.mdcell textarea{
+:is(#app-db,.db-scope) .mdcell-tools .hintk{color:var(--sub); font-size:11px; margin-left:auto}
+:is(#app-db,.db-scope) td.mdcell textarea{
     width:100%; min-height:150px; box-sizing:border-box; resize:vertical;
     font-family:ui-monospace,Consolas,Menlo,monospace; font-size:12.5px; line-height:1.6;
     padding:7px 8px; border:1px solid var(--accent); border-radius:6px;
     background:var(--input-bg); color:var(--ink);
   }
-#app-db .mdcell-open{
+:is(#app-db,.db-scope) .mdcell-open{
     position:absolute; top:3px; right:3px; opacity:0; transition:opacity .12s;
     background:var(--panel); border:1px solid var(--line); border-radius:5px;
     font-size:11px; padding:1px 6px; color:var(--accent2); cursor:pointer; line-height:1.7;
   }
-#app-db td.mdcell:hover .mdcell-open{opacity:1}
-#app-db .mdcell-open:hover{background:var(--chip)}
-#app-db .mdcell-syncing{outline:2px solid var(--accent); outline-offset:-2px}
+:is(#app-db,.db-scope) td.mdcell:hover .mdcell-open{opacity:1}
+:is(#app-db,.db-scope) .mdcell-open:hover{background:var(--chip)}
+:is(#app-db,.db-scope) .mdcell-syncing{outline:2px solid var(--accent); outline-offset:-2px}
 
 /* ---- 入力フォームの長文欄（Markdownメモ連携・プレビュー） ---- */
-#app-db .fieldhead{display:flex; align-items:center; gap:8px; margin:8px 0 3px; flex-wrap:wrap}
-#app-db .fieldhead label{margin:0}
-#app-db .fieldbtns{margin-left:auto; display:flex; gap:5px}
-#app-db button.fbtn{
+:is(#app-db,.db-scope) .fieldhead{display:flex; align-items:center; gap:8px; margin:8px 0 3px; flex-wrap:wrap}
+:is(#app-db,.db-scope) .fieldhead label{margin:0}
+:is(#app-db,.db-scope) .fieldbtns{margin-left:auto; display:flex; gap:5px}
+:is(#app-db,.db-scope) button.fbtn{
     background:var(--panel); color:var(--accent2); border:1px solid var(--line);
     border-radius:5px; font-size:11px; padding:2px 8px; line-height:1.7; font-weight:600;
   }
-#app-db button.fbtn:hover{background:var(--chip)}
-#app-db button.fbtn.on{background:var(--accent); color:#fff; border-color:var(--accent2)}
-#app-db .fieldlinked{color:#7fd1a2; font-size:11px; font-weight:700}
-#app-db .formfield.linked > textarea{border-color:#3a7d5a; box-shadow:0 0 0 1px #3a7d5a inset}
-#app-db .formprev{
+:is(#app-db,.db-scope) button.fbtn:hover{background:var(--chip)}
+:is(#app-db,.db-scope) button.fbtn.on{background:var(--accent); color:#fff; border-color:var(--accent2)}
+:is(#app-db,.db-scope) .fieldlinked{color:#7fd1a2; font-size:11px; font-weight:700}
+:is(#app-db,.db-scope) .formfield.linked > textarea{border-color:#3a7d5a; box-shadow:0 0 0 1px #3a7d5a inset}
+:is(#app-db,.db-scope) .formprev{
     display:none; margin-top:6px; padding:8px 10px; border:1px dashed var(--line2);
     border-radius:7px; background:var(--code-bg);
   }
-#app-db .formprev.show{display:block}
-#app-db .formprev .prevcap{color:var(--sub); font-size:11px; margin-bottom:5px}
-#app-db .formprev .mdbody{max-height:340px}
+:is(#app-db,.db-scope) .formprev.show{display:block}
+:is(#app-db,.db-scope) .formprev .prevcap{color:var(--sub); font-size:11px; margin-bottom:5px}
+:is(#app-db,.db-scope) .formprev .mdbody{max-height:340px}
 
-#app-db button.del{background:var(--panel); color:var(--del); border:1px solid #f1c6c2; padding:3px 9px; font-size:12px; border-radius:6px}
-#app-db button.del:hover{background:var(--errbg)}
-#app-db .err{color:var(--errink)}
-#app-db details{margin-top:6px; font-size:13px}
-#app-db summary{cursor:pointer; color:var(--accent2); font-weight:600}
-#app-db details .body{padding:8px 2px; color:var(--ink)}
-#app-db details.card{margin:0 0 14px; padding:14px 16px}
-#app-db details.card > summary{margin:-14px -16px 0; padding:14px 16px; list-style-position:outside}
-#app-db details.card[open] > summary{margin-bottom:10px; border-bottom:1px dashed var(--line2); padding-bottom:12px}
-#app-db details.card > summary::-webkit-details-marker{color:var(--accent2)}
-#app-db details.card summary h2{margin:0; display:inline-flex !important}
-#app-db code{background:var(--code-bg); padding:1px 5px; border-radius:4px; font-family:ui-monospace,Consolas,monospace; font-size:12px}
-#app-db pre{background:#0f1115; color:#e7eaee; padding:10px 12px; border-radius:8px; overflow:auto; font-size:12px}
-#app-db .hint{font-size:12px; color:var(--sub)}
-#app-db .tabbar{display:flex; gap:6px; flex-wrap:wrap; margin:0 0 -1px; position:relative; z-index:1}
-#app-db .tabbtn{background:var(--panel); color:var(--sub); border:1px solid var(--line); border-bottom:none; border-radius:8px 8px 0 0; padding:8px 14px; font-weight:600; font-size:13px; cursor:pointer}
-#app-db .tabbtn:hover{color:var(--ink)}
-#app-db .tabbtn.active{background:var(--accent); color:#fff; border-color:var(--accent2)}
-#app-db .reopen-banner{display:flex; gap:10px; align-items:center; background:var(--chip); border:1px solid var(--line); border-radius:8px; padding:10px 14px; margin:0 0 12px; font-size:13px; flex-wrap:wrap}
-#app-db .tblmgr-row{border-bottom:1px dashed var(--line2); padding:8px 0; margin-bottom:6px}
-#app-db .tblmgr-row:last-of-type{border-bottom:none}
-#app-db .tblmgr-head{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px}
-#app-db .tblmgr-cols{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px}
-#app-db .colchip{background:var(--chip); border:1px solid var(--line2); border-radius:999px; padding:3px 6px 3px 10px; font-size:12px; display:inline-flex; align-items:center; gap:4px; color:var(--ink)}
-#app-db .tblmgr-add,
-#app-db .tblmgr-newtable{display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:4px}
-#app-db .tblmgr-add input,
-#app-db .tblmgr-add select,
-#app-db .tblmgr-newtable input{width:auto}
-#app-db .colpanel{display:flex; gap:10px; flex-wrap:wrap; background:var(--chip); border:1px solid var(--line2); border-radius:8px; padding:10px; margin:0 0 10px}
-#app-db .colchk{font-size:12.5px; display:inline-flex; align-items:center; gap:4px; color:var(--ink)}
-#app-db .colchk input{width:auto}
+:is(#app-db,.db-scope) button.del{background:var(--panel); color:var(--del); border:1px solid #f1c6c2; padding:3px 9px; font-size:12px; border-radius:6px}
+:is(#app-db,.db-scope) button.del:hover{background:var(--errbg)}
+:is(#app-db,.db-scope) .err{color:var(--errink)}
+:is(#app-db,.db-scope) details{margin-top:6px; font-size:13px}
+:is(#app-db,.db-scope) summary{cursor:pointer; color:var(--accent2); font-weight:600}
+:is(#app-db,.db-scope) details .body{padding:8px 2px; color:var(--ink)}
+:is(#app-db,.db-scope) details.card{margin:0 0 14px; padding:14px 16px}
+:is(#app-db,.db-scope) details.card > summary{margin:-14px -16px 0; padding:14px 16px; list-style-position:outside}
+:is(#app-db,.db-scope) details.card[open] > summary{margin-bottom:10px; border-bottom:1px dashed var(--line2); padding-bottom:12px}
+:is(#app-db,.db-scope) details.card > summary::-webkit-details-marker{color:var(--accent2)}
+:is(#app-db,.db-scope) details.card summary h2{margin:0; display:inline-flex !important}
+:is(#app-db,.db-scope) code{background:var(--code-bg); padding:1px 5px; border-radius:4px; font-family:ui-monospace,Consolas,monospace; font-size:12px}
+:is(#app-db,.db-scope) pre{background:#0f1115; color:#e7eaee; padding:10px 12px; border-radius:8px; overflow:auto; font-size:12px}
+:is(#app-db,.db-scope) .hint{font-size:12px; color:var(--sub)}
+:is(#app-db,.db-scope) .tabbar{display:flex; gap:6px; flex-wrap:wrap; margin:0 0 -1px; position:relative; z-index:1}
+:is(#app-db,.db-scope) .tabbtn{background:var(--panel); color:var(--sub); border:1px solid var(--line); border-bottom:none; border-radius:8px 8px 0 0; padding:8px 14px; font-weight:600; font-size:13px; cursor:pointer}
+:is(#app-db,.db-scope) .tabbtn:hover{color:var(--ink)}
+:is(#app-db,.db-scope) .tabbtn.active{background:var(--accent); color:#fff; border-color:var(--accent2)}
+:is(#app-db,.db-scope) .reopen-banner{display:flex; gap:10px; align-items:center; background:var(--chip); border:1px solid var(--line); border-radius:8px; padding:10px 14px; margin:0 0 12px; font-size:13px; flex-wrap:wrap}
+:is(#app-db,.db-scope) .tblmgr-row{border-bottom:1px dashed var(--line2); padding:8px 0; margin-bottom:6px}
+:is(#app-db,.db-scope) .tblmgr-row:last-of-type{border-bottom:none}
+:is(#app-db,.db-scope) .tblmgr-head{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:6px}
+:is(#app-db,.db-scope) .tblmgr-cols{display:flex; gap:6px; flex-wrap:wrap; margin-bottom:6px}
+:is(#app-db,.db-scope) .colchip{background:var(--chip); border:1px solid var(--line2); border-radius:999px; padding:3px 6px 3px 10px; font-size:12px; display:inline-flex; align-items:center; gap:4px; color:var(--ink)}
+:is(#app-db,.db-scope) .tblmgr-add,
+:is(#app-db,.db-scope) .tblmgr-newtable{display:flex; gap:6px; flex-wrap:wrap; align-items:center; margin-top:4px}
+:is(#app-db,.db-scope) .tblmgr-add input,
+:is(#app-db,.db-scope) .tblmgr-add select,
+:is(#app-db,.db-scope) .tblmgr-newtable input{width:auto}
+:is(#app-db,.db-scope) .colpanel{display:flex; gap:10px; flex-wrap:wrap; background:var(--chip); border:1px solid var(--line2); border-radius:8px; padding:10px; margin:0 0 10px}
+:is(#app-db,.db-scope) .colchk{font-size:12.5px; display:inline-flex; align-items:center; gap:4px; color:var(--ink)}
+:is(#app-db,.db-scope) .colchk input{width:auto}
 
 /* ============================================================
    Ver1.4.00 追加分
    ・日付／時刻の入力補助（今日ボタン・ポップアップのカレンダー/時計）
    ・現在時刻ハイライト（進行中の予定の色を変える）
    ============================================================ */
-#app-db{
+:is(#app-db,.db-scope){
   --nowbg:#e3f7ea; --nowline:#1d9a55; --nowink:#12703c;
   --todaybg:#fff6de; --todayline:#c98f00; --todayink:#8a6300;
   --pastink:#98a0aa;
 }
-#app-db[data-theme="dark"]{
+:is(#app-db,.db-scope)[data-theme="dark"]{
   --nowbg:#123a24; --nowline:#57d58a; --nowink:#8fe3b4;
   --todaybg:#2e2712; --todayline:#e0b95e; --todayink:#e0b95e;
   --pastink:#6b727c;
 }
 
 /* ---- 入力フォームの日付・時刻欄 ---- */
-#app-db .row > div.dtfield{flex:1 1 250px; min-width:230px}
-#app-db .row > div.chkfield{flex:0 0 auto; min-width:130px}
-#app-db .dtwrap{display:flex; gap:5px; align-items:center; flex-wrap:nowrap}
-#app-db .dtwrap input[type=text]{flex:1 1 auto; min-width:0}
-#app-db button.dtbtn{
+:is(#app-db,.db-scope) .row > div.dtfield{flex:1 1 250px; min-width:230px}
+:is(#app-db,.db-scope) .row > div.chkfield{flex:0 0 auto; min-width:130px}
+:is(#app-db,.db-scope) .dtwrap{display:flex; gap:5px; align-items:center; flex-wrap:nowrap}
+:is(#app-db,.db-scope) .dtwrap input[type=text]{flex:1 1 auto; min-width:0}
+:is(#app-db,.db-scope) button.dtbtn{
     background:var(--panel); color:var(--accent2); border:1px solid var(--line);
     border-radius:6px; font-size:12px; padding:7px 8px; line-height:1.15;
     font-weight:600; white-space:nowrap;
   }
-#app-db button.dtbtn:hover{background:var(--chip)}
-#app-db .chkopt{display:inline-flex; align-items:center; gap:6px; font-size:13px;
+:is(#app-db,.db-scope) button.dtbtn:hover{background:var(--chip)}
+:is(#app-db,.db-scope) .chkopt{display:inline-flex; align-items:center; gap:6px; font-size:13px;
     color:var(--ink); margin:0; padding:7px 0; cursor:pointer}
-#app-db .chkopt input{width:auto}
+:is(#app-db,.db-scope) .chkopt input{width:auto}
 
 /* ==========================================================
    Ver1.7.00: タグ列（選んで入力）
    ========================================================== */
-#app-db .row > div.tagfield{flex:1 1 100%}
-#app-db .tagwrap{display:flex; gap:6px; align-items:stretch}
-#app-db .tagwrap input[type=text]{flex:1 1 auto; min-width:0}
-#app-db button.tagbtn{
+:is(#app-db,.db-scope) .row > div.tagfield{flex:1 1 100%}
+:is(#app-db,.db-scope) .tagwrap{display:flex; gap:6px; align-items:stretch}
+:is(#app-db,.db-scope) .tagwrap input[type=text]{flex:1 1 auto; min-width:0}
+:is(#app-db,.db-scope) button.tagbtn{
     background:var(--panel); color:var(--accent2); border:1px solid var(--line);
     border-radius:6px; font-size:12.5px; padding:7px 12px; line-height:1.15;
     font-weight:700; white-space:nowrap; cursor:pointer; font-family:inherit;
   }
-#app-db button.tagbtn:hover{background:var(--chip); border-color:var(--accent)}
-#app-db .tagchips{display:flex; flex-wrap:wrap; gap:5px; margin-top:6px}
-#app-db .tagchips:empty{margin-top:0}
-#app-db .tchip{
+:is(#app-db,.db-scope) button.tagbtn:hover{background:var(--chip); border-color:var(--accent)}
+:is(#app-db,.db-scope) .tagchips{display:flex; flex-wrap:wrap; gap:5px; margin-top:6px}
+:is(#app-db,.db-scope) .tagchips:empty{margin-top:0}
+:is(#app-db,.db-scope) .tchip{
     display:inline-flex; align-items:center; gap:5px;
     background:var(--chip); border:1px solid var(--line2); color:var(--ink);
     border-radius:999px; padding:2px 10px; font-size:12px; font-weight:600;
     white-space:nowrap;
   }
-#app-db td.tagcell{cursor:pointer; background:var(--edit); vertical-align:top}
-#app-db td.tagcell:hover{background:var(--editfocus)}
-#app-db td.tagcell .tchip{margin:1px 3px 1px 0}
-#app-db td.tagcell .tcempty{color:var(--sub); font-size:12px}
+:is(#app-db,.db-scope) td.tagcell{cursor:pointer; background:var(--edit); vertical-align:top}
+:is(#app-db,.db-scope) td.tagcell:hover{background:var(--editfocus)}
+:is(#app-db,.db-scope) td.tagcell .tchip{margin:1px 3px 1px 0}
+:is(#app-db,.db-scope) td.tagcell .tcempty{color:var(--sub); font-size:12px}
 
 /* ---- タグ選択モーダル ---- */
-#app-db .tgp-back{
+:is(#app-db,.db-scope) .tgp-back{
     position:fixed; inset:0; background:rgba(0,0,0,.62);
     display:none; align-items:flex-start; justify-content:center;
     z-index:940; padding:14px 8px; overflow:auto;
   }
-#app-db .tgp-back.show{display:flex}
-#app-db .tgp-modal{
+:is(#app-db,.db-scope) .tgp-back.show{display:flex}
+:is(#app-db,.db-scope) .tgp-modal{
     background:var(--panel); color:var(--ink); border:1px solid var(--line);
     border-radius:10px; width:720px; max-width:96vw; padding:14px 16px 16px;
     box-shadow:0 10px 40px rgba(0,0,0,.55); font-size:13.5px; line-height:1.6;
   }
-#app-db .tgp-modal h2{font-size:15px; margin:0 0 2px; display:flex; align-items:center; gap:8px}
-#app-db .tgp-modal h3{font-size:12px; color:var(--sub); margin:14px 0 6px;
+:is(#app-db,.db-scope) .tgp-modal h2{font-size:15px; margin:0 0 2px; display:flex; align-items:center; gap:8px}
+:is(#app-db,.db-scope) .tgp-modal h3{font-size:12px; color:var(--sub); margin:14px 0 6px;
     border-bottom:1px solid var(--line2); padding-bottom:3px; font-weight:700}
-#app-db .tgp-modal .hint{font-size:11.5px; color:var(--sub); margin:4px 0 0}
-#app-db .tgp-list{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
-#app-db .tgp-list .none{color:var(--sub); font-size:12px}
-#app-db .tgp-unit{display:inline-flex; align-items:stretch; gap:0}
-#app-db button.tgp-combo{
+:is(#app-db,.db-scope) .tgp-modal .hint{font-size:11.5px; color:var(--sub); margin:4px 0 0}
+:is(#app-db,.db-scope) .tgp-list{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+:is(#app-db,.db-scope) .tgp-list .none{color:var(--sub); font-size:12px}
+:is(#app-db,.db-scope) .tgp-unit{display:inline-flex; align-items:stretch; gap:0}
+:is(#app-db,.db-scope) button.tgp-combo{
     display:inline-flex; align-items:center; gap:6px; cursor:pointer; font-family:inherit;
     background:var(--chip); color:var(--ink); border:1px solid var(--line);
     border-radius:8px 0 0 8px; padding:5px 10px; font-size:12.5px; font-weight:600;
     text-align:left; max-width:330px;
   }
-#app-db button.tgp-combo:hover{border-color:var(--accent); color:var(--accent)}
-#app-db button.tgp-combo .kb{
+:is(#app-db,.db-scope) button.tgp-combo:hover{border-color:var(--accent); color:var(--accent)}
+:is(#app-db,.db-scope) button.tgp-combo .kb{
     color:var(--sub); font-size:10.5px; border:1px solid var(--line2);
     border-radius:4px; padding:0 4px; font-weight:700;
   }
-#app-db button.tgp-combo .nm{color:var(--accent); font-weight:700}
-#app-db button.tgp-combo .num{color:var(--sub); font-size:11px; font-weight:600}
-#app-db button.tgp-pin{
+:is(#app-db,.db-scope) button.tgp-combo .nm{color:var(--accent); font-weight:700}
+:is(#app-db,.db-scope) button.tgp-combo .num{color:var(--sub); font-size:11px; font-weight:600}
+:is(#app-db,.db-scope) button.tgp-pin{
     cursor:pointer; font-family:inherit; background:var(--panel); border:1px solid var(--line);
     border-left:none; color:var(--sub); border-radius:0 8px 8px 0; padding:5px 8px; font-size:12px;
   }
-#app-db button.tgp-pin:hover{color:var(--accent); border-color:var(--accent)}
-#app-db .tgp-filter{display:flex; align-items:center; gap:8px; margin-bottom:7px}
-#app-db .tgp-filter input[type=text]{flex:1 1 auto; min-width:0}
-#app-db label.tgp-opt{
+:is(#app-db,.db-scope) button.tgp-pin:hover{color:var(--accent); border-color:var(--accent)}
+:is(#app-db,.db-scope) .tgp-filter{display:flex; align-items:center; gap:8px; margin-bottom:7px}
+:is(#app-db,.db-scope) .tgp-filter input[type=text]{flex:1 1 auto; min-width:0}
+:is(#app-db,.db-scope) label.tgp-opt{
     display:inline-flex; align-items:center; gap:5px; margin:0; padding:3px 10px;
     background:var(--chip); border:1px solid var(--line2); border-radius:999px;
     font-size:12.5px; color:var(--ink); cursor:pointer; font-weight:600;
   }
-#app-db label.tgp-opt input{width:auto; margin:0}
-#app-db label.tgp-opt.on{border-color:var(--accent); color:var(--accent); background:var(--editfocus)}
-#app-db label.tgp-opt .num{color:var(--sub); font-size:11px; font-weight:600}
-#app-db .tgp-sel{
+:is(#app-db,.db-scope) label.tgp-opt input{width:auto; margin:0}
+:is(#app-db,.db-scope) label.tgp-opt.on{border-color:var(--accent); color:var(--accent); background:var(--editfocus)}
+:is(#app-db,.db-scope) label.tgp-opt .num{color:var(--sub); font-size:11px; font-weight:600}
+:is(#app-db,.db-scope) .tgp-sel{
     background:var(--edit); border:1px solid var(--line); border-radius:8px;
     padding:8px 10px; min-height:40px; display:flex; flex-wrap:wrap; gap:5px; align-items:center;
   }
-#app-db .tgp-sel .tchip b{cursor:pointer; color:var(--sub); font-weight:700; font-size:13px}
-#app-db .tgp-sel .tchip b:hover{color:var(--del)}
-#app-db .tgp-sel .none{color:var(--sub); font-size:12px}
-#app-db .tgp-add{display:flex; gap:6px; margin-top:7px}
-#app-db .tgp-add input[type=text]{flex:1 1 auto; min-width:0}
-#app-db .tgp-acts{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center}
-#app-db .tgp-acts .sp{flex:1 1 auto}
+:is(#app-db,.db-scope) .tgp-sel .tchip b{cursor:pointer; color:var(--sub); font-weight:700; font-size:13px}
+:is(#app-db,.db-scope) .tgp-sel .tchip b:hover{color:var(--del)}
+:is(#app-db,.db-scope) .tgp-sel .none{color:var(--sub); font-size:12px}
+:is(#app-db,.db-scope) .tgp-add{display:flex; gap:6px; margin-top:7px}
+:is(#app-db,.db-scope) .tgp-add input[type=text]{flex:1 1 auto; min-width:0}
+:is(#app-db,.db-scope) .tgp-acts{display:flex; flex-wrap:wrap; gap:8px; margin-top:14px; align-items:center}
+:is(#app-db,.db-scope) .tgp-acts .sp{flex:1 1 auto}
 /* ---- Ver1.19.08 D-03 案②: 決定ボタンの行を画面の下に貼り付ける ----
    .tgp-modal には max-height を足さない。足すと中身を包む div が要り、
    タグ選択画面を組み立てている JS まで触ることになるため。
    スクロールしているのは .tgp-back（960行 overflow:auto）なので、
    その中で sticky にすれば、モーダルが画面より高くてもボタンは残る。 */
-#app-db .tgp-acts{
+:is(#app-db,.db-scope) .tgp-acts{
     position:sticky; bottom:0; z-index:3;
     background:var(--panel); border-top:1px solid var(--line2);
     padding:10px 0 12px; margin-bottom:-16px;
@@ -1027,214 +1027,214 @@ margin:0; background:var(--bg); color:var(--ink);
 /* ---- Ver1.19.08 D-02 案①: 長い注意書きを畳む ----
    ★class="card" は付けていない。付けると #app-db details.card を拾う
    アコーディオン（S-03）に巻き込まれ、他の節を開くと勝手に閉じる。 */
-#app-db details.hintfold{ margin:6px 0 0 }
-#app-db details.hintfold > summary{
+:is(#app-db,.db-scope) details.hintfold{ margin:6px 0 0 }
+:is(#app-db,.db-scope) details.hintfold > summary{
     cursor:pointer; color:var(--sub); font-size:12px; font-weight:700;
     list-style:none; padding:2px 0; user-select:none;
   }
-#app-db details.hintfold > summary::-webkit-details-marker{ display:none }
-#app-db details.hintfold > summary:hover{ color:var(--accent) }
-#app-db details.hintfold[open] > summary{ margin-bottom:4px }
-#app-db details.hintfold > div{ font-size:11.5px; color:var(--sub); line-height:1.6 }
-#app-db .tgp-modal input[type=text]{
+:is(#app-db,.db-scope) details.hintfold > summary::-webkit-details-marker{ display:none }
+:is(#app-db,.db-scope) details.hintfold > summary:hover{ color:var(--accent) }
+:is(#app-db,.db-scope) details.hintfold[open] > summary{ margin-bottom:4px }
+:is(#app-db,.db-scope) details.hintfold > div{ font-size:11.5px; color:var(--sub); line-height:1.6 }
+:is(#app-db,.db-scope) .tgp-modal input[type=text]{
     background:var(--input-bg); color:var(--ink); border:1px solid var(--line);
     border-radius:6px; padding:6px 8px; font-family:inherit; font-size:13px;
   }
-#app-db .tgp-modal button.pri{background:var(--accent); color:#fff; border-color:var(--accent)}
-#app-db .tgp-modal button.pri:hover{background:var(--accent2)}
-#app-db .tgp-orig{font-size:11.5px; color:var(--sub); margin-top:6px; word-break:break-all}
+:is(#app-db,.db-scope) .tgp-modal button.pri{background:var(--accent); color:#fff; border-color:var(--accent)}
+:is(#app-db,.db-scope) .tgp-modal button.pri:hover{background:var(--accent2)}
+:is(#app-db,.db-scope) .tgp-orig{font-size:11.5px; color:var(--sub); margin-top:6px; word-break:break-all}
 
 /* ==========================================================
    Ver1.8.00: コンボの並べ替え／カテゴリ／名前の整理
    ========================================================== */
 /* 見出しの右にトグルボタンを置くための行 */
-#app-db .tgp-h3row{
+:is(#app-db,.db-scope) .tgp-h3row{
     display:flex; align-items:center; gap:8px; flex-wrap:wrap;
     margin:14px 0 6px; border-bottom:1px solid var(--line2); padding-bottom:3px;
   }
-#app-db .tgp-h3row h3{margin:0; border-bottom:none; padding-bottom:0}
-#app-db .tgp-h3row .sp{flex:1 1 auto}
-#app-db button.tgp-mini{
+:is(#app-db,.db-scope) .tgp-h3row h3{margin:0; border-bottom:none; padding-bottom:0}
+:is(#app-db,.db-scope) .tgp-h3row .sp{flex:1 1 auto}
+:is(#app-db,.db-scope) button.tgp-mini{
     cursor:pointer; font-family:inherit; background:var(--panel); color:var(--sub);
     border:1px solid var(--line); border-radius:6px; padding:2px 9px;
     font-size:11.5px; font-weight:700; white-space:nowrap;
   }
-#app-db button.tgp-mini:hover{color:var(--accent); border-color:var(--accent)}
-#app-db button.tgp-mini.on{color:#fff; background:var(--accent); border-color:var(--accent)}
+:is(#app-db,.db-scope) button.tgp-mini:hover{color:var(--accent); border-color:var(--accent)}
+:is(#app-db,.db-scope) button.tgp-mini.on{color:#fff; background:var(--accent); border-color:var(--accent)}
 /* 並べ替えモードの ◀ ▶ */
-#app-db button.tgp-mv{
+:is(#app-db,.db-scope) button.tgp-mv{
     cursor:pointer; font-family:inherit; background:var(--panel); color:var(--sub);
     border:1px solid var(--line); border-left:none; padding:5px 6px; font-size:11px;
   }
-#app-db button.tgp-mv:hover{color:var(--accent); border-color:var(--accent)}
-#app-db .tgp-unit.sorting button.tgp-pin{border-radius:0}
-#app-db .tgp-unit button.tgp-mv.last{border-radius:0 8px 8px 0}
+:is(#app-db,.db-scope) button.tgp-mv:hover{color:var(--accent); border-color:var(--accent)}
+:is(#app-db,.db-scope) .tgp-unit.sorting button.tgp-pin{border-radius:0}
+:is(#app-db,.db-scope) .tgp-unit button.tgp-mv.last{border-radius:0 8px 8px 0}
 /* カテゴリの見出し（個別タグ一覧の中） */
-#app-db .tgp-catrow{
+:is(#app-db,.db-scope) .tgp-catrow{
     width:100%; display:flex; align-items:center; gap:7px;
     margin:9px 0 3px; font-size:11.5px; font-weight:700; color:var(--sub);
   }
-#app-db .tgp-catrow:first-child{margin-top:0}
-#app-db .tgp-catrow .ln{flex:1 1 auto; height:1px; background:var(--line2)}
-#app-db .tcdot{
+:is(#app-db,.db-scope) .tgp-catrow:first-child{margin-top:0}
+:is(#app-db,.db-scope) .tgp-catrow .ln{flex:1 1 auto; height:1px; background:var(--line2)}
+:is(#app-db,.db-scope) .tcdot{
     width:8px; height:8px; border-radius:50%; flex:0 0 auto; display:inline-block;
   }
-#app-db .tgp-list.grouped{display:block}
-#app-db .tgp-list.grouped .tgp-catgrp{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
+:is(#app-db,.db-scope) .tgp-list.grouped{display:block}
+:is(#app-db,.db-scope) .tgp-list.grouped .tgp-catgrp{display:flex; flex-wrap:wrap; gap:6px; align-items:center}
 
 /* ---- タグの管理モーダル ---- */
-#app-db .tgm-back{
+:is(#app-db,.db-scope) .tgm-back{
     position:fixed; inset:0; background:rgba(0,0,0,.66);
     display:none; align-items:flex-start; justify-content:center;
     z-index:960; padding:14px 8px; overflow:auto;
   }
-#app-db .tgm-back.show{display:flex}
-#app-db .tgm-modal{
+:is(#app-db,.db-scope) .tgm-back.show{display:flex}
+:is(#app-db,.db-scope) .tgm-modal{
     background:var(--panel); color:var(--ink); border:1px solid var(--line);
     border-radius:10px; width:820px; max-width:96vw; padding:14px 16px 16px;
     box-shadow:0 10px 40px rgba(0,0,0,.55); font-size:13.5px; line-height:1.6;
   }
-#app-db .tgm-modal h2{font-size:15px; margin:0 0 8px; display:flex; align-items:center; gap:8px}
-#app-db .tgm-modal h4{font-size:12px; color:var(--sub); margin:16px 0 6px;
+:is(#app-db,.db-scope) .tgm-modal h2{font-size:15px; margin:0 0 8px; display:flex; align-items:center; gap:8px}
+:is(#app-db,.db-scope) .tgm-modal h4{font-size:12px; color:var(--sub); margin:16px 0 6px;
     border-bottom:1px solid var(--line2); padding-bottom:3px; font-weight:700}
-#app-db .tgm-modal .hint{font-size:11.5px; color:var(--sub); margin:4px 0 0}
-#app-db .tgm-modal input[type=text], #app-db .tgm-modal select{
+:is(#app-db,.db-scope) .tgm-modal .hint{font-size:11.5px; color:var(--sub); margin:4px 0 0}
+:is(#app-db,.db-scope) .tgm-modal input[type=text], :is(#app-db,.db-scope) .tgm-modal select{
     background:var(--input-bg); color:var(--ink); border:1px solid var(--line);
     border-radius:6px; padding:5px 8px; font-family:inherit; font-size:13px;
   }
-#app-db .tgm-modal button.pri{background:var(--accent); color:#fff; border-color:var(--accent)}
-#app-db .tgm-modal button.pri:hover{background:var(--accent2)}
-#app-db .tgm-scope{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px}
-#app-db .tgm-scope label{margin:0; color:var(--sub); font-size:12px}
-#app-db .tgm-tabs{display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 10px}
-#app-db button.tgm-tab{
+:is(#app-db,.db-scope) .tgm-modal button.pri{background:var(--accent); color:#fff; border-color:var(--accent)}
+:is(#app-db,.db-scope) .tgm-modal button.pri:hover{background:var(--accent2)}
+:is(#app-db,.db-scope) .tgm-scope{display:flex; align-items:center; gap:8px; flex-wrap:wrap; margin-bottom:8px}
+:is(#app-db,.db-scope) .tgm-scope label{margin:0; color:var(--sub); font-size:12px}
+:is(#app-db,.db-scope) .tgm-tabs{display:flex; gap:6px; flex-wrap:wrap; margin:2px 0 10px}
+:is(#app-db,.db-scope) button.tgm-tab{
     cursor:pointer; font-family:inherit; background:var(--chip); color:var(--ink);
     border:1px solid var(--line); border-radius:8px 8px 0 0; padding:6px 14px;
     font-size:12.5px; font-weight:700;
   }
-#app-db button.tgm-tab.on{background:var(--accent); color:#fff; border-color:var(--accent)}
-#app-db .tgm-body{min-height:180px; max-height:60vh; overflow:auto; padding-right:2px}
-#app-db .tgm-row{
+:is(#app-db,.db-scope) button.tgm-tab.on{background:var(--accent); color:#fff; border-color:var(--accent)}
+:is(#app-db,.db-scope) .tgm-body{min-height:180px; max-height:60vh; overflow:auto; padding-right:2px}
+:is(#app-db,.db-scope) .tgm-row{
     display:flex; align-items:center; gap:7px; padding:5px 8px; margin-bottom:5px;
     background:var(--chip); border:1px solid var(--line2); border-radius:8px;
   }
-#app-db .tgm-row.drag{opacity:.45}
-#app-db .tgm-row.over{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset}
-#app-db .tgm-row .grip{cursor:grab; color:var(--sub); font-size:13px; user-select:none}
-#app-db .tgm-row .nm{font-weight:700; color:var(--accent); white-space:nowrap}
-#app-db .tgm-row .tg{color:var(--ink); font-size:12.5px; word-break:break-all; flex:1 1 auto; min-width:0}
-#app-db .tgm-row .num{color:var(--sub); font-size:11px; font-weight:600; white-space:nowrap}
-#app-db .tgm-row .sp{flex:1 1 auto}
-#app-db button.tgm-ic{
+:is(#app-db,.db-scope) .tgm-row.drag{opacity:.45}
+:is(#app-db,.db-scope) .tgm-row.over{border-color:var(--accent); box-shadow:0 0 0 1px var(--accent) inset}
+:is(#app-db,.db-scope) .tgm-row .grip{cursor:grab; color:var(--sub); font-size:13px; user-select:none}
+:is(#app-db,.db-scope) .tgm-row .nm{font-weight:700; color:var(--accent); white-space:nowrap}
+:is(#app-db,.db-scope) .tgm-row .tg{color:var(--ink); font-size:12.5px; word-break:break-all; flex:1 1 auto; min-width:0}
+:is(#app-db,.db-scope) .tgm-row .num{color:var(--sub); font-size:11px; font-weight:600; white-space:nowrap}
+:is(#app-db,.db-scope) .tgm-row .sp{flex:1 1 auto}
+:is(#app-db,.db-scope) button.tgm-ic{
     cursor:pointer; font-family:inherit; background:var(--panel); color:var(--sub);
     border:1px solid var(--line); border-radius:6px; padding:3px 8px; font-size:12px; white-space:nowrap;
   }
-#app-db button.tgm-ic:hover{color:var(--accent); border-color:var(--accent)}
-#app-db button.tgm-ic.del:hover{color:var(--del); border-color:var(--del)}
-#app-db .tgm-none{color:var(--sub); font-size:12px; padding:6px 2px}
-#app-db .tgm-colors{display:flex; gap:5px; flex-wrap:wrap}
-#app-db button.tgm-sw{
+:is(#app-db,.db-scope) button.tgm-ic:hover{color:var(--accent); border-color:var(--accent)}
+:is(#app-db,.db-scope) button.tgm-ic.del:hover{color:var(--del); border-color:var(--del)}
+:is(#app-db,.db-scope) .tgm-none{color:var(--sub); font-size:12px; padding:6px 2px}
+:is(#app-db,.db-scope) .tgm-colors{display:flex; gap:5px; flex-wrap:wrap}
+:is(#app-db,.db-scope) button.tgm-sw{
     width:20px; height:20px; border-radius:50%; border:2px solid transparent;
     cursor:pointer; padding:0; font-size:0;
   }
-#app-db button.tgm-sw.on{border-color:var(--ink)}
-#app-db .tgm-arow{
+:is(#app-db,.db-scope) button.tgm-sw.on{border-color:var(--ink)}
+:is(#app-db,.db-scope) .tgm-arow{
     display:flex; align-items:center; gap:8px; padding:3px 8px; margin-bottom:4px;
     border-bottom:1px solid var(--line2);
   }
-#app-db .tgm-arow .tag{display:inline-flex; align-items:center; gap:6px; flex:1 1 auto; min-width:0; word-break:break-all}
-#app-db .tgm-arow select{min-width:150px}
-#app-db .tgm-rrow{
+:is(#app-db,.db-scope) .tgm-arow .tag{display:inline-flex; align-items:center; gap:6px; flex:1 1 auto; min-width:0; word-break:break-all}
+:is(#app-db,.db-scope) .tgm-arow select{min-width:150px}
+:is(#app-db,.db-scope) .tgm-rrow{
     display:flex; align-items:center; gap:8px; padding:4px 8px; margin-bottom:4px;
     border-bottom:1px solid var(--line2); flex-wrap:wrap;
   }
-#app-db .tgm-rrow .old{width:190px; flex:0 0 auto; word-break:break-all; display:flex; align-items:center; gap:6px}
-#app-db .tgm-rrow input[type=text]{flex:1 1 160px; min-width:120px}
-#app-db .tgm-rrow.del .old, #app-db .tgm-rrow.del input[type=text]{text-decoration:line-through; opacity:.55}
-#app-db .tgm-badge{
+:is(#app-db,.db-scope) .tgm-rrow .old{width:190px; flex:0 0 auto; word-break:break-all; display:flex; align-items:center; gap:6px}
+:is(#app-db,.db-scope) .tgm-rrow input[type=text]{flex:1 1 160px; min-width:120px}
+:is(#app-db,.db-scope) .tgm-rrow.del .old, :is(#app-db,.db-scope) .tgm-rrow.del input[type=text]{text-decoration:line-through; opacity:.55}
+:is(#app-db,.db-scope) .tgm-badge{
     font-size:10.5px; font-weight:700; border-radius:9px; padding:0 7px; white-space:nowrap;
     border:1px solid var(--line2); color:var(--sub);
   }
-#app-db .tgm-badge.mg{color:var(--okink); border-color:var(--okink); background:var(--okbg)}
-#app-db .tgm-badge.rn{color:var(--accent); border-color:var(--accent)}
-#app-db .tgm-badge.dl{color:var(--del); border-color:var(--del)}
-#app-db .tgm-acts{
+:is(#app-db,.db-scope) .tgm-badge.mg{color:var(--okink); border-color:var(--okink); background:var(--okbg)}
+:is(#app-db,.db-scope) .tgm-badge.rn{color:var(--accent); border-color:var(--accent)}
+:is(#app-db,.db-scope) .tgm-badge.dl{color:var(--del); border-color:var(--del)}
+:is(#app-db,.db-scope) .tgm-acts{
     display:flex; flex-wrap:wrap; gap:8px; margin-top:12px; align-items:center;
     border-top:1px solid var(--line2); padding-top:10px;
   }
-#app-db .tgm-acts .sp{flex:1 1 auto}
-#app-db .tgm-warn{color:var(--del); font-size:12px}
+:is(#app-db,.db-scope) .tgm-acts .sp{flex:1 1 auto}
+:is(#app-db,.db-scope) .tgm-warn{color:var(--del); font-size:12px}
 
 /* ---- ポップアップ（カレンダー／時刻） ---- */
-#app-db .wdt-pop{
+:is(#app-db,.db-scope) .wdt-pop{
     position:fixed; z-index:900; background:var(--panel); color:var(--ink);
     border:1px solid var(--line); border-radius:10px; padding:10px 12px;
     box-shadow:0 12px 34px rgba(0,0,0,.45); font-size:13px; width:max-content;
   }
-#app-db .wdt-pop button{
+:is(#app-db,.db-scope) .wdt-pop button{
     font-family:inherit; cursor:pointer; border:1px solid var(--line);
     background:var(--panel); color:var(--ink); border-radius:6px;
     font-size:12.5px; padding:3px 7px; font-weight:600;
   }
-#app-db .wdt-pop button:hover{background:var(--chip)}
-#app-db .wdt-head{display:flex; align-items:center; gap:6px; margin-bottom:6px}
-#app-db .wdt-head .ttl{font-weight:700; flex:1; text-align:center; font-size:13.5px}
-#app-db .wdt-dow{display:grid; grid-template-columns:repeat(7,32px); gap:2px; margin-bottom:2px}
-#app-db .wdt-dow span{text-align:center; font-size:11px; color:var(--sub)}
-#app-db .wdt-dow span.sun{color:#e06a6a}
-#app-db .wdt-dow span.sat{color:#6a9ae0}
-#app-db .wdt-grid{display:grid; grid-template-columns:repeat(7,32px); gap:2px}
-#app-db button.wdt-day{width:32px; padding:5px 0; text-align:center;
+:is(#app-db,.db-scope) .wdt-pop button:hover{background:var(--chip)}
+:is(#app-db,.db-scope) .wdt-head{display:flex; align-items:center; gap:6px; margin-bottom:6px}
+:is(#app-db,.db-scope) .wdt-head .ttl{font-weight:700; flex:1; text-align:center; font-size:13.5px}
+:is(#app-db,.db-scope) .wdt-dow{display:grid; grid-template-columns:repeat(7,32px); gap:2px; margin-bottom:2px}
+:is(#app-db,.db-scope) .wdt-dow span{text-align:center; font-size:11px; color:var(--sub)}
+:is(#app-db,.db-scope) .wdt-dow span.sun{color:#e06a6a}
+:is(#app-db,.db-scope) .wdt-dow span.sat{color:#6a9ae0}
+:is(#app-db,.db-scope) .wdt-grid{display:grid; grid-template-columns:repeat(7,32px); gap:2px}
+:is(#app-db,.db-scope) button.wdt-day{width:32px; padding:5px 0; text-align:center;
     border-color:transparent; background:transparent}
-#app-db button.wdt-day.out{opacity:.42}
-#app-db button.wdt-day.sun{color:#e06a6a}
-#app-db button.wdt-day.sat{color:#6a9ae0}
-#app-db button.wdt-day.today{border-color:var(--accent)}
-#app-db button.wdt-day.sel{background:var(--accent); color:#fff; border-color:var(--accent2)}
-#app-db .wdt-sec{margin-top:9px; padding-top:8px; border-top:1px dashed var(--line2)}
-#app-db .wdt-cap{font-size:11.5px; color:var(--sub); margin:0 0 4px}
-#app-db .wdt-hours{display:grid; grid-template-columns:repeat(8,30px); gap:2px}
-#app-db .wdt-mins{display:grid; grid-template-columns:repeat(6,36px); gap:2px; margin-top:2px}
-#app-db .wdt-hours button,#app-db .wdt-mins button{
+:is(#app-db,.db-scope) button.wdt-day.out{opacity:.42}
+:is(#app-db,.db-scope) button.wdt-day.sun{color:#e06a6a}
+:is(#app-db,.db-scope) button.wdt-day.sat{color:#6a9ae0}
+:is(#app-db,.db-scope) button.wdt-day.today{border-color:var(--accent)}
+:is(#app-db,.db-scope) button.wdt-day.sel{background:var(--accent); color:#fff; border-color:var(--accent2)}
+:is(#app-db,.db-scope) .wdt-sec{margin-top:9px; padding-top:8px; border-top:1px dashed var(--line2)}
+:is(#app-db,.db-scope) .wdt-cap{font-size:11.5px; color:var(--sub); margin:0 0 4px}
+:is(#app-db,.db-scope) .wdt-hours{display:grid; grid-template-columns:repeat(8,30px); gap:2px}
+:is(#app-db,.db-scope) .wdt-mins{display:grid; grid-template-columns:repeat(6,36px); gap:2px; margin-top:2px}
+:is(#app-db,.db-scope) .wdt-hours button,:is(#app-db,.db-scope) .wdt-mins button{
     padding:4px 0; text-align:center; border-color:transparent; background:transparent}
-#app-db .wdt-hours button.sel,#app-db .wdt-mins button.sel{
+:is(#app-db,.db-scope) .wdt-hours button.sel,:is(#app-db,.db-scope) .wdt-mins button.sel{
     background:var(--accent); color:#fff; border-color:var(--accent2)}
-#app-db .wdt-foot{display:flex; gap:6px; align-items:center; margin-top:9px;
+:is(#app-db,.db-scope) .wdt-foot{display:flex; gap:6px; align-items:center; margin-top:9px;
     padding-top:8px; border-top:1px dashed var(--line2)}
-#app-db .wdt-foot .val{flex:1; font-family:ui-monospace,Consolas,monospace;
+:is(#app-db,.db-scope) .wdt-foot .val{flex:1; font-family:ui-monospace,Consolas,monospace;
     font-size:12.5px; color:var(--sub); white-space:nowrap}
 
 /* ---- 表：現在時刻ハイライト ---- */
-#app-db table.grid tr.row-now > td{background:var(--nowbg) !important}
-#app-db table.grid tr.row-now > td:first-child{box-shadow:inset 3px 0 0 var(--nowline)}
-#app-db table.grid tr.row-today > td{background:var(--todaybg) !important}
-#app-db table.grid tr.row-today > td:first-child{box-shadow:inset 3px 0 0 var(--todayline)}
-#app-db table.grid tr.row-past > td{color:var(--pastink)}
-#app-db table.grid tr.row-now > td.edit:focus,
-#app-db table.grid tr.row-today > td.edit:focus{background:var(--editfocus) !important}
-#app-db .rowdot{display:block; font-size:10.5px; font-weight:700; margin-top:3px;
+:is(#app-db,.db-scope) table.grid tr.row-now > td{background:var(--nowbg) !important}
+:is(#app-db,.db-scope) table.grid tr.row-now > td:first-child{box-shadow:inset 3px 0 0 var(--nowline)}
+:is(#app-db,.db-scope) table.grid tr.row-today > td{background:var(--todaybg) !important}
+:is(#app-db,.db-scope) table.grid tr.row-today > td:first-child{box-shadow:inset 3px 0 0 var(--todayline)}
+:is(#app-db,.db-scope) table.grid tr.row-past > td{color:var(--pastink)}
+:is(#app-db,.db-scope) table.grid tr.row-now > td.edit:focus,
+:is(#app-db,.db-scope) table.grid tr.row-today > td.edit:focus{background:var(--editfocus) !important}
+:is(#app-db,.db-scope) .rowdot{display:block; font-size:10.5px; font-weight:700; margin-top:3px;
     white-space:nowrap; color:var(--nowink)}
-#app-db table.grid tr.row-today .rowdot{color:var(--todayink)}
-#app-db td.chkcell{text-align:center; cursor:pointer; background:var(--edit);
+:is(#app-db,.db-scope) table.grid tr.row-today .rowdot{color:var(--todayink)}
+:is(#app-db,.db-scope) td.chkcell{text-align:center; cursor:pointer; background:var(--edit);
     white-space:nowrap; font-size:12.5px}
-#app-db td.chkcell:hover{background:var(--editfocus)}
-#app-db .legend{display:flex; gap:12px; flex-wrap:wrap; align-items:center;
+:is(#app-db,.db-scope) td.chkcell:hover{background:var(--editfocus)}
+:is(#app-db,.db-scope) .legend{display:flex; gap:12px; flex-wrap:wrap; align-items:center;
     font-size:11.5px; color:var(--sub); margin:6px 0 0}
-#app-db .legend i{display:inline-block; width:12px; height:12px; border-radius:3px;
+:is(#app-db,.db-scope) .legend i{display:inline-block; width:12px; height:12px; border-radius:3px;
     vertical-align:-2px; margin-right:4px}
-#app-db .legend i.now{background:var(--nowbg); border:1px solid var(--nowline)}
-#app-db .legend i.today{background:var(--todaybg); border:1px solid var(--todayline)}
+:is(#app-db,.db-scope) .legend i.now{background:var(--nowbg); border:1px solid var(--nowline)}
+:is(#app-db,.db-scope) .legend i.today{background:var(--todaybg); border:1px solid var(--todayline)}
 
 /* ---- 項目管理：型・役割の詳細設定 ---- */
-#app-db .rolepanel{margin-top:6px; background:var(--chip); border:1px solid var(--line2);
+:is(#app-db,.db-scope) .rolepanel{margin-top:6px; background:var(--chip); border:1px solid var(--line2);
     border-radius:8px; padding:8px 10px}
-#app-db .rolerow{display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+:is(#app-db,.db-scope) .rolerow{display:flex; gap:8px; align-items:center; flex-wrap:wrap;
     padding:3px 0; font-size:12.5px}
-#app-db .rolerow .nm{min-width:150px; font-weight:600}
-#app-db .rolerow select{width:auto; font-size:12px; padding:4px 6px}
+:is(#app-db,.db-scope) .rolerow .nm{min-width:150px; font-weight:600}
+:is(#app-db,.db-scope) .rolerow select{width:auto; font-size:12px; padding:4px 6px}
 
 /* ---- #app-md : CSS変数（スコープ限定） ---- */
-#app-md{
+:is(#app-md,.md-scope){
 --bg-0:#1a1c20;
     --bg-1:#212327;
     --bg-2:#2a2d32;
@@ -1256,7 +1256,7 @@ background:var(--bg-0);
     font-size:14px;
 }
 
-#app-md button{
+:is(#app-md,.md-scope) button{
     font-family:inherit;
     background:var(--bg-2);
     color:var(--text-0);
@@ -1266,66 +1266,66 @@ background:var(--bg-0);
     cursor:pointer;
     font-size:13px;
   }
-#app-md button:hover{background:var(--bg-3);}
-#app-md button:active{transform:translateY(1px);}
-#app-md button.active{background:var(--accent);color:#0d1620;border-color:var(--accent);}
-#app-md button.icon-btn{padding:5px 8px;min-width:30px;text-align:center;}
-#app-md input[type=text],
-#app-md input[type=number]{
+:is(#app-md,.md-scope) button:hover{background:var(--bg-3);}
+:is(#app-md,.md-scope) button:active{transform:translateY(1px);}
+:is(#app-md,.md-scope) button.active{background:var(--accent);color:#0d1620;border-color:var(--accent);}
+:is(#app-md,.md-scope) button.icon-btn{padding:5px 8px;min-width:30px;text-align:center;}
+:is(#app-md,.md-scope) input[type=text],
+:is(#app-md,.md-scope) input[type=number]{
     background:var(--bg-1);color:var(--text-0);border:1px solid var(--border);
     border-radius:4px;padding:5px 7px;font-family:inherit;
   }
 /* ---------- top bar ---------- */
-#app-md #topbar{
+:is(#app-md,.md-scope) #topbar{
     display:flex;align-items:center;gap:6px;
     padding:6px 8px;background:var(--bg-1);border-bottom:1px solid var(--border);
     flex-wrap:wrap;
   }
-#app-md #topbar .spacer{flex:1;}
-#app-md #appTitle{font-weight:600;color:var(--text-1);margin-right:8px;font-size:13px;white-space:nowrap;}
-#app-md #saveStatus{font-size:12px;color:var(--text-2);white-space:nowrap;}
-#app-md #saveStatus.dirty{color:var(--warn);}
-#app-md #saveStatus.saved{color:var(--accent-2);}
+:is(#app-md,.md-scope) #topbar .spacer{flex:1;}
+:is(#app-md,.md-scope) #appTitle{font-weight:600;color:var(--text-1);margin-right:8px;font-size:13px;white-space:nowrap;}
+:is(#app-md,.md-scope) #saveStatus{font-size:12px;color:var(--text-2);white-space:nowrap;}
+:is(#app-md,.md-scope) #saveStatus.dirty{color:var(--warn);}
+:is(#app-md,.md-scope) #saveStatus.saved{color:var(--accent-2);}
 /* ---- 作業記録DBとの連携表示 ---- */
-#app-md #btnBackToDb{
+:is(#app-md,.md-scope) #btnBackToDb{
     background:#2f6fdb; color:#fff; border-color:#2a5fbc; font-weight:600;
   }
-#app-md #btnBackToDb:hover{background:#3f80ee;}
-#app-md #dbLinkBadge{
+:is(#app-md,.md-scope) #btnBackToDb:hover{background:#3f80ee;}
+:is(#app-md,.md-scope) #dbLinkBadge{
     font-size:11.5px; color:#cfe0ff; background:#25406e; border:1px solid #35558c;
     border-radius:11px; padding:2px 10px; white-space:nowrap;
   }
-#app-md #dbLinkBadge.saved{color:#bff0cf; background:#1e4630; border-color:#2c6644;}
-#app-md .tab.dblinked .dot{background:#4c8dff;}
-#app-md .tab.dblinked{border-bottom:2px solid #4c8dff;}
+:is(#app-md,.md-scope) #dbLinkBadge.saved{color:#bff0cf; background:#1e4630; border-color:#2c6644;}
+:is(#app-md,.md-scope) .tab.dblinked .dot{background:#4c8dff;}
+:is(#app-md,.md-scope) .tab.dblinked{border-bottom:2px solid #4c8dff;}
 /* ---------- tab bar ---------- */
-#app-md #tabbar{
+:is(#app-md,.md-scope) #tabbar{
     display:flex;align-items:stretch;background:var(--bg-1);
     border-bottom:1px solid var(--border);overflow-x:auto;min-height:34px;
   }
-#app-md .tab{
+:is(#app-md,.md-scope) .tab{
     display:flex;align-items:center;gap:6px;padding:0 10px;
     background:var(--bg-1);border-right:1px solid var(--border);
     cursor:pointer;white-space:nowrap;font-size:13px;color:var(--text-1);
     user-select:none;
   }
-#app-md .tab.active{background:var(--bg-2);color:var(--text-0);border-bottom:2px solid var(--accent);}
-#app-md .tab .dot{width:6px;height:6px;border-radius:50%;background:var(--warn);display:none;}
-#app-md .tab.dirty .dot{display:inline-block;}
-#app-md .tab .fsa{color:var(--accent-2);font-size:11px;}
-#app-md .tab .close{color:var(--text-2);padding:2px 4px;border-radius:3px;}
-#app-md .tab .close:hover{background:var(--danger);color:#fff;}
+:is(#app-md,.md-scope) .tab.active{background:var(--bg-2);color:var(--text-0);border-bottom:2px solid var(--accent);}
+:is(#app-md,.md-scope) .tab .dot{width:6px;height:6px;border-radius:50%;background:var(--warn);display:none;}
+:is(#app-md,.md-scope) .tab.dirty .dot{display:inline-block;}
+:is(#app-md,.md-scope) .tab .fsa{color:var(--accent-2);font-size:11px;}
+:is(#app-md,.md-scope) .tab .close{color:var(--text-2);padding:2px 4px;border-radius:3px;}
+:is(#app-md,.md-scope) .tab .close:hover{background:var(--danger);color:#fff;}
 /* ---- Ver1.11.00 (P1) タブのピン留め ---- */
-#app-md .tab .pin{color:var(--text-2);padding:2px 3px;border-radius:3px;font-size:11px;opacity:.45;}
-#app-md .tab:hover .pin{opacity:.9;}
-#app-md .tab.pinned .pin{opacity:1;color:var(--accent);}
-#app-md .tab .pin:hover{background:var(--bg-2);}
-#app-md .tab.pinned{border-top:2px solid var(--accent);}
-#app-md .tab.pinned .close{display:none;}
+:is(#app-md,.md-scope) .tab .pin{color:var(--text-2);padding:2px 3px;border-radius:3px;font-size:11px;opacity:.45;}
+:is(#app-md,.md-scope) .tab:hover .pin{opacity:.9;}
+:is(#app-md,.md-scope) .tab.pinned .pin{opacity:1;color:var(--accent);}
+:is(#app-md,.md-scope) .tab .pin:hover{background:var(--bg-2);}
+:is(#app-md,.md-scope) .tab.pinned{border-top:2px solid var(--accent);}
+:is(#app-md,.md-scope) .tab.pinned .close{display:none;}
 /* ---- Ver1.15.01 (P5) 📌 の右クリック／長押し ----
    長押しのときに文字が選択されたり、スマホの「コピー」メニューが出たりすると
    操作が邪魔されるので、📌 の上だけ選択とコールアウトを切っておく。 */
-#app-md .tab .pin{cursor:pointer;-webkit-user-select:none;user-select:none;
+:is(#app-md,.md-scope) .tab .pin{cursor:pointer;-webkit-user-select:none;user-select:none;
     -webkit-touch-callout:none;touch-action:manipulation;}
 /* ---- Ver1.15.02 (B9) 上限に達した📌の見た目 ----
    ★ここは踏んだ落とし穴です。必ず読んでください。
@@ -1339,117 +1339,117 @@ background:var(--bg-0);
      ・background / outline … 効く → まわりを色で囲める
    そこで「絵文字を灰色にする＝押せない」＋「オレンジの枠＝上限に達した」の
    2つを同時に伝えます。 */
-#app-md .tab .pin.pin-full{
+:is(#app-md,.md-scope) .tab .pin.pin-full{
     opacity:1;
     filter:grayscale(1) opacity(.6);
     outline:1px solid var(--warn);
     outline-offset:-1px;
     border-radius:3px;
   }
-#app-md .tab:hover .pin.pin-full{opacity:1;filter:grayscale(1) opacity(.9);}
+:is(#app-md,.md-scope) .tab:hover .pin.pin-full{opacity:1;filter:grayscale(1) opacity(.9);}
 /* ---- Ver1.15.00 (P4) ピン留め群と普通のタブの区切り線 ----
    tabs 配列が [📌…][普通…] の順に並べ替えられている(P2-b)ので、
    「普通のタブの1番目」にこの印を付けるだけで境目に線が引ける。
    新しい要素を足していないので、描画のたびに区切り線が増えていく心配がない。 */
-#app-md .tab.pin-edge{
+:is(#app-md,.md-scope) .tab.pin-edge{
     margin-left:10px; padding-left:10px;
     border-left:2px solid var(--accent);
   }
-#app-md #newTabBtn{padding:0 12px;color:var(--text-1);border-right:1px solid var(--border);}
-#app-md #newTabBtn:hover{color:var(--text-0);background:var(--bg-2);}
+:is(#app-md,.md-scope) #newTabBtn{padding:0 12px;color:var(--text-1);border-right:1px solid var(--border);}
+:is(#app-md,.md-scope) #newTabBtn:hover{color:var(--text-0);background:var(--bg-2);}
 /* ---------- format toolbar ---------- */
-#app-md #formatbar{
+:is(#app-md,.md-scope) #formatbar{
     display:flex;gap:4px;padding:6px 8px;background:var(--bg-1);
     border-bottom:1px solid var(--border);flex-wrap:wrap;align-items:center;
   }
-#app-md #formatbar .sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
+:is(#app-md,.md-scope) #formatbar .sep{width:1px;height:20px;background:var(--border);margin:0 4px;}
 /* ---------- main area ---------- */
-#app-md #main{flex:1;display:flex;min-height:0;position:relative;}
-#app-md #dropOverlay{
+:is(#app-md,.md-scope) #main{flex:1;display:flex;min-height:0;position:relative;}
+:is(#app-md,.md-scope) #dropOverlay{
     position:fixed;inset:0;background:rgba(20,25,35,0.85);
     display:none;align-items:center;justify-content:center;
     font-size:24px;color:var(--accent-2);z-index:999;
     border:4px dashed var(--accent-2);pointer-events:none;
   }
-#app-md #dropOverlay.show{display:flex;}
-#app-md #emptyState{
+:is(#app-md,.md-scope) #dropOverlay.show{display:flex;}
+:is(#app-md,.md-scope) #emptyState{
     flex:1;display:flex;align-items:center;justify-content:center;
     color:var(--text-2);font-size:15px;flex-direction:column;gap:14px;text-align:center;
   }
-#app-md #emptyState button{padding:10px 18px;}
-#app-md .pane-wrap{flex:1;display:none;min-width:0;}
-#app-md .pane-wrap.active{display:flex;}
-#app-md .editor-pane{
+:is(#app-md,.md-scope) #emptyState button{padding:10px 18px;}
+:is(#app-md,.md-scope) .pane-wrap{flex:1;display:none;min-width:0;}
+:is(#app-md,.md-scope) .pane-wrap.active{display:flex;}
+:is(#app-md,.md-scope) .editor-pane{
     flex:1;min-width:0;display:flex;flex-direction:column;background:var(--bg-0);
   }
-#app-md .editor-pane textarea{
+:is(#app-md,.md-scope) .editor-pane textarea{
     flex:1;resize:none;border:none;outline:none;
     background:var(--bg-0);color:var(--text-0);
     font-family:var(--mono);font-size:14.5px;line-height:1.65;
     padding:16px 18px;tab-size:2;white-space:pre-wrap;word-break:break-word;
   }
-#app-md .divider{width:5px;background:var(--bg-1);cursor:col-resize;flex:none;}
-#app-md .divider:hover{background:var(--accent);}
-#app-md .preview-pane{
+:is(#app-md,.md-scope) .divider{width:5px;background:var(--bg-1);cursor:col-resize;flex:none;}
+:is(#app-md,.md-scope) .divider:hover{background:var(--accent);}
+:is(#app-md,.md-scope) .preview-pane{
     flex:1;min-width:0;overflow-y:auto;background:var(--bg-1);
     padding:20px 28px;
   }
-#app-md .preview-pane h1,
-#app-md .preview-pane h2,
-#app-md .preview-pane h3,
-#app-md .preview-pane h4{
+:is(#app-md,.md-scope) .preview-pane h1,
+:is(#app-md,.md-scope) .preview-pane h2,
+:is(#app-md,.md-scope) .preview-pane h3,
+:is(#app-md,.md-scope) .preview-pane h4{
     border-bottom:1px solid var(--border);padding-bottom:6px;color:var(--text-0);
   }
-#app-md .preview-pane a{color:var(--accent);}
-#app-md .preview-pane code{background:var(--bg-3);padding:1px 5px;border-radius:3px;font-family:var(--mono);}
-#app-md .preview-pane pre{background:var(--bg-3);padding:12px 14px;border-radius:6px;overflow-x:auto;border:1px solid var(--border);}
-#app-md .preview-pane pre code{background:none;padding:0;}
-#app-md .preview-pane blockquote{
+:is(#app-md,.md-scope) .preview-pane a{color:var(--accent);}
+:is(#app-md,.md-scope) .preview-pane code{background:var(--bg-3);padding:1px 5px;border-radius:3px;font-family:var(--mono);}
+:is(#app-md,.md-scope) .preview-pane pre{background:var(--bg-3);padding:12px 14px;border-radius:6px;overflow-x:auto;border:1px solid var(--border);}
+:is(#app-md,.md-scope) .preview-pane pre code{background:none;padding:0;}
+:is(#app-md,.md-scope) .preview-pane blockquote{
     border-left:3px solid var(--accent);margin:0 0 12px 0;padding:2px 14px;color:var(--text-1);background:var(--bg-2);
   }
-#app-md .preview-pane table{border-collapse:collapse;margin-bottom:14px;}
-#app-md .preview-pane th,
-#app-md .preview-pane td{border:1px solid var(--border);padding:6px 10px;}
-#app-md .preview-pane th{background:var(--bg-3);}
-#app-md .preview-pane img{max-width:100%;border-radius:4px;}
-#app-md .preview-pane ul,
-#app-md .preview-pane ol{padding-left:26px;}
+:is(#app-md,.md-scope) .preview-pane table{border-collapse:collapse;margin-bottom:14px;}
+:is(#app-md,.md-scope) .preview-pane th,
+:is(#app-md,.md-scope) .preview-pane td{border:1px solid var(--border);padding:6px 10px;}
+:is(#app-md,.md-scope) .preview-pane th{background:var(--bg-3);}
+:is(#app-md,.md-scope) .preview-pane img{max-width:100%;border-radius:4px;}
+:is(#app-md,.md-scope) .preview-pane ul,
+:is(#app-md,.md-scope) .preview-pane ol{padding-left:26px;}
 /* Ver1.9.10 修正: チェックリストの左はみ出しを解消 */
-#app-md .preview-pane ul.task-list{list-style:none;padding-left:2px;margin-left:0;}
-#app-md .preview-pane ul.task-list ul{padding-left:22px;}
-#app-md .preview-pane li.task-item{list-style:none;margin-left:0;display:flex;align-items:flex-start;gap:8px;}
-#app-md .preview-pane li.task-item > input[type=checkbox]{
+:is(#app-md,.md-scope) .preview-pane ul.task-list{list-style:none;padding-left:2px;margin-left:0;}
+:is(#app-md,.md-scope) .preview-pane ul.task-list ul{padding-left:22px;}
+:is(#app-md,.md-scope) .preview-pane li.task-item{list-style:none;margin-left:0;display:flex;align-items:flex-start;gap:8px;}
+:is(#app-md,.md-scope) .preview-pane li.task-item > input[type=checkbox]{
     flex:0 0 auto;width:15px;height:15px;min-width:15px;margin:4px 0 0;
     cursor:pointer;accent-color:var(--accent,#4c8dff);
   }
-#app-md .preview-pane hr{border:none;border-top:1px solid var(--border);margin:18px 0;}
+:is(#app-md,.md-scope) .preview-pane hr{border:none;border-top:1px solid var(--border);margin:18px 0;}
 /* ---------- status bar ---------- */
-#app-md #statusbar{
+:is(#app-md,.md-scope) #statusbar{
     display:flex;align-items:center;gap:14px;padding:4px 12px;
     background:var(--bg-1);border-top:1px solid var(--border);
     font-size:12px;color:var(--text-2);
   }
-#app-md #statusbar .spacer{flex:1;}
-#app-md #statusbar .viewmode button{padding:3px 8px;font-size:12px;}
+:is(#app-md,.md-scope) #statusbar .spacer{flex:1;}
+:is(#app-md,.md-scope) #statusbar .viewmode button{padding:3px 8px;font-size:12px;}
 /* ---------- modal ---------- */
-#app-md .modal-backdrop{
+:is(#app-md,.md-scope) .modal-backdrop{
     position:fixed;inset:0;background:rgba(0,0,0,0.55);display:none;
     align-items:center;justify-content:center;z-index:500;
   }
-#app-md .modal-backdrop.show{display:flex;}
-#app-md .modal{
+:is(#app-md,.md-scope) .modal-backdrop.show{display:flex;}
+:is(#app-md,.md-scope) .modal{
     background:var(--bg-1);border:1px solid var(--border);border-radius:8px;
     width:520px;max-width:92vw;max-height:82vh;overflow-y:auto;padding:18px 20px;
   }
-#app-md .modal h2{margin-top:0;font-size:16px;color:var(--text-0);}
-#app-md .modal h3{font-size:13px;color:var(--text-1);margin:16px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px;}
-#app-md .modal label{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;color:var(--text-0);}
-#app-md .modal .row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;}
-#app-md .modal .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
-#app-md .modal textarea.pluginlog{width:100%;height:70px;background:var(--bg-0);color:var(--text-1);border:1px solid var(--border);font-family:var(--mono);font-size:11px;padding:6px;}
-#app-md .checklist-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;}
-#app-md .hint{color:var(--text-2);font-size:12px;line-height:1.6;margin-top:4px;}
-#app-md code.kbd{background:var(--bg-3);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:var(--mono);}
+:is(#app-md,.md-scope) .modal h2{margin-top:0;font-size:16px;color:var(--text-0);}
+:is(#app-md,.md-scope) .modal h3{font-size:13px;color:var(--text-1);margin:16px 0 8px;border-bottom:1px solid var(--border);padding-bottom:4px;}
+:is(#app-md,.md-scope) .modal label{display:flex;align-items:center;gap:8px;padding:4px 0;font-size:13px;color:var(--text-0);}
+:is(#app-md,.md-scope) .modal .row{display:flex;align-items:center;gap:10px;padding:6px 0;font-size:13px;}
+:is(#app-md,.md-scope) .modal .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px;}
+:is(#app-md,.md-scope) .modal textarea.pluginlog{width:100%;height:70px;background:var(--bg-0);color:var(--text-1);border:1px solid var(--border);font-family:var(--mono);font-size:11px;padding:6px;}
+:is(#app-md,.md-scope) .checklist-grid{display:grid;grid-template-columns:1fr 1fr;gap:2px 12px;}
+:is(#app-md,.md-scope) .hint{color:var(--text-2);font-size:12px;line-height:1.6;margin-top:4px;}
+:is(#app-md,.md-scope) code.kbd{background:var(--bg-3);border:1px solid var(--border);border-radius:3px;padding:1px 5px;font-family:var(--mono);}
 
 /* ==================================================================
    Ver1.5.00 で追加したCSS
@@ -1532,21 +1532,21 @@ background:var(--bg-0);
 .wdtx-ng{ color:#ff9d94; }
 
 /* ---------- 検索お気に入り・履歴 ---------- */
-#app-db .favlabelrow{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:8px 0 3px; }
-#app-db .favlabelrow label{ margin:0; }
-#app-db .favbar{ display:inline-flex; gap:3px; align-items:center; }
-#app-db .favchip{
+:is(#app-db,.db-scope) .favlabelrow{ display:flex; align-items:center; gap:6px; flex-wrap:wrap; margin:8px 0 3px; }
+:is(#app-db,.db-scope) .favlabelrow label{ margin:0; }
+:is(#app-db,.db-scope) .favbar{ display:inline-flex; gap:3px; align-items:center; }
+:is(#app-db,.db-scope) .favchip{
   font-size:13px; line-height:1.35; padding:1px 6px; border-radius:6px;
   border:1px solid var(--line); background:var(--panel); color:var(--ink);
   cursor:pointer; font-family:inherit; font-weight:600;
 }
-#app-db .favchip:hover{ background:var(--head); }
-#app-db .favmini{
+:is(#app-db,.db-scope) .favchip:hover{ background:var(--head); }
+:is(#app-db,.db-scope) .favmini{
   font-size:11.5px; line-height:1.35; padding:1px 6px; border-radius:6px;
   border:1px solid var(--line); background:var(--panel); color:var(--sub);
   cursor:pointer; font-family:inherit;
 }
-#app-db .favmini:hover{ background:var(--head); }
+:is(#app-db,.db-scope) .favmini:hover{ background:var(--head); }
 .wdtx-pop{
   position:fixed; z-index:920; display:none;
   background:#1b1e24; color:#e6e9ef; border:1px solid #3d4046; border-radius:9px;
@@ -1579,13 +1579,13 @@ background:var(--bg-0);
 .wdtx-empty{ color:#8b93a0; padding:10px 2px; font-size:12.5px; }
 
 /* ---------- 列のドラッグ並べ替え ---------- */
-#app-db .colchip .dragh{
+:is(#app-db,.db-scope) .colchip .dragh{
   cursor:grab; color:var(--sub); padding:0 3px 0 0; user-select:none;
   font-size:12px; touch-action:none;
 }
-#app-db .colchip.wdtx-dragging{ opacity:.4; }
-#app-db .colchip.wdtx-over{ outline:2px dashed var(--accent); outline-offset:1px; }
-#app-db .tblmgr-cols{ min-height:26px; }
+:is(#app-db,.db-scope) .colchip.wdtx-dragging{ opacity:.4; }
+:is(#app-db,.db-scope) .colchip.wdtx-over{ outline:2px dashed var(--accent); outline-offset:1px; }
+:is(#app-db,.db-scope) .tblmgr-cols{ min-height:26px; }
 
 /* ==================================================================
    アドオン：スマホ表示の不具合修正（body.wdt-mobfix）
@@ -1599,49 +1599,49 @@ body.wdt-mobfix #modeSwitcher{ padding:5px 8px; gap:5px; }
 body.wdt-mobfix #modeSwitcher .msHint{ display:none; }
 body.wdt-mobfix #modeSwitcher .msTitle{ font-size:11.5px; white-space:normal; }
 
-body.wdt-mobfix #app-db{ padding:10px 8px; }
-body.wdt-mobfix #app-db .card{ padding:10px; }
-body.wdt-mobfix #app-db .search-grid{ gap:8px; }
-body.wdt-mobfix #app-db .search-grid > div{ flex:1 1 100%; }
-body.wdt-mobfix #app-db .table-wrap{ max-height:52vh; }
-body.wdt-mobfix #app-db input[type=text],
-body.wdt-mobfix #app-db textarea,
-body.wdt-mobfix #app-db select{ font-size:16px; }
+body.wdt-mobfix :is(#app-db,.db-scope){ padding:10px 8px; }
+body.wdt-mobfix :is(#app-db,.db-scope) .card{ padding:10px; }
+body.wdt-mobfix :is(#app-db,.db-scope) .search-grid{ gap:8px; }
+body.wdt-mobfix :is(#app-db,.db-scope) .search-grid > div{ flex:1 1 100%; }
+body.wdt-mobfix :is(#app-db,.db-scope) .table-wrap{ max-height:52vh; }
+body.wdt-mobfix :is(#app-db,.db-scope) input[type=text],
+body.wdt-mobfix :is(#app-db,.db-scope) textarea,
+body.wdt-mobfix :is(#app-db,.db-scope) select{ font-size:16px; }
 
-body.wdt-mobfix #app-md #topbar{ gap:5px; padding:5px 6px; }
-body.wdt-mobfix #app-md #appTitle{ display:none; }
-body.wdt-mobfix #app-md #formatbar{ flex-wrap:nowrap; overflow-x:auto; }
-body.wdt-mobfix #app-md #formatbar button{ flex:0 0 auto; }
-body.wdt-mobfix #app-md #tabbar{ flex-wrap:nowrap; }
+body.wdt-mobfix :is(#app-md,.md-scope) #topbar{ gap:5px; padding:5px 6px; }
+body.wdt-mobfix :is(#app-md,.md-scope) #appTitle{ display:none; }
+body.wdt-mobfix :is(#app-md,.md-scope) #formatbar{ flex-wrap:nowrap; overflow-x:auto; }
+body.wdt-mobfix :is(#app-md,.md-scope) #formatbar button{ flex:0 0 auto; }
+body.wdt-mobfix :is(#app-md,.md-scope) #tabbar{ flex-wrap:nowrap; }
 /* ステータスバー：折り返して「分割／編集／プレビュー」を必ず1行使って表示する */
-body.wdt-mobfix #app-md #statusbar{ flex-wrap:wrap; gap:5px 10px; padding:6px 8px; }
-body.wdt-mobfix #app-md #statusbar .spacer{ display:none; }
-body.wdt-mobfix #app-md #statusbar .viewmode{ display:flex; gap:6px; width:100%; }
-body.wdt-mobfix #app-md #statusbar .viewmode button{ flex:1 1 0; padding:9px 4px; font-size:13.5px; }
+body.wdt-mobfix :is(#app-md,.md-scope) #statusbar{ flex-wrap:wrap; gap:5px 10px; padding:6px 8px; }
+body.wdt-mobfix :is(#app-md,.md-scope) #statusbar .spacer{ display:none; }
+body.wdt-mobfix :is(#app-md,.md-scope) #statusbar .viewmode{ display:flex; gap:6px; width:100%; }
+body.wdt-mobfix :is(#app-md,.md-scope) #statusbar .viewmode button{ flex:1 1 0; padding:9px 4px; font-size:13.5px; }
 /* 分割表示：横並びだと1画面が狭すぎるので、上下に積む */
-body.wdt-mobfix #app-md .pane-wrap.active{ flex-direction:column; }
-body.wdt-mobfix #app-md .editor-pane,
-body.wdt-mobfix #app-md .preview-pane{ min-height:0; min-width:0; }
-body.wdt-mobfix #app-md .divider{ width:auto; height:12px; cursor:row-resize; touch-action:none; }
-body.wdt-mobfix #app-md .preview-pane{ padding:14px; }
-body.wdt-mobfix #app-md .editor-pane textarea{ padding:12px; }
-body.wdt-mobfix #app-md .modal{ width:96vw; max-height:86dvh; }
-body.wdt-mobfix #app-md .checklist-grid{ grid-template-columns:1fr; }
+body.wdt-mobfix :is(#app-md,.md-scope) .pane-wrap.active{ flex-direction:column; }
+body.wdt-mobfix :is(#app-md,.md-scope) .editor-pane,
+body.wdt-mobfix :is(#app-md,.md-scope) .preview-pane{ min-height:0; min-width:0; }
+body.wdt-mobfix :is(#app-md,.md-scope) .divider{ width:auto; height:12px; cursor:row-resize; touch-action:none; }
+body.wdt-mobfix :is(#app-md,.md-scope) .preview-pane{ padding:14px; }
+body.wdt-mobfix :is(#app-md,.md-scope) .editor-pane textarea{ padding:12px; }
+body.wdt-mobfix :is(#app-md,.md-scope) .modal{ width:96vw; max-height:86dvh; }
+body.wdt-mobfix :is(#app-md,.md-scope) .checklist-grid{ grid-template-columns:1fr; }
 /* 「分割／編集／プレビュー」を上のバーへ移したときの見た目
    （下のバーが隠れる端末でも確実に押せるようにするための二重の保険） */
-#app-md #topbar .viewmode{ display:flex; gap:6px; width:100%; margin-top:2px; }
-#app-md #topbar .viewmode button{ flex:1 1 0; padding:9px 4px; font-size:13.5px; }
+:is(#app-md,.md-scope) #topbar .viewmode{ display:flex; gap:6px; width:100%; margin-top:2px; }
+:is(#app-md,.md-scope) #topbar .viewmode button{ flex:1 1 0; padding:9px 4px; font-size:13.5px; }
 
 /* ==================================================================
    アドオン：指で押しやすい大きさ（body.wdt-bigtap）
    ================================================================== */
 body.wdt-bigtap #modeSwitcher button{ padding:10px 15px; }
-body.wdt-bigtap #app-db button{ padding:10px 14px; font-size:14px; }
-body.wdt-bigtap #app-db button.small{ padding:7px 11px; font-size:13px; }
-body.wdt-bigtap #app-db button.mini{ padding:2px 8px; font-size:13px; }
-body.wdt-bigtap #app-db table.grid td.op button{ padding:6px 10px; font-size:12.5px; }
-body.wdt-bigtap #app-md button{ padding:9px 12px; font-size:14px; }
-body.wdt-bigtap #app-md .tab{ padding:0 14px; }
+body.wdt-bigtap :is(#app-db,.db-scope) button{ padding:10px 14px; font-size:14px; }
+body.wdt-bigtap :is(#app-db,.db-scope) button.small{ padding:7px 11px; font-size:13px; }
+body.wdt-bigtap :is(#app-db,.db-scope) button.mini{ padding:2px 8px; font-size:13px; }
+body.wdt-bigtap :is(#app-db,.db-scope) table.grid td.op button{ padding:6px 10px; font-size:12.5px; }
+body.wdt-bigtap :is(#app-md,.md-scope) button{ padding:9px 12px; font-size:14px; }
+body.wdt-bigtap :is(#app-md,.md-scope) .tab{ padding:0 14px; }
 
 /* ==========================================================
    Ver1.10.00 追加分
@@ -1662,28 +1662,28 @@ body.wdt-bigtap #app-md .tab{ padding:0 14px; }
 #appShell.hdr-small #modeSwitcher .msTblBar button{ padding:2px 7px; font-size:13px; }
 
 /* ---- 「🔎 検索・表示・編集」の見出しの中 ---- */
-#app-db .secnow{
+:is(#app-db,.db-scope) .secnow{
   display:inline-flex; align-items:center; gap:5px; vertical-align:middle;
   margin-left:14px; padding:1px 11px; border-radius:999px;
   background:var(--chip); border:1px solid var(--line2);
   color:var(--accent2); font-size:12.5px; font-weight:700; white-space:nowrap;
 }
-#app-db .sectbl{
+:is(#app-db,.db-scope) .sectbl{
   float:right; display:inline-flex; align-items:center; gap:3px;
   margin-left:10px; max-width:46%; overflow-x:auto; overflow-y:hidden;
 }
-#app-db .sectbl::-webkit-scrollbar{ height:5px; }
-#app-db .sectbl button{
+:is(#app-db,.db-scope) .sectbl::-webkit-scrollbar{ height:5px; }
+:is(#app-db,.db-scope) .sectbl button{
   padding:1px 8px; font-size:13px; line-height:1.75; border-radius:5px; font-weight:600;
   background:var(--panel); color:var(--sub); border:1px solid var(--line2); cursor:pointer;
   font-family:inherit;
 }
-#app-db .sectbl button:hover{ background:var(--head); color:var(--accent2); border-color:var(--line); }
-#app-db .sectbl button.on{ background:var(--accent); color:#fff; border-color:var(--accent2); }
+:is(#app-db,.db-scope) .sectbl button:hover{ background:var(--head); color:var(--accent2); border-color:var(--line); }
+:is(#app-db,.db-scope) .sectbl button.on{ background:var(--accent); color:#fff; border-color:var(--accent2); }
 
 /* ---- 表のすぐ上のボタン列（新規登録など） ---- */
-#app-db .gridtools{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 7px; }
-#app-db .gridtools .hint{ font-size:11.5px; }
+:is(#app-db,.db-scope) .gridtools{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 7px; }
+:is(#app-db,.db-scope) .gridtools .hint{ font-size:11.5px; }
 
 /* ============================================================
    Ver1.11.00 追加ぶんのCSS
@@ -1693,50 +1693,50 @@ body.wdt-bigtap #app-md .tab{ padding:0 14px; }
    ============================================================ */
 
 /* ---- (E2) 操作列 ---- */
-#app-db table.grid td.op{ white-space:nowrap; text-align:center; padding:3px 5px; vertical-align:middle; }
-#app-db table.grid td.op .opwrap{ display:flex; flex-direction:column; align-items:center; gap:3px; }
-#app-db table.grid td.op .opbtn{
+:is(#app-db,.db-scope) table.grid td.op{ white-space:nowrap; text-align:center; padding:3px 5px; vertical-align:middle; }
+:is(#app-db,.db-scope) table.grid td.op .opwrap{ display:flex; flex-direction:column; align-items:center; gap:3px; }
+:is(#app-db,.db-scope) table.grid td.op .opbtn{
   position:relative; width:26px; height:22px; line-height:1; padding:0;
   font-size:13px; border-radius:6px; cursor:pointer;
   background:var(--panel); color:var(--ink); border:1px solid var(--line);
 }
-#app-db table.grid td.op .opbtn:hover{ background:var(--chip); border-color:var(--accent); }
-#app-db table.grid td.op .opbtn.warn{ color:var(--del); }
-#app-db table.grid td.op .opbtn.warn:hover{ background:var(--errbg); border-color:var(--del); }
+:is(#app-db,.db-scope) table.grid td.op .opbtn:hover{ background:var(--chip); border-color:var(--accent); }
+:is(#app-db,.db-scope) table.grid td.op .opbtn.warn{ color:var(--del); }
+:is(#app-db,.db-scope) table.grid td.op .opbtn.warn:hover{ background:var(--errbg); border-color:var(--del); }
 /* マウスが近づいたら、その場に説明を出す（title より速く、確実に読める） */
-#app-db table.grid td.op .opbtn::after{
+:is(#app-db,.db-scope) table.grid td.op .opbtn::after{
   content:attr(data-tip); position:absolute; left:31px; top:50%; transform:translateY(-50%);
   background:#1c2027; color:#e7ecf3; border:1px solid #39404b; border-radius:6px;
   padding:3px 9px; font-size:11.5px; font-weight:400; white-space:nowrap;
   opacity:0; visibility:hidden; transition:opacity .1s linear; pointer-events:none; z-index:40;
   box-shadow:0 4px 14px rgba(0,0,0,.35);
 }
-#app-db table.grid td.op .opbtn:hover::after,
-#app-db table.grid td.op .opbtn:focus-visible::after{ opacity:1; visibility:visible; }
-body.wdt-bigtap #app-db table.grid td.op .opbtn{ width:34px; height:30px; font-size:16px; padding:0; }
+:is(#app-db,.db-scope) table.grid td.op .opbtn:hover::after,
+:is(#app-db,.db-scope) table.grid td.op .opbtn:focus-visible::after{ opacity:1; visibility:visible; }
+body.wdt-bigtap :is(#app-db,.db-scope) table.grid td.op .opbtn{ width:34px; height:30px; font-size:16px; padding:0; }
 
 /* ---- (E4) 行の選択 ---- */
-#app-db table.grid th.opchk, #app-db table.grid td.opchk{ width:30px; text-align:center; padding:3px 2px; }
-#app-db table.grid th.opchk input, #app-db table.grid td.opchk input{ width:15px; height:15px; cursor:pointer; }
-#app-db table.grid tr.rowsel > td{ background:var(--editfocus) !important; }
-#app-db .bulkbar{
+:is(#app-db,.db-scope) table.grid th.opchk, :is(#app-db,.db-scope) table.grid td.opchk{ width:30px; text-align:center; padding:3px 2px; }
+:is(#app-db,.db-scope) table.grid th.opchk input, :is(#app-db,.db-scope) table.grid td.opchk input{ width:15px; height:15px; cursor:pointer; }
+:is(#app-db,.db-scope) table.grid tr.rowsel > td{ background:var(--editfocus) !important; }
+:is(#app-db,.db-scope) .bulkbar{
   display:none; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 7px;
   padding:6px 10px; border:1px solid var(--accent); border-radius:8px; background:var(--chip);
 }
-#app-db .bulkbar.on{ display:flex; }
-#app-db .bulkbar b{ font-size:12.5px; }
-#app-db .bulkbar .hint{ font-size:11.5px; }
+:is(#app-db,.db-scope) .bulkbar.on{ display:flex; }
+:is(#app-db,.db-scope) .bulkbar b{ font-size:12.5px; }
+:is(#app-db,.db-scope) .bulkbar .hint{ font-size:11.5px; }
 
 /* ---- (G1)(G3) 並べ替え ---- */
-#app-db table.grid th.sortable{ cursor:pointer; user-select:none; }
-#app-db table.grid th.sortable:hover{ color:var(--accent); }
-#app-db table.grid th[data-sortdir]{ color:var(--accent); }
-#app-db table.grid th[data-sortdir="asc"]::after{ content:" \25B2"; font-size:10px; }
-#app-db table.grid th[data-sortdir="desc"]::after{ content:" \25BC"; font-size:10px; }
-#app-db table.grid tr.row-focus > td{ box-shadow:inset 0 -2px 0 var(--accent), inset 0 2px 0 var(--accent); }
-#app-db table.grid tr.row-focus > td:first-child{ box-shadow:inset 4px 0 0 var(--accent), inset 0 -2px 0 var(--accent), inset 0 2px 0 var(--accent); }
-#app-db .sortbar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 7px; font-size:11.5px; color:var(--sub); }
-#app-db .sortbar .cur{ color:var(--ink); font-weight:700; }
+:is(#app-db,.db-scope) table.grid th.sortable{ cursor:pointer; user-select:none; }
+:is(#app-db,.db-scope) table.grid th.sortable:hover{ color:var(--accent); }
+:is(#app-db,.db-scope) table.grid th[data-sortdir]{ color:var(--accent); }
+:is(#app-db,.db-scope) table.grid th[data-sortdir="asc"]::after{ content:" \25B2"; font-size:10px; }
+:is(#app-db,.db-scope) table.grid th[data-sortdir="desc"]::after{ content:" \25BC"; font-size:10px; }
+:is(#app-db,.db-scope) table.grid tr.row-focus > td{ box-shadow:inset 0 -2px 0 var(--accent), inset 0 2px 0 var(--accent); }
+:is(#app-db,.db-scope) table.grid tr.row-focus > td:first-child{ box-shadow:inset 4px 0 0 var(--accent), inset 0 -2px 0 var(--accent), inset 0 2px 0 var(--accent); }
+:is(#app-db,.db-scope) .sortbar{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin:0 0 7px; font-size:11.5px; color:var(--sub); }
+:is(#app-db,.db-scope) .sortbar .cur{ color:var(--ink); font-weight:700; }
 
 /* ---- 絵文字パレット（項目のアイコン選び） ---- */
 .rtt-emoji{ display:flex; flex-wrap:wrap; gap:4px; max-height:170px; overflow:auto; padding:6px;
@@ -1747,12 +1747,12 @@ body.wdt-bigtap #app-db table.grid td.op .opbtn{ width:34px; height:30px; font-s
   background:#12141a; border:1px solid #3d4046; font-size:15px; }
 
 /* ---- (F4) くわしい検索のお気に入り ---- */
-#app-db .advfavbar{ display:flex; gap:4px; align-items:center; flex-wrap:wrap; margin-left:auto; }
-#app-db .advfavbar .gchip{
+:is(#app-db,.db-scope) .advfavbar{ display:flex; gap:4px; align-items:center; flex-wrap:wrap; margin-left:auto; }
+:is(#app-db,.db-scope) .advfavbar .gchip{
   font-size:12px; line-height:1.35; padding:2px 8px; border-radius:6px; cursor:pointer;
   border:1px solid var(--line); background:var(--panel); color:var(--sub); font-family:inherit;
 }
-#app-db .advfavbar .gchip:hover{ background:var(--head); }
+:is(#app-db,.db-scope) .advfavbar .gchip:hover{ background:var(--head); }
 .wdtx-pop .afitem{ display:flex; align-items:flex-start; gap:7px; padding:7px 2px; border-bottom:1px solid #23262c; }
 .wdtx-pop .afitem:last-child{ border-bottom:none; }
 .wdtx-pop .afmain{ flex:1; min-width:0; cursor:pointer; }
@@ -1764,39 +1764,39 @@ body.wdt-bigtap #app-db table.grid td.op .opbtn{ width:34px; height:30px; font-s
 .wdtx-pop .afempty{ color:#8b93a0; font-size:12px; padding:10px 2px; }
 
 /* ---- 操作列の「複製」ボタン ---- */
-#app-db button.dup{
+:is(#app-db,.db-scope) button.dup{
   background:var(--panel); color:var(--accent2); border:1px solid var(--line);
   padding:3px 9px; font-size:12px; border-radius:6px; margin-right:5px;
 }
-#app-db button.dup:hover{ background:var(--chip); }
+:is(#app-db,.db-scope) button.dup:hover{ background:var(--chip); }
 
 /* ---- くわしい検索（AND / OR / NOT） ---- */
-#app-db .advpanel{
+:is(#app-db,.db-scope) .advpanel{
   border:1px solid var(--line); border-radius:9px; background:var(--chip);
   padding:11px 12px; margin:10px 0 4px;
 }
-#app-db .advpanel h4{
+:is(#app-db,.db-scope) .advpanel h4{
   margin:0 0 6px; font-size:12.5px; color:var(--sub); font-weight:700;
 }
-#app-db .advpanel h4.sec2{ margin-top:12px; }
-#app-db .advcols{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:4px; }
-#app-db label.advchk{
+:is(#app-db,.db-scope) .advpanel h4.sec2{ margin-top:12px; }
+:is(#app-db,.db-scope) .advcols{ display:flex; flex-wrap:wrap; gap:6px; margin-bottom:4px; }
+:is(#app-db,.db-scope) label.advchk{
   display:inline-flex; align-items:center; gap:5px; margin:0; padding:3px 10px;
   background:var(--panel); border:1px solid var(--line2); border-radius:999px;
   font-size:12.5px; color:var(--ink); cursor:pointer; font-weight:600;
 }
-#app-db label.advchk input{ width:auto; margin:0; }
-#app-db label.advchk.on{ border-color:var(--accent); color:var(--accent); background:var(--editfocus); }
-#app-db .advrow{ display:flex; gap:7px; align-items:center; flex-wrap:wrap; margin-bottom:6px; }
-#app-db .advrow .no{ width:44px; color:var(--sub); font-size:11.5px; font-weight:700; flex:0 0 auto; }
-#app-db .advrow select{ width:auto; flex:0 0 auto; padding:5px 7px; font-size:12.5px; }
-#app-db .advrow input[type=text]{ flex:1 1 220px; min-width:150px; width:auto; }
-#app-db .advrow label{
+:is(#app-db,.db-scope) label.advchk input{ width:auto; margin:0; }
+:is(#app-db,.db-scope) label.advchk.on{ border-color:var(--accent); color:var(--accent); background:var(--editfocus); }
+:is(#app-db,.db-scope) .advrow{ display:flex; gap:7px; align-items:center; flex-wrap:wrap; margin-bottom:6px; }
+:is(#app-db,.db-scope) .advrow .no{ width:44px; color:var(--sub); font-size:11.5px; font-weight:700; flex:0 0 auto; }
+:is(#app-db,.db-scope) .advrow select{ width:auto; flex:0 0 auto; padding:5px 7px; font-size:12.5px; }
+:is(#app-db,.db-scope) .advrow input[type=text]{ flex:1 1 220px; min-width:150px; width:auto; }
+:is(#app-db,.db-scope) .advrow label{
   margin:0; display:inline-flex; align-items:center; gap:4px;
   font-size:12px; color:var(--ink); white-space:nowrap;
 }
-#app-db .advrow label input{ width:auto; margin:0; }
-#app-db .advacts{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:10px; }
+:is(#app-db,.db-scope) .advrow label input{ width:auto; margin:0; }
+:is(#app-db,.db-scope) .advacts{ display:flex; gap:8px; align-items:center; flex-wrap:wrap; margin-top:10px; }
 
 /* ---- タグで絞り込むポップアップ（お気に入りと同じ見た目） ---- */
 #tagFilterPop .tfrow{ display:flex; flex-wrap:wrap; gap:5px; margin:6px 0 2px; }
@@ -1811,17 +1811,17 @@ body.wdt-bigtap #app-db table.grid td.op .opbtn{ width:34px; height:30px; font-s
 #tagFilterPop .tfmode{ display:flex; gap:6px; align-items:center; margin-bottom:2px; }
 
 /* ---- Markdownメモの ↶ ↷ ---- */
-#app-md #topbar button.mdundo{ padding:6px 9px; }
+:is(#app-md,.md-scope) #topbar button.mdundo{ padding:6px 9px; }
 
 /* ---- 画面が狭いとき ----
    見出しの中の項目アイコンは、一番上のバーにも同じものが出ているので、
    場所が足りないときは見出し側を消して、見出しの文字を優先する。 */
 @media (max-width:820px){
   #app-db .sectbl{ display:none; }
-  #app-db .secnow{ margin-left:8px; font-size:11.5px; padding:1px 8px; }
+  :is(#app-db,.db-scope) .secnow{ margin-left:8px; font-size:11.5px; padding:1px 8px; }
   #modeSwitcher .msTblBar{ max-width:100%; }
 }
-body.wdt-mobfix #app-db .sectbl{ display:none; }
+body.wdt-mobfix :is(#app-db,.db-scope) .sectbl{ display:none; }
 
 /* ==================================================================
    Ver1.13.00 追加ぶんのCSS
@@ -1833,7 +1833,7 @@ body.wdt-mobfix #app-db .sectbl{ display:none; }
    ================================================================== */
 
 /* ---- 横断検索の入口ボタン ---- */
-#app-db .xsopen{ margin-left:6px; }
+:is(#app-db,.db-scope) .xsopen{ margin-left:6px; }
 
 /* ---- 横断検索ダイアログ ---- */
 #xsBack .wdtx-modal{ max-height:88vh; }
@@ -1893,7 +1893,7 @@ body.wdt-mobfix #app-db .sectbl{ display:none; }
 
    【明るい配色にしたくなったら】(決-29)
      色の値は下の :root 1か所にしか無い。あとから1ブロック足すだけで差し替えられる。
-     ★ただし #xsBack は #app-db の【外】にある（2261行で開き 2801行あたりで閉じる。
+     ★ただし #xsBack は :is(#app-db,.db-scope) の【外】にある（2261行で開き 2801行あたりで閉じる。
        2192行の :root のコメントも「モーダルは外」と書いている）。
        したがって #app-db[data-theme="light"] .xs-… では届かない。
        明るい配色を足すときは :root:has(#app-db[data-theme="light"]){ … } か、
@@ -1956,7 +1956,7 @@ body.wdt-mobfix #app-db .sectbl{ display:none; }
 
 /* ------------------------------------------------------------------
    2〜5段目の入力行（案B3: 既定では畳んでおく）
-   ★#app-db .advrow{…}（1790行）は #app-db の中でしか効かないので、
+   ★:is(#app-db,.db-scope) .advrow{…}（1790行）は :is(#app-db,.db-scope) の中でしか効かないので、
      ここで .xs- 接頭辞のものを書き下ろす。流用しないこと。
    ------------------------------------------------------------------ */
 .xs-dans{ margin:2px 0 6px; }
@@ -2047,7 +2047,7 @@ body.wdt-mobfix #app-db .sectbl{ display:none; }
   --cb-bar-bg:#20242c; --cb-bar-fg:#9aa4b2; --cb-line:#3d4046;
 }
 /* ---- 配色：ライト（記録台帳をライト表示にしているとき） ---- */
-#app-db[data-theme="light"] .cbwrap{
+:is(#app-db,.db-scope)[data-theme="light"] .cbwrap{
   --hl-kw:#0033b3; --hl-typ:#0b7285; --hl-fn:#7a5c00; --hl-str:#a31515;
   --hl-num:#098658; --hl-com:#3f7f3f; --hl-var:#0b6d8f; --hl-atr:#6a3fa0;
   --hl-op:#5b6270;  --hl-tag:#0033b3; --hl-pre:#7c3aad;
@@ -2097,19 +2097,19 @@ body.wdt-mobfix #app-db .sectbl{ display:none; }
 .cbcopy.done{ opacity:1; color:var(--hl-add) !important; border-color:var(--hl-add) !important; }
 
 /* ---- 画面右下の「コードの言語」ドロップダウン ---- */
-#app-md #statusbar .langsel{ display:inline-flex; align-items:center; gap:5px; }
-#app-md #statusbar .langsel .lbl{ color:var(--text-2); font-size:11.5px; white-space:nowrap; }
-#app-md #statusbar .langsel select{
+:is(#app-md,.md-scope) #statusbar .langsel{ display:inline-flex; align-items:center; gap:5px; }
+:is(#app-md,.md-scope) #statusbar .langsel .lbl{ color:var(--text-2); font-size:11.5px; white-space:nowrap; }
+:is(#app-md,.md-scope) #statusbar .langsel select{
   background:var(--bg-2); color:var(--text-1);
   border:1px solid var(--border); border-radius:4px;
   padding:2px 6px; font-size:11.5px; max-width:200px;
 }
-#app-md #statusbar .langsel.on select{ border-color:var(--accent); color:var(--accent); }
-#app-md #statusbar .langsel select:disabled{ opacity:.45; }
+:is(#app-md,.md-scope) #statusbar .langsel.on select{ border-color:var(--accent); color:var(--accent); }
+:is(#app-md,.md-scope) #statusbar .langsel select:disabled{ opacity:.45; }
 
 /* ---- スマホ表示のとき ---- */
-body.wdt-mobfix #app-md #statusbar .langsel{ width:100%; }
-body.wdt-mobfix #app-md #statusbar .langsel select{ flex:1; max-width:none; }
+body.wdt-mobfix :is(#app-md,.md-scope) #statusbar .langsel{ width:100%; }
+body.wdt-mobfix :is(#app-md,.md-scope) #statusbar .langsel select{ flex:1; max-width:none; }
 body.wdt-mobfix .cbcopy{ opacity:1 !important; }   /* 指ではホバーできないので常に出す */
 
 
@@ -2151,7 +2151,7 @@ body.wdt-mobfix .cbcopy{ opacity:1 !important; }   /* 指ではホバーでき�
 #rkBar .rk-pend{ flex:0 0 auto; color:#ffd98a; font-weight:700; }
 
 /* 帯の分だけ本文の下に余白を作り、丸ボタンは持ち上げる */
-body.rk-hasbar #app-db{ padding-bottom:44px; }
+body.rk-hasbar :is(#app-db,.db-scope){ padding-bottom:44px; }
 body.rk-hasbar #rtt20Fab{ bottom:46px; }
 body.rk-hasbar #miniLauncher{ bottom:46px; }
 
@@ -2242,36 +2242,36 @@ table.rk-tbl button.rk-rec{ background:#7a2f2f; border-color:#b3564f; color:#fff
 .rk-acts .sp{ flex:1 1 auto; }
 
 /* ---------- 表：いま操作している行 ---------- */
-#app-db table.grid > tbody > tr.rowcur > td{
+:is(#app-db,.db-scope) table.grid > tbody > tr.rowcur > td{
   box-shadow:inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent);
 }
-#app-db table.grid > tbody > tr.rowcur > td:first-child{ box-shadow:inset 2px 0 0 var(--accent), inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent); }
-#app-db table.grid > tbody > tr.rowcur > td:last-child{ box-shadow:inset -2px 0 0 var(--accent), inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent); }
+:is(#app-db,.db-scope) table.grid > tbody > tr.rowcur > td:first-child{ box-shadow:inset 2px 0 0 var(--accent), inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent); }
+:is(#app-db,.db-scope) table.grid > tbody > tr.rowcur > td:last-child{ box-shadow:inset -2px 0 0 var(--accent), inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent); }
 
 /* ---------- タグ画面のキーの印 ---------- */
-#app-db .rk-tagkb{
+:is(#app-db,.db-scope) .rk-tagkb{
   display:inline-block; min-width:14px; text-align:center;
   margin-right:5px; padding:0 4px; border-radius:4px;
   background:var(--chip); border:1px solid var(--line);
   color:var(--sub); font-family:"Consolas","Courier New",monospace;
   font-size:10.5px; font-weight:700; line-height:1.7; letter-spacing:.04em;
 }
-#app-db .rk-tagkb.fix{
+:is(#app-db,.db-scope) .rk-tagkb.fix{
   background:#7a5a12; border-color:#e0b95e; color:#ffe6ab;
 }
-#app-db[data-theme="light"] .rk-tagkb.fix{ background:#fff3d0; border-color:#c99a1e; color:#7a5a12; }
-#app-db .rk-pend2{
+:is(#app-db,.db-scope)[data-theme="light"] .rk-tagkb.fix{ background:#fff3d0; border-color:#c99a1e; color:#7a5a12; }
+:is(#app-db,.db-scope) .rk-pend2{
   display:none; margin-left:8px; padding:1px 8px; border-radius:999px;
   background:var(--accent); color:#fff; font-weight:700; font-size:11px;
 }
-#app-db .rk-pend2.on{ display:inline-block; }
-#app-db .rk-hotwrap{ display:flex; flex-direction:column; gap:4px; }
+:is(#app-db,.db-scope) .rk-pend2.on{ display:inline-block; }
+:is(#app-db,.db-scope) .rk-hotwrap{ display:flex; flex-direction:column; gap:4px; }
 
 /* ---------- スマホ（狭い画面）では帯を2段に ---------- */
 @media (max-width:760px){
   #rkBar{ font-size:11.5px; padding:5px 8px; gap:7px; }
   #rkBar .rk-tip{ display:none; }
-  body.rk-hasbar #app-db{ padding-bottom:56px; }
+  body.rk-hasbar :is(#app-db,.db-scope){ padding-bottom:56px; }
   body.rk-hasbar #rtt20Fab, body.rk-hasbar #miniLauncher{ bottom:58px; }
   .rk-row .rk-k{ width:120px; }
 }
@@ -2292,7 +2292,7 @@ table.rk-tbl button.rk-rec{ background:#7a2f2f; border-color:#b3564f; color:#fff
 
    【色を変数にした理由】
      この道具は配色が3系統に分かれています。
-       #app-db（明）      --accent:#2f6fdb
+       :is(#app-db,.db-scope)（明）      --accent:#2f6fdb
        #app-db（暗）      --accent:#4c8dff
        #app-md（常に暗）  --accent:#5ea1e6
      どこでも同じ色にすると、明るい配色のときに浮いてしまいます。
@@ -2314,9 +2314,9 @@ table.rk-tbl button.rk-rec{ background:#7a2f2f; border-color:#b3564f; color:#fff
   --rtt-focus-w:2px;     /* 線の太さ */
   --rtt-focus-off:1px;   /* 要素との隙間 */
 }
-#app-db{ --rtt-focus:#2f6fdb; }
-#app-db[data-theme="dark"]{ --rtt-focus:#4c8dff; }
-#app-md{ --rtt-focus:#5ea1e6; }
+:is(#app-db,.db-scope){ --rtt-focus:#2f6fdb; }
+:is(#app-db,.db-scope)[data-theme="dark"]{ --rtt-focus:#4c8dff; }
+:is(#app-md,.md-scope){ --rtt-focus:#5ea1e6; }
 
 button:focus-visible,
 input:focus-visible,
@@ -2334,7 +2334,7 @@ summary:focus-visible,
    ここは開いている間ずっと文字を打ち続ける場所で、
    まわりに枠が出ると文字が読みにくくなるためです。
    どこにいるかは、点滅しているカーソルで分かります。 */
-#app-md .editor-pane textarea:focus-visible{
+:is(#app-md,.md-scope) .editor-pane textarea:focus-visible{
   outline:none !important;
 }
 
@@ -2351,7 +2351,7 @@ summary:focus-visible,
 
    外側の1本だけを消します。「いまここに打っている」ことは
    1px の枠・背景色（--editfocus）・点滅するカーソルの3つで分かります。 */
-#app-db td.mdcell textarea:focus-visible{
+:is(#app-db,.db-scope) td.mdcell textarea:focus-visible{
   outline:none !important;
 }
 
@@ -2360,7 +2360,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.17</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.22</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2379,7 +2379,7 @@ summary:focus-visible,
   <span class="msHint">1ファイル完結・オフライン動作</span>
 </div>
 <div id="appBody" class="mode-db">
-<div id="app-db">
+<div id="app-db" class="db-scope">
 
 <div id="app-db-title"><h1>📇 記録台帳</h1>
 <p class="lead">作業記録・測定データ目録にかぎらず、<b>好きな項目（テーブル）を自分で作って何でも記録できる台帳</b>です。SQLite（WebAssembly）をこのHTMLに埋め込んだ、1ファイル完結・オフラインのツール。項目（テーブル）や列は自由に追加・編集・削除でき、ダークモード・自動保存・元に戻す／やり直す・CSV/TXT書き出しに対応しています。<b>Ver1.4.00</b>から、日付はカレンダー・時刻は時計から選べるようになり、予定表として「いま進行中の予定」に色を付けられます。
@@ -2526,6 +2526,11 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.22 で増えたこと（見た目は変わりません・複数の操作をまとめる土台を入れました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。将来「いくつかの操作をまとめて1回で実行する」機能（マクロ）を作るための土台だけを、中に静かに置きました。入れたのは2つです。<b>①動作の棚</b>…「上書き保存」「今日へ」のような既にある52個の部品の動きに、<b>名前で呼び出せる</b>ようにしました。<b>②マクロという新しい部品の種類</b>…「この動作、次にこの動作…」と<b>手順を並べるだけ</b>で、順番に実行してくれる部品を作れるようになりました。手順の途中で動かせないものがあれば、そこで<b>はっきり止めて知らせます</b>（黙って続けて中途半端に終わることはありません）。※いまはこの土台を使ってマクロを作る画面がまだ無いので、開発用の準備です。使い方も見た目も今までどおりです。</p>
+      <p><strong>Ver1.19.21 で増えたこと（画面のボタンが、ぜんぶキーボードから届くようになりました）：</strong>これまで、上の段に並んだボタン（上書き保存・タグの管理・今日へ など）は<b>マウスで押すしかありません</b>でした。この版から、<b>それらが「部品」としてコマンドパレットに出ます</b>。<b>［Ctrl+K］を押して名前を打ち、Enter</b> で実行できます。「hozon」「ほぞん」のようにローマ字・かなでも探せます。<b>好きなキーを自分で割り当てられます</b>…「⚙ 設定 &gt; ショートカットキー」の一覧に部品が並ぶようになったので、「変更」を押して好きなキーを覚えさせてください。※<b>こちらから勝手に新しいキーを割り当てていません</b>。Ctrl と英字の組み合わせは残りが少なく、環境によってはブラウザや日本語入力に横取りされて「押しても効かない」が黙って残るためです。既定は<b>「（未割り当て）」</b>で、選ぶのはあなたです。※<b>使えないときは理由が出ます</b>…DBを開いていないのに「上書き保存」を呼ぶと、これまでは何も起きませんでしたが、これからは「いまは使えません」と出ます。※パレットの中身も整理しました。同じ操作が2か所に書かれていたものを<b>部品ひとつにまとめた</b>ので、片方だけ直して食い違うことがなくなります。隠したコマンド・付けた呼び出し語・使った回数の記録は<b>そのまま引き継がれます</b>。</p>
+      <p><strong>Ver1.19.20 で増えたこと（部品を画面のどこへ置いても見た目が崩れなくなりました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。これまで、記録台帳の部品と Markdownメモの部品は、<b>それぞれの画面の中でしか正しく表示できません</b>でした。外へ出すと文字も色も枠も全部なくなってしまう作りだったのです。この版で、<b>置き場所に印（db-scope / md-scope）を付ければ、どこへ置いても同じ見た目になる</b>ようにしました。※あとで<b>「左に日付・上に題名・広い側に長文メモを Markdownメモで」</b>のように、2つの画面の部品を混ぜて並べられるようにするための土台です。※見え方が本当に1つも変わっていないことは、<b>画面の中の1518か所について41種類の値をすべて記録し、前後で照合</b>して確かめました。</p>
+      <p><strong>Ver1.19.19 で増えたこと（Markdownメモの部品にも名札を付けました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。これまで「部品」として名前が付いていたのは<b>作業記録DB画面の41個だけ</b>で、Markdownメモ画面の部品には1つも名前がありませんでした。この版で、メモ画面の<b>上の帯・タブの帯・書式の帯・本文・下の帯</b>と、<b>開く・新規・保存・元に戻す・やり直す・メモの設定</b>に名札を付けました（あわせて11個）。※これは、あとで<b>「左に日付・上に題名・広い側に長文メモを Markdownメモで」</b>という画面を組み立てられるようにするための土台です。いまは並び方も動きも今までどおりです。</p>
+      <p><strong>Ver1.19.18 で増えたこと（選んでいる行が、もう迷子になりません）：</strong>表で行を選んでいるとき、その「いま選んでいる行」が<b>画面ではなく中の記録として持たれる</b>ようになりました。これまでは、<b>検索し直したり、Markdownメモへ行って戻ってきたりすると、選んでいた行がいちばん上へ戻って</b>いました。さらに、<b>検索欄に文字を打っている最中に表が描き直されると、選んでいた行の印そのものが消えて</b>いました。これからは<b>同じ行にとどまります</b>。<b>設定で選べます</b>…「⚙ 設定 &gt; ショートカットキー」の中に「<b>選んだ行</b>」という欄が増えました。チェックを入れておくと（既定）、検索し直しても選んでいた行に留まります。外すと、検索し直したときにいちばん上の行へ戻ります。※どちらにしても、Markdownメモへ行って戻ったときは<b>選んでいた行のまま</b>です。※これは、あとで<b>「左に日付・上に題名・広い側にメモ」を並べて、矢印キーで日付を送ると全部が一緒に切り替わる</b>画面を作るための土台でもあります。</p>
       <p><strong>Ver1.19.17 で増えたこと（見た目は変わりません・部品に「動き」と「説明」を付けました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。画面の部品（保存・元に戻す・検索など）に、<b>「押したときの動き」「入力欄へ行く動き」「いま使えるか」「探すときの言葉（ローマ字・かな）」「1行の説明」</b>を、中に静かに付けました。<b>なぜ「いま使えるか」を持たせたか</b>…たとえば「元に戻す」は、DBファイルが開いていないと意味がありません。これまでは、その状態でキーを押しても<b>何も起きないだけ</b>で、「効かないのか、壊れているのか」が分かりませんでした。これからは<b>「いま使えない」とはっきり分かる</b>ようにします。<b>探すときの言葉</b>は、日本語入力に切り替えなくても <code>hozon</code> や <code>もどす</code> で見つけられるように、41個の部品ぶん一度に用意しました。※これらは、次の版で<b>キーボードだけで全部の部品に届く</b>ようにするための土台です。いまは動きにはつないでいません。</p>
       <p><strong>Ver1.19.16 で増えたこと（見た目は変わりません・部品を隠せる仕組みを入れました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。画面の部品を<b>1つずつ表示したり非表示にしたりできる仕組み</b>を、中に静かに置きました。<b>ボタン1個</b>でも<b>パネルまるごと</b>でも、<b>同じ1つの指示</b>で切り替わります（将来これを<b>キー1つ</b>で瞬間に開閉できるようにします。エクセルの左側のツリーや、ブラウザのお気に入りバーを開いたり閉じたりする感覚です）。<b>設定は「隠したものだけ」を覚えます</b>…出しているものは記録しないので、<b>何も隠していないときは、これまでと1文字も変わりません</b>。<b>隠す・出すは、DBファイルの中に保存されます</b>ので、<b>会社のパソコンでも効きますし、.sqlite ファイルと一緒に持ち運べます</b>。※いまは切り替える画面がまだ無いので、この仕組みは開発用の準備です。</p>
       <p><strong>Ver1.19.15 で増えたこと（見た目は変わりません・部品に「札」を付けました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。画面の部品41個ひとつひとつに、<b>「これは何か」を表す札（タグ）</b>を付けました。たとえば「上書き保存」のボタンには<code>ファイル 保存 上の帯 押せる</code>のような札が付いています。<b>なぜ札が要るのか</b>…将来スキン（画面構成を丸ごと切り替える機能）を入れると、「どの部品をどこへ置くか」を決める必要が出てきます。これを<b>部品の名前で1つずつ書く</b>と、部品を1つ足すたびに<b>スキン全部を書き直す</b>ことになります。札なら「<b>上の帯の札が付いているもの全部</b>」と書けるので、<b>札を付けるだけで、すべてのスキンに自動で出ます</b>。<b>組み合わせも書けます</b>…「上の帯 かつ 押せる」「検索 でない」のように、<b>かつ／または／でない／かっこ</b>の4つだけで指定できます。よく使う組み合わせには<b>名前</b>を付けてあるので（「ツールバー」「押せるもの」など）、記号を覚えなくても選ぶだけで使えます。※<b>札の打ち間違いは機械が見つけます</b>…存在しない札を書くとどの指定にも当たらず、その部品が黙って消えてしまうため、「知らない札が混ざっていないか」を毎回点検しています。</p>
@@ -2930,7 +2935,7 @@ summary:focus-visible,
 </div>
 
 </div>
-<div id="app-md">
+<div id="app-md" class="md-scope">
 
 <div id="dropOverlay">📄 ファイルをドロップして開く（.md / .markdown / .txt）</div>
 
@@ -3364,6 +3369,14 @@ function weekdayJa(s){
 function applyTheme(t){
   const el = document.getElementById('app-db');
   if(el) el.setAttribute('data-theme', t);
+  /* ★Ver1.19.20 … 器の外へ出した部品を包む .db-scope の箱にも同じ印を付ける。
+     暗い配色は #app-db[data-theme="dark"] で当てているので、印が無い箱では
+     【字も枠も合っているのに色だけ明るいまま】になる（2026-09-08 実測）。
+     「箱を作る人が忘れずに付ける」決まりにすると必ず忘れるので、ここで面倒を見る。 */
+  try{
+    var bs = document.querySelectorAll('.db-scope'), i;
+    for(i = 0; i < bs.length; i++) bs[i].setAttribute('data-theme', t);
+  }catch(e){}
   try{ localStorage.setItem('wdt_theme', t); }catch(e){}
   const btn = document.getElementById('themeBtn');
   if(btn) btn.textContent = t === 'dark' ? '☀ ライトモード' : '🌙 ダークモード';
@@ -11785,17 +11798,133 @@ function gridRows(){
   if(!box) return [];
   return Array.prototype.slice.call(box.querySelectorAll('table.grid > tbody > tr'));
 }
-function curRow(){
-  var rows = gridRows();
-  for(var i = 0; i < rows.length; i++) if(rows[i].classList.contains('rowcur')) return rows[i];
+/* ==================================================================
+   Ver1.19.18 (L-06 第5段 工程4.5 土台1)  行のカーソルを【データ】にする
+   ------------------------------------------------------------------
+   ★決-71 … これまで「いま選んでいる行」は <tr> の rowcur という class に
+     住んでいた。つまり【状態が画面に貼り付いていた】。そのため:
+       ・表を出さないスキンでは、選んでいる行が存在しなくなる
+       ・左の日付／上の題名／右のメモが「行が変わった」を知る手段が無い
+       ・2026-09-07 実測 … ①全件表示を押し直す・③MDメモから戻る で先頭へ戻り、
+         検索欄に文字を打っている最中は【消える】
+         （付け直しが inCmdMode() のときだけ走っていたため）
+
+   ここでは状態を {table, rid} の1つだけにし、変わったことを
+   【見張りの登録簿】で配る。rowcur は「その結果として塗るもの」に格下げ。
+
+   ★★塗る係（curPaint）自身を最初の見張りとして登録するので、
+     登録簿は初日から空にならない（T-03 の「呼ぶ側が1つも無い」型を避ける）。
+   ★行は前から <tr data-rid="…"> を持っているので、描き直しても探し直せる。
+   ================================================================== */
+var CUR       = {table:null, rid:null};
+var CUR_WATCH = [];                       /* [{name, fn}] 名前で1つに保つ */
+
+/* 既定は「留まる」。要望の芯が「ストレスなく」であり、
+   L-06 の画面（日付を送りながらメモを読む）は留まらないと成立しないため。 */
+function curKeepDefault(){ return true; }
+function curKeep(){ return kOpt('curKeep', curKeepDefault()) !== false; }
+
+function curGet(){ return {table:CUR.table, rid:CUR.rid}; }
+
+function curFire(){
+  var snap = curGet(), i, w;
+  for(i = 0; i < CUR_WATCH.length; i++){
+    w = CUR_WATCH[i];
+    /* ★1つが転んでも、残りの見張りは必ず呼ぶ。
+       ただし黙って飲み込まない（#61）。名前を出して知らせる。 */
+    try{ w.fn(snap); }
+    catch(e){
+      try{ console.warn('RTTCUR: 見張り「' + w.name + '」でエラー … ' + e.message); }catch(e2){}
+    }
+  }
+}
+
+function curWatch(name, fn){
+  if(!name || typeof fn !== 'function') return false;
+  for(var i = 0; i < CUR_WATCH.length; i++){
+    if(CUR_WATCH[i].name === name){ CUR_WATCH[i].fn = fn; return true; }  /* 名前で1つ */
+  }
+  CUR_WATCH.push({name:String(name), fn:fn});
+  return true;
+}
+function curWatchers(){
+  return CUR_WATCH.map(function(w){ return w.name; });
+}
+
+function curSet(table, rid){
+  var t = (table == null || table === '') ? CUR.table : String(table);
+  var r = (rid == null || rid === '') ? null : String(rid);
+  if(CUR.table === t && CUR.rid === r) return curGet();   /* 変わっていないなら鳴らさない */
+  CUR.table = t;
+  CUR.rid   = r;
+  curFire();
+  return curGet();
+}
+
+/* いまの rid を持つ <tr> を探す。属性セレクタは rid の中身に左右されるので、
+   素直に回して比べる（数字以外の id を持つ表が来ても壊れない）。 */
+function curRowEl(){
+  if(CUR.rid == null) return null;
+  var rows = gridRows(), i;
+  for(i = 0; i < rows.length; i++){
+    if(String(rows[i].getAttribute('data-rid')) === String(CUR.rid)) return rows[i];
+  }
   return null;
 }
+
+/* ★塗る係。これが「最初の見張り」。基礎板は誰が塗るかを知らない。 */
+function curPaint(){
+  var rows = gridRows(), i, hit = null;
+  for(i = 0; i < rows.length; i++){
+    if(String(rows[i].getAttribute('data-rid')) === String(CUR.rid)) hit = rows[i];
+    rows[i].classList.remove('rowcur');
+  }
+  if(hit) hit.classList.add('rowcur');
+  return hit;
+}
+curWatch('grid.paint', curPaint);
+
+/* 描き直したあとに呼ぶ。同じレコードを探し直し、消えていたら先頭へ寄せる。
+   ★inCmdMode() は見ない。検索欄に文字を打っている最中でもカーソルは残す。 */
+function curApply(quiet){
+  var el = curPaint();
+  if(!el){
+    var rows = gridRows();
+    if(rows.length){
+      curSet(currentTable, rows[0].getAttribute('data-rid'));
+      el = curRowEl();
+    }else{
+      curSet(currentTable, null);
+    }
+  }
+  if(el && !quiet){ try{ el.scrollIntoView({block:'nearest'}); }catch(e){} }
+  return el;
+}
+
+function curToTop(){
+  var rows = gridRows();
+  if(!rows.length){ curSet(currentTable, null); return null; }
+  curSet(currentTable, rows[0].getAttribute('data-rid'));
+  return curRowEl();
+}
+
+/* ★「新しい検索結果になった」ときだけ呼ぶ。設定を見るのはここ【1か所だけ】。
+   呼ぶ側（showAll / runSearch の包み）は、設定の中身を知らない。 */
+function curOnNewResult(){
+  if(curKeep()) return curApply(true);
+  return curToTop();
+}
+
+/* ---- 昔からある2つは、上の仕組みを使う薄い皮になった ---- */
+function curRow(){ return curRowEl(); }
+
 function setCurRow(tr, quiet){
-  gridRows().forEach(function(r){ r.classList.remove('rowcur'); });
-  if(!tr) return null;
-  tr.classList.add('rowcur');
-  if(!quiet){ try{ tr.scrollIntoView({block:'nearest'}); }catch(e){} }
-  return tr;
+  if(!tr){ curSet(currentTable, null); curPaint(); return null; }
+  curSet(currentTable, tr.getAttribute('data-rid'));
+  var el = curRowEl() || tr;
+  curPaint();
+  if(!quiet){ try{ el.scrollIntoView({block:'nearest'}); }catch(e){} }
+  return el;
 }
 function moveCur(delta){
   var rows = gridRows();
@@ -12702,14 +12831,37 @@ function wrapAll(){
     var oRQ = renderQuery;
     renderQuery = function(){
       var r = oRQ.apply(this, arguments);
-      try{
-        var rows = gridRows();
-        if(rows.length && inCmdMode()) setCurRow(rows[0], true);
-      }catch(e){}
+      /* ★Ver1.19.18 … ここは前まで「先頭の行を選び直す」だった。しかも
+         inCmdMode() のときだけ走るので、検索欄に文字を打っている最中に
+         描き直されると、選んでいた行が【消えて】いた（2026-09-07 実測）。
+         いまは「同じレコードを探し直す」に変え、居場所の条件も外した。 */
+      try{ curApply(true); }catch(e){}
       refreshBar();
       return r;
     };
     renderQuery.__rk = 1;
+  }
+  /* --- 新しい検索結果になったときだけ、①の設定（curKeep）を見る ---
+     ★描き直し（renderQuery）は「同じレコードに留まる」で固定。
+       「先頭に戻すかどうか」は【新しい結果になったときだけ】の話なので、
+       showAll / runSearch の側で伝える。見分けを推測に頼らない（決-71）。 */
+  if(typeof showAll === 'function' && !showAll.__rkcur){
+    var oSA = showAll;
+    showAll = function(){
+      var r = oSA.apply(this, arguments);
+      try{ curOnNewResult(); }catch(e){}
+      return r;
+    };
+    showAll.__rkcur = 1;
+  }
+  if(typeof runSearch === 'function' && !runSearch.__rkcur){
+    var oRS = runSearch;
+    runSearch = function(){
+      var r = oRS.apply(this, arguments);
+      try{ curOnNewResult(); }catch(e){}
+      return r;
+    };
+    runSearch.__rkcur = 1;
   }
   /* --- タグの管理に「⌨ キー割り当て」タブを足す --- */
   if(typeof renderTagManager === 'function' && !renderTagManager.__rk){
@@ -12844,6 +12996,25 @@ if(document.readyState === 'loading'){
 }
 
 /* 外から呼べるようにしておく */
+/* ★Ver1.19.18 … 行のカーソルの窓口。
+   これまで curRow / setCurRow / moveCur / needRow / gridRows は
+   5つとも window に無く、この囲いの外からは一切さわれなかった。
+   L-06（左に日付・上に題名・右にMDメモ）は、外から「いまのレコード」を
+   知れないと成立しないので、ここで出す。 */
+window.RTTCUR = {
+  get         : curGet,          /* {table, rid} を返す                      */
+  set         : curSet,          /* 変える。変わったら見張りを回す            */
+  watch       : curWatch,        /* 見張りの登録簿。名前で1つに保つ            */
+  watchers    : curWatchers,     /* 名簿の名前一覧（検査用）                  */
+  apply       : curApply,        /* 描き直したあと、同じレコードを探し直す      */
+  toTop       : curToTop,        /* 先頭にする                               */
+  onNewResult : curOnNewResult,  /* 新しい結果になった。設定を見るのはここだけ  */
+  rowEl       : curRowEl,        /* いまのレコードの <tr>（無ければ null）      */
+  keep        : curKeep,         /* いまの設定（true = 留まる）               */
+  keepDefault : curKeepDefault,  /* 設定が無いときの既定                      */
+  version     : '1.19.18'
+};
+
 window.RTTKEY = {
   help        : openHelp,
   setting     : openKeySetting,
@@ -17027,6 +17198,29 @@ var SC = [
 var SC_BY_ID = {};
 SC.forEach(function(x){ SC_BY_ID[x.id] = x; });
 
+/* ---- Ver1.19.21 (L-01 第5段 工程5) ショートカットの登録簿への足し口 ----
+   部品の登録簿(RTTPARTS)は別の <script> ブロックの中に居るので、SC を直に
+   触ることができません（abc.md 落とし穴 #9）。ここが唯一の足し口です。
+
+   ★既定のキーは空（def:[]）で足します（決-77 案A）。
+     こちらから新しい既定キーを勝手に振りません。単独の Ctrl+英字 は26通りしか
+     なく、本体で8通り・ブラウザが13通りを既に使っています。残りに割り当てると
+     環境（IME・ウィンドウマネージャ）に横取りされる例があり、
+     「押しても効かない」が黙って残ります。
+     keyRows() は空のとき「（未割り当て）」と出すので、⚙設定の一覧には並びます。
+     利用者はそこで好きなキーを割り当てられます。
+   ★何度呼ばれても増えません（loadMeta() から繰り返し呼ばれるため）。 */
+function addShortcut(def){
+  if(!def || !def.id) return false;
+  if(SC_BY_ID[def.id]) return false;          /* 二重登録しない */
+  var row = {id: def.id, label: def.label || def.id,
+             where: def.where || '共通',
+             def : (def.def && def.def.length) ? def.def.slice() : []};
+  SC.push(row);
+  SC_BY_ID[row.id] = row;
+  return true;
+}
+
 /* ---------- キー配列（プリセット）の一覧 ---------- */
 var KEY_PRESETS = [
   {id:'vim',     label:'⌨ vim / ranger 風'},
@@ -17106,6 +17300,7 @@ function defaults(){
     keyPreset  : 'vim',      // vim | classic | emacs（単独キーとSCの既定を決める）
     cmdMode    : true,       // コマンドモード（単独キー）を使うか
     cmdBar     : true,       // 画面の下に「いまのモード」の帯を出すか
+    curKeep    : true,       // 検索し直したとき、選んでいた行に留まるか（false=先頭へ）
     cmdKeys    : {},         // 単独キーの個別上書き  {動作id: 'j' / 'g g' / ''}
     tagFocus   : 'cmd',      // タグ画面を開いたときのフォーカス位置（I1・5択）
     tagHotOn   : true,       // タグにキーの印を出すか（H5）
@@ -18170,6 +18365,10 @@ function buildSettings(){
      + '<label><input type="checkbox" id="wdtCmdMode"' + (st.cmdMode !== false ? ' checked' : '') + '> 単独キーで操作できるようにする</label></div>';
   h += '<div class="wdtx-row"><span class="lbl">下の帯</span>'
      + '<label><input type="checkbox" id="wdtCmdBar"' + (st.cmdBar !== false ? ' checked' : '') + '> 画面の一番下に「いまのモード」と主なキーを出す</label></div>';
+  h += '<div class="wdtx-row"><span class="lbl">選んだ行</span>'
+     + '<label><input type="checkbox" id="wdtCurKeep"' + (st.curKeep !== false ? ' checked' : '') + '> 検索し直しても、選んでいた行に<b>留まる</b></label></div>';
+  h += '<div class="wdtx-hint">チェックを外すと、検索し直したときに<b>いちばん上の行</b>へ戻ります。'
+     + 'どちらにしても、Markdownメモへ行って戻ってきたときは<b>選んでいた行のまま</b>です。</div>';
   h += radioRow('キー配列', 'wdtKeyPreset',
         KEY_PRESETS.map(function(p){ return [p.id, p.label]; }), keyPreset(),
         '<b>vim風</b>＝ j k で上下・<code>/</code> で検索・<code>dd</code> で削除。'
@@ -18699,6 +18898,7 @@ function bindSettings(){
     if(t.name === 'wdtTagFocus'){ st.tagFocus = t.value; save(); return; }
     if(t.id === 'wdtCmdMode'){ st.cmdMode = t.checked; save(); refreshKeyUi(); return; }
     if(t.id === 'wdtCmdBar'){  st.cmdBar  = t.checked; save(); refreshKeyUi(); return; }
+    if(t.id === 'wdtCurKeep'){ st.curKeep = t.checked; save(); return; }
     if(t.id === 'wdtTagHot'){  st.tagHotOn = t.checked; save(); refreshKeyUi(); return; }
     if(t.dataset && t.dataset.addon){
       var id = t.dataset.addon;
@@ -18827,6 +19027,9 @@ function refreshKeyUi(){
 
 return {
   matches: matches,
+  /* Ver1.19.21 (L-01 工程5): 部品がショートカットの一覧へ自分を足す口。
+     ★これが無いと、部品は ⚙設定 の一覧に出られない（＝キーを振れない）。 */
+  addShortcut: addShortcut,
   /* Ver1.19.02 C3-1: id からいま割り当たっているキーの配列を返す。
      案内文に実際のキーを出すため。振り直しても正しく出る。 */
   combosFor: combosFor,
@@ -20279,6 +20482,24 @@ function registerKind(kind, def){
 }
 function kindOf(k){ return PART_KINDS[k] || PART_KINDS.dom || null; }
 
+/* ---- ①.5 動作の登録簿（第5段 工程6・決-79）… 名前で呼べる関数の棚 -----
+   ★マクロ（kind:'macro'）の steps はここから引く。
+     基礎板（マクロの run）は、呼ぶ動作の中身を知らない（CLAUDE.md §5.2 決まり④）。
+   ★流し込みは【別関数】にする — 決-65 (10) と同じ流儀（分岐点1・案B・2026-09-09）。
+     registerPart はこの登録簿の存在を知らない。 */
+var ACTIONS = {};
+function registerAction(name, fn){
+  if(!name || typeof fn !== 'function') return false;
+  ACTIONS[String(name)] = fn;
+  return true;
+}
+function runAction(name){
+  var fn = ACTIONS[name];
+  if(typeof fn !== 'function') return false;
+  fn();
+  return true;
+}
+
 /* ---- ② 部品の登録簿 ------------------------------------------------ */
 var PARTS = [];
 var PART_AT = {};                       /* key → PARTS の位置 */
@@ -20316,8 +20537,42 @@ function registerPart(def){
             when : (typeof def.when  === 'function') ? def.when  : null,  /* 工程4 */
             kw   : def.kw   || '',      /* 工程4 … ローマ字・かな（パレットで探す）*/
             desc : def.desc || '',      /* 工程4 … 1行の説明（ヘルプ・設定）*/
+            /* ---- 工程5 … キーの口（決-65 (8)「口を今のうちに全部開ける」）----
+               ★registerPart は白名簿です。ここに書いていない欄は【黙って捨てられます】。
+                 工程5 の実装で実際に踏みました … PART_ACTION に cmdId を書いたのに
+                 パレットの id が変わらず、verify も不変量も全部 緑のままでした。
+                 欄を足すときは必ずここにも足すこと。 */
+            sc   : def.sc   || '',      /* 既定のキー。決-77 案A により既定は空 */
+            scWhere: def.scWhere || '', /* ⚙設定の一覧で「どの画面か」に出す欄 */
+            scOn : (def.scOn === false) ? false : true,  /* 一覧に出すか（S-02）*/
+            /* ★cmdId / scId は「引き継ぎ札」であって参照ではありません。
+               決-69 が却下したのは「部品が run を持たず、パレットのコマンドを
+               指す案」。ここは逆向きで、動きの正は部品が持ちます。
+               利用者の設定（非表示・呼び出し語・使用回数）は id で保存されて
+               いるので、その id を引き継ぐためだけの札です。 */
+            cmdId: def.cmdId || '',     /* 昔からのパレットの id を引き継ぐ */
+            scId : def.scId  || '',     /* 既にある SC のキーに相乗りする */
             tags : normTags(def.tags, def.group),   /* 第5段 工程2 */
+            /* ---- 第5段 工程6（決-79）… マクロの手順 ----
+               ★registerPart は白名簿。steps をここに足し忘れると #94 と同じ形で
+                 黙って捨てられる（決-79・工程6で先回りして塞ぐ）。 */
+            steps: (def.kind === 'macro' && def.steps && def.steps.length)
+                   ? def.steps.slice() : null,
             from : def.from || '' };    /* どのアドオンが足したか */
+  /* ★分岐点2・案①（fail-fast）… マクロは steps を順に呼ぶだけの run を持つ。
+     1手順でも呼べなければ、そこで止めて利用者に知らせる（決-69「黙って落とさない」
+     と同じ思想）。def.run が明示されていれば、そちらを優先する（上書きしない）。 */
+  if(!d.run && d.steps){
+    d.run = function(){
+      var i;
+      for(i = 0; i < d.steps.length; i++){
+        if(!runAction(d.steps[i])){
+          try{ say((d.label || d.key) + ' は途中で止まりました（' + d.steps[i] + '）。', 'err'); }catch(e){}
+          return;
+        }
+      }
+    };
+  }
   var i = PART_AT[d.key];
   if(i != null){ PARTS[i] = d; }        /* 同じ key は上書き（重複防止）*/
   else { PART_AT[d.key] = PARTS.length; PARTS.push(d); }
@@ -20350,6 +20605,15 @@ registerKind('dom', {
     box.appendChild(el);
     return true;
   }
+});
+
+/* マクロの種類（第5段 工程6・決-79・分岐点3・案イ）… 表示する場所を持たないので
+   木には置けない。★kindOf() は未登録の種類を黙って 'dom' 扱いにフォールバックする
+   実装（20482行）なので、登録しておかないと「マクロを木に置こうとしたら本体の
+   移動を試みて失敗する」という #94 / #95 と同じ「黙って標準に落ちる」事故になる。
+   ここで明示的に断る（工程7で木にマクロを置く機能を作るときは、ここを直す）。 */
+registerKind('macro', {
+  mount: function(){ return false; }
 });
 
 /* ---- ③ 領域の登録簿 … 画面のマス目 --------------------------------- */
@@ -20390,6 +20654,7 @@ var GROUP_LABEL = {
   page:'ページ見出し', status:'状態表示', edit:'編集履歴', file:'ファイル操作',
   global:'全体設定', tableMgr:'項目管理', inputForm:'新規登録',
   tableSwitch:'項目の切り替え', queryCond:'検索条件', dateQuick:'日付の絞り込み',
+  mdShell:'メモ画面の骨組み',
   advSearch:'高度な検索', resultHead:'結果の見出し', cellHelp:'セルの説明',
   gridTools:'表の道具', sortSel:'並べ替え・選択', results:'表', help:'使い方'
 };
@@ -20474,8 +20739,8 @@ var PART_SEED = [
   {key:'page.reopenBanner', group:'page',   label:'前回のDBに戻す帯', icon:'↩', elId:'reopenBanner', tags:'db banner'},
   {key:'status.msg',        group:'status', label:'状態メッセージ', icon:'ℹ', elId:'status', tags:'db status toolbar'},
   {key:'status.autosave',   group:'status', label:'自動保存の状態', icon:'💾', elId:'autosaveInfo', tags:'db status save'},
-  {key:'edit.undo',         group:'edit',   label:'↶ 元に戻す', icon:'↶', elId:'undoBtn', tags:'db history toolbar action'},
-  {key:'edit.redo',         group:'edit',   label:'↷ やり直す', icon:'↷', elId:'redoBtn', tags:'db history toolbar action'},
+  {key:'edit.undo',         group:'edit',   label:'元に戻す', icon:'↶', elId:'undoBtn', tags:'db history toolbar action'},
+  {key:'edit.redo',         group:'edit',   label:'やり直す', icon:'↷', elId:'redoBtn', tags:'db history toolbar action'},
   {key:'file.saveOver',     group:'file',   label:'上書き保存',     icon:'💾', tags:'db save toolbar action'},
   {key:'file.saveAs',       group:'file',   label:'名前を付けて保存', icon:'💾', tags:'db save toolbar action'},
   {key:'file.open',         group:'file',   label:'DBを開く',       icon:'📂', tags:'db open toolbar action'},
@@ -20512,7 +20777,24 @@ var PART_SEED = [
   {key:'bulk.bar',          group:'sortSel', label:'複数選択の操作', icon:'☑', elId:'bulkBar', tags:'db grid select'},
   {key:'results.table',     group:'results', label:'結果の表',      icon:'📋', elId:'results', tags:'db results grid'},
   {key:'search.hint',       group:'results', label:'検索のヒント',  icon:'', tags:'db help search'},
-  {key:'help.card',         group:'help',   label:'このツールの使い方', icon:'📦', elId:'secHelp', tags:'db help section'}
+  {key:'help.card',         group:'help',   label:'このツールの使い方', icon:'📦', elId:'secHelp', tags:'db help section'},
+
+  /* ===== Ver1.19.19 (L-06 第5段 工程4.5 土台3)  MDメモ画面の部品 =====
+     ★これまで PART_SEED は db タグだけだった。MDメモ画面の主要な塊と
+       アクションに名札を貼り、木に置けるようにする（決-70・案B）。
+     ★塊は run を持たない（results.table などと同じ）。アクションは
+       PART_ACTION 側で run/when を持つ。 */
+  {key:'md.topbar',    group:'mdShell', label:'メモ：上の帯',   icon:'📝', elId:'topbar',    tags:'md toolbar section'},
+  {key:'md.tabs',      group:'mdShell', label:'メモ：タブの帯', icon:'',   elId:'tabbar',    tags:'md tabs'},
+  {key:'md.formatbar', group:'mdShell', label:'メモ：書式の帯', icon:'',   elId:'formatbar', tags:'md toolbar'},
+  {key:'md.editor',    group:'mdShell', label:'メモ：本文',     icon:'📄', elId:'main',      tags:'md section'},
+  {key:'md.statusbar', group:'mdShell', label:'メモ：下の帯',   icon:'',   elId:'statusbar', tags:'md status'},
+  {key:'md.open',      group:'file',    label:'メモ：ファイルを開く', icon:'📂', elId:'btnOpen',     tags:'md file open toolbar action'},
+  {key:'md.new',       group:'file',    label:'メモ：新規',     icon:'➕', elId:'btnNew',      tags:'md file toolbar action'},
+  {key:'md.save',      group:'file',    label:'メモ：保存',     icon:'💾', elId:'btnSaveNow',  tags:'md save toolbar action'},
+  {key:'md.undo',      group:'edit',    label:'メモ：元に戻す', icon:'↶', elId:'btnMdUndo',   tags:'md history toolbar action'},
+  {key:'md.redo',      group:'edit',    label:'メモ：やり直す', icon:'↷', elId:'btnMdRedo',   tags:'md history toolbar action'},
+  {key:'md.settings',  group:'global',  label:'メモ：設定', icon:'⚙', elId:'btnSettings', tags:'md settings toolbar action'}
 ];
 
 /* ---- 読み口 … 将来ぜんぶ DB へ移すときは、この2つだけ直す ----------- */
@@ -20545,25 +20827,67 @@ function focusById(id){
     if(el){ try{ el.focus(); if(el.select) el.select(); }catch(e){} }
   };
 }
+/* ★Ver1.19.19 … MD側の関数は IIFE の中で window に無い。
+   でもボタンには安定した id が在るので、ボタンを click する。
+   ユーザーが押すのとまったく同じ経路（addEventListener）を通る。 */
+function clickById(id){
+  return function(){
+    var el = document.getElementById(id);
+    if(el && !el.disabled){ try{ el.click(); return true; }catch(e){} }
+    return false;
+  };
+}
 var NEED_DB = function(){ try{ return !!(window.WDT && window.WDT.dbOptGet); }catch(e){ return false; } };
+/* MDメモのタブが1つ以上開いているか（保存・元に戻す・やり直す は
+   タブが無いと意味がない。「押したのに何も起きない」を消す＝決-71 と同じ考え）。 */
+var NEED_MD_TAB = function(){ try{
+  return !!(window.MDEditor && window.MDEditor.getActiveTab && window.MDEditor.getActiveTab());
+}catch(e){ return false; } };
 
 var PART_ACTION = {
   'edit.undo':       {run: winCall('undo'),            when: NEED_DB,
+                      cmdId:'db.undo', scId:'db.undo',
+                      scWhere:'共通',
                       kw:'undo modosu もどす もとにもどす', desc:'直前の変更を取り消します'},
   'edit.redo':       {run: winCall('redo'),            when: NEED_DB,
+                      cmdId:'db.redo', scId:'db.redo',
+                      scWhere:'共通',
                       kw:'redo yarinaosu やりなおす', desc:'取り消した変更をやり直します'},
   'file.saveOver':   {run: winCall('saveDbOverwrite'), when: NEED_DB,
+                      cmdId:'db.save',
+                      scWhere:'共通',
                       kw:'hozon save uwagaki ほぞん うわがき うわがきほぞん', desc:'開いているDBファイルに上書き保存します'},
   'file.saveAs':     {run: winCall('saveDbAs'),        when: NEED_DB,
+                      cmdId:'db.saveAs', scId:'db.saveAs',
+                      scWhere:'共通',
                       kw:'hozon save namae ほぞん なまえ なまえをつけて', desc:'名前を付けて別のファイルに保存します'},
   'file.open':       {run: winCall('openDbPicker'),
+                      cmdId:'db.open',
+                      scWhere:'共通',
                       kw:'hiraku open file ひらく ファイルをひらく', desc:'DBファイルを選んで開きます'},
   'global.theme':    {run: winCall('toggleTheme'),
+                      cmdId:'db.theme',
+                      scWhere:'共通',
                       kw:'dark light theme いろ てーま だーく らいと', desc:'ダークモードとライトモードを切り替えます'},
-  'global.tagMgr':   {run: function(){ try{ if(typeof window.openTagManager === 'function')
-                        window.openTagManager((window.currentTable || null), ''); }catch(e){} }, when: NEED_DB,
+  /* ★Ver1.19.21 (工程5): パレットの db.tags を引き取った。
+     元のコマンドは toDb() で先にDB画面へ移り、開いている項目を
+     WorkDB.getCurrentTable() から取っていた。そこまで含めて引き取らないと、
+     メモ画面から呼んだときに「押したのに何も起きない」になる。
+     ★札（cmdId/scId）は run/focus の【後ろ】に置くこと。
+       不変量「部品の動きの登録簿」は `'key': {run:` の形を数えている。 */
+  'global.tagMgr':   {run: function(){
+                        toDb();
+                        if(typeof window.openTagManager !== 'function') return;
+                        var t = null;
+                        try{ t = (window.WorkDB && WorkDB.getCurrentTable)
+                                 ? WorkDB.getCurrentTable() : (window.currentTable || null); }catch(e){}
+                        try{ window.openTagManager(t, ''); }
+                        catch(e){ try{ say('タグの管理を開けませんでした', 'err'); }catch(e2){} }
+                      }, when: NEED_DB, cmdId:'db.tags',
                       kw:'tag tagu たぐ たぐのかんり', desc:'タグの並べ替え・カテゴリ分け・整理をします'},
   'global.settings': {run: function(){ try{ if(window.WDT && window.WDT.openSettings) window.WDT.openSettings(); }catch(e){} },
+                      cmdId:'app.settings', scId:'app.settings',
+                      scWhere:'共通',
                       kw:'settei setting config せってい せっていをひらく', desc:'設定画面（ショートカット・表示・アドオン）を開きます'},
   'query.run':       {run: winCall('runSearch'),       when: NEED_DB,
                       kw:'kensaku search sagasu けんさく さがす', desc:'いまの条件で検索します'},
@@ -20573,12 +20897,16 @@ var PART_ACTION = {
   'query.colPanel':  {run: function(){ try{ if(typeof window.gotoSection === 'function') window.gotoSection('secSearch');
                         setTimeout(function(){ try{ if(typeof window.toggleColPanel === 'function') window.toggleColPanel(); }catch(e){} }, 380);
                       }catch(e){} },
+                      cmdId:'db.cols',
                       kw:'retsu column hyouji れつ ひょうじするれつ', desc:'表に出す列を選ぶパネルを開きます'},
   'query.mdCell':    {run: winCall('toggleGridMarkdown'), when: NEED_DB,
+                      cmdId:'db.mdcell',
                       kw:'markdown md ちょうぶん まーくだうん', desc:'長文の列を Markdown で表示するかを切り替えます'},
-  'adv.bar':         {run: function(){ try{ if(typeof window.openCrossSearch === 'function') window.openCrossSearch(); }catch(e){} }, when: NEED_DB,
+  /* ★Ver1.19.21 (工程5): パレットの db.xsearch を引き取った（toDb() ごと）。 */
+  'adv.bar':         {run: function(){ toDb(); try{ if(typeof window.openCrossSearch === 'function') window.openCrossSearch(); }catch(e){} }, when: NEED_DB, cmdId:'db.xsearch',
                       kw:'kuwashii oudan and or not くわしい けんさく おうだん', desc:'くわしい検索・全項目の横断検索を開きます'},
-  'grid.newEntry':   {run: function(){ try{ if(typeof window.gotoNewEntry === 'function') window.gotoNewEntry(); }catch(e){} }, when: NEED_DB,
+  /* ★Ver1.19.21 (工程5): パレットの db.newrow を引き取った（toDb() ごと）。 */
+  'grid.newEntry':   {run: function(){ toDb(); try{ if(typeof window.gotoNewEntry === 'function') window.gotoNewEntry(); }catch(e){} }, when: NEED_DB, cmdId:'db.newrow',
                       kw:'atarashii tuika touroku あたらしい ついか しんきとうろく', desc:'新規登録の入力欄へ移動します'},
   'grid.resetAll':   {run: function(){ try{ if(typeof window.showAll === 'function')
                         window.showAll(window.currentTable); }catch(e){} }, when: NEED_DB,
@@ -20590,11 +20918,30 @@ var PART_ACTION = {
   'query.col':       {focus: focusById('q_col'),
                       kw:'taisho retsu たいしょうのれつ', desc:'検索の対象にする列を選びます'},
   'query.kw':        {focus: focusById('q_kw'),
+                      scId:'db.search',
                       kw:'keyword kw キーワード けんさくご', desc:'検索キーワード／正規表現を入れる欄です'},
   'inputForm.card':  {focus: function(){ var c = document.getElementById('formCard');
                         var el = c ? c.querySelector('input,textarea,select') : null;
                         if(el){ try{ el.focus(); }catch(e){} } },
-                      kw:'nyuryoku form にゅうりょく フォーム', desc:'新規登録の入力フォームへ移動します'}
+                      kw:'nyuryoku form にゅうりょく フォーム', desc:'新規登録の入力フォームへ移動します'},
+
+  /* --- MDメモ画面のアクション（Ver1.19.19・工程4.5 土台3）---
+     run はボタンの click。when はタブが要るものだけ NEED_MD_TAB。 */
+  'md.open':     {run: clickById('btnOpen'),
+                  kw:'hiraku open memo ひらく めもをひらく ファイルをひらく', desc:'Markdownメモのファイルを選んで開きます'},
+  'md.new':      {run: clickById('btnNew'),
+                  kw:'atarashii new memo あたらしい しんき あたらしいメモ', desc:'新しい空のメモを1枚つくります'},
+  'md.save':     {run: clickById('btnSaveNow'), when: NEED_MD_TAB,
+                  scId:'md.save',
+                  kw:'hozon save memo ほぞん めもをほぞん', desc:'いま開いているメモを保存します'},
+  'md.undo':     {run: clickById('btnMdUndo'), when: NEED_MD_TAB,
+                  scId:'md.undo',
+                  kw:'undo modosu もどす めもをもとにもどす', desc:'メモの直前の変更を取り消します'},
+  'md.redo':     {run: clickById('btnMdRedo'), when: NEED_MD_TAB,
+                  scId:'md.redo',
+                  kw:'redo yarinaosu やりなおす めもをやりなおす', desc:'メモの取り消した変更をやり直します'},
+  'md.settings': {run: clickById('btnSettings'),
+                  kw:'settei setting memo せってい めものせってい', desc:'Markdownメモ専用の設定を開きます'}
 };
 
 var PARTS_SEEDED = false;
@@ -20614,6 +20961,149 @@ function mergeDef(base, extra){
   for(k in base){ if(Object.prototype.hasOwnProperty.call(base, k)) o[k] = base[k]; }
   for(k in extra){ if(Object.prototype.hasOwnProperty.call(extra, k)) o[k] = extra[k]; }
   return o;
+}
+
+/* ==================================================================
+   Ver1.19.21 (L-01 第5段 工程5)  部品を「キー」と「パレット」へ流し込む
+   ------------------------------------------------------------------
+   設計の正: 改良/L-01_スキン/06_第5段の確定設計.md §5 §6 ／ 決-77
+
+   ★なぜ2段構えなのか（実測）
+     単独の Ctrl+英字 は26通りしかなく、本体が8通り・ブラウザが13通りを
+     すでに使っています。52部品ぜんぶに固有キーは振れません。
+       よく使うもの … 利用者が ⚙設定 で好きなキーを割り当てる（口は全部開けてある）
+       残り全部     … Ctrl+K → 名前を打つ → Enter（数に制限が無い）
+
+   ★キーの受け口は【1つ】です。
+     既存の bindKeys() は `if(W.matches(e,'db.undo'))…` を key の数だけ
+     並べる形でしたが、ここは登録簿を回すだけで if を1つも持ちません
+     （CLAUDE.md §5.2 決まり②「読む側に if を増やさない」）。
+     部品が何個増えても、この関数は1行も変わりません。
+   ================================================================== */
+
+/* その部品のキーが載っている SC の id。
+   既存のキー（Ctrl+Z など）に相乗りするものは scId、それ以外は part.<key>。
+   ★同じキーを2か所に登録しない（正を1つに保つ）。 */
+function partScId(d){ return d.scId || ('part.' + d.key); }
+
+/* その部品がどの画面のものか。⚙設定の「どの画面のキーか」欄と、
+   パレットの見出しの【両方】がこの1つの欄から決まります。
+   ★同じことを言う欄を2つ作らない（#13 / #27）。
+   ★既定は「メモ画面の部品なら メモ、それ以外は DB」。
+     共通（どちらの画面からでも使える）ものだけ、明示的に '共通' と書きます。
+     ★既定を '共通' にしないこと … DB専用の部品が共通のふりをすると、
+       メモ画面で上のほうに浮いてきます（黙って邪魔になる）。 */
+function partScWhere(d){
+  if(d.scWhere) return d.scWhere;
+  return (String(d.key).indexOf('md.') === 0) ? 'メモ' : 'DB';
+}
+
+/* 画面 → パレットの見出し（登録簿。増やすときは1行）。
+   ★見出しは【既存の3つ】に合わせます。palSortByScreen() は PAL_GROUP_SCR で
+     見出しごとに both/db/md を持っており、いま居る画面のものを上に出します。
+     新しい見出しを作ると、その登録簿に載っていないので全部 both 扱いになり、
+     「メモ画面なのに台帳の道具が上に来る」が起きます（2026-09-09 に実測）。 */
+var PART_CMD_GROUP = {'共通':'操作', 'DB':'台帳の操作', 'メモ':'メモ（Markdown）'};
+function partCmdGroup(d){ return PART_CMD_GROUP[partScWhere(d)] || '操作'; }
+
+/* 部品1件を、パレットのコマンドの形にする。動きが無い部品は null。 */
+function partAsCommand(d){
+  var key = d.key, act = d.run || d.focus;
+  if(typeof act !== 'function') return null;
+  return {
+    id     : d.cmdId || ('part.' + key),
+    partKey: key,
+    /* ★見出しは部品のグループ名（ファイル操作 等）ではなく【画面】で決めます。
+       部品のグループは画面をまたいでいるため（file に DBの保存とメモの保存が
+       同居）、グループ名を見出しにすると必ず取り違えが残ります。 */
+    group  : partCmdGroup(d),
+    icon   : d.icon || '\uD83E\uDDE9',
+    label  : d.label || key,
+    hint   : mdKeyHint(partScId(d)),
+    kw     : (d.kw || '') + ' ' + key,
+    run    : function(){
+      /* ★工程4 の when がここで効く。「キーは効いたのに何も起きない」を
+         「なぜ使えないか言う」に変える（決-69）。黙って落とさない。 */
+      if(!partCan(key)){
+        try{ say((d.label || key) + ' は、いまは使えません。', 'err'); }catch(e){}
+        return;
+      }
+      try{ act(); }
+      catch(e){ try{ say('実行できませんでした: ' + e.message, 'err'); }catch(e2){} }
+    }
+  };
+}
+
+function partsAsCommands(){
+  var out = [], i, c;
+  loadParts();
+  for(i = 0; i < PARTS.length; i++){
+    c = partAsCommand(PARTS[i]);
+    if(c) out.push(c);
+  }
+  return out;
+}
+
+/* 部品を回って、ショートカットの登録簿(SC)へ流し込む。
+   ★登録は【別関数】にする — 利用者の明示的な指示（決-65 (10)）。
+     基礎板もキー処理も、この関数の中身を知りません。
+   ★何度呼ばれても増えません（loadMeta() から繰り返し呼ばれます）。 */
+var PART_KEYS_BOUND = false;
+function registerPartHotkeys(){
+  var W = window.WDT, i, d, n = 0;
+  if(!W || typeof W.addShortcut !== 'function') return 0;
+  loadParts();
+  for(i = 0; i < PARTS.length; i++){
+    d = PARTS[i];
+    if(typeof d.run !== 'function' && typeof d.focus !== 'function') continue;
+    if(d.scId) continue;              /* 既存のキーに相乗り。二重に作らない */
+    if(d.scOn === false) continue;    /* 一覧に出さない指定 */
+    if(W.addShortcut({id: 'part.' + d.key, label: d.label || d.key,
+                      where: partScWhere(d),
+                      def : d.sc ? [d.sc] : []})) n++;
+  }
+  if(!PART_KEYS_BOUND){ bindPartHotkeys(); PART_KEYS_BOUND = true; }
+  return n;
+}
+
+/* 部品を回って、run を持つものを「動作の棚」へ流し込む（第5段 工程6・決-79）。
+   ★登録は【別関数】にする — 決-65 (10) と同じ流儀（分岐点1・案B）。
+     registerPart はこの関数の存在を知らない。
+   ★何度呼ばれても壊れない … 同じ key は同じ関数で上書きされるだけ（実質何も変わらない）。
+     これで「run を持つ部品41件は初日から自動で registerAction に載る」
+     （改良/L-01_スキン/06_第5段の確定設計.md §6）が実現する。 */
+function seedActionsFromParts(){
+  var i, d, n = 0;
+  loadParts();
+  for(i = 0; i < PARTS.length; i++){
+    d = PARTS[i];
+    if(typeof d.run === 'function' && registerAction(d.key, d.run)) n++;
+  }
+  return n;
+}
+
+/* キーの受け口（1つだけ）。 */
+function bindPartHotkeys(){
+  document.addEventListener('keydown', function(e){
+    var W = window.WDT, i, d;
+    if(!W || typeof W.matches !== 'function') return;
+    if(W.isRecording && W.isRecording()) return;
+    if(e.isComposing || e.keyCode === 229) return;   /* IME 変換中（落とし穴 #10）*/
+    for(i = 0; i < PARTS.length; i++){
+      d = PARTS[i];
+      if(typeof d.run !== 'function' && typeof d.focus !== 'function') continue;
+      if(d.scOn === false) continue;
+      if(d.scId) continue;            /* 既存のキーは既存の受け口が処理する */
+      if(!W.matches(e, 'part.' + d.key)) continue;
+      e.preventDefault(); e.stopPropagation();
+      if(!partCan(d.key)){
+        try{ say((d.label || d.key) + ' は、いまは使えません。', 'err'); }catch(e2){}
+        return;
+      }
+      try{ (d.run || d.focus)(); }catch(e2){}
+      return;
+    }
+  }, true);
 }
 
 /* いま使えるか … when が無ければいつでも true。知らない部品は false（黙って true にしない）。 */
@@ -20889,6 +21379,32 @@ function effTagsOf(part){
 }
 
 /* ---- 取り付け … 種類の登録簿に任せる（読む側に if を増やさない）----- */
+/* ==================================================================
+   Ver1.19.20 (L-06 第5段 工程4.5 土台2)  scope の箱を作る
+   ------------------------------------------------------------------
+   ★器（#app-db / #app-md）の外へ部品を出すとき、その部品を包む箱。
+     class を付けると CSS が届き（:is(#app-db,.db-scope) …）、
+     data-theme を写すと暗い配色も届く。
+
+   ★★「箱を作る人が両方を忘れずに付ける」決まりにしない。
+     忘れても誰も教えてくれず、黙って色だけ変わるから（2026-09-08 実測）。
+     箱を作る口を1つにして、ここで面倒を見る。木もアドオンもテストもこれを呼ぶ。
+   ================================================================== */
+var SCOPE_OF = {db: 'db-scope', md: 'md-scope'};
+var SCOPE_SRC = {db: 'app-db', md: 'app-md'};
+
+function scopeBox(side, el){
+  var cls = SCOPE_OF[side];
+  if(!cls) return null;                       /* 知らない側は作らない（黙って作らない）*/
+  var box = document.createElement('div');
+  box.className = cls;
+  var src = document.getElementById(SCOPE_SRC[side]);
+  var th  = src ? src.getAttribute('data-theme') : null;
+  if(th) box.setAttribute('data-theme', th);   /* 暗い配色をそのまま持っていく */
+  if(el) box.appendChild(el);
+  return box;
+}
+
 function mountPart(key, box){
   var d = partDef(key), k;
   if(!d) return false;
@@ -20939,6 +21455,12 @@ registerSkin({key:'std', label:'標準（縦に並べる）',
 /* ---- 起動時に1回だけ ------------------------------------------------ */
 function skinBoot(){
   loadParts();
+  /* Ver1.19.21 (工程5): 部品を ⚙設定 のショートカット一覧へ流し込む。
+     ★何度呼ばれても増えません（addShortcut が既存 id を弾く）。 */
+  try{ registerPartHotkeys(); }catch(e){}
+  /* Ver1.19.22 (工程6): run を持つ部品を「動作の棚」へ流し込む。
+     ★何度呼ばれても増えません（同じ key は上書きされるだけ）。 */
+  try{ seedActionsFromParts(); }catch(e){}
   try{ applySkin(loadLayout().skin); }catch(e){}
   return currentSkin();
 }
@@ -21217,6 +21739,7 @@ window.RTTPARTS = {
   unregisterPart: unregisterPart,
   registerArea  : registerArea,
   registerSkin  : registerSkin,
+  scopeBox      : scopeBox,      /* 第5段 工程4.5 土台2: scope の箱を作る唯一の口 */
   partDef       : partDef,
   partEl        : partEl,
   partElId      : partElId,
@@ -21228,6 +21751,19 @@ window.RTTPARTS = {
   applySkin     : applySkin,
   currentSkin   : currentSkin,
   skinBoot      : skinBoot,
+  /* ---- 第5段 工程5: キーとパレットへの流し込み ---- */
+  partsAsCommands   : partsAsCommands,
+  registerPartHotkeys: registerPartHotkeys,
+  partScId      : partScId,
+  /* ---- 第5段 工程6: 動作の登録簿とマクロ（決-79） ---- */
+  registerAction    : registerAction,
+  runAction         : runAction,
+  seedActionsFromParts: seedActionsFromParts,
+  actionNames       : function(){ var k, out = [];
+                                   for(k in ACTIONS){
+                                     if(Object.prototype.hasOwnProperty.call(ACTIONS, k)) out.push(k);
+                                   }
+                                   return out; },
   /* ---- 第5段 工程4: 部品の口 ---- */
   partCan       : partCan,
   /* ---- 第5段 工程3: 貼り札と開閉表 ---- */
@@ -21386,8 +21922,6 @@ function buildCommands(showHidden){
             kw:'db kirokudaicho daicho 台帳 でーたべーす', run:function(){ toDb(); }});
   out.push({id:'mode.md', group:'画面', icon:'\uD83D\uDCDD', label:'Markdownメモを開く', hint:'Ctrl+Alt+M',
             kw:'md memo memo markdown めも', run:function(){ if(typeof window.setAppMode === 'function') window.setAppMode('md'); }});
-  out.push({id:'app.settings', group:'画面', icon:'\u2699', label:'設定を開く', hint:'Ctrl+,',
-            kw:'settei setting config せってい', run:function(){ if(window.WDT && WDT.openSettings) WDT.openSettings(); }});
 
   /* --- セクションへ飛ぶ --- */
   for(i = 0; i < SECTIONS.length; i++){
@@ -21431,33 +21965,18 @@ function buildCommands(showHidden){
   }
 
   /* --- よく使う操作 --- */
-  out.push({id:'db.save', group:'操作', icon:'\uD83D\uDCBE', label:'上書き保存', hint:'元のファイルへ',
-            kw:'hozon save uwagaki ほぞん うわがき', run:call('saveDbOverwrite')});
-  out.push({id:'db.saveAs', group:'操作', icon:'\uD83D\uDCBE', label:'名前を付けて保存', hint:'Ctrl+Shift+S',
-            kw:'hozon save namae ほぞん なまえ', run:call('saveDbAs')});
-  out.push({id:'db.open', group:'操作', icon:'\uD83D\uDCC2', label:'DBファイルを開く',
-            kw:'hiraku open file ひらく', run:call('openDbPicker')});
-  out.push({id:'db.undo', group:'操作', icon:'\u21B6', label:'元に戻す', hint:'Ctrl+Z',
-            kw:'undo modosu もどす', run:call('undo')});
-  out.push({id:'db.redo', group:'操作', icon:'\u21B7', label:'やり直す', hint:'Ctrl+Y',
-            kw:'redo yarinaosu やりなおす', run:call('redo')});
+  /* --- 部品（RTTPARTS）から作るコマンド（Ver1.19.21・工程5）---
+     ★ここに在った「操作」「台帳の操作」の12件は、部品へ一本化しました。
+       同じ動きを2か所に書くと、片方だけ直して食い違います（#13 / #27）。
+       動きの正は部品（PART_ACTION）にあり、パレットはそこから作られます。
+     ★id は cmdId で引き継いでいます。利用者が隠したコマンド・付けた
+       呼び出し語・使用回数は id で保存されているので、消さずに済みます。 */
+  out = out.concat(partsAsCommands());
+
   out.push({id:'sec.openAll', group:'台帳の操作', icon:'\u25BC', label:'すべてのセクションを開く',
             kw:'zenbu hiraku ひらく ぜんぶ', run:function(){ allSections(true); }});
   out.push({id:'sec.closeAll', group:'台帳の操作', icon:'\u25B2', label:'すべてのセクションを折りたたむ',
             kw:'zenbu tojiru とじる ぜんぶ', run:function(){ allSections(false); }});
-  out.push({id:'db.theme', group:'操作', icon:'\uD83C\uDF19', label:'ダーク／ライトを切り替え',
-            kw:'dark light theme いろ てーま', run:call('toggleTheme')});
-  out.push({id:'db.tags', group:'台帳の操作', icon:'\uD83C\uDFF7', label:'タグの管理',
-            kw:'tag tagu たぐ', run:function(){
-              toDb();
-              if(typeof window.openTagManager === 'function'){
-                var t = null;
-                try{ t = window.WorkDB && WorkDB.getCurrentTable ? WorkDB.getCurrentTable() : null; }catch(e){}
-                try{ window.openTagManager(t, ''); }catch(e){ say('タグの管理を開けませんでした', 'err'); }
-              }
-            }});
-  out.push({id:'db.cols', group:'台帳の操作', icon:'\u2699', label:'表示する列を選ぶ',
-            kw:'retsu column hyouji れつ', run:function(){ gotoSection('secSearch'); setTimeout(call('toggleColPanel'), 380); }});
   /* --- Ver1.10.00 で足した機能 --- */
   out.push({id:'db.advsearch', group:'検索', icon:'\uD83E\uDDEE', label:'くわしい検索（AND / OR / NOT・最大5段）',
             kw:'and or not kuwashii detail sagasu くわしい けんさく じょうけん',
@@ -21470,9 +21989,6 @@ function buildCommands(showHidden){
               }, 380);
             }});
   /* --- Ver1.13.00 で足した機能 --- */
-  out.push({id:'db.xsearch', group:'検索', icon:'\uD83D\uDD0E', label:'全項目（全テーブル）を横断検索',
-            kw:'oudan yokodan zenbu zenkomoku cross search ゆこうだん おうだん すべて さがす',
-            run:function(){ toDb(); if(typeof window.openCrossSearch === 'function') window.openCrossSearch(); }});
   out.push({id:'db.moverules', group:'台帳の操作', icon:'\u27A1', label:'項目間の「移動ルール」を設定する',
             kw:'idou rule ru-ru いどう るーる うつす',
             run:function(){
@@ -21485,15 +22001,10 @@ function buildCommands(showHidden){
   out.push({id:'db.backups', group:'操作', icon:'\uD83D\uDD50', label:'控え（バックアップ）の一覧',
             kw:'backup hikae modosu ひかえ もどす ばっくあっぷ',
             run:function(){ toDb(); if(typeof window.openBackupList === 'function') window.openBackupList(); }});
-  out.push({id:'db.newrow', group:'台帳の操作', icon:'\u2795', label:'新しい行を登録する（入力欄へ移動）',
-            kw:'atarashii tuika touroku あたらしい ついか とうろく にゅうりょく',
-            run:function(){ toDb(); if(typeof window.gotoNewEntry === 'function') window.gotoNewEntry(); }});
   out.push({id:'db.csv', group:'台帳の操作', icon:'\u21E9', label:'CSVで書き出す',
             kw:'csv export kakidashi かきだし', run:call('exportCsv')});
   out.push({id:'db.txt', group:'台帳の操作', icon:'\u21E9', label:'TXTで書き出す',
             kw:'txt export kakidashi かきだし', run:call('exportTxt')});
-  out.push({id:'db.mdcell', group:'台帳の操作', icon:'\uD83D\uDCDD', label:'長文列のMarkdown表示を切り替え',
-            kw:'markdown md hyouji ちょうぶん', run:call('toggleGridMarkdown')});
   out.push({id:'db.colwidth', group:'台帳の操作', icon:'\u2194', label:'表の列幅をリセット',
             kw:'haba width reset はば', run:function(){ if(window.RTT19 && RTT19.resetWidths) RTT19.resetWidths(); }});
   out.push({id:'db.selfcheck', group:'操作', icon:'\uD83D\uDD12', label:'自己点検（ファイルが書き換えられていないか）',
