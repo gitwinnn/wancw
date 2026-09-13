@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.23</title>
+<title>記録台帳＋MDメモ Ver1.19.34</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -1388,8 +1388,13 @@ background:var(--bg-0);
     font-family:var(--mono);font-size:14.5px;line-height:1.65;
     padding:16px 18px;tab-size:2;white-space:pre-wrap;word-break:break-word;
   }
-:is(#app-md,.md-scope) .divider{width:5px;background:var(--bg-1);cursor:col-resize;flex:none;}
+:is(#app-md,.md-scope) .divider{width:5px;background:var(--bg-1);cursor:col-resize;flex:none;position:relative;}
 :is(#app-md,.md-scope) .divider:hover{background:var(--accent);}
+/* D-11 工程8（決-99）… 横用・縦用の透明な取っ手を重ねて置く。
+   基礎板(RTT21)には触れず、CSSの表示切り替えだけで交通整理する。
+   ★同じ要素に2回 attach しないので、二重取り付けガードにも触れない。 */
+:is(#app-md,.md-scope) .divider .rtt-d8-x{position:absolute;inset:-3px;cursor:col-resize;display:block;}
+:is(#app-md,.md-scope) .divider .rtt-d8-y{position:absolute;inset:-3px;cursor:row-resize;display:none;}
 :is(#app-md,.md-scope) .preview-pane{
     flex:1;min-width:0;overflow-y:auto;background:var(--bg-1);
     padding:20px 28px;
@@ -1513,6 +1518,15 @@ background:var(--bg-0);
 .wdtx-modal input[type=color]{ width:40px; height:27px; padding:0; border:1px solid #3d4046; background:#12141a; border-radius:5px; }
 .wdtx-row{ display:flex; align-items:center; gap:10px; flex-wrap:wrap; margin:7px 0; }
 .wdtx-row > .lbl{ flex:0 0 200px; color:#c7ccd4; }
+/* ---- Ver1.19.27 (L-01 第5段 工程10・乙A) 木の組み替えのドラッグ ----------
+   ★見た目は既存の .tgm-row（項目管理のタグ並べ替え・1121行）にそろえる。
+     掴んでいる行は薄く、落とし先は枠を光らせる。同じ操作は同じ見た目にする。
+   ★.over-before と .over-in で「前に入る」「中に入る」を描き分ける。
+     どちらになるかを【落とす前に】見せないと、やってみるまで分からない。 */
+.rtt-edit-row .grip{ cursor:grab; color:#9aa4b2; font-size:13px; user-select:none; }
+.rtt-edit-row.drag{ opacity:.45; }
+.rtt-edit-row.over-before{ box-shadow:0 -2px 0 0 #6ea8fe; }
+.rtt-edit-row.over-in{ box-shadow:0 0 0 1px #6ea8fe inset; background:#1b2230; }
 .wdtx-tbl{ width:100%; border-collapse:collapse; font-size:12.5px; }
 .wdtx-tbl th, .wdtx-tbl td{ border-bottom:1px solid #2b2f37; padding:5px 6px; text-align:left; vertical-align:middle; }
 .wdtx-tbl th{ color:#9aa4b2; font-weight:600; }
@@ -1623,6 +1637,8 @@ body.wdt-mobfix :is(#app-md,.md-scope) .pane-wrap.active{ flex-direction:column;
 body.wdt-mobfix :is(#app-md,.md-scope) .editor-pane,
 body.wdt-mobfix :is(#app-md,.md-scope) .preview-pane{ min-height:0; min-width:0; }
 body.wdt-mobfix :is(#app-md,.md-scope) .divider{ width:auto; height:12px; cursor:row-resize; touch-action:none; }
+body.wdt-mobfix :is(#app-md,.md-scope) .divider .rtt-d8-x{ display:none; }
+body.wdt-mobfix :is(#app-md,.md-scope) .divider .rtt-d8-y{ display:block; touch-action:none; }
 body.wdt-mobfix :is(#app-md,.md-scope) .preview-pane{ padding:14px; }
 body.wdt-mobfix :is(#app-md,.md-scope) .editor-pane textarea{ padding:12px; }
 body.wdt-mobfix :is(#app-md,.md-scope) .modal{ width:96vw; max-height:86dvh; }
@@ -1631,6 +1647,59 @@ body.wdt-mobfix :is(#app-md,.md-scope) .checklist-grid{ grid-template-columns:1f
    （下のバーが隠れる端末でも確実に押せるようにするための二重の保険） */
 :is(#app-md,.md-scope) #topbar .viewmode{ display:flex; gap:6px; width:100%; margin-top:2px; }
 :is(#app-md,.md-scope) #topbar .viewmode button{ flex:1 1 0; padding:9px 4px; font-size:13.5px; }
+
+/* ==================================================================
+   アドオン：表の行の高さ（body.wdt-rowfix ／ --rtt-rowh）
+   D-06 工程3・決-94・2026-09-13
+   ------------------------------------------------------------------
+   ★何が 79px を作っていたか（ダミー50件で実測）
+       ・「操作」列のボタン3つ（⧉ ➡ 🗑）が【縦積み】… .opwrap が 72px ← 最大の原因
+       ・長文列の「📝 メモで開く」23px ＋ 本文 20px ＝ 43px
+     表の入れ物は max-height:620px なので、79px では 7行しか入らなかった。
+
+   ★ここがいちばん大事な学び（実測 2026-09-13）
+       height は【表の欄では「最低の高さ」にしかならない】。だから height を
+       指定しただけでは揃わず、34 / 40 / 47 / 61px が混ざった。
+       **文字の折り返しを止めて1行に収める**ことで、初めて全行が揃う。
+       ★これは決-89 が前回踏んだのと同じ形（詰め方が長文列にしか効いておらず、
+         短い文字の列に届いていなかった）。長文列だけに効かせないこと。
+   ================================================================== */
+body.wdt-rowfix :is(#app-db,.db-scope) #results table.grid tbody td{
+  height:var(--rtt-rowh); max-height:var(--rtt-rowh);
+  padding-top:0; padding-bottom:0;
+  overflow:hidden; vertical-align:middle; position:relative;
+}
+/* ★全部の欄に効かせる。ここを長文列だけにすると、短い文字の列が
+   勝手に2行へ折り返して高さがバラつく（上の「いちばん大事な学び」）*/
+body.wdt-rowfix :is(#app-db,.db-scope) #results table.grid tbody td,
+body.wdt-rowfix :is(#app-db,.db-scope) #results table.grid tbody td *{
+  white-space:nowrap;
+}
+body.wdt-rowfix :is(#app-db,.db-scope) #results table.grid tbody td{
+  text-overflow:ellipsis;
+}
+/* 「操作」列のボタンを縦積みから横並びへ（ここが 72px の正体） */
+body.wdt-rowfix :is(#app-db,.db-scope) #results table.grid tbody .opwrap{
+  flex-direction:row; gap:1px; align-items:center; height:var(--rtt-rowh);
+}
+body.wdt-rowfix :is(#app-db,.db-scope) #results table.grid tbody .opbtn{
+  height:calc(var(--rtt-rowh) - 10px); max-height:22px; width:20px;
+  font-size:11px; line-height:1; padding:0;
+}
+body.wdt-rowfix :is(#app-db,.db-scope) #results table.grid tbody .mdbody{
+  max-height:var(--rtt-rowh); overflow:hidden;
+}
+body.wdt-rowfix :is(#app-db,.db-scope) #results table.grid tbody .mdbody p{ margin:0; }
+/* 「📝 メモで開く」は、その欄にマウスを乗せたときだけ浮かせて出す。
+   ★position:absolute で浮かせるので、出ても行の高さは変わらない
+     （display の出し入れにすると、出た瞬間に行が伸びて絵が踊る）*/
+body.wdt-rowfix :is(#app-db,.db-scope) #results table.grid tbody .mdcell-open{
+  position:absolute; right:2px; top:50%; transform:translateY(-50%);
+  opacity:0; transition:opacity .12s; font-size:10px; padding:0 4px; z-index:3;
+}
+body.wdt-rowfix :is(#app-db,.db-scope) #results table.grid tbody td:hover .mdcell-open{
+  opacity:1;
+}
 
 /* ==================================================================
    アドオン：指で押しやすい大きさ（body.wdt-bigtap）
@@ -2360,7 +2429,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.23</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.34</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2526,6 +2595,21 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.34 で増えたこと（表の行の高さも、ドラッグでその場で変えられるようになりました）：</strong>①<b>表の行と行の境目</b>にマウスを近づけると、上下にドラッグできるつまみが出ます。<b>どの行の境目をつかんでも、表の全部の行がいっしょに高さを変えます</b>（列幅や仕切り線と違い、行の高さは1つの数字で全体を決めているためです）。②ドラッグ中はマウスのそばに<b>いまの高さ（px）</b>が出ます。<b>Shift を押しながら</b>動かすと、目盛りに吸い付きます。③新しい高さは<b>DBファイルの中</b>に入るので、⚙設定の「📏 表の行の高さ」を選んだときと同じように、別のパソコンで開いても覚えています。これで<b>表の列幅・表の行の高さ・MDメモの仕切り線</b>の3か所すべてが、同じ「ドラッグの土台」の上に載りました。</p>
+      <p><strong>Ver1.19.33 で増えたこと（MDメモの仕切り線も、Shift を押しながらで「丁度いい所」に吸い付くようになりました）：</strong>①<b>Markdownメモの「編集」と「できあがり」の間の仕切り線</b>をドラッグするとき、<b>Shift を押しながら</b>動かすと<b>「半分（50:50）」にひゅっと吸い付きます</b>。表の列幅と同じ仕組みです。②スマホ表示（上下に積む表示）でも、同じ仕組みで縦にドラッグできます。③<b>仕切りの位置は、これまでこのパソコンのブラウザだけに覚えていましたが、この版から DB ファイルの中に入るようになりました。</b>別のパソコンで同じファイルを開いても、同じ位置から始まります。</p>
+      <p><strong>Ver1.19.32 で増えたこと（列の幅が最初から詰まり、ドラッグ中に「丁度いい所」へ吸い付くようになりました）：</strong>①<b>表を開いたときの列の幅が、中身に合わせて最初から詰まります。</b>これまでは「担当者」の列が中身は「田中」の2文字なのに <b>240ピクセル</b>もありました。原因は<b>見出しの「担当者・一緒に作業した人」という文字</b>です。この版から<b>見出しは1行に収めて「…」で切り</b>（マウスを乗せると全文が出ます）、<b>列の幅は「いま画面に見えている行」の中身に合わせます</b>。実測では、これまで画面からはみ出していた「登録日時」まで<b>11列すべてが1画面に収まる</b>ようになりました。②<b>列の境目をドラッグすると、マウスのそばに今の幅（例：240px）が出ます。</b>③<b>Shift を押しながら</b>動かすと<b>「丁度いい所」にひゅっと吸い付きます</b>。吸い付く先は<b>青い点線</b>で示され、3種類あります ── <b>「⇔ ぴったり」</b>（表に出ている全部の行で文字が切れない幅）、<b>「▣ 見える範囲」</b>（いま画面に映っている行で切れない幅）、<b>「▤ 5文字ぶん」</b>ごとの目盛り。④<b>⚙ 設定 → アドオン → 「🧲 ドラッグ中に『丁度いい所』へ吸い付くキー」</b>で、<b>Shift / Ctrl / Alt / 使わない</b>から選べます。※<b>一度ドラッグして決めた幅は、これまでどおり覚えています</b>（自動で詰め直したりしません）。<b>つまみをダブルクリック</b>すれば、その列だけ自動の幅に戻ります。</p>
+
+      <p><strong>Ver1.19.31 で増えたこと（次の版で使う「ドラッグの土台」を入れました。画面の見た目はまだ変わりません）：</strong>この版は<b>準備の版</b>です。いまの画面でできることは、Ver1.19.30 とまったく同じです。何を入れたかというと、<b>「つまんで動かす」ときの共通の仕組み</b>です。①動かしている間、<b>マウスのそばに小さな札</b>が出て、いまの数字（例：<b>240px</b>）が読めます。②<b>Shift を押しながら</b>動かすと、<b>ちょうど良い所にひゅっと吸い付きます</b>。吸い付く先は<b>青い点線</b>で示されます。吸い付く先は2種類で、<b>「ぴったり」（文字が切れずに収まる所）</b>と<b>「5文字ぶんごと」（いまの文字の大きさが基準）</b>です。③<b>Shift 以外（Ctrl / Alt／使わない）にも変えられます</b>。※これらは<b>まだどの場所にも取り付けていません</b>。次の版から、<b>表の列の幅・表の行の高さ・メモ画面の仕切り線</b>の3か所が、順にこの土台の上に載ります。<b>3か所を別々に作らない</b>ので、あとから直すときも1か所を直すだけで3つとも直ります。</p>
+
+      <p><strong>Ver1.19.30 で増えたこと（表の行が薄くなり、一度に見える行が倍になりました）：</strong>これまで表の1行は <b>79ピクセル</b>もあり、画面には<b>7行しか入りませんでした</b>。原因は<b>「操作」の列にあるボタン3つ（⧉ ➡ 🗑）が縦に積まれていた</b>ことです。この3つのために、全部の行が3行ぶんの高さになっていました。この版からボタンを<b>横並び</b>にし、余白を詰め、文字を1行に収めるようにしたので、<b>同じ画面で15行</b>見えるようになりました（実測・ダミー50件）。<b>文字の大きさは変えていません。</b>長い文は末尾が「…」で切れますが、<b>その欄にマウスを乗せると「📝 メモで開く」が出て全文を読めます</b>。※<b>⚙ 設定 → アドオン → 「📏 表の行の高さ」</b>で、<b>ゆったり（いままでどおり・約7行）／ふつう（おすすめ・約15行）／ぎっしり（約20行）</b>の3つから選べます。<b>「ゆったり」を選べば、いつでも今までどおりに戻せます。</b>この設定もDBファイルの中に入るので、別のパソコンへ持っていっても付いてきます。</p>
+
+      <p><strong>Ver1.19.29 で増えたこと（列の幅が、DBファイルと一緒に旅をするようになりました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。表の列幅をドラッグで調節すると、これまでも次に開いたとき同じ幅に戻りました。ただし<b>その記録は「そのパソコンのそのブラウザの中」だけ</b>に残っていたため、<b>同じ .sqlite ファイルを別のパソコンへ持っていくと、列幅だけが自動の幅に戻って</b>いました。1つのファイルで持ち運べるのが、この道具のいちばんの取り柄なのに、<b>設定だけがファイルの外に居た</b>わけです。この版から、列幅は<b>DBファイルの中</b>（<code>_meta_opts</code>）に入ります。<b>会社のパソコンのように、ブラウザの保存領域が塞がれている環境でも効きます。</b>いま幅を設定している方の記録は、<b>最初に表を開いたときに自動でDBへ引っ越します</b>（何もしなくてかまいません）。※記録は「項目（テーブル）ごと・列の見出しごと」に残るので、表示する列を増やしたり減らしたりしても、同じ列に同じ幅が戻ります。</p>
+
+      <p><strong>Ver1.19.28 で増えたこと（見た目は変わりません・実機で見つけた不具合を直しました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。「木の組み替え」の「部品を1つ置く」の選択肢から、<b>Markdownメモ画面の部品（メモの本文など）</b>が消えました。これらを木に置くと、<b>メモ画面を開いたときに本文が空になる</b>という不具合があったためです（気づいてすぐ、その場で修正しました）。記録台帳の3つの部品（検索・新規登録・項目管理）は、これまでどおり選べます。</p>
+      <p><strong>Ver1.19.27 で増えたこと（画面編集の並べ替えが、掴んで動かせるようになりました）：</strong>「⚙ 設定 &gt; 🌳 画面編集」の<b>木の組み替え</b>で、各行の左に <b>⠿</b> の取っ手が付きました。<b>行を掴んで動かせます</b>。落とす場所で入り方が変わります。行の<b>上半分</b>に落とすと<b>その行の前</b>へ、行の<b>下半分</b>に落とすと<b>その行の中</b>へ入ります（タブや折りたたみなど、中に入れられる行のときだけ）。これで<b>「タブの中に入れる」「階層の外に出す」</b>といった、これまで▲▼ボタンではできなかった動かし方ができます。※<b>▲▼ボタンは今までどおり残してあります。</b>ドラッグが効かない環境でも困りません。※記録台帳の画面そのものは<b>まだ掴めません</b>（普通に使っているときに、うっかり動いてしまわないようにするためです）。実際の画面を直接組み替える機能は、後の版で「組み替えモード」として用意する予定です。</p>
+      <p><strong>Ver1.19.26 で増えたこと（「⚙ 設定 &gt; 🌳 画面編集」タブが増えました）：</strong>これまでコードでしか作れなかった「画面の並べ方」を、画面の中から組み立てられるようになりました。<b>木の組み替え</b>…「項目管理」「新規登録」「検索・表示・編集」の3つを、ボタン（＋追加／▲▼並べ替え／削除）で好きな形（縦横・仕切り・タブ・折りたたみ）に組み立てられます。組み立てた形は「🖥 表示 &gt; 画面の構成」の<b>「自分で組み替え（カスタム）」</b>を選ぶと画面に出ます。<b>コンボ作成</b>…よく使うタグの組み合わせに、自分で名前を付けられるようになりました。<b>表示・非表示</b>…画面の部品ひとつひとつを、チェックを外すだけで隠せます。※どれも<b>DBファイルの中に覚えます</b>ので、次に開いたときも同じ形で始まります。標準の並べ方を使っているあいだは<b>画面は1ピクセルも変わりません</b>。</p>
+      <p><strong>Ver1.19.25 で増えたこと（画面の並べ方を「⚙ 設定」から選べるようになりました）：</strong>「⚙ 設定 &gt; 🖥 表示」の一番上に<b>「画面の構成（スキン）」</b>が増えました。いまは4つから選べます。<b>標準（縦に並べる）</b>…これまでどおり。<b>タブ切り替え</b>…項目管理・新規登録・検索の3つを上のタブでカチッと切り替えます。<b>アコーディオン</b>…並びは標準のまま、1つ開くと他が自動で閉じます。<b>階層（折りたたみ）</b>…同じ3つを開閉できる形で並べます。選んだ並べ方は<b>DBファイルの中に覚えます</b>ので、次に開いたときも同じ画面で始まります（会社のパソコンでも効きます）。※これまで「🧩 アドオン」の中にあった<b>「📖 セクションは1つだけ開く」のチェックは、「アコーディオン」という並べ方に一本化しました</b>。以前ONにしていた方は、最初に開いたときに自動で「アコーディオン」へ移ります。設定画面が1行ぶん短くなり、画面を広く使えます。</p>
+      <p><strong>Ver1.19.24 で増えたこと（仕切りを掴んで、部屋の広さを変えられるようになりました）：</strong>新しい並べ方（タブ・階層）の中に、<b>左右や上下を分ける仕切り</b>を置ける仕組みがあります。この版から、その<b>仕切りをマウスや指で掴んで動かせる</b>ようになりました。動かした幅は<b>DBファイルの中に覚えます</b>ので、会社のパソコンでも効きますし、<code>.sqlite</code> と一緒に持ち運べます。★<b>覚えるのは、あなたが動かした側だけ</b>です。反対側は「余った分だけ」広がるので、窓の大きさを変えても窮屈になりません。★<b>動かしていないものは何も記録しません</b>（設定が勝手に増えません）。※いまの「標準（縦に並べる）」を選んでいるあいだは、<b>画面は1ピクセルも変わりません</b>。仕切りを使う並べ方は、次の版で設定から選べるようにします。</p>
       <p><strong>Ver1.19.23 で増えたこと（項目管理・新規登録・検索を、タブか折りたたみで並べられるようになりました）：</strong>「⚙ 設定」から選べる新しい並べ方が2つ増えました（設定画面の選択肢はまだ次の版で出す予定で、いまは開発中の機能です）。<b>タブ切り替え</b>…「項目（テーブル）管理」「新規登録」「検索・表示・編集」の3つを、上のタブでカチッと切り替えられます。<b>階層（折りたたみ）</b>…同じ3つを、開閉できる階層として並べます。★いつもの「標準（縦に並べる）」を選んでいるあいだは<b>画面は1ピクセルも変わりません</b>。どちらの並べ方でも、検索・入力・保存はこれまでどおり使えます。「📖 アコーディオン（1つ開くと他が閉じる）」の設定は、タブ・階層の並べ方では自動的に働かなくなります（矛盾した動きを避けるためです）。</p>
       <p><strong>Ver1.19.22 で増えたこと（見た目は変わりません・複数の操作をまとめる土台を入れました）：</strong>画面の見た目も操作も<b>まったく変わりません</b>。将来「いくつかの操作をまとめて1回で実行する」機能（マクロ）を作るための土台だけを、中に静かに置きました。入れたのは2つです。<b>①動作の棚</b>…「上書き保存」「今日へ」のような既にある52個の部品の動きに、<b>名前で呼び出せる</b>ようにしました。<b>②マクロという新しい部品の種類</b>…「この動作、次にこの動作…」と<b>手順を並べるだけ</b>で、順番に実行してくれる部品を作れるようになりました。手順の途中で動かせないものがあれば、そこで<b>はっきり止めて知らせます</b>（黙って続けて中途半端に終わることはありません）。※いまはこの土台を使ってマクロを作る画面がまだ無いので、開発用の準備です。使い方も見た目も今までどおりです。</p>
       <p><strong>Ver1.19.21 で増えたこと（画面のボタンが、ぜんぶキーボードから届くようになりました）：</strong>これまで、上の段に並んだボタン（上書き保存・タグの管理・今日へ など）は<b>マウスで押すしかありません</b>でした。この版から、<b>それらが「部品」としてコマンドパレットに出ます</b>。<b>［Ctrl+K］を押して名前を打ち、Enter</b> で実行できます。「hozon」「ほぞん」のようにローマ字・かなでも探せます。<b>好きなキーを自分で割り当てられます</b>…「⚙ 設定 &gt; ショートカットキー」の一覧に部品が並ぶようになったので、「変更」を押して好きなキーを覚えさせてください。※<b>こちらから勝手に新しいキーを割り当てていません</b>。Ctrl と英字の組み合わせは残りが少なく、環境によってはブラウザや日本語入力に横取りされて「押しても効かない」が黙って残るためです。既定は<b>「（未割り当て）」</b>で、選ぶのはあなたです。※<b>使えないときは理由が出ます</b>…DBを開いていないのに「上書き保存」を呼ぶと、これまでは何も起きませんでしたが、これからは「いまは使えません」と出ます。※パレットの中身も整理しました。同じ操作が2か所に書かれていたものを<b>部品ひとつにまとめた</b>ので、片方だけ直して食い違うことがなくなります。隠したコマンド・付けた呼び出し語・使った回数の記録は<b>そのまま引き継がれます</b>。</p>
@@ -15230,6 +15314,7 @@ window.MDEditor = {
     if(!isFinite(v)) return;
     settings.splitRatio = Math.min(0.9, Math.max(0.1, v));
     saveJSON('mdeditor_settings', settings);
+    try{ if(window.RTT19 && window.RTT19.setSplitRatioDb) window.RTT19.setSplitRatioDb(settings.splitRatio); }catch(e){}
     document.querySelectorAll('.pane-wrap').forEach(applySplitRatio);
   },
   saveActive(){ const t = getActiveTab(); if(t) manualSaveOrDownload(t); },
@@ -16034,22 +16119,71 @@ function renderMain(){
     ta.addEventListener('keyup', renderStatus);
     editorPane.appendChild(ta);
 
+    /* DBに分割比が在れば、そちらを正として読み直す（決-90 の引っ越しの作法）。
+       ★窓口(RTTSTORE)が無い版では null が返り、settings 側の値のまま動く。 */
+    try{
+      if(window.RTT19 && window.RTT19.loadSplitRatio){
+        const dbv = window.RTT19.loadSplitRatio(null);
+        if(dbv != null) settings.splitRatio = dbv;
+      }
+    }catch(e){}
     const divider = document.createElement('div');
     divider.className = 'divider';
-    let dragging = false;
-    divider.addEventListener('mousedown', ()=>{ dragging = true; document.body.style.cursor='col-resize'; });
-    window.addEventListener('mouseup', ()=>{ dragging=false; document.body.style.cursor=''; });
-    window.addEventListener('mousemove', (e)=>{
-      if(!dragging) return;
-      // スマホ修正アドオンONのときは上下分割になるので、WDT側のタッチ処理に任せる
-      if(document.body.classList.contains('wdt-mobfix')) return;
-      const rect = wrap.getBoundingClientRect();
-      let ratio = (e.clientX - rect.left) / rect.width;
-      ratio = Math.min(0.85, Math.max(0.15, ratio));
-      settings.splitRatio = ratio;
-      applySplitRatio(wrap);
-      saveJSON('mdeditor_settings', settings);
-    });
+    /* ---- ドラッグは基礎板（RTT21）に任せる（D-11 工程8・決-99）--------
+       ★横用・縦用の透明な取っ手を重ねて置き、CSSの表示切り替えだけで
+         いま有効なほうにしかイベントが届かないようにする（両にらみ）。
+         同じ要素へ2回 attach しないので、基礎板の二重取り付けガードには触れない。
+       ★基礎板が無い版では、今までどおり自前の col-resize ドラッグで動く。 */
+    const rttD8A = window.RTTDRAG;
+    if(rttD8A && typeof rttD8A.attach === 'function'){
+      const hx = document.createElement('div'); hx.className = 'rtt-d8-x';
+      const hy = document.createElement('div'); hy.className = 'rtt-d8-y';
+      divider.appendChild(hx);
+      divider.appendChild(hy);
+      let d8rect = null;
+      function d8cfg(axis){
+        return {
+          axis: axis, min: 0, max: 1000000, tol: 14,
+          unitName: 'px', stepName: '%', fitName: '半分',
+          start(){ d8rect = wrap.getBoundingClientRect(); },
+          get(){
+            const r = d8rect || wrap.getBoundingClientRect();
+            const size = axis === 'x' ? r.width : r.height;
+            return Math.round(settings.splitRatio * size);
+          },
+          set(v){
+            const r = d8rect || wrap.getBoundingClientRect();
+            const size = axis === 'x' ? r.width : r.height;
+            if(!size) return;
+            settings.splitRatio = Math.min(0.85, Math.max(0.15, v / size));
+            applySplitRatio(wrap);
+          },
+          commit(){ if(window.MDEditor && MDEditor.setSplitRatio) MDEditor.setSplitRatio(settings.splitRatio); },
+          fit(){ const r = d8rect || wrap.getBoundingClientRect(); return (axis === 'x' ? r.width : r.height) * 0.5; },
+          unit(){ const r = d8rect || wrap.getBoundingClientRect(); return (axis === 'x' ? r.width : r.height) * 0.05; },
+          base(){ return 0; },
+          rect(){ const r = wrap.getBoundingClientRect(); return {left:r.left, top:r.top, width:r.width, height:r.height}; },
+          posOf(v){ const r = wrap.getBoundingClientRect(); return (axis === 'x' ? r.left : r.top) + v; }
+        };
+      }
+      rttD8A.attach(hx, d8cfg('x'));
+      rttD8A.attach(hy, d8cfg('y'));
+    }else{
+      let dragging = false;
+      divider.addEventListener('mousedown', ()=>{ dragging = true; document.body.style.cursor='col-resize'; });
+      window.addEventListener('mouseup', ()=>{ dragging=false; document.body.style.cursor=''; });
+      window.addEventListener('mousemove', (e)=>{
+        if(!dragging) return;
+        // スマホ修正アドオンONのときは上下分割になるので、WDT側のタッチ処理に任せる
+        if(document.body.classList.contains('wdt-mobfix')) return;
+        const rect = wrap.getBoundingClientRect();
+        let ratio = (e.clientX - rect.left) / rect.width;
+        ratio = Math.min(0.85, Math.max(0.15, ratio));
+        settings.splitRatio = ratio;
+        applySplitRatio(wrap);
+        saveJSON('mdeditor_settings', settings);
+      });
+    }
 
     const preview = document.createElement('div');
     preview.className = 'preview-pane';
@@ -17230,6 +17364,73 @@ var KEY_PRESETS = [
 ];
 
 /* ---------- アドオンの一覧 ---------- */
+/* ============================================================
+   アドオンの「種類」の登録簿（D-06 工程3・決-94・2026-09-13）
+   ------------------------------------------------------------
+   ★なぜ表にするか … これまで描く側は
+       if(a.kind === 'tri'){ …select… } else { …checkbox… }
+     でした。種類を1つ足すたびに、この if が伸びます。
+     `CLAUDE.md §5.2` 決まり④「種類が増えるなら『種類の登録簿』を作る」。
+
+   ★足し方 … registerAddonKind を1行足すだけ。描く側・読む側は1行も変わりません。
+       input(a, cur) … その種類の入力部品の HTML を返す
+       read(el)      … 画面の部品から、保存する値を取り出す
+   ============================================================ */
+var ADDON_KIND = {};
+function registerAddonKind(key, def){
+  if(!key || !def) return false;
+  ADDON_KIND[key] = def;
+  return true;
+}
+function addonKindOf(kind){
+  return ADDON_KIND[kind] || ADDON_KIND['bool'];   /* 知らない種類は入切として扱う */
+}
+
+/* 入切（これまでの既定） */
+registerAddonKind('bool', {
+  input: function(a, cur){
+    return '<label><input type="checkbox" data-addon="' + a.id + '"'
+         + (cur ? ' checked' : '') + '> 有効にする</label>';
+  },
+  read: function(el){ return !!el.checked; }
+});
+
+/* 自動 / 常にON / 常にOFF の3択 */
+registerAddonKind('tri', {
+  input: function(a, cur){
+    return '<select data-addon="' + a.id + '">'
+         + ['auto', 'on', 'off'].map(function(v){
+             var lab = v === 'auto' ? '自動（スマホなら自動でON）'
+                     : (v === 'on' ? '常にON' : '常にOFF');
+             return '<option value="' + v + '"' + (cur === v ? ' selected' : '')
+                  + '>' + lab + '</option>';
+           }).join('')
+         + '</select>';
+  },
+  read: function(el){ return el.value; }
+});
+
+/* ★好きな数だけ選べる表（D-06 工程3 で新設）。
+   選べる中身は ADDONS の opts 側に【データとして】置く（§5.2 決まり⑤）。
+   だから選択肢を増やすのに、この登録簿は1行も変わりません。 */
+registerAddonKind('choice', {
+  input: function(a, cur){
+    return '<select data-addon="' + a.id + '">'
+         + (a.opts || []).map(function(o){
+             return '<option value="' + o.v + '"'
+                  + (String(cur) === String(o.v) ? ' selected' : '')
+                  + '>' + o.label + '</option>';
+           }).join('')
+         + '</select>';
+  },
+  /* ★数字で持つものは数字に戻す。文字のまま入れると
+     「38」と 38 が別物になり、選び直しても selected が付かない */
+  read: function(el){
+    var n = Number(el.value);
+    return (el.value !== '' && !isNaN(n)) ? n : el.value;
+  }
+});
+
 var ADDONS = [
   { id:'mobilefix', kind:'tri', name:'📱 スマホ表示の不具合修正',
     desc:'スマホのブラウザ（Vanadium・Chrome など）で、Markdownメモの一番下にある「分割／編集／プレビュー」ボタンが画面外に隠れて押せない問題を直します。'
@@ -17243,6 +17444,50 @@ var ADDONS = [
       '入力欄の文字を16pxにして、タップしたときの自動ズームを防止',
       '検索欄・カードの余白を詰めて、狭い画面でも表が見えるように'
     ]},
+  /* ★D-06 工程3（決-94）… 表の行の高さ。**1つの数字**で全行いっせいに決める（決-90 案カ）。
+     選べる中身は【データ】なので、増やしたくなったら opts に1行足すだけ。
+     0 は「制限しない」＝これまでどおり（折り返して全部見せる）。 */
+  /* ★D-06 工程6（決-96）… ドラッグの吸い付きに使う「押しながらキー」。
+     ここは【表に1行足しただけ】。描く側も読む側も1行も変わっていない
+     （CLAUDE.md §5.2 決まり②）。値の持ち主はこの st.addons で、
+     基礎板（RTT21）は WDT.dragMod() で毎回聞きに来る（家を2つ作らない・決-94）。 */
+  { id:'dragmod', kind:'choice', name:'🧲 ドラッグ中に「丁度いい所」へ吸い付くキー',
+    opts:[ {v:'shift', label:'Shift を押しながら（おすすめ）'},
+           {v:'ctrl',  label:'Ctrl を押しながら'},
+           {v:'alt',   label:'Alt を押しながら'},
+           {v:'off',   label:'使わない（吸い付かせない）'} ],
+    desc:'表の列の境目をドラッグして幅を変えるとき、このキーを押しながら動かすと'
+       + '「丁度いい所」にひゅっと吸い付きます。吸い付く先は青い点線で示され、'
+       + 'マウスのそばの札に今の幅と吸い付き先が出ます。'
+       + '★吸い付く先は2種類 …「⇔ ぴったり」（表に出ている全部の行で文字が切れない幅）と'
+       + '「▣ 見える範囲」（いま画面に映っている行で切れない幅）。'
+       + 'さらに「▤ 5文字ぶん」ごとの目盛りにも止まります。'
+       + '★Alt は、パソコンの種類によっては「窓を動かす」操作に使われていることがあります。'
+       + 'うまく効かないときは Shift か Ctrl に戻してください。',
+    detail:[
+      'ドラッグ中、マウスのそばに今の幅（例：240px）を出す',
+      '押しながらのとき、近くの「丁度いい所」に吸い付く',
+      '吸い付き先を青い点線と札で示す',
+      '「使わない」を選ぶと、いつでも自由な幅で止まる'
+    ]},
+  { id:'rowdens', kind:'choice', name:'📏 表の行の高さ（１行に何ピクセル）',
+    opts:[ {v:0,  label:'ゆったり（いままでどおり・約7行）'},
+           {v:38, label:'ふつう（おすすめ・約15行）'},
+           {v:28, label:'ぎっしり（約20行）'} ],
+    desc:'記録台帳の表で、1行の高さをそろえます。'
+       + 'これまでは「操作」列のボタン3つ（⧉ ➡ 🗑）が縦に積まれていたため、1行が79pxありました。'
+       + 'ボタンを横並びにして余白を詰め、文字を1行に収めると、同じ画面で見える行数が増えます。'
+       + '★実測（ダミー50件・同じ画面）… ゆったり 7行 ／ ふつう 15行 ／ ぎっしり 20行。'
+       + '長い文は末尾が「…」で切れますが、その欄にマウスを乗せると「📝 メモで開く」が出て全文を読めます。'
+       + '「ゆったり」を選べば、いつでも今までどおりに戻せます。',
+    detail:[
+      '1行の高さを、選んだ数字で全行そろえる（行ごとには変えません）',
+      '「操作」列のボタン3つを縦積みから横並びへ',
+      '文字を折り返さず1行に収める（はみ出しは「…」）',
+      '★height だけでは表の欄は揃いません（「最低の高さ」にしかならない）。折り返しを止めて初めて揃います',
+      '「📝 メモで開く」は、その欄にマウスを乗せたときだけ浮かせて出す',
+      '設定は DB（_meta_opts）に入るので、.sqlite と一緒に持ち運べます'
+    ] },
   { id:'bigtap', kind:'bool', name:'👆 指で押しやすい大きさ',
     desc:'ボタンの当たり判定と文字を大きくします。スマホや、手袋をしたままの操作に向きます。パソコンでは1画面に入る情報が減ります。',
     detail:['ボタンの上下左右の余白を拡大','ボタン文字を 13px → 14px に','表の「削除」ボタンも大きく'] },
@@ -17267,15 +17512,12 @@ var ADDONS = [
       '見出しの右端に「メニュー／探す／上書き保存／全部開く／全部閉じる」を追加',
       'OFFにすると見出しは固定されず、追加ボタンも押せますが一緒にスクロールします'
     ] },
-  { id:'oneopen', kind:'bool', name:'📖 セクションは1つだけ開く（アコーディオン）',
-    desc:'どれか1つのセクションを開くと、ほかのセクションが自動で閉じます。'
-       + '画面の縦がとても短くなるので、ノートPCの狭い画面や、表を大きく見たいときに向きます。'
-       + '入力しながら検索結果を見比べたい人はOFFのままにしてください。',
-    detail:[
-      'セクションを開いたとき、ほかの details を閉じる',
-      '「全部開く」を押したときだけは、この動きを一時的に止める',
-      '開いたセクションの先頭まで自動でスクロール'
-    ] },
+  /* ★工程9（決-82・案X）… 「📖 セクションは1つだけ開く」はここから外し、
+     スキン「アコーディオン」に一本化した。理由は利用者の決定:
+     「スキンは画面を広く使うために作った。アコーディオンの説明のために
+       スペースを取りたくない。アコーディオンはアコーディオンのスキンとして存在させる」。
+     ★これで矛盾する組み合わせ（タブなのに1つだけ開く）がそもそも作れない。
+       以前 ON にしていた人は skinBoot() が一度だけスキン acc へ移す。 */
   { id:'cmdrank', kind:'bool', name:'⭐ よく使うコマンドを Ctrl+K の先頭に出す',
     desc:'コマンドパレット（Ctrl+K）を開いた直後、これまで多く使ったコマンドを「よく使う」として上に6件並べます。'
        + '使うほど自分専用の並びに育ちます。回数の記録はこのブラウザの中だけに残ります。'
@@ -17321,7 +17563,14 @@ function defaults(){
        作ったので、出すかどうかは利用者が決める。 */
     rowTouchShow   : false,
     addons     : { mobilefix:'auto', bigtap:false, quickbar:false, autofocus:false,
-                   stickyhead:true, oneopen:false, cmdrank:true }
+                   stickyhead:true, cmdrank:true,
+                   /* ★D-06 工程3（決-94）… 既定は 38px＝「ふつう」。
+                      利用者が実際の画面で3案を見比べて選んだ値（7行 → 15行）。
+                      0 にすると、これまでどおり（折り返して全部見せる）に戻る。 */
+                   rowdens:38,
+                   /* ★D-06 工程6（決-96）… ドラッグで「丁度いい所」に吸い付くときの
+                      押しながらキー。既定は Shift。決め打ちにしない理由は決-91 の却下欄。 */
+                   dragmod:'shift' }
   };
 }
 var st = defaults();
@@ -17578,6 +17827,33 @@ function mobFixOn(){
   var v = st.addons.mobilefix;
   return v === 'on' || (v === 'auto' && isPhone());
 }
+/* ============================================================
+   表の行の高さ（D-06 工程3・決-94・2026-09-13）
+   ------------------------------------------------------------
+   設定は st.addons.rowdens に【1つの数字】で持つ（決-90 案カ）。
+   0 = 制限しない（これまでどおり折り返して全部見せる）。
+
+   ★形は既にあるお手本と同じ … 設定（データ）→ body の class ＋ CSS 変数 → CSS。
+     見た目の決まりごとは CSS 側に置き、ここは「数字を1つ渡すだけ」にする。
+     こうしておくと、工程5 で「つまみでドラッグして高さを変える」を足すとき、
+     つまみ側はこの関数に数字を渡すだけで済む（描き直す処理を書かない）。
+   ============================================================ */
+function rowDensPx(){
+  var n = Number(st.addons ? st.addons.rowdens : 0);
+  if(!isFinite(n) || n <= 0) return 0;      /* 0・空・壊れた値 → 制限しない */
+  if(n < 18) n = 18;                        /* これ以下は文字が欠ける（実測）*/
+  if(n > 200) n = 200;
+  return Math.round(n);
+}
+function applyRowDensity(){
+  var px = rowDensPx();
+  try{
+    document.body.classList.toggle('wdt-rowfix', px > 0);
+    /* ★0 のときも変数は消さない。消すと CSS 側の既定値と食い違う */
+    document.documentElement.style.setProperty('--rtt-rowh', (px || 0) + 'px');
+  }catch(e){}
+}
+
 function applyAll(){
   var shell = el('appShell');
   if(shell){
@@ -17589,8 +17865,11 @@ function applyAll(){
   document.body.classList.toggle('wdt-quickbar', !!st.addons.quickbar);
   /* Ver1.9.10 追加分（クラスが付いていないとき＝有効、という向きに注意） */
   document.body.classList.toggle('wdt-nosticky',  !st.addons.stickyhead);
-  document.body.classList.toggle('wdt-oneopen',   !!st.addons.oneopen);
+  /* ★工程9（決-82）… 「1つだけ開く」は【スキンが持ち主】になった。
+     ここでは触らない（持ち主が2人いると、片方が消しに来て食い違う・#13 / #27）。
+     旧設定を ON にしていた人は、skinBoot() が一度だけスキン acc へ移す。 */
   document.body.classList.toggle('wdt-nocmdrank', !st.addons.cmdrank);
+  applyRowDensity();       /* ★D-06 工程3（決-94）… 表の行の高さ */
   relocateViewMode(mobFixOn());
   applyDynStyle();
   imeCaretBind();          /* Ver1.17.00 (案E-1) 1回だけ結線する */
@@ -18148,10 +18427,14 @@ function bindColumnDrag(){
   document.addEventListener('pointercancel', endDrag);
 }
 
-/* ---------- スマホ：分割バーを指で動かす ---------- */
+/* ---------- スマホ：分割バーを指で動かす ----------
+   ★D-11 工程8（決-99）… 基礎板(RTT21)が在る版では、.rtt-d8-y の取っ手が
+     同じ仕切りをタッチでも動かせるようになったので、ここは出番が無い。
+     RTT21 が無い版（逃げ道）だけ、今までどおりこの経路で動く。 */
 var divS = null;
 function bindDivider(){
   document.addEventListener('pointerdown', function(e){
+    if(window.RTTDRAG && typeof window.RTTDRAG.attach === 'function') return;
     if(!document.body.classList.contains('wdt-mobfix')) return;
     if(!e.target.closest) return;
     var d = e.target.closest('#app-md .divider');
@@ -18250,6 +18533,127 @@ var RTT_LIC_PRE_CSS = 'white-space:pre-wrap;word-break:break-word;'
   + 'font-family:ui-monospace,Consolas,monospace;font-size:11.5px;'
   + 'line-height:1.55;color:#c7ccd4;';
 
+/* ==================================================================
+   Ver1.19.26 (L-01 第5段 工程10)  画面編集タブ（甲・リスト型）
+   ------------------------------------------------------------------
+   ★このタブより下（buildSettings 本体）は window.RTTPARTS の中を直接見られない
+     （RTT20 は IIFE で包まれ、中の関数は外に出ていない・落とし穴 #9 の型）。
+     だから、ここから先はすべて window.RTTPARTS 経由でデータを取る
+     （20行上の「画面の構成（スキン）」欄とまったく同じ流儀）。
+   ================================================================== */
+function editTreeRowsHtml(node, depth, parentKey){
+  var out, kids, i, icon, kindLabel, first;
+  if(!node) return '';
+  icon = (node.kind === 'stack') ? '▤' : (node.kind === 'split') ? '⇔'
+       : (node.kind === 'tabs')  ? '\u{1F5C2}' : (node.kind === 'fold') ? '\u{1F4C1}' : '\u{1F9E9}';
+  kindLabel = {stack:'並べる', split:'仕切り', tabs:'タブ', fold:'折りたたみ', slot:'部品'}[node.kind] || node.kind;
+  kids = (node.children && node.children.length) ? node.children : [];
+  first = kids.length ? kids[0].key : '';
+  /* ★落とし先を決めるのに要るものは、行に【名札】として貼っておく（位置で数えない）。
+       data-tree-parent … 「この行の前に入る」ときの行き先の親
+       data-tree-kind   … 葉（slot）は子を持てないので、中へは落とせない
+       data-tree-first  … 「この行の中へ入る」ときは、いまの第1子の前に入る
+                          （画面上、その行のすぐ下に描かれる位置＝指している所そのもの）*/
+  out = '<div class="wdtx-row rtt-edit-row" data-tree-key="' + esc(node.key) + '"'
+      + ' data-tree-parent="' + esc(parentKey || '') + '"'
+      + ' data-tree-kind="' + esc(node.kind) + '"'
+      + ' data-tree-first="' + esc(first) + '"'
+      + (depth > 0 ? ' draggable="true"' : '')
+      + ' style="padding-left:' + (depth * 18) + 'px">'
+      + '<span class="lbl">'
+      + (depth > 0 ? '<span class="grip" title="掴んで動かせます">⠿</span> ' : '')
+      + icon + ' ' + esc(node.label || node.key)
+      + ' <span class="wdtx-hint">（' + esc(kindLabel) + (node.dir ? '・' + esc(node.dir) : '') + '）</span></span>'
+      + '<span>';
+  if(depth > 0){
+    out += '<button type="button" data-tree-act="up" data-tree-key="' + esc(node.key) + '">▲</button> '
+         + '<button type="button" data-tree-act="down" data-tree-key="' + esc(node.key) + '">▼</button> '
+         + '<button type="button" class="danger" data-tree-act="del" data-tree-key="' + esc(node.key) + '">削除</button>';
+  }else{
+    out += '<span class="wdtx-hint">（いちばん上・削除できません）</span>';
+  }
+  out += '</span></div>';
+  for(i = 0; i < kids.length; i++) out += editTreeRowsHtml(kids[i], depth + 1, node.key);
+  return out;
+}
+
+function buildEditScreensHtml(){
+  var R = window.RTTPARTS, h = '', tree, containers, secs, parts, combos, i;
+  if(!R) return '<div class="wdtx-hint">画面編集の土台が読み込まれていません。</div>';
+
+  /* ---- ① 木の組み替え ---- */
+  h += '<h3>木の組み替え（ボタンで動かします。ドラッグではありません）</h3>';
+  h += '<div class="wdtx-hint">ここで組み立てた並びは、上の「🖥 表示 &gt; 画面の構成」で'
+     + '<b>「自分で組み替え（カスタム）」</b>を選ぶと画面に出ます。<br>'
+     + '★<b>行は掴んで動かせます</b>（⠿ の部分）。行の<b>上半分</b>に落とすと'
+     + '<b>その行の前</b>へ、<b>下半分</b>に落とすと<b>その行の中</b>へ入ります。'
+     + 'ドラッグが効かないときは <b>▲▼ ボタン</b>で同じことができます。</div>';
+  try{ tree = R.customTree(); }catch(e){ tree = null; }
+  h += '<div id="wdtTreeRows">' + (tree ? editTreeRowsHtml(tree, 0) : '') + '</div>';
+
+  try{ containers = R.treeContainers(); }catch(e){ containers = []; }
+  try{ secs = R.sectionParts(); }catch(e){ secs = []; }
+  h += '<div class="wdtx-row"><span class="lbl">追加する場所</span><span>'
+     + '<select id="wdtTreeParent">'
+     + containers.map(function(c){
+         return '<option value="' + esc(c.key) + '">' + Array(c.depth + 1).join('　') + esc(c.key)
+              + '（' + esc(c.kind) + '）</option>';
+       }).join('')
+     + '</select></span></div>';
+  h += '<div class="wdtx-row"><span class="lbl">増やす種類</span><span>'
+     + '<select id="wdtTreeKind">'
+     + '<option value="stack:col">縦に並べる</option>'
+     + '<option value="stack:row">横に並べる</option>'
+     + '<option value="split:col">仕切りで区切る（縦）</option>'
+     + '<option value="split:row">仕切りで区切る（横）</option>'
+     + '<option value="tabs">タブで切り替える</option>'
+     + '<option value="fold">折りたたむ</option>'
+     + '<option value="slot">部品を1つ置く</option>'
+     + '</select> '
+     + '<select id="wdtTreePart">'
+     + secs.map(function(p){ return '<option value="' + esc(p.key) + '">' + esc(p.icon || '') + ' ' + esc(p.label) + '</option>'; }).join('')
+     + '</select>'
+     + ' <span class="wdtx-hint">（「部品を1つ置く」を選んだときだけ、右のプルダウンを使います）</span>'
+     + '</span></div>';
+  h += '<div class="wdtx-row"><span class="lbl"></span><span>'
+     + '<button type="button" id="wdtTreeAdd">＋ 追加</button>'
+     + '</span></div>';
+
+  /* ---- ② コンボ作成 ---- */
+  h += '<h3>コンボ作成</h3>';
+  h += '<div class="wdtx-hint">よく使うタグの組み合わせに名前を付けます。式の中で <code>@名前</code> と書くと呼び出せます。</div>';
+  try{ combos = R.combos(); }catch(e){ combos = []; }
+  h += '<table class="wdtx-tbl"><tr><th>名前</th><th>式</th><th></th></tr>';
+  for(i = 0; i < combos.length; i++){
+    var cb = combos[i], builtin = R.isBuiltinCombo(cb.name);
+    h += '<tr><td>' + esc(cb.name) + (builtin ? ' <span class="wdtx-hint">（組み込み）</span>' : '') + '</td>'
+       + '<td style="font-family:ui-monospace,Consolas,monospace">' + esc(cb.expr) + '</td>'
+       + '<td>' + (builtin ? '' : '<button type="button" class="danger" data-combo-del="' + esc(cb.name) + '">削除</button>') + '</td></tr>';
+  }
+  h += '</table>';
+  h += '<div class="wdtx-row"><span class="lbl">新しいコンボ</span><span>'
+     + '<input type="text" id="wdtComboName" placeholder="名前" style="width:140px"> '
+     + '<input type="text" id="wdtComboExpr" placeholder="式（例: db & toolbar）" style="width:220px"> '
+     + '<button type="button" id="wdtComboAdd">＋ 追加</button>'
+     + '</span></div>'
+     + '<div class="wdtx-hint" id="wdtComboMsg"></div>';
+
+  /* ---- ③ 表示・非表示 ---- */
+  h += '<h3>表示・非表示</h3>';
+  h += '<div class="wdtx-hint">チェックを外すと、その部品を画面から隠します。すぐに反映されます。</div>';
+  try{ parts = R.parts(); }catch(e){ parts = []; }
+  h += '<table class="wdtx-tbl"><tr><th></th><th>部品</th><th>グループ</th></tr>';
+  for(i = 0; i < parts.length; i++){
+    var pp = parts[i];
+    h += '<tr><td><input type="checkbox" data-show-key="' + esc(pp.key) + '"'
+       + (R.isShown(pp.key) ? ' checked' : '') + '></td>'
+       + '<td>' + esc(pp.icon || '') + ' ' + esc(pp.label) + ' <span class="wdtx-hint">(' + esc(pp.key) + ')</span></td>'
+       + '<td class="wdtx-hint">' + esc(R.groupLabel(pp.group)) + '</td></tr>';
+  }
+  h += '</table>';
+  return h;
+}
+
 function buildSettings(){
   var box = el('wdtSettingsBody');
   if(!box) return;
@@ -18270,10 +18674,30 @@ function buildSettings(){
      + '<button type="button" data-pg="data">💾 データ</button>'
      /* Ver1.16.07 (案L1) ライセンス表記 */
      + '<button type="button" data-pg="about">ℹ このソフトについて</button>'
+     /* Ver1.19.26 (工程10) 画面編集（木の組み替え・コンボ作成・表示/非表示） */
+     + '<button type="button" data-pg="edit">🌳 画面編集</button>'
      + '</div>';
 
   /* ---- 表示 ---- */
   h += '<div class="wdtx-page on" data-pg="disp">';
+  /* ---- 第5段 工程9（決-82）… 画面の構成（スキン）----------------------
+     ★選択肢は【スキンの登録簿から自動で作る】。スキンを1つ足しても、
+       ここは1行も変わらない（CLAUDE.md §5.2 決まり②・拘束しない）。 */
+  h += '<h3>画面の構成（スキン）</h3>';
+  h += (function(){
+    var R = window.RTTPARTS, list = [], cur = 'std', i, s;
+    try{ list = R ? R.skins() : []; }catch(e){ list = []; }
+    try{ cur = R ? R.currentSkin() : 'std'; }catch(e){ cur = 'std'; }
+    if(!list.length) return '';                 /* 登録簿が空なら欄ごと出さない */
+    var opts = [], notes = [];
+    for(i = 0; i < list.length; i++){
+      s = list[i];
+      opts.push([s.key, s.label || s.key]);
+      if(s.desc) notes.push('<b>' + esc(s.label || s.key) + '</b> … ' + esc(s.desc));
+    }
+    return radioRow('並べ方', 'wdtSkin', opts, cur, notes.join('<br>'));
+  })();
+
   h += '<h3>一番上のヘッダー（モード切替バー）</h3>';
   h += radioRow('大きさ', 'wdtHdr',
         [['normal','標準'],['small','小さくする'],['hidden','表示しない']], st.headerSize,
@@ -18439,17 +18863,9 @@ function buildSettings(){
   h += '<h3>アドオン（追加機能）</h3>';
   h += ADDONS.map(function(a){
     var cur = st.addons[a.id];
-    var sw;
-    if(a.kind === 'tri'){
-      sw = '<select data-addon="' + a.id + '">'
-         + ['auto','on','off'].map(function(v){
-             var lab = v === 'auto' ? '自動（スマホなら自動でON）' : (v === 'on' ? '常にON' : '常にOFF');
-             return '<option value="' + v + '"' + (cur === v ? ' selected' : '') + '>' + lab + '</option>';
-           }).join('')
-         + '</select>';
-    }else{
-      sw = '<label><input type="checkbox" data-addon="' + a.id + '"' + (cur ? ' checked' : '') + '> 有効にする</label>';
-    }
+    /* ★種類の登録簿に任せる（決-94）。ここに if を増やさない。
+       新しい見せ方は registerAddonKind を1行足すだけで届く。 */
+    var sw = addonKindOf(a.kind).input(a, cur);
     return '<div class="wdtx-card"><div class="wdtx-row" style="margin:0">'
          + '<b style="flex:1">' + a.name + '</b>' + sw + '</div>'
          + '<div class="wdtx-hint" style="margin-top:6px">' + a.desc + '</div>'
@@ -18590,6 +19006,13 @@ function buildSettings(){
      + '上に出している全文が、そのまま原文です。'
      + '同じものは、このHTMLをテキストエディタで開いたときの一番上（コメント）にも入っています。'
      + '</div>';
+  h += '</div>';
+
+  /* ---- 第5段 工程10 … 画面編集（木の組み替え・コンボ作成・表示/非表示）----
+     ★ここも他の欄と同じく【登録簿から自動で作る】。決め打ちの3件（section部品）が
+       増えても、ここは1行も変わらない（sectionParts() がタグから引くため）。 */
+  h += '<div class="wdtx-page" data-pg="edit">';
+  h += buildEditScreensHtml();
   h += '</div>';
 
   h += '<div class="wdtx-actions"><button type="button" class="primary" id="wdtClose">閉じる</button></div>';
@@ -18862,10 +19285,54 @@ function bindSettings(){
       st = defaults(); save(); applyAll(); buildSettings();
       return;
     }
+
+    /* ---- 第5段 工程10: 画面編集（木の組み替え） ---- */
+    var R10 = window.RTTPARTS;
+    var tb = t.closest('[data-tree-act]');
+    if(tb && R10){
+      var tact = tb.dataset.treeAct, tkey = tb.dataset.treeKey;
+      if(tact === 'up') R10.editTreeMove(tkey, -1);
+      else if(tact === 'down') R10.editTreeMove(tkey, 1);
+      else if(tact === 'del'){ if(confirm('この節を削除しますか？（中の部品も一緒に消えます）')) R10.editTreeRemove(tkey); }
+      refreshEditScreens();
+      return;
+    }
+    if(t.id === 'wdtTreeAdd' && R10){
+      var parentKey = (el('wdtTreeParent') || {}).value;
+      var kindRaw = (el('wdtTreeKind') || {}).value || 'stack:col';
+      var kindParts = kindRaw.split(':');
+      var partKey = (el('wdtTreePart') || {}).value;
+      R10.editTreeAdd(parentKey, kindParts[0], kindParts[1], partKey);
+      refreshEditScreens();
+      return;
+    }
+    /* ---- 第5段 工程10: 画面編集（コンボ作成） ---- */
+    if(t.id === 'wdtComboAdd' && R10){
+      var cname = (el('wdtComboName') || {}).value;
+      var cexpr = (el('wdtComboExpr') || {}).value;
+      var cres = R10.addUserCombo(cname, cexpr);
+      var cmsg = el('wdtComboMsg');
+      if(cmsg) cmsg.textContent = cres.ok ? '追加しました。' : ('できません: ' + cres.why);
+      if(cres.ok) refreshEditScreens();
+      return;
+    }
+    var cdb = t.closest('[data-combo-del]');
+    if(cdb && R10){
+      if(confirm('コンボ「' + cdb.dataset.comboDel + '」を削除しますか？')) R10.removeUserCombo(cdb.dataset.comboDel);
+      refreshEditScreens();
+      return;
+    }
   });
 
   box.addEventListener('change', function(e){
     var t = e.target;
+    /* ★工程9（決-82）… スキンは st に持たない。RTTPARTS.setSkin() が
+       「当てる」と「覚える（layout.skin）」を両方やる唯一の口。正は1つ。 */
+    if(t.name === 'wdtSkin'){
+      var R9 = window.RTTPARTS;
+      try{ if(R9 && R9.setSkin) R9.setSkin(t.value); }catch(e9){}
+      return;
+    }
     if(t.name === 'wdtHdr'){ st.headerSize = t.value; save(); applyAll(); return; }
     if(t.name === 'wdtGridFont'){ st.gridFont = Number(t.value); save(); applyDynStyle(); return; }
     if(t.name === 'wdtMdFont'){ st.mdFont = Number(t.value); save(); applyDynStyle(); return; }
@@ -18903,11 +19370,109 @@ function bindSettings(){
     if(t.id === 'wdtTagHot'){  st.tagHotOn = t.checked; save(); refreshKeyUi(); return; }
     if(t.dataset && t.dataset.addon){
       var id = t.dataset.addon;
-      st.addons[id] = (t.tagName === 'SELECT') ? t.value : t.checked;
+      /* ★種類の登録簿から読む（決-94）。「SELECT なら文字、それ以外は入切」
+         という決めつけをやめた。数字で持つ設定が文字で入ると、選び直しても
+         selected が付かず【設定したのに戻らない】ように見える */
+      var adef = null;
+      for(var ai = 0; ai < ADDONS.length; ai++){
+        if(ADDONS[ai].id === id){ adef = ADDONS[ai]; break; }
+      }
+      st.addons[id] = addonKindOf(adef ? adef.kind : 'bool').read(t);
       save(); applyAll(); updateMobState();
       return;
     }
+    /* ---- 第5段 工程10: 画面編集（表示・非表示）----
+       ★setShow が「覚える」も「画面へ反映する」も両方やる唯一の口（工程3）。
+         ここは呼ぶだけで、保存先を知らない。 */
+    if(t.dataset && t.dataset.showKey != null){
+      var R10c = window.RTTPARTS;
+      if(R10c) R10c.setShow(t.dataset.showKey, t.checked);
+      return;
+    }
   });
+
+  /* ---- 第5段 工程10・乙A … 木の組み替えのドラッグ ----------------------
+     ★形は項目管理のタグ並べ替え（11104行あたり）と同じ。この作業場には
+       「▲▼ でも同じことができるので、効かない環境でも困らない」という
+       先例がある。**ボタンが保証・ドラッグはおまけ**。だから甲の▲▼は残す。
+     ★落とし先の判定は editDropTarget() の【1か所だけ】。dragover（光らせる側）と
+       drop（実際に動かす側）が同じ関数を見るので、「光った場所と入る場所が違う」
+       という、目で見ても気づけない食い違いが原理的に起きない。 */
+  var editDragKey = null;
+
+  function editOverClear(){
+    Array.prototype.forEach.call(box.querySelectorAll('.rtt-edit-row'), function(r){
+      r.classList.remove('over-before', 'over-in');
+    });
+  }
+  function editDragClear(){
+    editOverClear();
+    Array.prototype.forEach.call(box.querySelectorAll('.rtt-edit-row.drag'), function(r){
+      r.classList.remove('drag');
+    });
+  }
+
+  function editDropTarget(e){
+    var row = (e.target && e.target.closest) ? e.target.closest('.rtt-edit-row') : null;
+    var r, lower;
+    if(!row || !editDragKey) return null;
+    if(row.dataset.treeKey === editDragKey) return null;      /* 自分の上には落とせない */
+    r = row.getBoundingClientRect();
+    lower = (e.clientY - r.top) > r.height / 2;
+    /* 下半分 ＝ この節の【中】へ。ただし葉（slot）は子を持てないので前に入れる。 */
+    if(lower && row.dataset.treeKind !== 'slot'){
+      return {row: row, into: true,
+              parent: row.dataset.treeKey,
+              before: row.dataset.treeFirst || null};
+    }
+    /* 上半分 ＝ この行の【前】に兄弟として。ルートの前には入れない。 */
+    if(!row.dataset.treeParent) return null;
+    return {row: row, into: false,
+            parent: row.dataset.treeParent,
+            before: row.dataset.treeKey};
+  }
+
+  box.addEventListener('dragstart', function(e){
+    var row = (e.target && e.target.closest)
+            ? e.target.closest('.rtt-edit-row[draggable="true"]') : null;
+    if(!row) return;
+    editDragKey = row.dataset.treeKey;
+    row.classList.add('drag');
+    try{
+      e.dataTransfer.effectAllowed = 'move';
+      e.dataTransfer.setData('text/plain', editDragKey);
+    }catch(err){}
+  });
+
+  box.addEventListener('dragover', function(e){
+    var d = editDropTarget(e);
+    editOverClear();
+    if(!d) return;
+    e.preventDefault();                 /* ★これを呼ばないと drop が起きない */
+    d.row.classList.add(d.into ? 'over-in' : 'over-before');
+  });
+
+  box.addEventListener('drop', function(e){
+    var d = editDropTarget(e), R = window.RTTPARTS, key = editDragKey;
+    editDragKey = null;
+    editDragClear();
+    if(!d || !R || !key) return;        /* ★ここで抜けたときは、ファイルのドロップ
+                                           （DBを開く・10156行）を邪魔しない */
+    e.preventDefault();
+    e.stopPropagation();
+    R.editTreeMoveTo(key, d.parent, d.before);
+    refreshEditScreens();
+  });
+
+  box.addEventListener('dragend', function(){ editDragKey = null; editDragClear(); });
+}
+
+/* 画面編集タブだけを描き直す（他のタブの状態やスクロールを巻き込まない）。
+   ★buildSettings() をまるごと呼ぶと表示中のタブが「🖥 表示」に戻ってしまうため、
+     この1画面だけを差し替える専用の口にした。 */
+function refreshEditScreens(){
+  var page = document.querySelector('#wdtSettingsBody .wdtx-page[data-pg="edit"]');
+  if(page) page.innerHTML = buildEditScreensHtml();
 }
 
 function exportSettings(){
@@ -19068,6 +19633,15 @@ return {
   addKind:     function(k, d){ var R = window.RTTPARTS; try{ return !!(R && R.registerKind(k, d)); }catch(e){ return false; } },
   addArea:     function(k, l){ var R = window.RTTPARTS; try{ return !!(R && R.registerArea(k, l)); }catch(e){ return false; } },
   applySkin:   function(k){ var R = window.RTTPARTS; try{ return !!(R && R.applySkin(k)); }catch(e){ return false; } },
+  setSkin:     function(k){ var R = window.RTTPARTS; try{ return !!(R && R.setSkin(k)); }catch(e){ return false; } },
+  /* ★工程9（決-82）… 旧「📖 アコーディオン」の設定を【1回だけ渡して消す】窓口。
+     設定 st の持ち主はこの WDT なので、外からは中身を覗かせない。
+     読むだけの窓口にすると、起動のたびに移し替えてしまう。 */
+  takeOneOpenFlag: function(){
+    var on = !!(st.addons && st.addons.oneopen);
+    if(on){ try{ delete st.addons.oneopen; save(); }catch(e){} }
+    return on;
+  },
   currentSkin: function(){ var R = window.RTTPARTS; try{ return R ? R.currentSkin() : ''; }catch(e){ return ''; } },
   listParts:   function(){ var R = window.RTTPARTS; try{ return R ? R.parts() : []; }catch(e){ return []; } },
   listSkins:   function(){ var R = window.RTTPARTS; try{ return R ? R.skins() : []; }catch(e){ return []; } },
@@ -19075,6 +19649,32 @@ return {
   getLayout:   function(){ var R = window.RTTPARTS; try{ return R ? R.loadLayout() : null; }catch(e){ return null; } },
   setLayout:   function(o){ var R = window.RTTPARTS; try{ return !!(R && R.saveLayout(o)); }catch(e){ return false; } },
   partElId:    function(k){ var R = window.RTTPARTS; try{ return R ? R.partElId(k) : ''; }catch(e){ return ''; } },
+  /* ★D-06 工程6（決-96）… ドラッグの吸い付きに使う修飾キー。
+     ⚙設定に出す項目なので、正はここ（st.addons）。決-94 の切り分けどおり。
+     基礎板（RTT21）は自分では覚えず、毎回この窓口に聞きに来る。
+     ★st そのものは外に出さない（決-82 の takeOneOpenFlag と同じ作法）。 */
+  dragMod: function(){
+    var v = (st.addons && st.addons.dragmod) || 'shift';
+    return (v === 'ctrl' || v === 'alt' || v === 'off') ? v : 'shift';
+  },
+  setDragMod: function(k){
+    if(k !== 'shift' && k !== 'ctrl' && k !== 'alt' && k !== 'off') return false;
+    try{ st.addons.dragmod = k; save(); return true; }catch(e){ return false; }
+  },
+  /* ★D-06 工程5（決-100）… 行の高さのつまみが、RTT19 の外から
+     ⚙設定の値（st.addons.rowdens）を読み書きするための窓口。
+     dragMod/setDragMod（決-96）とまったく同じ形にした。
+     ★rowDens() は【止まっている値】を返すだけ。ドラッグ中の見た目の追従は
+     つまみ側が CSS 変数を直接書き換えて行う（家を2つ作らないため・決-94）。 */
+  rowDens: function(){
+    var v = Number(st.addons && st.addons.rowdens);
+    return isFinite(v) ? v : 38;
+  },
+  setRowDens: function(v){
+    v = Math.round(Number(v));
+    if(!isFinite(v) || v < 0) return false;
+    try{ st.addons.rowdens = v; save(); applyAll(); return true; }catch(e){ return false; }
+  },
   dbOptGet: dbOptGet,          /* 読む   : WDT.dbOptGet('mde','font') */
   dbOptSet: dbOptSet,          /* 書く   : WDT.dbOptSet('mde','font','15') */
   dbOptDel: dbOptDel,          /* 消す   : WDT.dbOptDel('mde','font') */
@@ -19622,10 +20222,105 @@ function showPanel(){
    3. 表の列幅をドラッグで調節する（幅は記憶する）
    ============================================================ */
 var K_COLW = 'rtt19_colw';
+
+/* ---- 幅の置き場（D-06 工程2・決-90 / 決-93・2026-09-13）------------------
+   ★前は「このブラウザの中だけ」の置き場（lsGet / lsSet の側）に直接入れていた。
+     そのため【.sqlite を別のPCへ持っていくと、列幅だけが自動の幅に戻っていた】。
+     1ファイルで持ち運ぶ道具なのに、設定だけがファイルの外に居た（絶対規律2）。
+
+   いまは RTT20 ブロックの「保存先の登録簿」を window.RTTSTORE 経由で借り、
+   _meta_opts の ('grid','colw') へ入れる。だから .sqlite と一緒に旅をする。
+   自動保存の予約（落とし穴 #18）も登録簿の側が面倒を見てくれる。
+
+   ★窓口が無いとき（RTT20 を外した版）だけ、今までと同じ道を通る。
+     この逃げ道が無いと、RTT20 を消した瞬間に RTT19 が黙って壊れる。
+     エラーも出ないので誰も気づけない（落とし穴 #38 の型）。
+     どちらのブロックにも「ここだけ消せば前の版に戻る」と書いてあるので、
+     その約束を守るために要る。 */
+var COLW_SCOPE = 'grid', COLW_NAME = 'colw';
+var colwReg = false, colwMoved = false;
+
+function colwStore(){
+  var S = window.RTTSTORE;
+  if(!S || typeof S.get !== 'function' || typeof S.set !== 'function'
+        || typeof S.register !== 'function') return null;   /* 窓口が無い → 逃げ道へ */
+  if(!colwReg){ S.register(K_COLW, 'db', COLW_SCOPE, COLW_NAME); colwReg = true; }
+  if(!colwMoved){ try{ moveOldWidths(S); }catch(e){} }
+  return S;
+}
+
+/* 古い置き場に残っている幅を、DB へ1回だけ写す（決-90 の引っ越しの作法）。
+   ★DB がまだ開いていないときは「写した」ことにしない。書き込みが false を返すので、
+     次に呼ばれたときにもう一度試す。ここで諦めると、DB が開く前に1回でも
+     触られた人の幅が永久に消える（黙って消えるので、あとから誰も気づけない）。
+   ★写したあとも古い側は消さない。消すと、逃げ道で動いている人の幅まで失う。
+     以後は DB 側だけを読むので、古い値が残っていても邪魔にならない。 */
+function moveOldWidths(S){
+  var old = null, cur;
+  try{ old = JSON.parse(lsGet(K_COLW, '{}')); }catch(e){ old = null; }
+  if(!old || typeof old !== 'object' || !Object.keys(old).length){
+    colwMoved = true; return;               /* 写すものが無い */
+  }
+  cur = S.get(K_COLW, null);
+  if(cur && typeof cur === 'object' && Object.keys(cur).length){
+    colwMoved = true; return;               /* DB に既に在る → 上書きしない */
+  }
+  if(S.set(K_COLW, old)) colwMoved = true;  /* false＝DB未オープン。次の機会に */
+}
+
 function loadWidths(){
+  var S = colwStore(), v;
+  if(S){
+    v = S.get(K_COLW, null);
+    return (v && typeof v === 'object' && !Array.isArray(v)) ? v : {};
+  }
   try{ return JSON.parse(lsGet(K_COLW, '{}')) || {}; }catch(e){ return {}; }
 }
-function saveWidths(o){ lsSet(K_COLW, JSON.stringify(o)); }
+function saveWidths(o){
+  var S = colwStore();
+  if(S) return S.set(K_COLW, o);            /* ★DB のみ。古い置き場へは書かない */
+  lsSet(K_COLW, JSON.stringify(o));
+  return true;
+}
+
+/* ---- MDメモの分割比の置き場（D-11 工程8・決-91 / 決-99）----------------
+   ★前は mdeditor_settings（lsGet / lsSet の側）にしか置いていなかった。
+     .sqlite を別PCへ持っていくと、分割比だけ元の50:50に戻る（絶対規律2）。
+   ★K_COLW と同じ形。窓口が無い版（RTT20を外した版）は素通りし、
+     mdeditor_settings 側だけで今までどおり動く（逃げ道）。
+   ★書き込みの正窓口は MDEditor.setSplitRatio() の1本だけ（15303行）。
+     PC・スマホどちらのドラッグも、離したときにそこを呼ぶ。 */
+var K_SPLIT = 'mde_split', SPLIT_SCOPE = 'mde', SPLIT_NAME = 'split';
+var splitReg = false, splitMoved = false;
+function splitStore(){
+  var S = window.RTTSTORE;
+  if(!S || typeof S.get !== 'function' || typeof S.set !== 'function'
+        || typeof S.register !== 'function') return null;
+  if(!splitReg){ S.register(K_SPLIT, 'db', SPLIT_SCOPE, SPLIT_NAME); splitReg = true; }
+  if(!splitMoved){ try{ moveOldSplit(S); }catch(e){} }
+  return S;
+}
+function moveOldSplit(S){
+  var cur = S.get(K_SPLIT, null);
+  if(typeof cur === 'number' && isFinite(cur)){ splitMoved = true; return; }  /* DB に既に在る */
+  var old = null;
+  try{ old = JSON.parse(lsGet('mdeditor_settings', 'null')); }catch(e){ old = null; }
+  var v = old && typeof old.splitRatio === 'number' && isFinite(old.splitRatio) ? old.splitRatio : null;
+  if(v == null){ splitMoved = true; return; }             /* 写すものが無い */
+  if(S.set(K_SPLIT, v)) splitMoved = true;                /* false＝DB未オープン。次の機会に */
+}
+function loadSplitRatio(dflt){
+  var S = splitStore(), v;
+  if(S){
+    v = S.get(K_SPLIT, null);
+    if(typeof v === 'number' && isFinite(v)) return v;
+  }
+  return dflt;
+}
+function setSplitRatioDb(v){
+  var S = splitStore();
+  return S ? S.set(K_SPLIT, v) : false;      /* false＝逃げ道。mdeditor_settings 側は既に書いてある */
+}
 
 function tableKeyNow(){
   try{ if(typeof currentTable !== 'undefined' && currentTable) return String(currentTable); }catch(e){}
@@ -19643,6 +20338,89 @@ function colKeys(ths){
   return keys;
 }
 
+/* ---- 文字の幅を測る道具（D-06 工程6・決-96）--------------------------
+   ★掴んだ瞬間に1回だけ測る。ドラッグ中は毎回測らない。
+     実測（ダミー53件・11列）… 全列を測るのに 22〜29ms。表は LIMIT 1000 なので
+     1000件では1列だけで 50ms を超え、毎フレームでは間に合わない。
+     ドラッグ中に中身は変わらないので、1回測れば答えは同じ。 */
+var measProbe = null;
+function measurer(sample){
+  var cs;
+  if(!measProbe){
+    measProbe = document.createElement('span');
+    measProbe.setAttribute('data-rtt-skip', '1');
+    measProbe.style.cssText = 'position:absolute;left:-9999px;top:0;'
+                            + 'visibility:hidden;white-space:pre';
+    document.body.appendChild(measProbe);
+  }
+  try{ cs = sample ? getComputedStyle(sample) : null; }catch(e){ cs = null; }
+  measProbe.style.font = cs ? cs.font : '';
+  return measProbe;
+}
+function widthOfText(probe, text){
+  probe.textContent = (text == null) ? '' : String(text);
+  return probe.offsetWidth;
+}
+function padOf(cell){
+  var cs;
+  try{ cs = getComputedStyle(cell); }catch(e){ return 16; }
+  return (parseFloat(cs.paddingLeft) || 0) + (parseFloat(cs.paddingRight) || 0) + 8;
+}
+/* いま画面に映っている行だけを返す。
+   ★入れ物の四角だけで決めてはいけない（2026-09-13 実測）…
+     表を描いた直後、入れ物はまだ高さが決まっておらず 2101px あった（画面は820px）。
+     そのため【53行すべてが「見えている」扱い】になり、
+     「見える範囲で詰める」が黙って「全行で詰める」に化けていた。
+     利用者が絵を見て却下したほうの動きが、そのまま出ていたことになる。
+   ★だから画面の高さでも頭打ちにする。 */
+function visibleRows(table){
+  var body = table.tBodies[0], wrap = table.parentElement, out = [], i, r, wr, b, top, bot;
+  if(!body) return [];
+  try{ wr = (wrap || table).getBoundingClientRect(); }catch(e){ return []; }
+  top = Math.max(wr.top, 0);
+  bot = Math.min(wr.bottom, window.innerHeight || wr.bottom);
+  if(!(bot > top)) bot = top + 400;          /* 念のため（高さ0で返ってきたとき）*/
+  for(i = 0; i < body.rows.length; i++){
+    r = body.rows[i];
+    b = r.getBoundingClientRect();
+    if(b.bottom > top && b.top < bot) out.push(r);
+  }
+  return out.length ? out : Array.prototype.slice.call(body.rows, 0, 20);
+}
+/* i 列目の「文字が切れない幅」。rows に渡した行だけを見る。 */
+function fitOf(table, i, rows){
+  var body = table.tBodies[0], sample = (body && body.rows[0]) ? body.rows[0].cells[i] : null;
+  var probe, max = 0, k, c;
+  if(!sample) return 0;
+  probe = measurer(sample);
+  for(k = 0; k < rows.length; k++){
+    c = rows[k].cells[i];
+    if(c) max = Math.max(max, widthOfText(probe, c.innerText || ''));
+  }
+  return Math.round(max + padOf(sample));
+}
+/* 見出しだけの幅 */
+function headFitOf(table, i){
+  var th = table.tHead.rows[0].cells[i];
+  if(!th) return 0;
+  return Math.round(widthOfText(measurer(th), (th.innerText || '').trim()) + padOf(th));
+}
+
+/* ★見出しはここまでしか伸ばさない（決-96・見出し案ア）。
+   「担当者・一緒に作業した人」は中身が43px なのに見出しが239px あり、
+   これを切らない限り列は縮まない。全文は title に残してマウスで読める。 */
+var HEAD_MAX = 120;
+var COL_MAX  = 600;      /* 念のための上限（見える行で測るので、ふつう当たらない）*/
+
+/* 記憶が無い列の既定の幅（D-06 工程6・決-96・利用者の追加指示）------------
+   ★これまでは「ブラウザが自動で決めた幅」をそのまま固めていたので、
+     中身が「田中」の2文字でも見出しのぶんだけ広い列ができていた。
+     実測 … 担当者 240px（中身43px）／得られた知識 317px（中身197px）。 */
+function defaultWidth(table, i, rows){
+  var w = Math.max(fitOf(table, i, rows), Math.min(headFitOf(table, i), HEAD_MAX));
+  return Math.max(46, Math.min(COL_MAX, Math.round(w)));
+}
+
 function applyResizable(table){
   if(!table || table.dataset.rttResz === '1') return;
   var head = table.tHead;
@@ -19654,12 +20432,26 @@ function applyResizable(table){
   var store = loadWidths();
   var keys = colKeys(ths);
   var widths = [], i, w;
+  var rows0 = visibleRows(table);
 
-  /* いまの自動レイアウトでの幅を測ってから、固定レイアウトに切り替える */
+  /* 幅を決めてから、固定レイアウトに切り替える。
+     ★覚えている幅があればそれが最優先（利用者が動かした結果を勝手に戻さない）。
+       無い列だけ、中身と見出しに合わせて詰める（決-96）。 */
   for(i = 0; i < ths.length; i++){
     w = store[keys[i]];
-    if(!w || !isFinite(w)) w = Math.round(ths[i].getBoundingClientRect().width);
+    if(!w || !isFinite(w)) w = defaultWidth(table, i, rows0);
     widths.push(Math.max(46, Math.round(w)));
+    /* ★見出しは「…」で切れるので、全文を title に残す（マウスで読める）。
+       ★title は既に「クリックで並べ替え…」の案内に使われている（実測）。
+         上書きすると並べ替えの案内が消えるので、【全文を先頭に足す】形にする。
+         二重に足さないよう、先頭が同じなら何もしない。 */
+    try{
+      (function(th){
+        var full = (th.innerText || '').trim(), cur = th.title || '';
+        if(!full || cur.indexOf(full) === 0) return;
+        th.title = full + (cur ? '\n' + cur : '');
+      })(ths[i]);
+    }catch(e){}
   }
 
   var cg = document.createElement('colgroup');
@@ -19726,8 +20518,59 @@ function applyResizable(table){
         ev.preventDefault();
         ev.stopPropagation();
       }
-      grip.addEventListener('mousedown', onDown);
-      grip.addEventListener('touchstart', onDown, {passive:false});
+      /* ---- ドラッグは基礎板（RTT21）に任せる（D-06 工程6・決-96）--------
+         ★呼ぶ側がすることは「いまの値を返す／新しい値を当てる／測って渡す」だけ。
+           ヒント札・吸い付き・ガイド線・修飾キーは基礎板が全部持っている。
+         ★基礎板が無い版（RTT21 を外した本体）では、今までどおり自前で動く。
+           これが無いと、ブロックを1つ外しただけで列幅が動かせなくなる。 */
+      var A = window.RTTDRAG, fitc = null;
+      if(A && typeof A.attach === 'function'){
+        A.attach(grip, {
+          axis:'x', min:46, tol:14,
+          unitName:'px', stepName:'文字', fitName:'ぴったり', viewName:'見える範囲',
+          /* 掴んだ瞬間に1回だけ測る（毎フレーム測ると 1000件で間に合わない）*/
+          start: function(){
+            var body = table.tBodies[0];
+            var sample = (body && body.rows[0]) ? body.rows[0].cells[idx] : th;
+            var probe = measurer(sample);
+            fitc = {
+              all:  fitOf(table, idx, body ? Array.prototype.slice.call(body.rows) : []),
+              view: fitOf(table, idx, visibleRows(table)),
+              ch:   widthOfText(probe, 'あ'),        /* 1文字ぶんの幅 */
+              pad:  padOf(sample)
+            };
+          },
+          get: function(){ return parseInt(cg.children[idx].style.width, 10)
+                                || Math.round(th.getBoundingClientRect().width); },
+          set: function(v){
+            cg.children[idx].style.width = v + 'px';
+            var t = 0, k;
+            for(k = 0; k < cg.children.length; k++){
+              t += parseInt(cg.children[k].style.width, 10) || 0;
+            }
+            table.style.width = t + 'px';
+          },
+          commit: function(){
+            var s = loadWidths(), k2;
+            for(k2 = 0; k2 < cg.children.length; k2++){
+              s[keys[k2]] = parseInt(cg.children[k2].style.width, 10) || 46;
+            }
+            saveWidths(s);
+          },
+          fit:     function(){ return fitc ? fitc.all  : null; },
+          fitView: function(){ return fitc ? fitc.view : null; },
+          unit:    function(){ return fitc ? fitc.ch   : 0; },
+          base:    function(){ return fitc ? fitc.pad  : 0; },
+          rect:    function(){
+            var r = table.getBoundingClientRect();
+            return {left:r.left, top:r.top, width:r.width, height:r.height};
+          },
+          posOf:   function(v){ return th.getBoundingClientRect().left + v; }
+        });
+      }else{
+        grip.addEventListener('mousedown', onDown);
+        grip.addEventListener('touchstart', onDown, {passive:false});
+      }
       grip.addEventListener('dblclick', function(ev){
         ev.preventDefault(); ev.stopPropagation();
         var s = loadWidths();
@@ -19736,6 +20579,100 @@ function applyResizable(table){
         rerender();
       });
     })(i);
+  }
+}
+
+/* ============================================================
+   行の高さのつまみ（D-06 工程5・決-100）
+   ------------------------------------------------------------
+   ★列幅（applyResizable）とは違う形になる理由 …
+     列は列ごとに別々の幅を持つが、行の高さは決-90で
+     「全行いっせいに1つの数字」と決まっている。だから、
+     どの行の境目に付いたつまみを掴んでも【同じ値】が動く。
+   ★吸い付き先は「目盛りだけ」（決-100・案え）。名前付き候補
+     （ゆったり／ふつう／ぎっしり）は今回は載せない。値そのものは
+     既に⚙設定にあり、まず目盛りだけで動かしてみてから、
+     必要になったら決-95と同じ形で registerSnap に1行足す。
+   ★設定の置き場は増やさない … WDT.rowDens / setRowDens を通して
+     st.addons.rowdens を読み書きするだけ（8-4番のテストが守る）。
+   ============================================================ */
+var ROW_MIN = 18, ROW_MAX = 200;      /* rowDensPx() の頭打ちと同じ（RTT19側） */
+
+/* いまの行の高さ（px）。「ゆったり」（0 = 制限なし）のときは、
+   まだ数字が無いので、掴んだその行の【いまの見た目の高さ】を出発点にする。 */
+function curRowPx(tr){
+  var v = 0, W = window.WDT;
+  try{ if(W && typeof W.rowDens === 'function') v = Number(W.rowDens()); }catch(e){}
+  if(!isFinite(v) || v <= 0) v = Math.round(tr.getBoundingClientRect().height) || 38;
+  return Math.max(ROW_MIN, Math.min(ROW_MAX, Math.round(v)));
+}
+
+/* ドラッグ中の見た目だけを先に動かす（軽い処理・毎フレーム呼んでよい）。
+   ★保存は commit（離したとき）まで待つ。列幅と同じ考え方。 */
+function previewRowPx(px){
+  try{
+    document.body.classList.add('wdt-rowfix');
+    document.documentElement.style.setProperty('--rtt-rowh', Math.round(px) + 'px');
+  }catch(e){}
+}
+
+/* 1目盛りの大きさ（px）… その表の実際の行の文字サイズから測る。
+   ★吸い付き先は「5目盛りぶん」ごとに候補が並ぶ（基礎板 RTT21 の仕様。
+     RTTDRAG.step() で刻み数を確かめる）。★「5目盛り＝ちょうど1行ぶん」に
+     なるよう、測った行高を刻み数（5）で割ってから渡す。ただし画面の札に
+     出る文言は基礎板が決める「5目盛りぶん」のまま（決-100 案え・
+     名前付き候補は付けない。stepName を「行」にすり替えると
+     「5行ぶん動く」と読めてしまい、実際は1行ぶんしか動かないので
+     2026-09-13 の実機確認で「行」の表記をやめた）。 */
+function rowStepUnit(table){
+  var body = table.tBodies[0];
+  var sample = (body && body.rows[0]) ? body.rows[0].cells[0] : null;
+  var lh = 0, A = window.RTTDRAG, n = 5;
+  try{ if(A && typeof A.step === 'function') n = Number(A.step()) || 5; }catch(e){}
+  try{ lh = sample ? parseFloat(getComputedStyle(sample).lineHeight) : 0; }catch(e){ lh = 0; }
+  if(!isFinite(lh) || lh <= 0) lh = 20;
+  return Math.max(1, Math.round(lh / n));
+}
+
+function applyRowResizable(table){
+  if(!table || table.dataset.rttRowResz === '1') return;
+  var body = table.tBodies[0];
+  if(!body || !body.rows.length) return;
+  table.dataset.rttRowResz = '1';
+
+  var unit = rowStepUnit(table);
+  var i;
+  for(i = 0; i < body.rows.length; i++){
+    (function(tr){
+      var grip = document.createElement('div');
+      grip.className = 'rtt19-rowgrip';
+      grip.title = 'ドラッグで行の高さを変える（すべての行がいっしょに変わります）';
+      tr.appendChild(grip);
+
+      var A = window.RTTDRAG, startPx = 0;
+      if(A && typeof A.attach === 'function'){
+        A.attach(grip, {
+          axis:'y', min:ROW_MIN, max:ROW_MAX, tol:8,
+          unitName:'px',    /* stepName は既定の「目盛り」のまま（決-100 案え・名前付き候補なし） */
+          start: function(){ startPx = curRowPx(tr); },
+          get:   function(){ return startPx; },
+          set:   function(v){ previewRowPx(v); },
+          commit: function(v){
+            var W = window.WDT;
+            if(!(W && typeof W.setRowDens === 'function' && W.setRowDens(v))){
+              previewRowPx(v);   /* ★窓口が無い版でも、見た目だけは今までどおり動く（逃げ道） */
+            }
+          },
+          unit: function(){ return unit; },
+          base: function(){ return 0; },
+          rect: function(){
+            var r = table.getBoundingClientRect();
+            return {left:r.left, top:r.top, width:r.width, height:r.height};
+          },
+          posOf: function(v){ return tr.getBoundingClientRect().top + v; }
+        });
+      }
+    })(body.rows[i]);
   }
 }
 
@@ -19757,11 +20694,11 @@ function watchResults(){
   if(!box) return;
   var mo = new MutationObserver(function(){
     var t = box.querySelector('table.grid');
-    if(t) applyResizable(t);
+    if(t){ applyResizable(t); applyRowResizable(t); }
   });
   mo.observe(box, {childList:true, subtree:false});
   var t0 = box.querySelector('table.grid');
-  if(t0) applyResizable(t0);
+  if(t0){ applyResizable(t0); applyRowResizable(t0); }
 }
 
 /* ============================================================
@@ -19980,9 +20917,24 @@ function addStyle(){
   s.setAttribute('data-rtt-skip', '1');   /* 指紋の計算からは外す */
   s.textContent =
       '#app-db table.grid th{position:sticky;top:0}' +
-      '#app-db table.grid th .rtt19-grip{position:absolute;top:0;right:-3px;width:8px;height:100%;' +
+      /* ★D-06 工程6（決-96）… 見出しを1行に収めて「…」で切る。
+         こうしないと「担当者・一緒に作業した人」のような長い見出しが
+         列幅の下限になってしまい、中身が2文字でも列が詰まらない。
+         全文は title に入れてあるので、マウスを乗せれば読める。 */
+      '#app-db table.grid th{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}' +
+      /* ★つまみは right:0 に置く。overflow:hidden を付けたので、
+         はみ出して置くと 3px ぶんが切れて掴みにくくなる */
+      '#app-db table.grid th .rtt19-grip{position:absolute;top:0;right:0;width:8px;height:100%;' +
         'cursor:col-resize;z-index:3;user-select:none;touch-action:none}' +
       '#app-db table.grid th .rtt19-grip:hover{background:#4c8dff;opacity:.65}' +
+      /* ★D-06 工程5（決-100）… 行の高さのつまみ。列幅のつまみ（すぐ上）と同じ形。
+         全行いっせいに1つの数字で決まるので（決-90 案カ）、どの行の境目を
+         掴んでも同じ値が動く。tr に position:relative を足すのはこの取っ手を
+         行の下端へ絶対配置するため（他の見た目には影響しない）。 */
+      '#app-db table.grid tbody tr{position:relative}' +
+      '#app-db table.grid tbody tr .rtt19-rowgrip{position:absolute;left:0;right:0;bottom:-4px;' +
+        'height:8px;cursor:row-resize;z-index:3;user-select:none;touch-action:none}' +
+      '#app-db table.grid tbody tr .rtt19-rowgrip:hover{background:#4c8dff;opacity:.65}' +
       '#app-db table.grid td{overflow:hidden}' +
       '#app-db table.grid td.mdcell .mdbody{overflow-wrap:anywhere}' +
       '#app-db .mdbody li.task-item>input[type=checkbox],' +
@@ -20094,6 +21046,11 @@ window.RTT19 = {
   resetWidths: resetWidths,
   toggleHardBreaks: toggleHardBreaks,
   fingerprint: function(){ return currentFp; },
+  /* D-11 工程8（決-99）… MDエディタのブロックは別の <script> なので、
+     このIIFEの中で定義した関数は、そのままでは向こうから見えない。
+     MDEditor.setSplitRatio() から呼べるように、ここで公開する。 */
+  setSplitRatioDb: setSplitRatioDb,
+  loadSplitRatio: loadSplitRatio,
   /* Ver1.14.01 (B7): いま指紋が何ブロック・何文字を見ているかを確かめる窓口 */
   coverage: function(){
     ensureSource();
@@ -20179,6 +21136,28 @@ registerStore(K_HIDE,  'db', 'palette', 'hidden');
      「回数の記録はこのブラウザの中だけに残ります」と書いてあるため。
      動かすときは、ヘルプの文も一緒に直すこと。 */
 registerStore(K_USE,   'ls');
+
+/* ---- 外から使えるようにする窓口（D-06 工程2・決-93・2026-09-13）----------
+   ★登録簿そのものは1行も動かしていない。窓口を1つ足しただけ。
+
+   なぜ要るか … 表の列幅を覚えている loadWidths / saveWidths は、
+   1つ前の <script>（RTT19）の閉じた入れ物の中にあり、ここからは見えない。
+   直接 WDT.dbOptGet を叩かせると【しまい方のルールが本体に2つ】でき、
+   CLAUDE.md §5.2 の決まり②（読む側に if を増やさず登録簿に載せる）に反する。
+
+   ★借りる側は必ず「窓口が無いとき今までどおり動く」逃げ道を持つこと。
+     このブロック（RTT20）を消しても RTT19 が道連れにならないようにするため。
+     どちらのブロックにも「ここだけ消せば前の版に戻る」と書いてある。 */
+try{
+  window.RTTSTORE = {
+    register: registerStore,   /* 1行足すだけで置き場が決まる */
+    get:      jGet,            /* JSON にして読む（無ければ既定値）*/
+    set:      jSet,            /* JSON にして書く（DB なら自動保存も予約）*/
+    raw:      jRaw,            /* 文字列のまま読む（null＝まだ読めない）*/
+    put:      jPut,            /* 文字列のまま書く */
+    where:    function(k){ var s = storeOf(k); return s ? s.where : null; }
+  };
+}catch(e){}
 
 function jRaw(key){
   var s = storeOf(key), W = window.WDT;
@@ -20647,7 +21626,14 @@ function registerSkin(def){
                ★registerSkin も白名簿。ここに書いていない欄は【黙って捨てられる】
                  （落とし穴 #94 と同じ型。工程7の実測で実際に踏んだ）。 */
             tree     : def.tree || null,
-            noOneOpen: !!def.noOneOpen };
+            /* ---- 第5段 工程9（決-82）… スキンが【自分で名乗る】------------
+               ★以前は「このスキンでは1つだけ開く方式を **使わない**」（noOneOpen）
+                 という否定形だった。工程9 で「アコーディオン」をスキンの1つにしたので、
+                 **肯定形（私は1つだけ開く方式です）** に直した。
+               ★これで基礎板は「どのスキンが何を望むか」を知らなくてよい。
+                 将来「タブでも1つだけ開きたい」と思えば、そのスキンに
+                 oneOpen:true と書くだけ。コードには何も埋め込まない（拘束しない）。 */
+            oneOpen  : !!def.oneOpen };
   var i = SKIN_AT[d.key];
   if(i != null){ SKINS[i] = d; }
   else { SKIN_AT[d.key] = SKINS.length; SKINS.push(d); }
@@ -21150,6 +22136,71 @@ function registerCombo(name, expr){
 }
 function comboOf(n){ var i = COMBO_AT[n]; return (i == null) ? null : COMBOS[i]; }
 
+/* ==================================================================
+   Ver1.19.26 (L-01 第5段 工程10)  利用者が増やせるコンボ
+   ------------------------------------------------------------------
+   ★組み込み5個は【コードが正】（起動のたびに同じものが並ぶ）。
+     利用者が「コンボ作成」画面で増やした分だけ layout.userCombos に乗る。
+     置き場を分けたのは決-39「部品の定義はコード、配置はDB」と同じ切り分け。
+   ★消せるのは利用者が増やした分だけ。組み込みは見本として残す（消せない）。 */
+var BUILTIN_COMBO_NAMES = {'ツールバー':1, '検索まわり':1, '押せるもの':1, '入力欄':1, '出してよいもの':1};
+
+function unregisterCombo(name){
+  var i = COMBO_AT[name], j;
+  if(i == null) return false;
+  COMBOS.splice(i, 1);
+  COMBO_AT = {};
+  for(j = 0; j < COMBOS.length; j++) COMBO_AT[COMBOS[j].name] = j;
+  return true;
+}
+
+/* 起動のたびに DB から登録簿へ流し込む。★何度呼ばれても増えない
+   （registerCombo が同じ name を上書きするだけ・#94 と同じ形にしない）。 */
+function loadUserCombos(){
+  var lay, arr, i, n = 0;
+  try{ lay = loadLayout(); }catch(e){ return 0; }
+  arr = (lay.userCombos && lay.userCombos.length) ? lay.userCombos : [];
+  for(i = 0; i < arr.length; i++){
+    if(arr[i] && arr[i].name && arr[i].expr && registerCombo(arr[i].name, arr[i].expr)) n++;
+  }
+  return n;
+}
+
+/* 追加も上書きも1つの口で。★答えは必ず {ok, why} の形（pickParts と同じ流儀・#34/#68）。 */
+function addUserCombo(name, expr){
+  var lay, arr, i, found = -1, chk;
+  name = String(name == null ? '' : name).trim();
+  expr = String(expr == null ? '' : expr).trim();
+  if(!name || !expr) return {ok:false, why:'名前と式の両方が要ります'};
+  if(BUILTIN_COMBO_NAMES[name]) return {ok:false, why:'組み込みと同じ名前は使えません: ' + name};
+  chk = pickParts(expr);
+  if(!chk.ok) return {ok:false, why:chk.why};
+  try{ lay = loadLayout(); }catch(e){ return {ok:false, why:'設定を読めませんでした'}; }
+  arr = lay.userCombos || (lay.userCombos = []);
+  for(i = 0; i < arr.length; i++){ if(arr[i].name === name){ found = i; break; } }
+  if(found >= 0) arr[found] = {name:name, expr:expr};
+  else arr.push({name:name, expr:expr});
+  saveLayout(lay);
+  registerCombo(name, expr);
+  return {ok:true, why:''};
+}
+
+function removeUserCombo(name){
+  var lay, arr, i;
+  if(!name || BUILTIN_COMBO_NAMES[name]) return false;   /* ★組み込みは消せない */
+  try{ lay = loadLayout(); }catch(e){ return false; }
+  arr = lay.userCombos || [];
+  for(i = 0; i < arr.length; i++){
+    if(arr[i].name === name){
+      arr.splice(i, 1);
+      saveLayout(lay);
+      unregisterCombo(name);
+      return true;
+    }
+  }
+  return false;
+}
+
 registerCombo('ツールバー',     'db & toolbar');
 registerCombo('検索まわり',     'db & search & !panel');
 registerCombo('押せるもの',     'db & action');
@@ -21268,6 +22319,21 @@ function unknownTags(){
 var LAYOUT_SCOPE = 'shell';
 var LAYOUT_NAME  = 'layout';
 
+/* 第5段 工程8（決-81）… 利用者がドラッグして決めた大きさの控え。
+   ★正は DB（_meta_opts の shell/layout の sizes）。ここはその写しで、
+     loadLayout() が呼ばれるたびに入れ替わる（描く側が毎回DBを読まないため）。 */
+var LAYOUT_SIZES = {};
+
+/* その節の大きさ … 利用者が決めた値があればそれ、無ければ木に書いてある値。
+   ★コード側の木は書き換えない（木は共有の定数。書き換えると次の描画にも残る）。 */
+function sizeOfNode(node){
+  var v;
+  if(!node) return null;
+  v = node.key ? LAYOUT_SIZES[node.key] : null;
+  if(typeof v === 'number' && v > 0) return v;
+  return (typeof node.size === 'number' && node.size > 0) ? node.size : null;
+}
+
 /* 標準のグループ分け … 各部品の group: から組み立てる（コードに埋め込まない）*/
 function defaultLayout(){
   var i, g, order = [], bag = {}, groups = [];
@@ -21294,6 +22360,14 @@ function loadLayout(){
   if(!o.skin) o.skin = 'std';
   if(!o.areas) o.areas = {};
   if(!o.show || typeof o.show !== 'object') o.show = {};   /* 第5段 工程3 */
+  /* ---- 第5段 工程8（決-81・案A）… 利用者がドラッグして決めた大きさ ----
+     ★開閉表（show）とまったく同じ形。**触ったものだけ**を持つので表が太らない。
+       触っていない節は載らない ＝ 既定の「伸びる」のまま（利用者の指示
+       「固定で拘束する仕組みは絶対に避けて」）。
+     ★コード側の木は書き換えない。描く直前にここから上書きするだけなので、
+       コード側の木を直したとき DB の古い値に勝たれない（正が1つ・#13 / #27）。 */
+  if(!o.sizes || typeof o.sizes !== 'object') o.sizes = {};
+  LAYOUT_SIZES = o.sizes;
   return o;
 }
 
@@ -21448,6 +22522,10 @@ function applySkin(key){
     try{ prev.leave({layout: lay, from: curSkinKey, to: def.key, mount: mountPart}); }catch(e){}
   }
   bodySkinClear();
+  /* ★工程9（決-82）… 「1つだけ開く方式か」は【スキンが持ち主】。
+     以前は applyAll() が st.addons.oneopen から付けていたが、持ち主が2人いると
+     片方が消しに来て食い違う（#13 / #27）。ここ1か所だけが付け外しする。 */
+  try{ document.body.classList.toggle('wdt-oneopen', !!def.oneOpen); }catch(e){}
   try{ document.body.classList.add('wdt-skin-' + def.key); }catch(e){}
   curSkinKey = def.key;
   if(def.apply){
@@ -21498,10 +22576,11 @@ function skinTreeLeave(){
 }
 
 /* 同じ形のスキンを1行で作る（CLAUDE.md §5.2 決まり①）。
-   ★noOneOpen … S-03「📖 アコーディオン」との衝突を避ける（危険R-3の一次対策）。
-     bindOneOpen が currentSkin() 経由でこの1点だけを見る。 */
+   ★工程9（決-82）… 木のスキンは oneOpen を名乗らない（＝1つだけ開く方式ではない）。
+     「アコーディオン」は独立したスキンになったので、矛盾する組み合わせがそもそも作れない。
+     危険R-3（アコーディオンとタブの衝突）は、これで**構造として**消えた。 */
 function makeTreeSkin(key, label, desc, tree){
-  registerSkin({key: key, label: label, desc: desc, tree: tree, noOneOpen: true,
+  registerSkin({key: key, label: label, desc: desc, tree: tree,
     apply: function(){ skinTreeApply(tree); },
     leave: function(){ skinTreeLeave(); }});
 }
@@ -21514,6 +22593,18 @@ makeTreeSkin('s1', 'タブ切り替え（3節をタブで）',
     {key:'s1c', kind:'slot', part:'db.secTableManager', label:'🗂 項目（テーブル）管理'}
   ]});
 
+/* ---- アコーディオン … 節を1つだけ開くスキン（第5段 工程9・決-82）--------
+   ★利用者の決定 … 「アコーディオンはアコーディオンでスキンを作って、
+     他のスキンは別物扱い。スキンは画面を広く使うために作ったので、
+     アコーディオンの説明のためにスペースを取りたくない」。
+   ★木を持たないので画面の並びは標準のまま。違うのは「1つ開くと他が閉じる」だけ。
+   ★これで「タブなのに1つだけ開く」という矛盾した組み合わせが**作れなくなった**。
+     警告も灰色表示も要らない（危険R-3 が構造として消えた）。 */
+registerSkin({key:'acc', label:'アコーディオン（節を1つだけ開く）',
+              desc:'並びは標準のまま。1つ開くと他の節が自動で閉じます。'
+                 + '画面を広く使いたいときに向きます。',
+              oneOpen: true});
+
 makeTreeSkin('s2', '階層（折りたたみ）',
   '項目管理・新規登録・検索の3つを、開閉できる階層で並べます。',
   {key:'s2root', kind:'fold', children:[
@@ -21521,6 +22612,230 @@ makeTreeSkin('s2', '階層（折りたたみ）',
     {key:'s2b', kind:'slot', part:'db.secInputForm',    label:'✏️ 新規登録'},
     {key:'s2c', kind:'slot', part:'db.secTableManager', label:'🗂 項目（テーブル）管理'}
   ]});
+
+/* ---- スキンを選ぶ唯一の口（第5段 工程9・決-82・分岐点1 案A）------------
+   ★「当てる」と「覚える」を1か所にまとめる。設定画面は保存先を知らなくてよい。
+     保存先は layout.skin（DB の _meta_opts の shell/layout）。起動時に
+     skinBoot() が読むので、次に開いたときも同じスキンで立ち上がる。 */
+function setSkin(key){
+  var lay;
+  if(!skinDef(key)) return false;          /* 知らないスキンは受け付けない */
+  if(!applySkin(key)) return false;
+  lay = loadLayout();
+  lay.skin = key;
+  saveLayout(lay);                         /* ★中で scheduleAutosave() を呼ぶ */
+  return true;
+}
+
+/* ==================================================================
+   Ver1.19.26 (L-01 第5段 工程10)  利用者が組み替える木（'usr' スキン）
+   ------------------------------------------------------------------
+   ★決-81 の教訓（「工程10 の木の組み替え画面で移行を設計するのが安全」）を、
+     木の全部が利用者作というケースにそのまま延長する。
+   ★この木は【DBだけが正】。s1 / s2 のようにコードへ木を書くと、
+     利用者が「画面編集」で消した子が再起動のたびに生き返ってしまう
+     （コード側の値が DB の値に毎回勝つ＝正が2つ・#13 / #27 の型）。
+     だから 'usr' の registerSkin() には tree を渡さない。 */
+function loadCustomTree(){
+  var lay;
+  try{ lay = loadLayout(); }catch(e){ lay = null; }
+  if(lay && lay.customTree && lay.customTree.kind) return lay.customTree;
+  return {key:'usrRoot', kind:'stack', children:[]};
+}
+
+function saveCustomTree(tree){
+  var lay;
+  try{ lay = loadLayout(); }catch(e){ return false; }
+  lay.customTree = tree;
+  return saveLayout(lay);
+}
+
+registerSkin({key:'usr', label:'自分で組み替え（カスタム）',
+              desc:'「画面編集」タブの「木の組み替え」で作った並びが、ここに出ます。'
+                 + 'まだ何も置いていなければ、標準と同じに見えます。',
+              apply: function(){ skinTreeApply(loadCustomTree()); },
+              leave: function(){ skinTreeLeave(); }});
+
+/* ---- 木の中を探す … {node, parent, index} を返す（無ければ null）------
+   ★親と居場所（index）を一緒に返すので、動かす・消すが1回の探索で済む。 */
+function findNodeAndParent(tree, key, parent){
+  var kids, i, r;
+  if(!tree) return null;
+  if(tree.key === key) return {node: tree, parent: parent || null, index: -1};
+  kids = tree.children || [];
+  for(i = 0; i < kids.length; i++){
+    if(kids[i].key === key) return {node: kids[i], parent: tree, index: i};
+    r = findNodeAndParent(kids[i], key, tree);
+    if(r) return r;
+  }
+  return null;
+}
+
+/* 入れ物になれる節（slot 以外）だけを集める … 「追加する場所」の選択肢に使う。 */
+function collectContainers(tree, out, depth){
+  var kids, i;
+  out = out || []; depth = depth || 0;
+  if(!tree) return out;
+  if(tree.kind !== 'slot') out.push({key: tree.key, kind: tree.kind, depth: depth});
+  kids = tree.children || [];
+  for(i = 0; i < kids.length; i++) collectContainers(kids[i], out, depth + 1);
+  return out;
+}
+
+/* 部品の中から「節として置ける」ものだけを引く … タグ section を持つもの。
+   ★3つに決め打ちしない（将来 section タグの部品が増えても、ここは1行も変わらない）。
+
+   ★★2026-09-12 実機で発見・修正 … 'usr' スキンは #app-db の中にしか
+     マウントされません（skinTreeApply が #secTableManager の直前に挿す）。
+     ところが section タグは db 用（page.title 等）と md 用（md.editor 等）の
+     【両方】に付いています。md 側を選ぶと、その部品の実体（#main 等）が
+     #app-md から物理的に抜き取られ、記録台帳の木の中へ運ばれてしまいます。
+     結果、Markdownメモ画面を開くと本文が空になる（実測ずみ・実害あり）。
+     ★だから section に加えて db タグも必須にする。将来 usr スキンが
+     md 側にも広がるとき（L-06 の融合）は、ここを「いまの app-mode に
+     合う節だけ」に直す（決め打ちの3件と同じく、この1行だけ直せば済む）。 */
+function sectionParts(){
+  var out = [], i, tg;
+  loadParts();
+  for(i = 0; i < PARTS.length; i++){
+    tg = PARTS[i].tags;
+    if(tg.indexOf('section') >= 0 && tg.indexOf('db') >= 0) out.push(PARTS[i]);
+  }
+  return out;
+}
+
+var usrKeySeq = 0;
+function newUsrKey(){
+  usrKeySeq += 1;
+  return 'usr' + Date.now().toString(36) + usrKeySeq;
+}
+
+/* いま 'usr' を見ているときだけ、その場で描き直す（保存はどのみち即時）。
+   ★applySkin は「前のスキンの leave → 新しいスキンの apply」を必ず呼ぶ実装なので、
+     同じ 'usr' へ当て直すだけで正しく再描画される（新しい受け口を作らない）。 */
+function refreshUsrIfActive(){
+  if(currentSkin() === 'usr'){ try{ applySkin('usr'); }catch(e){} }
+}
+
+function editTreeAdd(parentKey, kind, dir, partKey){
+  var tree = loadCustomTree(), found, target, node, pd;
+  found = parentKey ? findNodeAndParent(tree, parentKey, null) : null;
+  target = (found && found.node) ? found.node : tree;
+  if(target.kind === 'slot') return false;     /* ★葉には子を持たせない */
+  if(!target.children) target.children = [];
+  node = {key: newUsrKey(), kind: kind};
+  if(kind === 'stack' || kind === 'split') node.dir = (dir === 'row') ? 'row' : 'col';
+  if(kind === 'slot'){
+    pd = partDef(partKey);
+    if(!pd) return false;                      /* 知らない部品は置かない */
+    node.part = partKey;
+    node.label = pd.label || partKey;
+  }else{
+    node.children = [];
+  }
+  target.children.push(node);
+  saveCustomTree(tree);
+  refreshUsrIfActive();
+  return true;
+}
+
+function editTreeMove(key, delta){
+  var tree = loadCustomTree(), found = findNodeAndParent(tree, key, null), kids, at, to, tmp;
+  if(!found || !found.parent) return false;    /* ルートは動かせない */
+  kids = found.parent.children || [];
+  at = found.index; to = at + delta;
+  if(to < 0 || to >= kids.length) return false;
+  tmp = kids[at]; kids[at] = kids[to]; kids[to] = tmp;
+  saveCustomTree(tree);
+  refreshUsrIfActive();
+  return true;
+}
+
+/* ---- 第5段 工程10・乙A … 別の親へ移す（ドラッグの受け皿）---------------
+   ★甲の editTreeMove(key, ±1) は【同じ親の中の入れ替え】しかできません。
+     ドラッグは階層をまたぐので、この口を新しく作ります。
+
+   ★行き先を「何番目」ではなく【どの節の前か（beforeKey）】で指します。
+     理由は栞（takeOut/putBack）と同じ … 番号で覚えると、あいだに1つ増えた
+     だけでずれます。さらに「同じ親の中で後ろへ動かす」とき、先に抜いてから
+     番号で入れると1つずれる（古典的な off-by-one）。名前で指せば起きません。
+     beforeKey が null なら末尾に付けます。
+
+   ★輪（ループ）の防止 … 自分の子孫の中へ自分を落とすと木が輪になります。
+     ボタン（甲）は兄弟入れ替えしかしないのでこの事故は存在せず、
+     ドラッグで【初めて起こりうる】ので、ここで断ります。
+
+   ★★2026-09-12 の壊し検証（s10b_a）で分かった【本当の怖さ】…
+     この守りを外すと、起きるのは「無限に潜る」ではなく**部分木が丸ごと消える**。
+     理由: 先に自分を親から抜くので、輪になった塊は root から切り離される。
+     すると JSON.stringify は**循環参照に出会わないので普通に成功**し、
+     切り離された節ごと DB に保存されてしまう（実測では3節が消えた）。
+     つまり「保存が失敗して助かる」という逃げ道は**無い**。ここだけが守り。
+     守りのテストは pw_l01 の 21-2（★行き先は必ず【入れ物】にすること。
+     葉を行き先にすると葉のガードが先に断ってしまい、この検査は空振りする）。 */
+function isDescendantOf(node, key){
+  var kids, i;
+  if(!node) return false;
+  if(node.key === key) return true;
+  kids = node.children || [];
+  for(i = 0; i < kids.length; i++){
+    if(isDescendantOf(kids[i], key)) return true;
+  }
+  return false;
+}
+
+function editTreeMoveTo(key, newParentKey, beforeKey){
+  var tree = loadCustomTree(), found, dest, kids, at, node;
+  if(!key || key === newParentKey) return false;
+  found = findNodeAndParent(tree, key, null);
+  if(!found || !found.parent) return false;          /* ルートは動かせない */
+  dest = newParentKey ? findNodeAndParent(tree, newParentKey, null) : null;
+  dest = (dest && dest.node) ? dest.node : tree;
+  if(dest.kind === 'slot') return false;             /* 葉は子を持てない */
+  /* ★自分（と自分の子孫）の中へは落とせない。ここが輪の防止そのもの。 */
+  if(isDescendantOf(found.node, dest.key)) return false;
+  node = found.node;
+  found.parent.children.splice(found.index, 1);      /* 先に抜く */
+  if(!dest.children) dest.children = [];
+  kids = dest.children;
+  at = kids.length;                                  /* 既定は末尾 */
+  if(beforeKey){
+    for(var i = 0; i < kids.length; i++){
+      if(kids[i].key === beforeKey){ at = i; break; }
+    }
+  }
+  kids.splice(at, 0, node);
+  saveCustomTree(tree);
+  refreshUsrIfActive();
+  return true;
+}
+
+function editTreeRemove(key){
+  var tree = loadCustomTree(), found = findNodeAndParent(tree, key, null);
+  if(!found || !found.parent) return false;    /* ルートは消せない */
+  found.parent.children.splice(found.index, 1);
+  saveCustomTree(tree);
+  refreshUsrIfActive();
+  return true;
+}
+
+/* ---- 旧「📖 アコーディオン」設定からの引き継ぎ（工程9・決-82 案X）--------
+   ★アドオンのチェック欄は廃止し、スキン「アコーディオン」に一本化した。
+     以前 ON にしていた人が黙って挙動を失わないよう、初回だけ移し替える。
+   ★設定（st）の持ち主は WDT なので、こちらからは中身を覗かない。
+     WDT.takeOneOpenFlag() が「1回だけ渡して消す」窓口になっている
+     （読むだけの窓口にすると、毎回移してしまう）。 */
+function migrateOneOpenToSkin(){
+  var W = window.WDT, lay;
+  if(!W || typeof W.takeOneOpenFlag !== 'function') return false;
+  if(!W.takeOneOpenFlag()) return false;
+  lay = loadLayout();
+  if(!lay.skin || lay.skin === 'std'){     /* 標準のままの人だけ移す */
+    lay.skin = 'acc';
+    saveLayout(lay);
+  }
+  return true;
+}
 
 /* ---- 起動時に1回だけ ------------------------------------------------ */
 function skinBoot(){
@@ -21531,6 +22846,15 @@ function skinBoot(){
   /* Ver1.19.22 (工程6): run を持つ部品を「動作の棚」へ流し込む。
      ★何度呼ばれても増えません（同じ key は上書きされるだけ）。 */
   try{ seedActionsFromParts(); }catch(e){}
+  /* Ver1.19.24 (工程8): 木の仕切りを掴めるようにする受け口を1つだけ張る。
+     ★何度呼ばれても増えません（TREE_DIVIDERS_BOUND で1回だけ）。 */
+  try{ bindTreeDividers(); }catch(e){}
+  /* Ver1.19.25 (工程9): 旧「📖 アコーディオン」の設定を一度だけスキンへ移す。
+     ★applySkin より【前】に呼ぶこと（移した結果を、このあとの適用で反映するため）。 */
+  try{ migrateOneOpenToSkin(); }catch(e){}
+  /* Ver1.19.26 (工程10): 利用者が増やしたコンボを登録簿へ流し込む。
+     ★何度呼ばれても増えません（registerCombo が同じ name を上書きするだけ）。 */
+  try{ loadUserCombos(); }catch(e){}
   try{ applySkin(loadLayout().skin); }catch(e){}
   return currentSkin();
 }
@@ -21696,7 +23020,7 @@ registerNodeKind('stack', {
      ドラッグで決まった値は node.size に入り、DB へ落ちる（工程8）。 */
 registerNodeKind('split', {
   render: function(node, box, draw){
-    var wrap = nodeBox(node, 'rtt-split'), kids = kidsOf(node), i, bar;
+    var wrap = nodeBox(node, 'rtt-split'), kids = kidsOf(node), i, bar, cell;
     wrap.style.display = 'flex';
     wrap.style.flexDirection = (node.dir === 'row') ? 'row' : 'column';
     applySize(wrap, node);
@@ -21707,9 +23031,28 @@ registerNodeKind('split', {
         bar.setAttribute('data-at', String(i));
         bar.style.flex = '0 0 5px';
         bar.style.cursor = (node.dir === 'row') ? 'col-resize' : 'row-resize';
+        /* ★指でも掴めるように。これが無いと touch では画面のスクロールに取られる
+           （既存の #app-md .divider も同じ理由で touch-action:none にしている・1625行）*/
+        bar.style.touchAction = 'none';
         wrap.appendChild(bar);
       }
-      draw(kids[i], wrap);
+      /* ---- 第5段 工程8（決-81）… 子は必ず「枠」に入れる ----------------
+         ★大きさを持つ担当を枠1つに決める。理由は2つ:
+           ① slot（実物の要素をそのまま運ぶ）にも大きさが効くようになる。
+              枠が無いと、実物の要素に inline style を書くしかなく、
+              std へ帰したあとも flex が残って**画面が静かに崩れる**。
+           ② 仕切りを掴んだとき「どの節の大きさか」を data-node で指させる。
+              名前が無い節は保存しない（指させないものは覚えない）。 */
+      cell = document.createElement('div');
+      cell.className = 'rtt-cell';
+      if(kids[i] && kids[i].key) cell.setAttribute('data-node', kids[i].key);
+      cell.style.display = 'flex';
+      cell.style.flexDirection = wrap.style.flexDirection;
+      cell.style.minWidth = '0';
+      cell.style.minHeight = '0';
+      applySize(cell, {size: sizeOfNode(kids[i]), min: kids[i] && kids[i].min});
+      draw(kids[i], cell);
+      wrap.appendChild(cell);
     }
     box.appendChild(wrap);
     return true;
@@ -21781,6 +23124,76 @@ registerNodeKind('fold', {
   }
 });
 
+/* ==================================================================
+   Ver1.19.24 (L-01 第5段 工程8・決-81)  仕切りを掴んで大きさを変える
+   ------------------------------------------------------------------
+   ★受け口は【1つだけ】新しく作る（決-65 (10) と同じ流儀・分岐点3 案②）。
+     既存の #app-md .divider（PC 16037行 ／ スマホ 18152行）には1行も触りません。
+     触らないので、メモ画面を見ている既存のテストが原理的に巻き添えになりません。
+   ★pointer イベントなので、マウスと指を1つの実装で受けられます。
+   ★決めた値は「枠（.rtt-cell）」の data-node が指す節の大きさとして
+     DB（_meta_opts の shell/layout の sizes）へ落ちます（案A）。
+   ★掴んだ仕切りの【手前側】にだけ数値が入ります（案甲）。
+     向こう側は伸びたまま ＝「片方だけ決めて、残りは余った分」。
+   ================================================================== */
+var TREE_DRAG = null;
+var TREE_DIVIDERS_BOUND = false;
+var TREE_MIN_PX = 40;          /* これ以上は縮めない（掴めなくなるため）*/
+var TREE_MAX_RATIO = 0.85;     /* 片側が画面を占領しないように（既存も 0.85）*/
+
+function bindTreeDividers(){
+  if(TREE_DIVIDERS_BOUND) return false;
+  TREE_DIVIDERS_BOUND = true;
+
+  document.addEventListener('pointerdown', function(e){
+    var bar, wrap, cell, row, r;
+    if(!e.target || !e.target.closest) return;
+    bar = e.target.closest('.rtt-divider');
+    if(!bar) return;
+    wrap = bar.parentNode;
+    cell = bar.previousElementSibling;      /* ★掴んだ仕切りの手前側の枠 */
+    if(!wrap || !cell) return;
+    row = (wrap.style.flexDirection !== 'column');
+    e.preventDefault();
+    try{ bar.setPointerCapture(e.pointerId); }catch(err){}
+    r = cell.getBoundingClientRect();
+    TREE_DRAG = {pid: e.pointerId, wrap: wrap, cell: cell, row: row,
+                 start: row ? e.clientX : e.clientY,
+                 base: row ? r.width : r.height, px: null};
+  }, true);
+
+  document.addEventListener('pointermove', function(e){
+    var d = TREE_DRAG, now, box, full, px, max;
+    if(!d || e.pointerId !== d.pid) return;
+    now  = d.row ? e.clientX : e.clientY;
+    box  = d.wrap.getBoundingClientRect();
+    full = d.row ? box.width : box.height;
+    max  = Math.max(TREE_MIN_PX, full * TREE_MAX_RATIO);
+    px   = Math.min(max, Math.max(TREE_MIN_PX, d.base + (now - d.start)));
+    px   = Math.round(px);
+    d.cell.style.flex = '0 0 ' + px + 'px';
+    d.px = px;
+  });
+
+  /* 離したときだけ DB へ落とす。★動かしている間は書かない（自動保存が暴れるため）*/
+  function endTreeDrag(e){
+    var d = TREE_DRAG, key, lay;
+    if(!d || (e && e.pointerId !== d.pid)) return;
+    TREE_DRAG = null;
+    if(d.px == null) return;                 /* 掴んだだけで動かしていない */
+    key = d.cell.getAttribute('data-node');
+    if(!key) return;                         /* 名前が無い節は覚えない */
+    lay = loadLayout();
+    if(!lay.sizes) lay.sizes = {};
+    lay.sizes[key] = d.px;
+    LAYOUT_SIZES = lay.sizes;
+    saveLayout(lay);                         /* ★中で scheduleAutosave() を呼ぶ */
+  }
+  document.addEventListener('pointerup', endTreeDrag);
+  document.addEventListener('pointercancel', endTreeDrag);
+  return true;
+}
+
 /* ---- ⑤ slot … 葉。実際の部品を1つ差し込む -------------------------
    ★ここだけが本物の DOM を動かします。必ず栞を置いてから運ぶこと。 */
 registerNodeKind('slot', {
@@ -21819,12 +23232,24 @@ window.RTTPARTS = {
   saveLayout    : saveLayout,
   defaultLayout : defaultLayout,
   applySkin     : applySkin,
+  /* ★工程9（決-82）… 「当てる」と「覚える」をまとめた唯一の口。
+     設定画面はこれを呼ぶだけで、保存先（layout.skin）を知らなくてよい。 */
+  setSkin       : setSkin,
+  skinWantsOneOpen : skinWantsOneOpen,
   currentSkin   : currentSkin,
   skinBoot      : skinBoot,
   /* ---- 第5段 工程5: キーとパレットへの流し込み ---- */
   partsAsCommands   : partsAsCommands,
   registerPartHotkeys: registerPartHotkeys,
   partScId      : partScId,
+  /* ---- 第5段 工程8: 仕切りのドラッグ（決-81） ---- */
+  bindTreeDividers : bindTreeDividers,
+  sizeOfNode       : sizeOfNode,
+  nodeSizes        : function(){ var k, o = {};
+                                 for(k in LAYOUT_SIZES){
+                                   if(Object.prototype.hasOwnProperty.call(LAYOUT_SIZES, k)) o[k] = LAYOUT_SIZES[k];
+                                 }
+                                 return o; },
   /* ---- 第5段 工程6: 動作の登録簿とマクロ（決-79） ---- */
   registerAction    : registerAction,
   runAction         : runAction,
@@ -21873,6 +23298,18 @@ window.RTTPARTS = {
   parts         : function(){ loadParts(); return PARTS.slice(); },
   skins         : function(){ return SKINS.slice(); },
   areas         : function(){ return AREAS.slice(); },
+  /* ---- 第5段 工程10: 画面編集タブ（木の組み替え・コンボ作成・表示/非表示）---- */
+  customTree      : loadCustomTree,
+  editTreeAdd     : editTreeAdd,
+  editTreeMove    : editTreeMove,
+  editTreeMoveTo  : editTreeMoveTo,   /* 第5段 工程10・乙A（ドラッグの受け皿）*/
+  editTreeRemove  : editTreeRemove,
+  treeContainers  : function(){ return collectContainers(loadCustomTree()); },
+  sectionParts    : sectionParts,
+  addUserCombo    : addUserCombo,
+  removeUserCombo : removeUserCombo,
+  isBuiltinCombo  : function(name){ return !!BUILTIN_COMBO_NAMES[name]; },
+  groupLabel      : function(g){ return GROUP_LABEL[g] || g; },
   version       : '1.19.11+L01'
 };
 
@@ -23141,11 +24578,13 @@ function miniLauncherVisible(){
 
 /* セクションを1つだけ開く（アコーディオン）。設定でONにしたときだけ働く */
 var oneOpenGuard = false;
-/* ★工程7（決-80）… 「いまのスキンは、他を閉じる仕掛けと相性が悪いか」を
-   この1点だけで判定する。散らばった if を作らない（CLAUDE.md §5.2 決まり④）。 */
-function skinAllowsOneOpen(){
+/* ★工程9（決-82）… 「いまのスキンは【1つだけ開く方式】か」をこの1点だけで判定する。
+   散らばった if を作らない（CLAUDE.md §5.2 決まり④）。
+   ★工程7 では否定形（noOneOpen）だったが、アコーディオンをスキンの1つにしたので
+     肯定形に直した。名前も意味に合わせて変えている（逆の意味の名前は罠になる）。 */
+function skinWantsOneOpen(){
   var d = skinDef(curSkinKey);
-  return !(d && d.noOneOpen);
+  return !!(d && d.oneOpen);
 }
 
 function bindOneOpen(){
@@ -23158,7 +24597,7 @@ function bindOneOpen(){
       if(!bodyHas('wdt-oneopen')) return;
       /* ★工程7（決-80・危険R-3の一次対策）… タブ/階層系スキンでは無視する。
          判定は currentSkin() 経由でこの1点だけに集約する（ifを散らさない）。 */
-      if(!skinAllowsOneOpen()) return;
+      if(!skinWantsOneOpen()) return;
       oneOpenGuard = true;
       var all = document.querySelectorAll('#app-db details.card'), j;
       for(j = 0; j < all.length; j++){ if(all[j] !== this) all[j].open = false; }
@@ -23653,6 +25092,417 @@ window.RTT20 = {
     close   : closeIt,
     version : '1.16.01'
   };
+})();
+</script>
+
+<!-- ============================================================
+     Ver1.19.31 追加ブロック（RTT21）── ドラッグの基礎板
+     ・ドラッグ中の「ヒント札」（マウスに付いてくる小さな箱）
+     ・吸い付き先の「登録簿」registerSnap（読む側に if を増やさない）
+     ・吸い付き先を示す「ガイド線」（見た目C・決-95）
+     このブロックだけを消せば、Ver1.19.30 と同じ動きに戻ります。
+
+     ★いまは【まだ誰にも呼ばれていません】。
+       本体の3か所へ載せ替えるのは別の工程です:
+         ・表の列幅グリップ（applyResizable）… D-06 工程6
+         ・表の行の高さのつまみ            … D-06 工程5
+         ・MDメモの分割線（divider）        … D-11 工程8
+       先に基礎板だけを置く理由 … 3か所を一度に書き換えると、
+       どこで壊れたか分からなくなるため（CLAUDE.md §5.2 / 落とし穴 #32 #38）。
+     ============================================================ -->
+<script data-rtt-fp="1">
+/* ============================================================
+   Ver1.19.31 追加ブロック（RTT21）ドラッグの基礎板
+   窓口は window.RTTDRAG。呼ぶ側は「いまの値を返す / 新しい値を当てる /
+   ぴったりの値を測る」を渡すだけで、この基礎板は中身を知りません。
+   ============================================================ */
+(function(){
+'use strict';
+
+/* ------------------------------------------------------------
+   0. 小さな道具
+   ------------------------------------------------------------ */
+function num(v, d){ v = Number(v); return isFinite(v) ? v : d; }
+function esc(s){
+  return String(s == null ? '' : s)
+    .replace(/&/g, '&amp;').replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+function call(cfg, name, def){
+  try{ return (typeof cfg[name] === 'function') ? cfg[name]() : def; }catch(e){ return def; }
+}
+
+/* ------------------------------------------------------------
+   1. 設定の置き場（決-93 の窓口をそのまま借りる）
+   ★ブラウザの中だけの置き場を自分で触らない（絶対規律2）。窓口が無い版でも
+     動くように、読めないときは既定値で動き続ける。
+   ------------------------------------------------------------ */
+var K_DRAG = 'rtt21_drag';          /* {mod:'shift', seen:0} */
+var dragReg = false;
+function store(){
+  var S = window.RTTSTORE;
+  if(!S || typeof S.get !== 'function' || typeof S.set !== 'function'
+        || typeof S.register !== 'function') return null;
+  if(!dragReg){ S.register(K_DRAG, 'db', 'drag', 'conf'); dragReg = true; }
+  return S;
+}
+function conf(){
+  var S = store(), o = S ? S.get(K_DRAG, null) : null;
+  return (o && typeof o === 'object' && !Array.isArray(o)) ? o : {};
+}
+function confSet(k, v){
+  var S = store(), o = conf();
+  o[k] = v;
+  return S ? S.set(K_DRAG, o) : false;
+}
+
+/* ------------------------------------------------------------
+   2. 修飾キーの登録簿（決-91 案サ … 既定は Shift。決め打ちにしない）
+   ★Alt は環境によって「窓を動かす」に取られる【恐れ】がある（実測はしていない）。
+     だから逃げ道として、利用者が選べる形にしてある。
+   ------------------------------------------------------------ */
+var MODS = [
+  {key:'shift', label:'Shift', on:function(e){ return !!e.shiftKey; }},
+  {key:'ctrl',  label:'Ctrl',  on:function(e){ return !!(e.ctrlKey || e.metaKey); }},
+  {key:'alt',   label:'Alt',   on:function(e){ return !!e.altKey; }},
+  {key:'off',   label:'使わない', on:function(){ return false; }}
+];
+function modOf(k){
+  var i;
+  for(i = 0; i < MODS.length; i++){ if(MODS[i].key === k) return MODS[i]; }
+  return MODS[0];
+}
+/* ★どのキーかを【自分では覚えない】（D-06 工程6・決-96）。
+   ⚙設定に出す項目なので、正は本体の st.addons（決-94 の切り分け）。
+   ここは毎回 WDT の窓口に聞くだけ。こうしないと家が2つになり、
+   食い違ったときどちらが本当か決まらなくなる（CLAUDE.md §5.2）。
+   ★WDT が無い版では既定の Shift で動き続ける（逃げ道）。 */
+function modifier(){
+  var W = window.WDT, k = null;
+  try{ if(W && typeof W.dragMod === 'function') k = W.dragMod(); }catch(e){}
+  return modOf(k || 'shift');
+}
+
+/* ------------------------------------------------------------
+   3. 吸い付き先の登録簿（決-91 案タ）
+   ★増やすときは registerSnap を1行足すだけ。読む側（candidates）は
+     1行も変わらない（CLAUDE.md §5.2 決まり②）。
+   ------------------------------------------------------------ */
+var SNAPS = [], SNAP_AT = {};
+function registerSnap(key, def){
+  if(!key || !def || typeof def.at !== 'function') return false;
+  var d = {key:String(key), label:(def.label || key), icon:(def.icon || ''),
+           order:num(def.order, 50), at:def.at};
+  var i = SNAP_AT[d.key];
+  if(i != null){ SNAPS[i] = d; }
+  else { SNAP_AT[d.key] = SNAPS.length; SNAPS.push(d); }
+  return true;
+}
+function labelOf(d, cfg){
+  try{ return (typeof d.label === 'function') ? d.label(cfg) : d.label; }
+  catch(e){ return d.key; }
+}
+
+/* ---- 初日に載せる2種類（決-91 / 決-95）---------------------------- */
+registerSnap('fit', {
+  icon:'⇔', order:10,
+  label:function(cfg){ return (cfg && cfg.fitName) || 'ぴったり'; },
+  at:function(cfg){
+    var v = call(cfg, 'fit', null);
+    return (v == null || !isFinite(v)) ? [] : [Math.round(v)];
+  }
+});
+
+/* ★「見える範囲でぴったり」（D-06 工程6・決-96 案う）。
+   全行で測ると、1件だけ長い文があるだけで列が暴走する（実測 749px。
+   同じ列を見えている16行で測ると 182px）。どちらが欲しいかは場面で変わるので、
+   ★両方を候補に載せて、近いほうへ吸い付く形にした。登録簿なので1行で足せる。 */
+registerSnap('fitview', {
+  icon:'▣', order:15,
+  label:function(cfg){ return (cfg && cfg.viewName) || '見える範囲'; },
+  at:function(cfg){
+    var v = call(cfg, 'fitView', null);
+    return (v == null || !isFinite(v)) ? [] : [Math.round(v)];
+  }
+});
+
+/* ★刻みは「5文字ぶん」「5行ぶん」ごと。1つぶん（実測 12.8px）では
+     吸い付く範囲（14px）より刻みのほうが細かく、修飾キーを押しても
+     押さなくても同じ所に止まった（2026-09-13 試作で実測・決-95）。
+   ★この数字は登録簿の中に在るので、変えたくなったら1行で変えられる。 */
+var STEP_N = 5;
+registerSnap('step', {
+  icon:'▤', order:20,
+  label:function(cfg){ return STEP_N + ((cfg && cfg.stepName) || '目盛り') + 'ぶん'; },
+  at:function(cfg){
+    var u = num(call(cfg, 'unit', 0), 0), b = num(call(cfg, 'base', 0), 0), out = [], n;
+    if(u <= 0) return [];
+    for(n = 1; n <= 40; n++) out.push(Math.round(b + u * STEP_N * n));
+    return out;
+  }
+});
+
+function candidates(cfg){
+  var out = [], i, j, a;
+  for(i = 0; i < SNAPS.length; i++){
+    try{ a = SNAPS[i].at(cfg) || []; }catch(e){ a = []; }
+    for(j = 0; j < a.length; j++){
+      if(isFinite(a[j])) out.push({v:Math.round(a[j]), kind:SNAPS[i]});
+    }
+  }
+  return out;
+}
+function nearest(cands, v, tol){
+  var best = null, bd = Infinity, i, d;
+  for(i = 0; i < cands.length; i++){
+    d = Math.abs(cands[i].v - v);
+    /* 同じ距離なら order の小さい種類（ぴったり）を優先する */
+    if(d < bd || (d === bd && best && cands[i].kind.order < best.kind.order)){ bd = d; best = cands[i]; }
+  }
+  return (best && bd <= tol) ? best : null;
+}
+
+/* ------------------------------------------------------------
+   4. 向きの登録簿（縦か横かの違いを、読む側に if で書かない）
+   ------------------------------------------------------------ */
+var AXIS = {
+  x: {
+    cursor:'col-resize',
+    at:function(p){ return p.x; },
+    draw:function(g, cap, r, pos){
+      g.style.left = (pos - 1) + 'px'; g.style.top = r.top + 'px';
+      g.style.width = '0px'; g.style.height = r.height + 'px';
+      g.style.borderLeft = '2px dashed #4c8dff'; g.style.borderTop = '0';
+      /* ★札は線の【下端】へ置く。上端に置くと見出しの文字に重なった
+           （2026-09-13 試作の絵で実測・決-95） */
+      cap.style.left = (pos + 5) + 'px';
+      cap.style.top = (r.top + r.height - 20) + 'px';
+    }
+  },
+  y: {
+    cursor:'row-resize',
+    at:function(p){ return p.y; },
+    draw:function(g, cap, r, pos){
+      g.style.top = (pos - 1) + 'px'; g.style.left = r.left + 'px';
+      g.style.height = '0px'; g.style.width = r.width + 'px';
+      g.style.borderTop = '2px dashed #4c8dff'; g.style.borderLeft = '0';
+      cap.style.left = (r.left + 6) + 'px';
+      cap.style.top = (pos + 5) + 'px';
+    }
+  }
+};
+
+/* ------------------------------------------------------------
+   5. 見た目（ヒント札とガイド線）
+   ------------------------------------------------------------ */
+var styled = false;
+function addStyle(){
+  if(styled) return;
+  styled = true;
+  var s = document.createElement('style');
+  s.setAttribute('data-rtt-skip', '1');      /* 指紋の計算からは外す */
+  s.textContent =
+    '.rtt21-hint,.rtt21-guide,.rtt21-cap{position:fixed;pointer-events:none;display:none}' +
+    '.rtt21-hint{z-index:99999;background:#0f1115;color:#eef2f8;border:1px solid #3a434f;' +
+      'border-radius:6px;box-shadow:0 6px 18px rgba(0,0,0,.55);padding:6px 9px;' +
+      'font:12px/1.4 system-ui,sans-serif;white-space:nowrap}' +
+    '.rtt21-hint b{font-size:15px;font-weight:700;color:#fff}' +
+    '.rtt21-hint .sub{color:#93a0b4;font-size:11px;margin-top:2px}' +
+    '.rtt21-hint kbd{background:#252c36;border:1px solid #414b58;border-radius:3px;padding:0 4px;font-size:11px}' +
+    '.rtt21-guide{z-index:99998;opacity:.85}' +
+    '.rtt21-cap{z-index:99999;background:#2f6df0;color:#fff;border-radius:3px;padding:0 5px;' +
+      'font:11px/1.5 system-ui,sans-serif;white-space:nowrap}';
+  document.head.appendChild(s);
+}
+var elHint = null, elGuide = null, elCap = null;
+/* ★名前（id）を必ず付ける … 名前が無い部品は指し示せない＝動かせない
+   （CLAUDE.md §5.2「そぐわないコードの見分け方」の3番目）。
+   id は工程1 で書いた守りのテスト pw_d06.py 8-2 が先に決めていたものに合わせる。 */
+function part(id, cls){
+  var n = document.createElement('div');
+  n.id = id;
+  n.className = cls;
+  document.body.appendChild(n);
+  return n;
+}
+function ui(){
+  addStyle();
+  if(!elHint){ elHint = part('rttDragHint', 'rtt21-hint'); }
+  if(!elGuide){ elGuide = part('rttDragGuide', 'rtt21-guide'); }
+  if(!elCap){ elCap = part('rttDragCap', 'rtt21-cap'); }
+}
+function hideAll(){
+  if(elHint) elHint.style.display = 'none';
+  if(elGuide) elGuide.style.display = 'none';
+  if(elCap) elCap.style.display = 'none';
+}
+
+/* 案内（「Shift を押すと…」）は最初の数回だけ出す（決-91）。
+   慣れたあとも、実際に吸い付いている間は「何に吸い付いたか」を出す
+   ── これは案内ではなく、いまの状態を示すものなので消さない。 */
+var HINT_TIMES = 5;
+function stillGuiding(){ return num(conf().seen, 0) < HINT_TIMES; }
+
+function draw(cfg, ax, val, snapped, near, mod, keyOn, p){
+  var h, sub, r, pos;
+  ui();
+  h = elHint;
+  if(keyOn && snapped){
+    sub = esc(snapped.kind.icon + ' ' + labelOf(snapped.kind, cfg) + ' に吸い付き中');
+  }else if(keyOn && near){
+    /* ★吸い付く範囲の外に居るとき。ガイド線は「そこが吸い付き先だ」と指しているので、
+       ここで「近くに丁度いい所がありません」と書くと【線と札が食い違う】。
+       2026-09-13 に本体で実測（262px なのに線は 280px を指していた）。 */
+    sub = 'もう少し近づけると ' + esc(near.kind.icon + ' ' + labelOf(near.kind, cfg)
+        + ' ' + near.v + (cfg.unitName || 'px')) + ' へ吸い付きます';
+  }else if(keyOn){
+    sub = '吸い付ける所がありません';
+  }else if(mod.key === 'off'){
+    sub = stillGuiding() ? '吸い付きは ⚙設定 で「使わない」になっています' : '';
+  }else if(near){
+    sub = stillGuiding()
+      ? ('<kbd>' + esc(mod.label) + '</kbd> を押すと ' + esc(labelOf(near.kind, cfg) + ' ' + near.v) + ' へ')
+      : '';
+  }else{
+    sub = stillGuiding() ? ('<kbd>' + esc(mod.label) + '</kbd> で丁度いい所へ吸い付き') : '';
+  }
+  h.innerHTML = '<b>' + esc(val + (cfg.unitName || 'px')) + '</b>'
+              + (sub ? '<div class="sub">' + sub + '</div>' : '');
+  h.style.display = 'block';
+  h.style.left = Math.max(2, Math.min(window.innerWidth  - h.offsetWidth  - 8, p.x + 16)) + 'px';
+  h.style.top  = Math.max(2, Math.min(window.innerHeight - h.offsetHeight - 8, p.y + 18)) + 'px';
+
+  /* ガイド線（見た目C）… ★修飾キーを押している間だけ出す。
+     押していないのに線を出すと「いま吸い付いている」と読めてしまい、
+     実際には吸い付いていないので嘘の合図になる（2026-09-13 pw_d11 3-7 で実測）。 */
+  r = call(cfg, 'rect', null);
+  if(keyOn && near && r && typeof cfg.posOf === 'function'){
+    pos = num(cfg.posOf(near.v), NaN);
+    if(isFinite(pos)){
+      elGuide.style.display = 'block';
+      elCap.style.display = 'block';
+      elCap.textContent = near.kind.icon + ' ' + labelOf(near.kind, cfg) + ' ' + near.v + (cfg.unitName || 'px');
+      ax.draw(elGuide, elCap, r, pos);
+      return;
+    }
+  }
+  elGuide.style.display = 'none';
+  elCap.style.display = 'none';
+}
+
+/* ------------------------------------------------------------
+   6. 基礎板そのもの … つまみに取り付ける
+   呼ぶ側が渡すもの（これだけ）:
+     axis 'x'|'y' / min,max,tol / unitName,stepName,fitName
+     get()   いまの値を返す            set(v)  新しい値を当てる
+     commit(v) 離したときに保存する（省略可）
+     fit()   ぴったりの値（省略可）    unit()  1目盛りの大きさ（省略可）
+     base()  目盛りの起点（省略可）
+     rect()  ガイド線を引く範囲（省略可）  posOf(v) 値 v の画面位置（省略可）
+   ------------------------------------------------------------ */
+function xy(ev){
+  var t = (ev.touches && ev.touches[0]) ? ev.touches[0] : ev;
+  return {x:num(t.clientX, 0), y:num(t.clientY, 0)};
+}
+function attach(handle, cfg){
+  if(!handle || !cfg || typeof cfg.get !== 'function' || typeof cfg.set !== 'function') return false;
+  if(handle.dataset && handle.dataset.rtt21 === '1') return false;   /* 二重取り付け防止 */
+  if(handle.dataset) handle.dataset.rtt21 = '1';
+
+  var ax = AXIS[(cfg.axis === 'y') ? 'y' : 'x'];
+  var start = 0, startV = 0, dragging = false, lastV = 0, snappedOnce = false;
+
+  function move(ev){
+    if(!dragging) return;
+    var p = xy(ev), raw, mod, keyOn, cands, near, s, val;
+    raw = num(startV + (ax.at(p) - start), startV);
+    raw = Math.round(Math.max(num(cfg.min, 0), Math.min(num(cfg.max, Infinity), raw)));
+    mod = modifier();
+    keyOn = mod.on(ev);
+    cands = candidates(cfg);
+    near = nearest(cands, raw, Infinity);
+    s = keyOn ? nearest(cands, raw, num(cfg.tol, 14)) : null;
+    val = s ? s.v : raw;
+    if(s) snappedOnce = true;
+    lastV = val;
+    try{ cfg.set(val); }catch(e){}
+    draw(cfg, ax, val, s, (s || near), mod, keyOn, p);
+    if(ev.cancelable) ev.preventDefault();
+  }
+  function up(){
+    if(!dragging) return;
+    dragging = false;
+    hideAll();
+    document.body.style.cursor = '';
+    document.body.style.userSelect = '';
+    document.removeEventListener('mousemove', move);
+    document.removeEventListener('mouseup', up);
+    document.removeEventListener('touchmove', move);
+    document.removeEventListener('touchend', up);
+    try{ if(typeof cfg.commit === 'function') cfg.commit(lastV); }catch(e){}
+    /* 案内を見た回数を1つ増やす（数えるのはドラッグ1回につき1回）*/
+    if(stillGuiding()){ try{ confSet('seen', num(conf().seen, 0) + 1); }catch(e){} }
+  }
+  function down(ev){
+    var p = xy(ev);
+    /* ★掴んだ瞬間に1回だけ、呼ぶ側に「測り直す機会」を渡す（D-06 工程6・決-96）。
+       ぴったりの幅を測るのは重い処理（実測 22〜29ms／11列）なので、
+       ドラッグ中に毎回やらせない。中身はドラッグ中に変わらないので1回で足りる。 */
+    try{ if(typeof cfg.start === 'function') cfg.start(); }catch(e){}
+    start = ax.at(p);
+    startV = num(call(cfg, 'get', 0), 0);
+    lastV = startV; snappedOnce = false;
+    dragging = true;
+    document.body.style.cursor = ax.cursor;
+    document.body.style.userSelect = 'none';
+    document.addEventListener('mousemove', move);
+    document.addEventListener('mouseup', up);
+    document.addEventListener('touchmove', move, {passive:false});
+    document.addEventListener('touchend', up);
+    if(ev.cancelable) ev.preventDefault();
+    ev.stopPropagation();
+  }
+  handle.addEventListener('mousedown', down);
+  handle.addEventListener('touchstart', down, {passive:false});
+  return true;
+}
+
+/* ------------------------------------------------------------
+   7. 窓口（このブロックを消せば、これごと消える）
+   ------------------------------------------------------------ */
+window.RTTDRAG = {
+  attach:   attach,          /* つまみに取り付ける */
+  register: registerSnap,    /* 吸い付き先を1行足す */
+  snaps: function(){
+    var out = [], i;
+    for(i = 0; i < SNAPS.length; i++){
+      out.push({key:SNAPS[i].key, icon:SNAPS[i].icon, order:SNAPS[i].order});
+    }
+    return out;
+  },
+  mods: function(){
+    var out = [], i;
+    for(i = 0; i < MODS.length; i++) out.push({key:MODS[i].key, label:MODS[i].label});
+    return out;
+  },
+  modifier:    function(){ return modifier().key; },
+  /* ★書く先も本体の ⚙（st.addons）。ここでは覚えない（決-96）。
+     窓口が無ければ false を返す ── 「変えたつもり」にさせない（落とし穴 #61）。 */
+  setModifier: function(k){
+    var i, W = window.WDT;
+    for(i = 0; i < MODS.length; i++){
+      if(MODS[i].key === k){
+        try{ return !!(W && typeof W.setDragMod === 'function' && W.setDragMod(k)); }
+        catch(e){ return false; }
+      }
+    }
+    return false;
+  },
+  step:     function(){ return STEP_N; },
+  hintSeen: function(){ return num(conf().seen, 0); },
+  resetHint:function(){ return confSet('seen', 0); },
+  version:  '1.19.31'
+};
 })();
 </script>
 
