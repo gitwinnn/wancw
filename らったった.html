@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.34</title>
+<title>記録台帳＋MDメモ Ver1.19.41</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -712,7 +712,7 @@ html,body{height:100%;margin:0;overflow:hidden}
     --ink:#1f2530; --sub:#5b6470; --accent:#2f6fdb; --accent2:#235bbd;
     --okbg:#e7f6ec; --okink:#1d7a3d; --errbg:#fdecec; --errink:#b3261e;
     --head:#eef2f8; --zebra:#fafbfc; --chip:#eef2f8; --edit:#fffdf3; --editfocus:#fff7d6;
-    --del:#b3261e; --input-bg:#ffffff; --code-bg:#eef0f3;
+    --del:#b3261e; --input-bg:#ffffff; --code-bg:#eef0f3; --sb-w:11px;
 margin:0; background:var(--bg); color:var(--ink);
     font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic UI",Meiryo,system-ui,sans-serif;
     font-size:14px; line-height:1.6; padding:18px;
@@ -764,7 +764,23 @@ margin:0; background:var(--bg); color:var(--ink);
 :is(#app-db,.db-scope) .check{display:flex; align-items:center; gap:6px; font-size:13px; color:var(--ink); padding-bottom:7px}
 :is(#app-db,.db-scope) .check input{width:auto}
 :is(#app-db,.db-scope) .meta{font-size:12px; color:var(--sub); margin:10px 0 6px; display:flex; gap:12px; align-items:center; flex-wrap:wrap}
-:is(#app-db,.db-scope) .table-wrap{overflow:auto; border:1px solid var(--line); border-radius:8px; max-height:62vh}
+:is(#app-db,.db-scope) .table-wrap{overflow-x:scroll; overflow-y:auto; border:1px solid var(--line); border-radius:8px; max-height:62vh}
+/* D-05（決-70）… .table-wrap は横も縦もスクロールバーの指定が0件で、
+   会社のEdge/Chromiumは既定のまま太いが、自宅のFirefoxは指定が無いぶん
+   OSのテーマ任せで細く・自動で隠れて出にくかった。--sb-w は登録簿というほど
+   ではないが「いくつのスクロールバーに同じ太さを配るか」を1箇所にまとめておく
+   （拘束しない＝ここだけ直せば他のスクロールバーにも同じ太さを配れる）。 */
+:is(#app-db,.db-scope) .table-wrap{scrollbar-width:auto; scrollbar-color:var(--line2) transparent}
+:is(#app-db,.db-scope) .table-wrap::-webkit-scrollbar{width:var(--sb-w); height:var(--sb-w)}
+:is(#app-db,.db-scope) .table-wrap::-webkit-scrollbar-track{background:transparent}
+:is(#app-db,.db-scope) .table-wrap::-webkit-scrollbar-thumb{background:var(--line2); border-radius:6px}
+:is(#app-db,.db-scope) .table-wrap::-webkit-scrollbar-thumb:hover{background:var(--sub)}
+/* ---- D-06 工程7（決-89・決-101）… 表だけの全画面モード -----------------
+   ★栞（takeOut/putBack・22916行〜）で .table-wrap を document.body 直下の
+     この箱へ運び出す。箱に db-scope を付けて、CSS変数（--bg 等）と
+     ダーク配色がここでも届くようにする（Ver1.19.20 の作法・3457行）。 */
+.rtt-tablefs-ov{position:fixed; inset:0; z-index:9000; background:var(--bg); display:flex; padding:14px; box-sizing:border-box}
+:is(#app-db,.db-scope) .table-wrap.rtt-tablefs{max-height:none; height:100%; width:100%; margin:0}
 :is(#app-db,.db-scope) table.grid{border-collapse:collapse; width:100%; font-size:12.5px}
 :is(#app-db,.db-scope) table.grid th,
 :is(#app-db,.db-scope) table.grid td{
@@ -1592,6 +1608,40 @@ background:var(--bg-0);
 .wdtx-item .sub{ font-size:11px; color:#8b93a0; white-space:nowrap; }
 .wdtx-empty{ color:#8b93a0; padding:10px 2px; font-size:12.5px; }
 
+/* ---------- A-04「？」ヘルプボタン（.wdtx-pop の隣・同じ吹き出しの流儀。決-107）---------- */
+:is(#app-db,.db-scope) .hlp-btn{
+  display:inline-flex; align-items:center; justify-content:center;
+  width:16px; height:16px; margin-left:4px; padding:0; border-radius:50%;
+  font-size:11px; line-height:1; font-family:inherit; vertical-align:middle;
+  border:1px solid var(--line); background:var(--panel); color:var(--sub); cursor:pointer;
+}
+:is(#app-db,.db-scope) .hlp-btn:hover{ background:var(--head); }
+.hlp-pop{
+  position:fixed; z-index:1600; display:none;
+  background:#1b1e24; color:#e6e9ef; border:1px solid #3d4046; border-radius:9px;
+  box-shadow:0 8px 26px rgba(0,0,0,.5); padding:8px 10px;
+  min-width:260px; max-width:min(94vw,420px); max-height:64vh; overflow:auto;
+  font-family:"Segoe UI","Hiragino Kaku Gothic ProN","Yu Gothic UI",Meiryo,system-ui,sans-serif;
+  font-size:13px; line-height:1.6;
+}
+.hlp-pop.show{ display:block; }
+.hlp-pop .ph{ display:flex; align-items:center; gap:8px; padding:0 0 7px; border-bottom:1px solid #2b2f37; margin-bottom:6px; }
+.hlp-pop .ph b{ flex:1; font-size:13px; }
+.hlp-pop button{
+  font-family:inherit; font-size:12px; cursor:pointer; background:#2a2d32; color:#e6e9ef;
+  border:1px solid #3d4046; border-radius:5px; padding:3px 8px;
+}
+.hlp-pop button:hover{ background:#33363c; }
+.hlp-pop button:disabled{ opacity:.4; cursor:default; }
+.hlp-pop .hlp-body{ white-space:pre-wrap; }
+.hlp-pop .hlp-ladder,.hlp-pop .hlp-tools{ display:flex; align-items:center; gap:8px; margin-top:8px; }
+.hlp-pop .hlp-tools{ border-top:1px solid #2b2f37; padding-top:7px; }
+.hlp-pop .hlp-origin{ font-size:11px; color:#8b93a0; }
+.hlp-pop textarea.hlp-ta{
+  width:100%; box-sizing:border-box; margin-top:6px; background:#12141a; color:#e6e9ef;
+  border:1px solid #3d4046; border-radius:5px; padding:5px 7px; font-family:inherit; font-size:13px;
+}
+
 /* ---------- 列のドラッグ並べ替え ---------- */
 :is(#app-db,.db-scope) .colchip .dragh{
   cursor:grab; color:var(--sub); padding:0 3px 0 0; user-select:none;
@@ -2316,6 +2366,14 @@ table.rk-tbl button.rk-rec{ background:#7a2f2f; border-color:#b3564f; color:#fff
 }
 :is(#app-db,.db-scope) table.grid > tbody > tr.rowcur > td:first-child{ box-shadow:inset 2px 0 0 var(--accent), inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent); }
 :is(#app-db,.db-scope) table.grid > tbody > tr.rowcur > td:last-child{ box-shadow:inset -2px 0 0 var(--accent), inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent); }
+/* K-02（決-105）… h/l で選んでいる列。行の印（上下の帯）とは別の色にして、
+   「いまの行のどのセルか」まで分かるようにする。
+   ★colcur は常に rowcur の行の中にだけ付く。tr.rowcur > td の box-shadow のほうが
+     詳しさ（type数）で勝ってしまい、そのままでは列の輪が消えて見えなくなるため、
+     同じ詳しさの構造で「行の帯＋列の輪」を1つのbox-shadowにまとめて書く */
+:is(#app-db,.db-scope) table.grid > tbody > tr.rowcur > td.colcur{
+  box-shadow:inset 0 2px 0 var(--accent), inset 0 -2px 0 var(--accent), inset 0 0 0 2px var(--accent2);
+}
 
 /* ---------- タグ画面のキーの印 ---------- */
 :is(#app-db,.db-scope) .rk-tagkb{
@@ -2429,7 +2487,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.34</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.41</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2496,7 +2554,7 @@ summary:focus-visible,
 
 <!-- 検索＆表示 -->
 <details class="card" id="secSearch" open>
-  <summary><span id="secSearchTabs" class="sectbl"></span><h2 style="display:inline-flex">🔎 検索・表示・編集</h2><span id="secSearchNow" class="secnow">－</span></summary>
+  <summary><span id="secSearchTabs" class="sectbl"></span><h2 id="secSearchTitle" style="display:inline-flex">🔎 検索・表示・編集</h2><span id="secSearchNow" class="secnow">－</span></summary>
   <div class="search-grid" style="margin-top:8px">
     <div id="p-query-col">
       <label>対象の列</label>
@@ -2504,7 +2562,7 @@ summary:focus-visible,
     </div>
     <div class="kw" id="p-query-kw">
       <div class="favlabelrow">
-        <label for="q_kw">キーワード／正規表現</label>
+        <label id="qkwLabel" for="q_kw">キーワード／正規表現</label>
         <span id="favGroupBar" class="favbar"></span>
         <button type="button" class="favmini" id="favAddBtn" title="いまの検索条件をお気に入りに登録">★＋</button>
         <button type="button" class="favmini" id="favHistBtn" title="検索履歴を開く">🕘 履歴</button>
@@ -2556,6 +2614,7 @@ summary:focus-visible,
     <label class="hint" id="p-grid-todayFocus" style="display:inline-flex;align-items:center;gap:4px;cursor:pointer" title="この項目を開いたとき、自動で今日の行まで画面を動かします">
       <input type="checkbox" id="chkTodayFocus" onchange="toggleTodayFocus(this.checked)"> 開いたら今日へ
     </label>
+    <button class="ghost small" id="p-grid-fullscreen" onclick="toggleTableFullscreen()" title="表だけを画面いっぱいに広げます（もう一度押すか Esc で元に戻ります）">⛶ 表を全画面</button>
     <span class="hint">▶ <b>列の見出しをクリック</b>で並べ替え（1回目＝順、2回目＝逆順、3回目＝解除）。タグのセルは <b>1回クリック＝編集</b> ／ <b>ダブルクリック＝絞り込み</b>。<br>
     ▶ 入力欄にカーソルが無いときは<b>コマンドモード</b>です。<b>?</b> でキーの一覧、<b>j / k</b> で行の移動、<b>/</b> で検索欄へ。画面の一番下の帯にいまの状態が出ます。</span>
   </div>
@@ -2568,7 +2627,7 @@ summary:focus-visible,
     <button class="ghost small" onclick="clearRowSelection()">選択をやめる</button>
     <span class="hint">▶ 見出しの☑で全選択／<b>Shift＋クリック</b>で範囲選択。まとめて操作したあとも <b>Ctrl+Z</b> で元に戻せます。</span>
   </div>
-  <div class="table-wrap"><div id="results"></div></div>
+  <div class="table-wrap" id="tableWrap"><div id="results"></div></div>
 
   <details id="p-search-hint">
     <summary>検索のヒント（正規表現の例）</summary>
@@ -2595,6 +2654,13 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.41 で増えたこと（表の横スクロールバーが、いつでも見えるようになりました）：</strong>「🔎 検索・表示・編集」の表の横スクロールバーが、これまでは<b>横にはみ出しているときだけ</b>現れる作りでした。この版から、<b>はみ出していなくても、下端にバーの置き場所が常にある</b>形にしました（エクセルの下部バーと同じ動きです）。表の中身や操作方法は変わりません。縦方向のスクロールバーは、これまでどおり必要なときだけ出ます。</p>
+      <p><strong>Ver1.19.40 で増えたこと（「？」の出し方の登録簿を拡張しました）：</strong><b>内部の話</b>です。「？」の吹き出しを出す方法を、コードの中に登録簿として持つことで、<b>後から新しい出し方を1行足すだけで増やせる形</b>にしました（今までは「下だけ」と「下→上に返す」の2つだけ）。見た目や操作方法の変化はありません。</p>
+      <p><strong>Ver1.19.39 で増えたこと（迷いやすいところに「？」が付きました）：</strong>画面のいくつかの場所に、小さな<b>「？」</b>ボタンが出るようになりました。押すと、<b>その場所のすぐ下に説明の吹き出し</b>が開きます（説明されている場所を見たまま読めるようにするためです）。説明は<b>5段のはしご</b>になっていて、「🧒 まだわかんない」を押すともっとやさしい言葉に、「🚀 もっとレベルアップしたいんだ」を押すとレベル1→2→3と詳しくなります。<b>「✎ 自分のメモを追加」</b>で、もとの説明を消さずに<b>あなたのメモを書き足せます</b>（社内での呼び方や注意点など）。書き足したメモは<b>DBファイルの中に覚えます</b>ので、次に開いたときも残っています。「↺ 元に戻す」でメモだけを消せます（もとの説明は消えません）。※<b>もとの説明はアプリ側にあります</b>ので、新しい版に入れ替えると説明は新しくなり、あなたのメモはそのまま残ります。※今回「？」が付いたのは<b>「🔎 検索・表示・編集」と「キーワード／正規表現」の2か所</b>です。説明文はこれから増やしていきます。※DBファイルを開いていないときは、説明は読めますがメモの追加はできません。</p>
+      <p><strong>Ver1.19.38 で増えたこと（表の中を、キーボードの h / j / k /l で左右上下に移動できるようになりました）：</strong>これで<b>D-06「表をエクセルのように編集する」の3つの目標（セルの直接入力・キーでの移動・縦横のスクロール）が全部そろいました</b>。<code>j</code>（下）<code>k</code>（上）は前からありましたが、この版から<code>h</code>（左の列へ）<code>l</code>（右の列へ）が使えます。動けるのは<b>直接入力できる列だけ</b>（ID・登録日時のような読み取り専用の列は対象外）。<b>行を移っても、選んでいた列はそのまま保たれます</b>（Excelで下へ移動しても同じ列にいるのと同じ動きです）。選んだセルには<b>枠</b>が付き、<code>i</code>（編集を始める）を押すと<b>そのセルがそのまま編集モードになります</b>。項目（テーブル）を切り替えると、選んでいた列は最初からやり直しになります（別の表では意味が違う列名を持ち越さないため）。</p>
+      <p><strong>Ver1.19.37 で増えたこと（表の横スクロールバーが、会社のパソコンでも自宅のパソコンでも同じように見やすくなりました）：</strong>「🔎 検索・表示・編集」の表の下端にあるスクロールバーが、これまで<b>お使いのパソコン・ブラウザによっては細い・自動で消えて出にくい</b>ことがありました。この版から、表(<code>.table-wrap</code>)のスクロールバーに<b>色と太さを明示的に指定</b>し、常にはっきり見える形にしました。色は<b>いまお使いのテーマ(明るい／暗い)に自動で合わせて</b>変わります。表の中身や操作方法は変わりません。</p>
+      <p><strong>Ver1.19.36 で増えたこと（表のセルで、Enterキーを押すとその場で確定できるようになりました）：</strong>表のセルをクリックしてその場で書き換えるとき、これまで<b>Enterキーを押すと改行が入るだけ</b>でした。この版から、<b>Enterを押すとその内容で確定してセルから抜けます</b>（改行は入りません）。<b>手を離す（クリックで他の場所へ移る）のと同じ「保存する」動きに、Enterでも入れるようになった</b>形です。※<b>セルを移動する機能ではありません</b>。次のセルへは、これまでどおり自分でクリックして移動してください。※Escキーの動きは変えていません（これまでどおり、入力した内容のまま欄から抜けます）。※日本語入力で変換中にEnterを押したときは、確定扱いにしません（変換の確定として扱われます）。</p>
+      <p><strong>Ver1.19.35 で増えたこと（表だけを画面いっぱいに広げられるようになりました）：</strong>「🔎 検索・表示・編集」の表のすぐ下に<b>「⛶ 表を全画面」</b>ボタンが増えました。押すと<b>検索欄や入力フォームが隠れて、表だけが画面いっぱいに広がります</b>。もう一度押すか、<b>Escキー</b>で元の場所へ戻ります（コマンドパレット Ctrl+K の「表を全画面」からも呼べます）。表そのものは動かすだけなので、<b>列幅・行の高さのドラッグや検索・並べ替えは全画面のままいつもどおり使えます</b>。※検索条件を変えたいときは、いったん元へ戻ってから操作してください（全画面には表だけが入ります）。</p>
       <p><strong>Ver1.19.34 で増えたこと（表の行の高さも、ドラッグでその場で変えられるようになりました）：</strong>①<b>表の行と行の境目</b>にマウスを近づけると、上下にドラッグできるつまみが出ます。<b>どの行の境目をつかんでも、表の全部の行がいっしょに高さを変えます</b>（列幅や仕切り線と違い、行の高さは1つの数字で全体を決めているためです）。②ドラッグ中はマウスのそばに<b>いまの高さ（px）</b>が出ます。<b>Shift を押しながら</b>動かすと、目盛りに吸い付きます。③新しい高さは<b>DBファイルの中</b>に入るので、⚙設定の「📏 表の行の高さ」を選んだときと同じように、別のパソコンで開いても覚えています。これで<b>表の列幅・表の行の高さ・MDメモの仕切り線</b>の3か所すべてが、同じ「ドラッグの土台」の上に載りました。</p>
       <p><strong>Ver1.19.33 で増えたこと（MDメモの仕切り線も、Shift を押しながらで「丁度いい所」に吸い付くようになりました）：</strong>①<b>Markdownメモの「編集」と「できあがり」の間の仕切り線</b>をドラッグするとき、<b>Shift を押しながら</b>動かすと<b>「半分（50:50）」にひゅっと吸い付きます</b>。表の列幅と同じ仕組みです。②スマホ表示（上下に積む表示）でも、同じ仕組みで縦にドラッグできます。③<b>仕切りの位置は、これまでこのパソコンのブラウザだけに覚えていましたが、この版から DB ファイルの中に入るようになりました。</b>別のパソコンで同じファイルを開いても、同じ位置から始まります。</p>
       <p><strong>Ver1.19.32 で増えたこと（列の幅が最初から詰まり、ドラッグ中に「丁度いい所」へ吸い付くようになりました）：</strong>①<b>表を開いたときの列の幅が、中身に合わせて最初から詰まります。</b>これまでは「担当者」の列が中身は「田中」の2文字なのに <b>240ピクセル</b>もありました。原因は<b>見出しの「担当者・一緒に作業した人」という文字</b>です。この版から<b>見出しは1行に収めて「…」で切り</b>（マウスを乗せると全文が出ます）、<b>列の幅は「いま画面に見えている行」の中身に合わせます</b>。実測では、これまで画面からはみ出していた「登録日時」まで<b>11列すべてが1画面に収まる</b>ようになりました。②<b>列の境目をドラッグすると、マウスのそばに今の幅（例：240px）が出ます。</b>③<b>Shift を押しながら</b>動かすと<b>「丁度いい所」にひゅっと吸い付きます</b>。吸い付く先は<b>青い点線</b>で示され、3種類あります ── <b>「⇔ ぴったり」</b>（表に出ている全部の行で文字が切れない幅）、<b>「▣ 見える範囲」</b>（いま画面に映っている行で切れない幅）、<b>「▤ 5文字ぶん」</b>ごとの目盛り。④<b>⚙ 設定 → アドオン → 「🧲 ドラッグ中に『丁度いい所』へ吸い付くキー」</b>で、<b>Shift / Ctrl / Alt / 使わない</b>から選べます。※<b>一度ドラッグして決めた幅は、これまでどおり覚えています</b>（自動で詰め直したりしません）。<b>つまみをダブルクリック</b>すれば、その列だけ自動の幅に戻ります。</p>
@@ -3244,6 +3310,10 @@ window.currentAppMode = 'db';
 
 function setAppMode(mode){
   if(mode !== 'db' && mode !== 'md') return;
+
+  /* D-06 工程7（決-101）… #app-db ごと隠れる前に、表の全画面オーバーレイを閉じる。
+     オーバーレイは document.body の直下なので、隠さないと居残ってしまう。 */
+  if(mode !== 'db'){ try{ if(typeof exitTableFullscreen === 'function') exitTableFullscreen(); }catch(e){} }
 
   // Markdownメモ側で編集中のDB連携タブがあれば、DBへ書き戻してから切り替える。
   // これで「メモで書いた内容が表に反映されていない」状態を作らない。
@@ -6898,6 +6968,61 @@ function focusTodayRow(quiet){
   return true;
 }
 function jumpToToday(){ focusTodayRow(false); }
+
+/* ==================================================================
+   D-06 工程7（決-89・決-101）… 表だけの全画面モード（栞つき）
+   ------------------------------------------------------------------
+   ★案A「表(.table-wrap)だけを栞で運び出す」。栞（takeOut/putBack）は
+     決-65 で作った RTT21 の仕組みをそのまま使う（22916行〜。
+     このファイル内では関数宣言なので、書いてある行の前後に関係なく呼べる）。
+   ★画面モードを離れる（MDメモへ切り替える）と #app-db ごと隠れるが、
+     このオーバーレイは document.body の直下なので隠れずに残ってしまう。
+     setAppMode() 側で退出を呼ぶ（3245行付近）。 ==================== */
+var TABLEFS_OV = null;
+function isTableFullscreen(){ return !!TABLEFS_OV; }
+function tablefsBtnUpdate(on){
+  var b = document.getElementById('p-grid-fullscreen');
+  if(!b) return;
+  b.textContent = on ? '⛶ 全画面を終える' : '⛶ 表を全画面';
+  b.title = on ? '表を元の場所へ戻します（Esc でも戻せます）'
+               : '表だけを画面いっぱいに広げます（もう一度押すか Esc で元に戻ります）';
+}
+function tablefsEscHandler(e){ if(e.key === 'Escape') exitTableFullscreen(); }
+function enterTableFullscreen(){
+  var tw = document.getElementById('tableWrap'), ov;
+  if(!tw || TABLEFS_OV) return false;
+  /* ★箱は自分で作らない。「箱を作る口を1つにする」既存の窓口
+     RTTPARTS.scopeBox('db') を使う（22552行。class と data-theme を
+     両方まとめて面倒を見てくれる。CLAUDE.md §5.2「そぐわないコード」の
+     "データがコードに埋まっている" と同じ轍を踏まない）。 */
+  if(!window.RTTPARTS || typeof window.RTTPARTS.scopeBox !== 'function') return false;
+  ov = window.RTTPARTS.scopeBox('db');
+  if(!ov) return false;
+  ov.classList.add('rtt-tablefs-ov');
+  ov.id = 'rttTableFsOv';
+  document.body.appendChild(ov);
+  if(!window.RTT20 || !window.RTT20.takeOut(tw)){ ov.parentNode && ov.parentNode.removeChild(ov); return false; }
+  ov.appendChild(tw);
+  tw.classList.add('rtt-tablefs');
+  TABLEFS_OV = ov;
+  document.addEventListener('keydown', tablefsEscHandler, true);
+  tablefsBtnUpdate(true);
+  return true;
+}
+function exitTableFullscreen(){
+  var tw = document.getElementById('tableWrap');
+  if(!TABLEFS_OV || !tw) return false;
+  tw.classList.remove('rtt-tablefs');
+  try{ if(window.RTT20) window.RTT20.putBack(tw); }catch(e){}
+  try{ TABLEFS_OV.parentNode && TABLEFS_OV.parentNode.removeChild(TABLEFS_OV); }catch(e){}
+  TABLEFS_OV = null;
+  document.removeEventListener('keydown', tablefsEscHandler, true);
+  tablefsBtnUpdate(false);
+  return true;
+}
+function toggleTableFullscreen(){
+  return isTableFullscreen() ? exitTableFullscreen() : enterTableFullscreen();
+}
 /* ==================================================================
    Ver1.19.11 (B-03)  「開いたら今日へ」の保存先
    ------------------------------------------------------------------
@@ -7297,17 +7422,109 @@ function openTagFilter(colName, presetTag, anchor){
   p.classList.add('show');
   placeTagFilter(anchor);
 }
+/* ==================================================================
+   吹き出しの置き方（決-112・案S）… 浮かぶ箱をどこに置くかの【唯一の場所】
+   ------------------------------------------------------------------
+   ★以前は同じ9行が4か所に複製されていた（🏷タグ絞り込み／⭐お気に入り／
+     advFav の中に直書き／📅日付ピッカー）。直書きは関数ですらなかった。
+   ★置き方は登録簿。基礎板 popPlace() は中身を知らず、名前で呼ぶだけ。
+     将来「右に出す」「中央に出す」を足すときは registerPopPlace に1行。
+   ★当てずっぽうの既定値（300/240・320/260）は捨てた。実測したところ
+     一度も使われておらず、本当の大きさ（470x236 / 290x126）とも似ていない。
+     隠れていても測れるようにして、必ず実寸で置く（日付ピッカーの作法）。
+   ================================================================== */
+var POP_PLACE = {};
+function registerPopPlace(name, def){
+  if(!name || !def || typeof def.put !== 'function') return false;
+  POP_PLACE[String(name)] = def;
+  return true;
+}
+/* def.put(a, box, vp, gap)
+     a   … アンカーの位置 { top, bottom, left, right, w }
+           ★left / right / w は横位置の手掛かり（決-118 で足した）
+           ★w は【アンカーの幅】。置きたい箱の幅は第2引数 box.w のほう
+     box … 置きたい箱の実寸 { w, h }
+     vp  … 画面の大きさ { w, h }
+     gap … アンカーとの隙間(px)
+   戻り値 … { top, how }。横を動かしたいときだけ { left } も返す。
+            ★返さなければ今までどおり＝既存の below / belowFlip は1文字も変えていない。
+            「中央に出す」「右端に寄せる」は、この口に1行登録するだけで作れる
+            （★実体は作らない。決-107 のとおり出し方は吹き出し1つだけ） */
+/* 下に置く。入らなければ画面の下端へ寄せる（昔の1〜3の動き。残しておく） */
+registerPopPlace('below', {
+  label: '下だけ',
+  put: function(a, box, vp, gap){
+    var top = a.bottom + gap, how = 'below';
+    if(top + box.h > vp.h - 8){ top = Math.max(8, vp.h - box.h - 8); how = 'clamped'; }
+    return { top: top, how: how };
+  }
+});
+/* 下に置く。入らなければ【上に返す】（日付ピッカーの動き。これを既定にする） */
+registerPopPlace('belowFlip', {
+  label: '下→入らなければ上',
+  put: function(a, box, vp, gap){
+    var top = a.bottom + gap, how = 'below';
+    if(top + box.h > vp.h - 8){
+      var up = a.top - box.h - gap;
+      if(up >= 8){ top = up; how = 'flip'; }
+      else { top = Math.max(8, vp.h - box.h - 8); how = 'clamped'; }
+    }
+    return { top: top, how: how };
+  }
+});
+
+/* ★最後に置いた結果（見張り番）。how が 'clamped' なら「置き場所が足りなかった」
+   という記録で、D-10「画面を小さくしても使えるように」の手掛かりになる。 */
+var POP_LAST = null;
+
+/* box    … 浮かぶ箱（要素）
+   anchor … その隣に出したい相手（省略すると画面の中央・上から80px）
+   opt    … { gap: 隙間px(既定6), place: 置き方の名前(既定 'belowFlip') }
+   戻り値 … { left, top, w, h, how, clampedX }  ★裸の値ではなくオブジェクト（あとで欄を足せる）
+            clampedX … 横がはみ出したので画面内へ戻した、という見張り番（D-10 の手掛かり） */
+function popPlace(box, anchor, opt){
+  if(!box) return null;
+  opt = opt || {};
+  var gap  = (opt.gap == null) ? 6 : opt.gap;
+  var def  = POP_PLACE[opt.place || 'belowFlip'] || POP_PLACE.belowFlip;
+
+  /* 隠れていると offsetWidth が 0 になる。測れる形にしてから測り、あとで戻す。 */
+  var hidden = (window.getComputedStyle(box).display === 'none');
+  var keepD, keepV;
+  if(hidden){
+    keepD = box.style.display; keepV = box.style.visibility;
+    box.style.visibility = 'hidden';
+    box.style.display = 'block';
+  }
+  /* 右端に置かれたままだと幅が縮んで測れることがあるので、いったん左上へ戻す */
+  box.style.left = '0px'; box.style.top = '0px';
+
+  var w = box.offsetWidth, h = box.offsetHeight;
+  var vp = { w: window.innerWidth, h: window.innerHeight };
+  var r  = (anchor && anchor.getBoundingClientRect) ? anchor.getBoundingClientRect() : null;
+
+  var left = r ? r.left : Math.max(10, (vp.w - w) / 2);
+
+  var v = r ? def.put({ top: r.top, bottom: r.bottom, left: r.left, right: r.right, w: r.width }, { w: w, h: h }, vp, gap)
+            : { top: 80, how: 'none' };
+
+  /* ★横は「置き方が決めたもの」を先に採り、そのあとで画面内へ戻す。
+     順序が逆だと、登録簿が返した横位置にだけ はみ出し補正が効かない。 */
+  if(v.left !== undefined) left = v.left;
+  var clampedX = false;
+  if(left + w > vp.w - 8){ left = Math.max(8, vp.w - w - 8); clampedX = true; }
+  else if(left < 8){ left = 8; clampedX = true; }
+
+  box.style.left = Math.round(left) + 'px';
+  box.style.top  = Math.round(v.top) + 'px';
+  if(hidden){ box.style.display = keepD; box.style.visibility = keepV; }
+
+  POP_LAST = { left: Math.round(left), top: Math.round(v.top), w: w, h: h, how: v.how, clampedX: clampedX };
+  return POP_LAST;
+}
+
 function placeTagFilter(anchor){
-  const p = tagFilter.el;
-  if(!p) return;
-  const r = (anchor && anchor.getBoundingClientRect) ? anchor.getBoundingClientRect() : null;
-  const w = p.offsetWidth || 300, h = p.offsetHeight || 240;
-  let left = r ? r.left : Math.max(10, (window.innerWidth - w) / 2);
-  let top  = r ? (r.bottom + 6) : 80;
-  if(left + w > window.innerWidth - 8) left = Math.max(8, window.innerWidth - w - 8);
-  if(top + h > window.innerHeight - 8) top = Math.max(8, window.innerHeight - h - 8);
-  p.style.left = Math.round(left) + 'px';
-  p.style.top  = Math.round(top) + 'px';
+  popPlace(tagFilter.el, anchor);
 }
 function renderTagFilter(){
   const p = tagFilterEl();
@@ -7976,16 +8193,7 @@ function rsRender(){
 }
 
 function rsPlace(anchor){
-  const p = rsPop.el;
-  if(!p) return;
-  const r = (anchor && anchor.getBoundingClientRect) ? anchor.getBoundingClientRect() : null;
-  const w = p.offsetWidth || 320, h = p.offsetHeight || 260;
-  let left = r ? r.left : Math.max(10, (window.innerWidth - w) / 2);
-  let top  = r ? (r.bottom + 6) : 80;
-  if(left + w > window.innerWidth - 8) left = Math.max(8, window.innerWidth - w - 8);
-  if(top + h > window.innerHeight - 8) top = Math.max(8, window.innerHeight - h - 8);
-  p.style.left = Math.round(left) + 'px';
-  p.style.top  = Math.round(top) + 'px';
+  popPlace(rsPop.el, anchor);
 }
 
 function openResultSets(anchor, focusName){
@@ -8504,14 +8712,7 @@ function openAdvFavPop(gid, anchor){
   advFav.popGid = gid || '';
   advFavRenderPop();
   p.classList.add('show');
-  const r = (anchor && anchor.getBoundingClientRect) ? anchor.getBoundingClientRect() : null;
-  const w = p.offsetWidth || 320, h = p.offsetHeight || 260;
-  let left = r ? r.left : Math.max(10, (window.innerWidth - w) / 2);
-  let top  = r ? (r.bottom + 6) : 80;
-  if(left + w > window.innerWidth - 8) left = Math.max(8, window.innerWidth - w - 8);
-  if(top + h > window.innerHeight - 8) top = Math.max(8, window.innerHeight - h - 8);
-  p.style.left = Math.round(left) + 'px';
-  p.style.top  = Math.round(top) + 'px';
+  popPlace(p, anchor);
 }
 function advFavRenderPop(){
   const p = advFavPopEl();
@@ -8606,6 +8807,9 @@ function attachGridEditing(){
     // 日付・時刻の列は、クリックした時点でカレンダー／時計を出す（そのまま手入力もできる）
     if(td.classList.contains('dtedit')) openPickerForCell(td);
   });
+  /* D-06 セルの直接編集: Enterで確定・Escapeで取り消す（決-103・案1）。
+     セルの移動はしない（K-02の担当のまま。決-103の却下欄を参照） */
+  box.addEventListener('keydown', gridEditKeydown);
 
   /* タグのセル（Ver1.7.00 → Ver1.10.00 で2種類に分けた）
        ・1回クリック   … タグを編集する画面を開く（従来どおり）
@@ -8719,6 +8923,24 @@ function attachGridEditing(){
     const all = e.target.closest ? e.target.closest('#gridChkAll') : null;
     if(all){ selectAllVisible(all.checked); return; }
   });
+}
+/* D-06 セルの直接編集（決-103・案1）
+   Enter … 改行を止めて確定する（td を抜けると focusout が保存する）。
+   ★Escapeには触らない … onDocKey（12418行〜）の「Esc二段階」が document の
+     capture 段階で先に動き、td.edit を含む入力欄を「blurして戻すだけ」の
+     役目を既に持っている（1段目はピッカー、2段目はセルから抜ける）。
+     ここで独自のEscape処理（値を戻す等）を足すと、その捕捉より後にしか
+     届かず値を戻す前に保存されてしまい、動かず二重管理になるだけだった
+     （実測して確認ずみ）。セルの移動も同様に足さない（K-02 の範囲。決-103の却下欄）*/
+function gridEditKeydown(e){
+  if(e.isComposing || e.keyCode === 229) return;   /* 日本語入力の変換中（落とし穴 #10）*/
+  const td = e.target.closest('td.edit');
+  if(!td) return;
+  if(e.key === 'Enter'){
+    e.preventDefault();
+    closePicker();
+    td.blur();
+  }
 }
 function saveCell(id, col, newVal, type, td){
   try{
@@ -9372,20 +9594,11 @@ function openPicker(anchor, ctx){
   wdtPosition(anchor);
 }
 function wdtPosition(anchor){
+  /* ★出す／隠すの責任は呼ぶ側に残す。popPlace は置くだけ（決-112） */
   const p = wdtPop;
   p.style.display = 'block';
   p.style.visibility = 'hidden';
-  p.style.left = '0px'; p.style.top = '0px';
-  const r = anchor.getBoundingClientRect();
-  const w = p.offsetWidth, h = p.offsetHeight;
-  let left = r.left, top = r.bottom + 4;
-  if(left + w > window.innerWidth - 8) left = Math.max(8, window.innerWidth - w - 8);
-  if(top + h > window.innerHeight - 8){
-    const up = r.top - h - 4;
-    top = (up >= 8) ? up : Math.max(8, window.innerHeight - h - 8);
-  }
-  p.style.left = left + 'px';
-  p.style.top = top + 'px';
+  popPlace(p, anchor, { gap: 4 });
   p.style.visibility = 'visible';
 }
 function wdtRender(){
@@ -11703,6 +11916,8 @@ var CMD_KEYS = [
   /* --- 移動 --- */
   {id:'down',    grp:'移動',     icon:'⬇', label:'次の行へ',                    vim:'j',        classic:'ArrowDown',      emacs:'n'},
   {id:'up',      grp:'移動',     icon:'⬆', label:'前の行へ',                    vim:'k',        classic:'ArrowUp',        emacs:'p'},
+  {id:'left',    grp:'移動',     icon:'⬅', label:'前の列へ',                    vim:'h',        classic:'ArrowLeft',      emacs:'b'},
+  {id:'right',   grp:'移動',     icon:'➡', label:'次の列へ',                    vim:'l',        classic:'ArrowRight',     emacs:'f'},
   {id:'top',     grp:'移動',     icon:'⤒', label:'先頭の行へ',                  vim:'g g',      classic:'Home',           emacs:'<'},
   {id:'bottom',  grp:'移動',     icon:'⤓', label:'最後の行へ',                  vim:'G',        classic:'End',            emacs:'>'},
   {id:'tabPrev', grp:'移動',     icon:'◀', label:'前の項目（テーブル）へ',      vim:'[',        classic:'Ctrl+ArrowLeft', emacs:'['},
@@ -11901,7 +12116,7 @@ function gridRows(){
      登録簿は初日から空にならない（T-03 の「呼ぶ側が1つも無い」型を避ける）。
    ★行は前から <tr data-rid="…"> を持っているので、描き直しても探し直せる。
    ================================================================== */
-var CUR       = {table:null, rid:null};
+var CUR       = {table:null, rid:null, col:null};
 var CUR_WATCH = [];                       /* [{name, fn}] 名前で1つに保つ */
 
 /* 既定は「留まる」。要望の芯が「ストレスなく」であり、
@@ -11909,7 +12124,7 @@ var CUR_WATCH = [];                       /* [{name, fn}] 名前で1つに保つ
 function curKeepDefault(){ return true; }
 function curKeep(){ return kOpt('curKeep', curKeepDefault()) !== false; }
 
-function curGet(){ return {table:CUR.table, rid:CUR.rid}; }
+function curGet(){ return {table:CUR.table, rid:CUR.rid, col:CUR.col}; }
 
 function curFire(){
   var snap = curGet(), i, w;
@@ -11936,12 +12151,19 @@ function curWatchers(){
   return CUR_WATCH.map(function(w){ return w.name; });
 }
 
-function curSet(table, rid){
+function curSet(table, rid, col){
   var t = (table == null || table === '') ? CUR.table : String(table);
   var r = (rid == null || rid === '') ? null : String(rid);
-  if(CUR.table === t && CUR.rid === r) return curGet();   /* 変わっていないなら鳴らさない */
+  /* ★col は「省略＝触らない」。行の移動（既存の呼び出し）は列を持ち越すため、
+     引数を増やさずに済む（K-02・vim風のセル移動でExcelのように
+     「上下しても、いた列のまま」を保つ）。★ただし項目（テーブル）そのものが
+     変わったときは、前の項目の列名を持ち越さない（別の表では意味が無い列名になる） */
+  var tableChanged = (CUR.table !== null && t !== CUR.table);
+  var c = (col !== undefined) ? col : (tableChanged ? null : CUR.col);
+  if(CUR.table === t && CUR.rid === r && CUR.col === c) return curGet();   /* 変わっていないなら鳴らさない */
   CUR.table = t;
   CUR.rid   = r;
+  CUR.col   = c;
   curFire();
   return curGet();
 }
@@ -11957,6 +12179,26 @@ function curRowEl(){
   return null;
 }
 
+/* K-02: 列の「いま」も探せるように（vim h/l・決-105で確定した左右移動の対象）。
+   data-col を持つセル（編集できる列だけ）に限る。id・登録日時・曜日の列のような
+   編集できない列は、直接入力の対象ではないので movableCols() には含めない。 */
+function movableCols(){
+  try{
+    var vis = getColumnVisibility(currentTable) || {};
+    var metaByName = {};
+    (metaColumnsByTable[currentTable] || []).forEach(function(c){ metaByName[c.col_name] = c; });
+    return (lastCols || []).filter(function(cn){
+      var m = metaByName[cn];
+      return cn !== 'id' && cn !== 'created_at' && m && m.editable && vis[cn] !== false;
+    });
+  }catch(e){ return []; }
+}
+function colTdOf(tr, col){
+  if(!tr || col == null) return null;
+  try{ return tr.querySelector('td[data-col="' + CSS.escape(col) + '"]'); }
+  catch(e){ return null; }
+}
+
 /* ★塗る係。これが「最初の見張り」。基礎板は誰が塗るかを知らない。 */
 function curPaint(){
   var rows = gridRows(), i, hit = null;
@@ -11965,6 +12207,15 @@ function curPaint(){
     rows[i].classList.remove('rowcur');
   }
   if(hit) hit.classList.add('rowcur');
+  var box = document.getElementById('results');
+  if(box){
+    var prevCol = box.querySelectorAll('td.colcur'), k;
+    for(k = 0; k < prevCol.length; k++) prevCol[k].classList.remove('colcur');
+  }
+  if(hit && CUR.col != null){
+    var td = colTdOf(hit, CUR.col);
+    if(td) td.classList.add('colcur');
+  }
   return hit;
 }
 curWatch('grid.paint', curPaint);
@@ -11972,7 +12223,12 @@ curWatch('grid.paint', curPaint);
 /* 描き直したあとに呼ぶ。同じレコードを探し直し、消えていたら先頭へ寄せる。
    ★inCmdMode() は見ない。検索欄に文字を打っている最中でもカーソルは残す。 */
 function curApply(quiet){
-  var el = curPaint();
+  /* ★K-02の実装中に見つけた既存の穴（決-71・curApplyの元の姿）… ここは
+     rid だけで「同じ行」を探し直しており、項目（テーブル）が変わっても
+     新しい表にたまたま同じ rid の行があると【別の項目の行】を「同じ行」と
+     見なしてしまい、CUR.table が古いまま更新されなかった（curSet が呼ばれない）。
+     まず「表そのものが変わっていないか」を先に見る。 */
+  var el = (CUR.table === currentTable) ? curPaint() : null;
   if(!el){
     var rows = gridRows();
     if(rows.length){
@@ -12021,6 +12277,18 @@ function moveCur(delta){
   else j = Math.min(rows.length - 1, Math.max(0, i + delta));
   return setCurRow(rows[j]);
 }
+/* K-02: h(左)/l(右)。決-105で確定した vim 標準どおり、j/k（上下）と対の役目。
+   端まで来たら止まる（moveCur と同じ、折り返さない） */
+function moveCol(delta){
+  needRow();
+  var cols = movableCols();
+  if(!cols.length){ say('この項目には、直接入力できる列がありません。', 'err'); return; }
+  var i = (CUR.col != null) ? cols.indexOf(CUR.col) : -1;
+  var j;
+  if(i < 0) j = (delta > 0) ? 0 : cols.length - 1;
+  else j = Math.min(cols.length - 1, Math.max(0, i + delta));
+  curSet(currentTable, CUR.rid, cols[j]);
+}
 function needRow(){
   var tr = curRow();
   if(tr) return tr;
@@ -12052,7 +12320,10 @@ function focusSearch(){
 }
 function editRow(tr){
   if(!tr) return;
-  var cell = tr.querySelector('td.edit[contenteditable="true"], td.mdcell, td.tagcell, td.chkcell');
+  /* K-02: h/l で列を選んでいれば、その列を開く（Excel風にカーソルの場所を編集する）。
+     まだ列を選んでいない・その列がこの行に無いときは、いままでどおり最初の1つ */
+  var cell = (CUR.col != null) ? colTdOf(tr, CUR.col) : null;
+  if(!cell) cell = tr.querySelector('td.edit[contenteditable="true"], td.mdcell, td.tagcell, td.chkcell');
   if(!cell){ say('この行には編集できるセルがありません。', 'err'); return; }
   if(cell.classList.contains('edit')){
     cell.focus();
@@ -12229,6 +12500,8 @@ var CMD_RUN = {
   palette:function(){ try{ if(window.RTT20 && window.RTT20.palette) window.RTT20.palette(''); }catch(e){} },
   down:   function(){ moveCur(1); },
   up:     function(){ moveCur(-1); },
+  left:   function(){ moveCol(-1); },
+  right:  function(){ moveCol(1); },
   top:    function(){ var r = gridRows(); if(r.length) setCurRow(r[0]); },
   bottom: function(){ var r = gridRows(); if(r.length) setCurRow(r[r.length - 1]); },
   tabPrev:function(){ switchTable(-1); },
@@ -13097,6 +13370,7 @@ window.RTTCUR = {
   rowEl       : curRowEl,        /* いまのレコードの <tr>（無ければ null）      */
   keep        : curKeep,         /* いまの設定（true = 留まる）               */
   keepDefault : curKeepDefault,  /* 設定が無いときの既定                      */
+  cols        : movableCols,     /* K-02: h/l で回れる列名の一覧（決-105）      */
   version     : '1.19.18'
 };
 
@@ -19611,6 +19885,10 @@ return {
   getOpt: getOpt,
   setOpt: setOpt,
   onDbReady: onDbReady,
+  /* ★Ver1.19.39 (A-04) … 「DBファイルを開いているか」を外の囲いから聞く口。
+     A-04 の「？」は、DBが無くても既定文で開くが、書き換えの保存はできない。
+     判定を各所で作り直すと食い違うので、正はこの1つだけ（§5.2 決まり3）。 */
+  hasDb: hasDb,
   noteSearch: noteSearch,
   startMode: startMode,
   renderFavBar: renderFavBar,
@@ -21568,6 +21846,484 @@ function unregisterPart(key){
   return true;
 }
 
+/* ==================================================================
+   Ver1.19.39 (A-04 第1弾)  「？」ヘルプの登録簿と登録の口
+   ------------------------------------------------------------------
+   設計の正: 改良/A-04_ヘルプボタン/04_フローチャートと二重対策.md ／ 決-107〜109
+   守り    : pw_a04.py 節2 節3 節6 節7 節8
+
+   ★欄の一覧そのものを登録簿にする（04 バグ予想③の一次対策）。
+     registerPart は白名簿で、欄を1つ書き忘れると【黙って捨てられる】
+     （21691行に工程5で実際に踏んだ記録がある）。ここは HELP_FIELDS を
+     回して写すので、欄を増やす＝配列に1語足すだけになり、書き忘れが
+     構造的に起きない。
+
+   ★いま使わない欄も先に開ける（決-109）。ver / baseHash は第2弾の
+     見張り番1（古びた書き換え）が、tags / see は横断検索とタグ絞り込みが
+     使う。後から足すと上の型で黙って捨てられるので、後回しにできない。
+   ================================================================== */
+var HELP_FIELDS = ['key', 'at', 'where', 'label', 'icon', 'tags', 'texts',
+                   'start', 'view', 'layer', 'when', 'see', 'ver', 'baseHash', 'from'];
+
+var HELP = [];              /* 登録された定義の並び（PARTS と同じ形）*/
+var HELP_AT = {};           /* key → HELP の位置 */
+var HELP_SEEDED = false;
+
+/* はしごは5段。園児 ← 初心者 → レベル1 → 2 → 3（決-108。枝分かれの木にはしない）*/
+var HELP_LADDER = ['園児', '初心者', 'レベル1', 'レベル2', 'レベル3'];
+
+/* ★欄ごとの「整えかた」も登録簿にする（読む側に if を増やさない・§5.2 決まり2）。
+   新しい欄に特別な既定値が要るときは、ここへ1行足すだけでよい。 */
+var HELP_NORM = {
+  key  : function(v, def){ return String(def.key); },
+  label: function(v, def){ return v || String(def.key); },
+  icon : function(v){ return v || '❓'; },
+  tags : function(v){ return normTags(v, ''); },
+  texts: function(v){ return helpTexts5(v); },
+  start: function(v){ return (v == null) ? 1
+                             : Math.max(0, Math.min(HELP_LADDER.length - 1, v | 0)); },
+  view : function(v){ return v || 'pop'; },
+  layer: function(v){ return v || 'append'; },
+  when : function(v){ return (typeof v === 'function') ? v : null; }
+};
+
+/* はしごは必ず5段そろえる。足りない段は空文字で埋める
+   （読む側が長さを仮定できる＝見張り番3 が「未記入」を数えられる）*/
+function helpTexts5(t){
+  var out = [], i;
+  for(i = 0; i < HELP_LADDER.length; i++){
+    out.push((t && t[i] != null) ? String(t[i]) : '');
+  }
+  return out;
+}
+
+function registerHelp(def){
+  if(!def || !def.key) return false;
+  var d = {}, i, f, n, idx;
+  for(i = 0; i < HELP_FIELDS.length; i++){
+    f = HELP_FIELDS[i];
+    n = HELP_NORM[f];
+    d[f] = n ? n(def[f], def) : ((def[f] == null) ? '' : def[f]);
+  }
+  idx = HELP_AT[d.key];
+  if(idx != null){ HELP[idx] = d; }        /* 同じ key は上書き（重複防止）*/
+  else { HELP_AT[d.key] = HELP.length; HELP.push(d); }
+  return true;
+}
+
+function unregisterHelp(key){
+  var i = HELP_AT[key], j;
+  if(i == null) return false;
+  HELP.splice(i, 1);
+  HELP_AT = {};
+  for(j = 0; j < HELP.length; j++) HELP_AT[HELP[j].key] = j;
+  return true;
+}
+
+/* 種を登録簿へ流し込む（loadParts と同じ形。何度呼んでも1回しか効かない）*/
+function loadHelp(){
+  var i;
+  if(HELP_SEEDED) return HELP.length;
+  HELP_SEEDED = true;
+  for(i = 0; i < HELP_SEED.length; i++){ registerHelp(HELP_SEED[i]); }
+  return HELP.length;
+}
+
+/* 「？」を差し込む先の id … 明示が無ければ部品の elId を使う。
+   ★同じ id を2つの登録簿に書かない（§5.2 決まり3・複製を作らない）*/
+function helpAtId(d){
+  if(!d) return '';
+  if(d.at) return String(d.at);
+  var p = partDef(d.key);
+  return p ? p.elId : partElId(d.key);
+}
+
+/* ---- 重ね方の登録簿（決-108）… 既定は append（追記）------------------
+   ★もとの文はコード側、利用者の書き足しは DB 側。版を上げると
+     もとの説明だけが新しくなり、利用者の書き込みは残る。 */
+var HELP_LAYER = {};
+function registerHelpLayer(name, def){
+  if(!name || !def || typeof def.apply !== 'function') return false;
+  HELP_LAYER[String(name)] = {label: def.label || String(name), apply: def.apply};
+  return true;
+}
+registerHelpLayer('append', {label: '追記', apply: function(base, user){
+  if(!user) return base || '';
+  if(!base) return user;
+  return base + '\n\n' + user;
+}});
+registerHelpLayer('replace', {label: '書き換え', apply: function(base, user){
+  return user ? user : (base || '');
+}});
+
+/* ---- 出し方の登録簿（決-107）------------------------------------------
+   ★実体を作るのは吹き出し（pop）1つだけ。中央モーダル・右サイドパネルは
+     「口だけ開けて実体は作らない」。足すときはここへ1行。 */
+var HELP_VIEW = {};
+function registerHelpView(name, def){
+  if(!name || !def || typeof def.open !== 'function' || typeof def.close !== 'function') return false;
+  HELP_VIEW[String(name)] = {label: def.label || String(name), open: def.open, close: def.close};
+  return true;
+}
+
+/* ---- ツリー継承（決-109 (3)）------------------------------------------
+   最後の「.」から後ろを削って遡るだけ。ドットが無くなったら終わり。
+   ★上限8段 … 万一おかしな鍵が来ても固まらない（04 バグ予想⑤の二次対策）。 */
+var HELP_MAX_UP = 8;
+function helpResolve(key){
+  if(!key) return null;
+  loadHelp();
+  var k = String(key), i, at, dot;
+  for(i = 0; i < HELP_MAX_UP; i++){
+    at = HELP_AT[k];
+    if(at != null) return HELP[at];
+    dot = k.lastIndexOf('.');
+    if(dot < 0) return null;
+    k = k.slice(0, dot);
+  }
+  return null;
+}
+
+/* ---- 見張り番3（未記入）… 文が1段も無い場所には「？」を出さない --------
+   ★継承まで含めて判定する。親に文があれば子にも出す／親も空なら出さない。
+     この「両方」を見ないと空振りを見抜けない（04 バグ予想④）。 */
+function helpShow(key){
+  var d = helpResolve(key), i;
+  if(!d) return false;
+  for(i = 0; i < d.texts.length; i++){ if(d.texts[i]) return true; }
+  return false;
+}
+
+/* ---- 利用者の書き換えの置き場（_meta_opts / scope='help'）--------------- */
+function helpOptName(key, lv){ return String(key) + '@' + (lv | 0); }
+
+/* ★設定の読み書きは window.WDT だけを通す（絶対規律2）。
+   ここは別の囲い（IIFE）の中なので、裸の dbOptGet / optTableReady は
+   そもそも届かない。2026-09-14 に実測して踏んだ … 届かないまま
+   try/catch で握り潰していたため、保存が【黙って】false になっていた。 */
+function helpWdt(){
+  try{ return (window.WDT && typeof window.WDT.dbOptSet === 'function') ? window.WDT : null; }
+  catch(e){ return null; }
+}
+
+/* ★DB を開いていないと dbOptSet は false を返すだけ（04 バグ予想⑥）。
+   「保存できたつもり」を作らないため、編集の口はここで塞ぐ。 */
+function helpCanEdit(){
+  var W = helpWdt();
+  if(!W || typeof W.hasDb !== 'function') return false;
+  try{ return !!W.hasDb(); }catch(e){ return false; }
+}
+
+function helpUserSaved(key, lv){
+  var W = helpWdt();
+  if(!W || !helpCanEdit()) return null;
+  var raw;
+  try{ raw = W.dbOptGet('help', helpOptName(key, lv)); }catch(e){ return null; }
+  if(!raw) return null;
+  /* 外から手で書き換えられていても黙って捨てない（決-69）*/
+  try{ return JSON.parse(raw); }catch(e){ return {mode: 'append', text: String(raw)}; }
+}
+
+/* 既定文の指紋。第2弾の見張り番1（古びた書き換え）が使う口（決-109 の 7）*/
+function helpHash(s){
+  var h = 5381, i;
+  s = String(s == null ? '' : s);
+  for(i = 0; i < s.length; i++){ h = ((h * 33) ^ s.charCodeAt(i)) >>> 0; }
+  return h.toString(16);
+}
+
+function helpNowIso(){
+  try{ return new Date().toISOString(); }catch(e){ return ''; }
+}
+
+function helpAppVer(){
+  try{
+    var e = document.querySelector('.verNo');
+    var m = e && (e.textContent || '').match(/([\d.]+)/);
+    return m ? m[1] : '';
+  }catch(e){ return ''; }
+}
+
+/* ---- 読み口の本体（決-109 (2)）----------------------------------------
+   ★戻り値は最初からオブジェクト。あとで欄を足せるようにするため。
+     {key, lv, text, base, user, origin, dirty, stale, ver}
+   ★origin は 既定 / 追記 / 書き換え。検算式がここを見る
+     （件数だけ数えると中身が空でも通ってしまう＝落とし穴 #52）。 */
+function helpText(key, lv){
+  var d = helpResolve(key);
+  if(!d) return null;
+  var n = (lv == null) ? d.start : (lv | 0);
+  if(n < 0) n = 0;
+  if(n > d.texts.length - 1) n = d.texts.length - 1;
+  var base  = d.texts[n] || '';
+  var saved = helpUserSaved(d.key, n);          /* ★継承元の鍵で引く */
+  var mode  = (saved && saved.mode) || d.layer || 'append';
+  var lay   = HELP_LAYER[mode] || HELP_LAYER.append;
+  var user  = (saved && saved.text) || '';
+  return { key   : d.key,
+           lv    : n,
+           text  : user ? lay.apply(base, user) : base,
+           base  : base,
+           user  : user,
+           origin: user ? (lay.label || mode) : '既定',
+           dirty : !!user,
+           stale : !!(saved && saved.baseHash && saved.baseHash !== helpHash(base)),
+           ver   : (saved && saved.ver) || d.ver || '' };
+}
+
+/* 一覧（第2弾のタグ絞り込み・横断検索がここに乗る。いまは口だけ）*/
+function helpList(filter){
+  loadHelp();
+  if(typeof filter !== 'function') return HELP.slice();
+  var out = [], i;
+  for(i = 0; i < HELP.length; i++){ if(filter(HELP[i])) out.push(HELP[i]); }
+  return out;
+}
+
+/* ---- 見張り番3・4 をまとめて数える（決-109 (4)(5)）--------------------
+   ready   … 文が書けている（「？」を出す）
+   missing … 1段も書かれていない（「？」を出さない）
+   broken  … 差し込み先の id が画面に無い＝口が断線している
+   lost    … 迷子の付箋（第2弾の見張り番2 が使う口。いまは常に空）*/
+function helpAudit(){
+  loadHelp();
+  var out = {total: HELP.length, ready: [], missing: [], broken: [], lost: []},
+      i, d, id;
+  for(i = 0; i < HELP.length; i++){
+    d = HELP[i];
+    if(helpShow(d.key)) out.ready.push(d.key); else out.missing.push(d.key);
+    id = helpAtId(d);
+    if(!id || !document.getElementById(id)) out.broken.push(d.key);
+  }
+  return out;
+}
+
+/* ---- 保存と「↺ 元に戻す」（決-108）------------------------------------
+   ★元に戻す ＝ DB の1行を消すだけ。これが決-108 を選んだいちばんの果実。 */
+function helpSave(key, lv, text, mode){
+  var d = helpResolve(key), W = helpWdt();
+  if(!d) return false;
+  if(!W || !helpCanEdit()){
+    say('DBファイルを開いていないので、説明の書き換えを保存できません。', 'err');
+    return false;
+  }
+  var n = (lv | 0), done = false;
+  var rec = {mode    : (mode && HELP_LAYER[mode]) ? mode : (d.layer || 'append'),
+             text    : String(text == null ? '' : text),
+             at      : helpNowIso(),
+             ver     : helpAppVer(),
+             baseHash: helpHash(d.texts[n] || '')};
+  try{ done = !!W.dbOptSet('help', helpOptName(d.key, n), JSON.stringify(rec)); }
+  catch(e){ done = false; }
+  if(!done){
+    say('説明の書き換えを保存できませんでした。', 'err');
+    return false;
+  }
+  try{ if(typeof window.scheduleAutosave === 'function') window.scheduleAutosave(); }catch(e){}
+  return true;
+}
+
+function helpReset(key, lv){
+  var d = helpResolve(key), W = helpWdt();
+  if(!d) return false;
+  if(!W || !helpCanEdit()){
+    say('DBファイルを開いていないので、元に戻せません。', 'err');
+    return false;
+  }
+  var done = false;
+  try{ done = !!W.dbOptDel('help', helpOptName(d.key, lv | 0)); }catch(e){ done = false; }
+  if(done){
+    try{ if(typeof window.scheduleAutosave === 'function') window.scheduleAutosave(); }catch(e){}
+  }
+  return done;
+}
+
+/* ==================================================================
+   Ver1.19.39 (A-04 第1弾)  出し方その1 … 吹き出し（決-107）
+   ------------------------------------------------------------------
+   ★出し方は登録簿（HELP_VIEW）で選べるが、実体を作るのはこの吹き出し1つだけ。
+     中央モーダル・右サイドパネルは「口だけ開けて実体は作らない」（決-107）。
+   ★同時に2つ開かない（04 バグ予想⑧）… 箱は1つを使い回す。
+     他人の .wdtx-pop には手を出さない。
+   ★スクロールしたら【追いかけず閉じる】（04 バグ予想②）。
+     #app-db を名指しせず document の capture で捕まえる
+     … window / document の bubble では一度も鳴らないと実測ずみ（02 §4.5）。
+   ★中身は textContent で入れる。innerHTML を使わないので、
+     利用者が書いた文に < が入っていても壊れないし、逃がし忘れも起きない。
+   ================================================================== */
+var HELP_POP = null;        /* いま出ている箱（1つだけ）*/
+var HELP_POP_ST = null;     /* {key, lv, anchor} */
+
+function helpPopClose(){
+  if(HELP_POP && HELP_POP.parentNode){ HELP_POP.parentNode.removeChild(HELP_POP); }
+  HELP_POP = null;
+  HELP_POP_ST = null;
+}
+
+function helpBtn(cls, label, on){
+  var b = document.createElement('button');
+  b.type = 'button';
+  b.className = cls;
+  b.textContent = label;
+  if(on){
+    b.addEventListener('click', function(e){
+      e.stopPropagation();          /* 開いた直後に自分で閉じないため（§0-1）*/
+      on(e);
+    });
+  }
+  return b;
+}
+
+/* 中身を同じ箱に描き直す（箱ごと作り直さない … はしごを上下しても
+   吹き出しが飛び跳ねないし、開いている箱は最後まで1つのまま）*/
+function helpPopRender(box, d, t, anchor){
+  var ph, b, body, lad, down, now, up, tools, org, edit, rst, canEdit;
+  while(box.firstChild){ box.removeChild(box.firstChild); }
+
+  ph = document.createElement('div');
+  ph.className = 'ph';
+  b = document.createElement('b');
+  b.textContent = (d.icon ? d.icon + ' ' : '') + d.label;
+  ph.appendChild(b);
+  ph.appendChild(helpBtn('hlp-close', '✕', helpPopClose));
+  box.appendChild(ph);
+
+  body = document.createElement('div');
+  body.className = 'hlp-body';
+  body.textContent = t.text;
+  box.appendChild(body);
+
+  /* はしご5段。端では押せなくする */
+  lad = document.createElement('div');
+  lad.className = 'hlp-ladder';
+  down = helpBtn('hlp-down', '🧒 まだわかんない', function(){
+    helpPopOpen(d.key, t.lv - 1, anchor);
+  });
+  now = document.createElement('span');
+  now.className = 'hlp-lv';
+  now.textContent = HELP_LADDER[t.lv] || '';
+  up = helpBtn('hlp-up', '🚀 もっとレベルアップしたいんだ', function(){
+    helpPopOpen(d.key, t.lv + 1, anchor);
+  });
+  down.disabled = (t.lv <= 0);
+  up.disabled   = (t.lv >= HELP_LADDER.length - 1);
+  lad.appendChild(down); lad.appendChild(now); lad.appendChild(up);
+  box.appendChild(lad);
+
+  /* いまの出どころ（既定 / 追記 / 書き換え）と、書き直す・元に戻す */
+  canEdit = helpCanEdit();
+  tools = document.createElement('div');
+  tools.className = 'hlp-tools';
+  org = document.createElement('span');
+  org.className = 'hlp-origin';
+  org.textContent = t.origin;
+  tools.appendChild(org);
+  /* ★文言は「自分のメモを追加」（利用者の指示・2026-09-14）。
+     既定の重ね方は append（もとの文は消さずに下へ足す）なので、
+     「書き直す」だと画面の言葉と実際の動きが食い違う。 */
+  edit = helpBtn('hlp-edit', '✎ 自分のメモを追加', function(){ helpPopEdit(d.key, t.lv, anchor); });
+  rst  = helpBtn('hlp-reset', '↺ 元に戻す', function(){
+    helpReset(d.key, t.lv);
+    helpPopOpen(d.key, t.lv, anchor);
+  });
+  /* ★DBを開いていないと保存できない。押せるのに効かない形を作らない（04 ⑥）*/
+  edit.disabled = !canEdit;
+  rst.disabled  = !canEdit || !t.dirty;
+  tools.appendChild(edit); tools.appendChild(rst);
+  box.appendChild(tools);
+  return box;
+}
+
+function helpPopOpen(key, lv, anchor){
+  var d = helpResolve(key), t;
+  if(!d || !helpShow(key)) return null;        /* 見張り番3 … 未記入なら出さない */
+  t = helpText(key, lv);
+  if(!t) return null;
+
+  if(!HELP_POP || !HELP_POP.parentNode){
+    HELP_POP = document.createElement('div');
+    HELP_POP.className = 'hlp-pop';
+    HELP_POP.addEventListener('click', function(e){ e.stopPropagation(); });
+    document.body.appendChild(HELP_POP);
+  }
+  HELP_POP.setAttribute('data-help-key', d.key);
+  helpPopRender(HELP_POP, d, t, anchor);
+  HELP_POP.classList.add('show');
+  HELP_POP_ST = {key: d.key, lv: t.lv, anchor: anchor || null};
+  popPlace(HELP_POP, anchor || null);
+  return HELP_POP;
+}
+
+function helpPopEdit(key, lv, anchor){
+  var box = helpPopOpen(key, lv, anchor), t, ta, save;
+  if(!box) return null;
+  t = helpText(key, lv);
+  ta = document.createElement('textarea');
+  ta.className = 'hlp-ta';
+  ta.value = t.user || '';
+  box.appendChild(ta);
+  save = helpBtn('hlp-save primary', '保存', function(){
+    helpSave(key, t.lv, ta.value, null);
+    helpPopOpen(key, t.lv, anchor);
+  });
+  box.appendChild(save);
+  popPlace(box, anchor || null);
+  try{ ta.focus(); }catch(e){}
+  return box;
+}
+
+registerHelpView('pop', {label: '吹き出し', open: helpPopOpen, close: helpPopClose});
+
+/* ==================================================================
+   Ver1.19.39 (A-04 第1弾)  「？」の配布（決-115・案A-2「データで指す」）
+   ------------------------------------------------------------------
+   ★基礎板は登録簿を回すだけ。どの場所に何を出すかは HELP_SEED（データ）が持つ。
+     「？」を1つ増やす ＝ 登録簿に1行足すだけで、ここは1行も変わらない。
+   ★探さない … at が指した要素の【すぐ右】に置く。見出しを探し回る書き方にすると
+     節に部品が増えた日に黙って壊れる（§5.2「位置や順番で決めつける」）。
+   ★出さない条件も基礎板は自分で決めない … 未記入なら helpShow が false を返す
+     （見張り番3）。差し込み先が無ければ helpAudit が broken に数える（見張り番4）。
+   ================================================================== */
+function helpQid(key){ return 'hlp-q-' + String(key).replace(/\./g, '-'); }
+
+function helpMount(d){
+  if(!d || !helpShow(d.key)) return false;          /* 見張り番3 … 未記入は出さない */
+  var host = document.getElementById(helpAtId(d));
+  if(!host) return false;                           /* 見張り番4 … 断線 */
+  var id = helpQid(d.key);
+  if(document.getElementById(id)) return true;      /* 二度付けしない */
+  var q = helpBtn('hlp-btn', '？', function(){
+    var v = HELP_VIEW[d.view] || HELP_VIEW.pop;
+    v.open(d.key, null, q);                         /* 段は def.start（初心者）から */
+  });
+  q.id = id;
+  q.title = d.label + ' の説明を見る';
+  q.setAttribute('aria-label', d.label + ' の説明');
+  q.setAttribute('data-help-key', d.key);
+  host.insertAdjacentElement('afterend', q);
+  return true;
+}
+
+function helpMountAll(){
+  loadHelp();
+  var i, n = 0;
+  for(i = 0; i < HELP.length; i++){ if(helpMount(HELP[i])) n++; }
+  return n;
+}
+
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){ helpMountAll(); });
+}else{
+  helpMountAll();
+}
+
+/* ★閉じる入り口は3つ。どれも「開いているときだけ」働く */
+document.addEventListener('scroll', function(){ if(HELP_POP) helpPopClose(); }, true);
+document.addEventListener('click',  function(){ if(HELP_POP) helpPopClose(); });
+document.addEventListener('keydown', function(e){
+  if(HELP_POP && e.key === 'Escape') helpPopClose();
+});
+
 function partDef(key){ var i = PART_AT[key]; return (i == null) ? null : PARTS[i]; }
 
 function partEl(d){
@@ -21765,6 +22521,7 @@ var PART_SEED = [
   {key:'grid.resetAll',     group:'gridTools', label:'全件に戻す',  icon:'↺', tags:'db grid action'},
   {key:'grid.today',        group:'gridTools', label:'今日へ',      icon:'📍', tags:'db grid date action'},
   {key:'grid.todayFocus',   group:'gridTools', label:'開いたら今日へ', icon:'', tags:'db grid date settings'},
+  {key:'grid.fullscreen',   group:'gridTools', label:'表を全画面',    icon:'⛶', tags:'db grid action'},
   {key:'sort.bar',          group:'sortSel', label:'並べ替えの状態', icon:'', elId:'sortBar', tags:'db grid sort status'},
   {key:'bulk.bar',          group:'sortSel', label:'複数選択の操作', icon:'☑', elId:'bulkBar', tags:'db grid select'},
   {key:'results.table',     group:'results', label:'結果の表',      icon:'📋', elId:'results', tags:'db results grid'},
@@ -21791,6 +22548,41 @@ var PART_SEED = [
   {key:'db.secSearch',       group:'global', label:'検索・表示・編集',   icon:'🔎', elId:'secSearch',       tags:'db section'},
   {key:'db.secInputForm',    group:'global', label:'新規登録',           icon:'✏',  elId:'secInputForm',    tags:'db section'},
   {key:'db.secTableManager', group:'global', label:'項目（テーブル）管理', icon:'🗂', elId:'secTableManager', tags:'db section'}
+];
+
+/* ==================================================================
+   Ver1.19.39 (A-04 第1弾)  「？」ヘルプの種（データ）
+   ------------------------------------------------------------------
+   ★【何を説明するか】はデータ。【どう出すか】はコード（§5.2 決まり5）。
+   ★第1弾で「？」を付けるのは db.secSearch と query.kw の2か所だけ（決-109）。
+     仕組みを固めてから広げる。ここに1行足せば「？」が1つ増える。
+   ★文面は 改良/A-04_ヘルプボタン/試作_出し方くらべ.html で
+     利用者が実際に触って確かめたものをそのまま使っている。
+   ★tags の「下書き」は執筆の進み具合の印（第2弾でタグ絞り込みに使う）。
+     説明文そのものは第2弾で 初心者向けの説明文/説明文/ から入れ替える
+     （利用者の明示指示「説明文は後半に作りたい。現段階では部品だけ」）。
+   ★at は「？」を【その右に】置く相手の id（決-115・案A-2「データで指す」）。
+     基礎板に「見出しを探す」ルールを持たせない。探さないので、節に部品が
+     増えても黙って壊れない（§5.2「位置や順番で決めつける」を避ける）。
+     at を書かなければ部品の elId が使われる（helpAtId）。
+   ================================================================== */
+var HELP_SEED = [
+  {key:'db.secSearch', label:'検索・表示・編集', icon:'🔎', at:'secSearchTitle',
+   where:'DB画面の「🔎 検索・表示・編集」の節', tags:'db search section 下書き', texts:[
+    'ここは「さがす」ところ。たからばこの中から、ほしいものをさがすんだ。',
+    'キーワードを入れて「検索」を押すと、あてはまる行だけが下の表に出ます。「全件表示」を押すと、また全部に戻ります。',
+    'レベル1：「正規表現で検索」にチェックを入れると、あいまいな探し方ができます。',
+    'レベル2：「くわしい検索」で、条件を組み合わせて絞り込めます。',
+    'レベル3：横断検索で、複数の表をまたいで一度に探せます。'
+  ]},
+  {key:'query.kw', label:'キーワード欄', icon:'🔎', at:'qkwLabel',
+   where:'検索条件のキーワード入力欄', tags:'db search query input 下書き', texts:[
+    'ここに、さがしたいことばを入れてね。',
+    'さがしたい言葉を入れて Enter を押すと検索します。｜で区切ると「どちらか」になります。',
+    'レベル1：★＋ でいまの条件をお気に入りに登録できます。',
+    'レベル2：🕘履歴 から前に使った条件を呼び戻せます。',
+    'レベル3：正規表現と組み合わせると、型番のゆらぎも一度に拾えます。'
+  ]}
 ];
 
 /* ---- 読み口 … 将来ぜんぶ DB へ移すときは、この2つだけ直す ----------- */
@@ -21909,6 +22701,12 @@ var PART_ACTION = {
                       kw:'modosu zenken もどす ぜんけんにもどす', desc:'絞り込みを解除して全件表示に戻します'},
   'grid.today':      {run: winCall('jumpToToday'),     when: NEED_DB,
                       kw:'kyou today きょう きょうへ', desc:'日付の列を見て、今日の行まで画面を動かします'},
+  /* ★D-06 工程7（決-101）… パレットから呼んでも押し直しても閉じられるよう、
+     run は常に toggleTableFullscreen()（決-101 の案A・栞つき） */
+  'grid.fullscreen': {run: function(){ try{ if(typeof window.toggleTableFullscreen === 'function') window.toggleTableFullscreen(); }catch(e){} },
+                      when: NEED_DB,
+                      kw:'zenmen fullscreen zenga men ぜんめん ぜんがめん',
+                      desc:'表だけを画面いっぱいに広げます（もう一度実行するか Esc で元に戻ります）'},
 
   /* --- 入力欄（押すのでなく「そこへ行く」）--- */
   'query.col':       {focus: focusById('q_col'),
@@ -23216,6 +24014,39 @@ registerNodeKind('slot', {
      中の関数は外から見えない（abc.md 落とし穴 #9 の型）。
      window.RTT19 / window.RTT20 と同じ作法で、公開する物だけを窓口に出す。
      window.WDT からはこの窓口を経由して呼ぶ（グローバル参照は window.◯◯ の形）。 */
+/* ==================================================================
+   Ver1.19.39 (A-04 第1弾)  「？」ヘルプの窓口
+   ------------------------------------------------------------------
+   ★RTTPARTS には混ぜない（01_ファイル一覧.md）。役目の違うものを1つの
+     窓口にまとめると、どちらの都合で欄が増えたのか分からなくなる。
+   ★この囲い（IIFE）の中の名前は外から見えない。外へ出すのはこの窓口だけ。
+   ================================================================== */
+window.RTTHELP = {
+  registerHelp     : registerHelp,
+  unregisterHelp   : unregisterHelp,
+  loadHelp         : loadHelp,
+  helpResolve      : helpResolve,
+  helpShow         : helpShow,
+  helpText         : helpText,
+  helpList         : helpList,
+  helpSave         : helpSave,
+  helpReset        : helpReset,
+  helpAudit        : helpAudit,
+  helpCanEdit      : helpCanEdit,
+  helpAtId         : helpAtId,
+  helpHash         : helpHash,
+  helpMount        : helpMount,
+  helpMountAll     : helpMountAll,
+  helpQid          : helpQid,
+  registerHelpView : registerHelpView,
+  registerHelpLayer: registerHelpLayer,
+  /* 登録簿そのもの（読む側が形を仮定できるように、名前で出す）*/
+  fields           : HELP_FIELDS,
+  ladder           : HELP_LADDER,
+  views            : HELP_VIEW,
+  layers           : HELP_LAYER
+};
+
 window.RTTPARTS = {
   registerKind  : registerKind,
   registerPart  : registerPart,
@@ -24766,6 +25597,11 @@ window.RTT20 = {
   /* 保存先の登録簿（B-05）… どの設定がどこへ入るかを外から見えるようにする。
      ★見えないものは守れない。pw_b05.py がここを見ています。 */
   stores  : function(){ return J_STORE.slice(); },
+  /* D-06 工程7（決-101）… 栞（takeOut/putBack）は RTT20 のこの IIFE の中にしか
+     居ないので、外側の関数（toggleTableFullscreen・6907行付近）から呼べるよう
+     ここで窓口を開ける。中身は変えない（既存の3か所の栞と同じ実体）。 */
+  takeOut : takeOut,
+  putBack : putBack,
   version : '1.9.10'
 };
 
