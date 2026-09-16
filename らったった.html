@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.42</title>
+<title>記録台帳＋MDメモ Ver1.19.43</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -793,8 +793,15 @@ margin:0; background:var(--bg); color:var(--ink);
 /* ★つまみは --sub（明るいグレー #9aa4b2）。--line2 は【暗い線の色 #262a31】で、
    帯の --line(#2b2f37) とほとんど同じになり【見えなくなる】。2026-09-16 に実測して
    気づいた（色が付いていても背景と同じなら見えない＝16-3 だけでは捕まらない穴）。 */
+/* ★縦のバー（決-121）… 右端に立てる。通常フローに置くと中身を下へ押しのけるので、
+   高さと同じ分だけ margin-bottom をマイナスにして戻す（JS 側で毎回入れ直す）。
+   ★16 で scrollbar-width:none にしたとき【縦のバーまで一緒に消えた】ので、
+     隠すなら縦も自前で描かないと片手落ちになる（利用者の指摘で発覚）。 */
+.rtt-sb[data-axis="y"]{ left:auto; bottom:auto; top:0; margin-top:0; margin-left:auto;
+  width:var(--sb-w,11px) }
 .rtt-sb-knob{ height:100%; min-width:24px; box-sizing:border-box; border-radius:inherit;
   background:var(--sub,#9aa4b2); transition:background .12s }
+.rtt-sb[data-axis="y"] > .rtt-sb-knob{ width:100%; min-width:0; min-height:24px }
 .rtt-sb:hover .rtt-sb-knob,
 .rtt-sb.rtt-sb-drag .rtt-sb-knob{ background:var(--accent,#4c8dff) }
 /* ---- D-06 工程7（決-89・決-101）… 表だけの全画面モード -----------------
@@ -2509,7 +2516,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.42</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.43</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2676,6 +2683,7 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.43 で増えたこと（表の【縦】のスクロールバーも自分で描くようにしました）：</strong>Ver1.19.42 で横のバーを自分で描くようにしたとき、<b>ブラウザ任せのバーを隠す指定が【縦にも効いてしまい】、縦のバーが消えていました</b>（行が多くて縦にスクロールできる表でも、つまみが1本も出ない状態）。この版で<b>縦のバーも自分で描く</b>ようにして直しました。表の<b>右端に明るい帯</b>が出ます。<b>つまみをつかんで上下に動かせます</b>し、<b>帯の空いている所を押すと1画面ぶん進みます</b>。※<b>縦のバーは、行が多くてはみ出しているときだけ出ます</b>（行が少ない表で帯が居座って邪魔にならないようにするためです）。横のバーは今までどおり、いつでも出ます。</p>
       <p><strong>Ver1.19.42 で増えたこと（表の横スクロールバーを、自分で描くようにしました）：</strong>Ver1.19.41 で「いつでも見えるように」したつもりでしたが、<b>お使いの Chromium では1本も出ていませんでした</b>。原因は、新しい Chromium（Linux）が<b>スクロールバーを自分の流儀で描く方式</b>に変わっており、こちらが指定した色や太さを<b>無視してしまう</b>ためです。そこでこの版から、<b>ブラウザ任せをやめて、バーを自分で描く</b>ようにしました。表の下に<b>いつでも明るい帯が出ます</b>。帯の<b>つまみをつかんで左右に動かせます</b>し、<b>帯の空いている所を押すと1画面ぶん進みます</b>（エクセルと同じ動きです）。<b>「⛶ 表を全画面」にしたときも同じように出ます</b>。※この仕組みは<b>登録簿</b>になっているので、今後ほかの場所（メモのタブの帯など）で同じ困りごとが出たら、<b>1行足すだけ</b>で同じバーを付けられます。</p>
       <p><strong>Ver1.19.41 で増えたこと（表の横スクロールバーが、いつでも見えるようになりました）：</strong>「🔎 検索・表示・編集」の表の横スクロールバーが、これまでは<b>横にはみ出しているときだけ</b>現れる作りでした。この版から、<b>はみ出していなくても、下端にバーの置き場所が常にある</b>形にしました（エクセルの下部バーと同じ動きです）。表の中身や操作方法は変わりません。縦方向のスクロールバーは、これまでどおり必要なときだけ出ます。</p>
       <p><strong>Ver1.19.40 で増えたこと（「？」の出し方の登録簿を拡張しました）：</strong><b>内部の話</b>です。「？」の吹き出しを出す方法を、コードの中に登録簿として持つことで、<b>後から新しい出し方を1行足すだけで増やせる形</b>にしました（今までは「下だけ」と「下→上に返す」の2つだけ）。見た目や操作方法の変化はありません。</p>
@@ -7611,14 +7619,17 @@ function attachScrollbar(el, opt){
   var min  = sbNum(opt.min,  def.min);
   var size = sbNum(opt.size, def.size);
 
-  var old = el.querySelector(':scope > .rtt-sb');
-  if(old) old.parentNode.removeChild(old);          /* 二重に付けない */
+  /* ★二重に付けない。ただし【向きごとに1本】なので、同じ器に横と縦は並んで付く */
+  var old = el.querySelector(':scope > .rtt-sb[data-axis="' + axis + '"]');
+  if(old) old.parentNode.removeChild(old);
 
   var bar = def.make();
   if(!bar) return null;
-  bar.style.height = size + 'px';
   bar.setAttribute('data-axis', axis);
-  el.appendChild(bar);
+  /* ★縦は中身より【先】に入れる … 右端に立てて、下の中身を margin で戻すため。
+     横は中身の【後ろ】に入れる … 表の下に敷くため。実測して決めた（2026-09-16）。 */
+  if(axis === 'y' && el.firstChild) el.insertBefore(bar, el.firstChild);
+  else el.appendChild(bar);
   var knob = bar.querySelector('.rtt-sb-knob');
 
   /* ★当てずっぽうの固定値を持たない。毎回その場で測る。 */
@@ -7639,29 +7650,57 @@ function attachScrollbar(el, opt){
   function update(){
     var m = measure();
     SB_LAST = m;
-    bar.style.width = m.view + 'px';               /* 器に追従（決め打ちにしない） */
+    /* ★器に追従（決め打ちにしない）。縦は「高さ」が器の高さ、横は「幅」が器の幅。
+       縦バーは通常フローに置くと中身を下へ押しのけるので、同じ分だけ margin で
+       戻す（実測して決めた形。2026-09-16）。 */
+    if(axis === 'y'){
+      bar.style.height = m.view + 'px';
+      bar.style.width  = size + 'px';
+      bar.style.marginBottom = (-m.view) + 'px';
+    }else{
+      bar.style.width  = m.view + 'px';
+      bar.style.height = size + 'px';
+    }
     if(mode === 'auto' && m.over <= 0){ bar.style.display = 'none'; return m; }
     bar.style.display = '';
     if(knob){
-      knob.style.width = m.thumb + 'px';
-      knob.style.transform = 'translateX(' + m.left + 'px)';
+      if(axis === 'y'){
+        knob.style.height = m.thumb + 'px';
+        knob.style.width  = '100%';
+        knob.style.transform = 'translateY(' + m.left + 'px)';   /* m.left は「つまみの位置」 */
+      }else{
+        knob.style.width  = m.thumb + 'px';
+        knob.style.height = '100%';
+        knob.style.transform = 'translateX(' + m.left + 'px)';
+      }
     }
     return m;
   }
 
   /* ---- つまみをつまんで動かす（⑦ 使いやすさ）---- */
   var dragFrom = null;
+  /* ★縦か横かで「どっちの座標を見るか」だけが違う。処理は1本のまま（if を増やさない） */
+  function ptOf(e){
+    var t = e.touches ? e.touches[0] : e;
+    return (axis === 'y') ? t.clientY : t.clientX;
+  }
+  function setPos(v){
+    if(axis === 'y') el.scrollTop = v; else el.scrollLeft = v;
+  }
   function onDown(e){
     var m = measure();
     if(m.over <= 0) return;
-    var x = (e.touches ? e.touches[0].clientX : e.clientX);
+    var p  = ptOf(e);
     var kb = knob ? knob.getBoundingClientRect() : null;
-    if(kb && x >= kb.left && x <= kb.right){
-      dragFrom = { x:x, pos:m.pos };               /* つまみをつかんだ */
+    var k0 = kb ? ((axis === 'y') ? kb.top : kb.left) : 0;
+    var k1 = kb ? ((axis === 'y') ? kb.bottom : kb.right) : 0;
+    if(kb && p >= k0 && p <= k1){
+      dragFrom = { p:p, pos:m.pos };               /* つまみをつかんだ */
     }else{
       /* 帯の空いている所を押した → 1画面ぶん送る（エクセルと同じ） */
       var br = bar.getBoundingClientRect();
-      el.scrollLeft = m.pos + ((x < (br.left + m.left)) ? -m.view : m.view);
+      var b0 = (axis === 'y') ? br.top : br.left;
+      setPos(m.pos + ((p < (b0 + m.left)) ? -m.view : m.view));
       update();
       return;
     }
@@ -7672,9 +7711,9 @@ function attachScrollbar(el, opt){
     if(!dragFrom) return;
     var m = measure();
     if(m.over <= 0 || m.view <= m.thumb) return;
-    var x = (e.touches ? e.touches[0].clientX : e.clientX);
-    var move = (x - dragFrom.x) * (m.over / (m.view - m.thumb));
-    el.scrollLeft = dragFrom.pos + move;
+    var p = ptOf(e);
+    var move = (p - dragFrom.p) * (m.over / (m.view - m.thumb));
+    setPos(dragFrom.pos + move);
     update();
     e.preventDefault();
   }
@@ -7732,7 +7771,11 @@ function attachScrollbar(el, opt){
 /* ② 種（データ）… ここに1行足せば、他の器にも同じバーが付く。
       読む側（sbMountAll）は1行も変わらない。 */
 var SCROLLBAR_SEED = [
-  { at:'.table-wrap', axis:'x', kind:'bar', mode:'always' }
+  { at:'.table-wrap', axis:'x', kind:'bar', mode:'always' },
+  /* ★縦は「はみ出しているときだけ」出す（mode:'auto'）。
+     いつも出すと、行が少ない表でも右端に帯が居座って邪魔になるため。
+     ★この1行を足すだけで縦バーが増えた＝登録簿の形が効いている証拠（決-121）。 */
+  { at:'.table-wrap', axis:'y', kind:'bar', mode:'auto' }
 ];
 var SB_MOUNTED = [];
 function sbMountAll(){
