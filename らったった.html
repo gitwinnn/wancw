@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.41</title>
+<title>記録台帳＋MDメモ Ver1.19.42</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -775,6 +775,28 @@ margin:0; background:var(--bg); color:var(--ink);
 :is(#app-db,.db-scope) .table-wrap::-webkit-scrollbar-track{background:transparent}
 :is(#app-db,.db-scope) .table-wrap::-webkit-scrollbar-thumb{background:var(--line2); border-radius:6px}
 :is(#app-db,.db-scope) .table-wrap::-webkit-scrollbar-thumb:hover{background:var(--sub)}
+/* ---- D-05-2 自前の横スクロールバー（決-120・Ver1.19.42）--------------
+   ★なぜ自分で描くか … Linux の新しい Chromium（Chrome/152 で実測）は
+     「オーバーレイスクロールバー」が既定で、上の ::-webkit-scrollbar の指定を
+     【無視して1本も描かない】。getComputedStyle では色も太さも正しく取れるのに
+     画面には出ない ── つまり CSS では原理的に直せない。だからバーを自分で描く。
+   ★ネイティブ側は隠す … Windows / Mac では見えているので、隠さないと二重になる。
+     隠すのは【見た目だけ】で、overflow は殺していない（横には今までどおり動ける）。
+   ★スコープ（:is(#app-db,.db-scope)）を付けない … 「表を全画面」にすると
+     .table-wrap は栞で body 直下のオーバーレイへ運ばれ、#app-db の外へ出るため。
+     .rtt-emoji（1861行）と同じ作法。 */
+:is(#app-db,.db-scope) .table-wrap{ scrollbar-width:none }
+:is(#app-db,.db-scope) .table-wrap::-webkit-scrollbar{ display:none }
+.rtt-sb{ position:sticky; left:0; bottom:0; z-index:6; box-sizing:border-box;
+  height:var(--sb-w,11px); margin-top:3px; border-radius:calc(var(--sb-w,11px) / 2);
+  background:var(--line,#2b2f37); cursor:pointer; user-select:none; touch-action:none }
+/* ★つまみは --sub（明るいグレー #9aa4b2）。--line2 は【暗い線の色 #262a31】で、
+   帯の --line(#2b2f37) とほとんど同じになり【見えなくなる】。2026-09-16 に実測して
+   気づいた（色が付いていても背景と同じなら見えない＝16-3 だけでは捕まらない穴）。 */
+.rtt-sb-knob{ height:100%; min-width:24px; box-sizing:border-box; border-radius:inherit;
+  background:var(--sub,#9aa4b2); transition:background .12s }
+.rtt-sb:hover .rtt-sb-knob,
+.rtt-sb.rtt-sb-drag .rtt-sb-knob{ background:var(--accent,#4c8dff) }
 /* ---- D-06 工程7（決-89・決-101）… 表だけの全画面モード -----------------
    ★栞（takeOut/putBack・22916行〜）で .table-wrap を document.body 直下の
      この箱へ運び出す。箱に db-scope を付けて、CSS変数（--bg 等）と
@@ -2487,7 +2509,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.41</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.42</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2654,6 +2676,7 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.42 で増えたこと（表の横スクロールバーを、自分で描くようにしました）：</strong>Ver1.19.41 で「いつでも見えるように」したつもりでしたが、<b>お使いの Chromium では1本も出ていませんでした</b>。原因は、新しい Chromium（Linux）が<b>スクロールバーを自分の流儀で描く方式</b>に変わっており、こちらが指定した色や太さを<b>無視してしまう</b>ためです。そこでこの版から、<b>ブラウザ任せをやめて、バーを自分で描く</b>ようにしました。表の下に<b>いつでも明るい帯が出ます</b>。帯の<b>つまみをつかんで左右に動かせます</b>し、<b>帯の空いている所を押すと1画面ぶん進みます</b>（エクセルと同じ動きです）。<b>「⛶ 表を全画面」にしたときも同じように出ます</b>。※この仕組みは<b>登録簿</b>になっているので、今後ほかの場所（メモのタブの帯など）で同じ困りごとが出たら、<b>1行足すだけ</b>で同じバーを付けられます。</p>
       <p><strong>Ver1.19.41 で増えたこと（表の横スクロールバーが、いつでも見えるようになりました）：</strong>「🔎 検索・表示・編集」の表の横スクロールバーが、これまでは<b>横にはみ出しているときだけ</b>現れる作りでした。この版から、<b>はみ出していなくても、下端にバーの置き場所が常にある</b>形にしました（エクセルの下部バーと同じ動きです）。表の中身や操作方法は変わりません。縦方向のスクロールバーは、これまでどおり必要なときだけ出ます。</p>
       <p><strong>Ver1.19.40 で増えたこと（「？」の出し方の登録簿を拡張しました）：</strong><b>内部の話</b>です。「？」の吹き出しを出す方法を、コードの中に登録簿として持つことで、<b>後から新しい出し方を1行足すだけで増やせる形</b>にしました（今までは「下だけ」と「下→上に返す」の2つだけ）。見た目や操作方法の変化はありません。</p>
       <p><strong>Ver1.19.39 で増えたこと（迷いやすいところに「？」が付きました）：</strong>画面のいくつかの場所に、小さな<b>「？」</b>ボタンが出るようになりました。押すと、<b>その場所のすぐ下に説明の吹き出し</b>が開きます（説明されている場所を見たまま読めるようにするためです）。説明は<b>5段のはしご</b>になっていて、「🧒 まだわかんない」を押すともっとやさしい言葉に、「🚀 もっとレベルアップしたいんだ」を押すとレベル1→2→3と詳しくなります。<b>「✎ 自分のメモを追加」</b>で、もとの説明を消さずに<b>あなたのメモを書き足せます</b>（社内での呼び方や注意点など）。書き足したメモは<b>DBファイルの中に覚えます</b>ので、次に開いたときも残っています。「↺ 元に戻す」でメモだけを消せます（もとの説明は消えません）。※<b>もとの説明はアプリ側にあります</b>ので、新しい版に入れ替えると説明は新しくなり、あなたのメモはそのまま残ります。※今回「？」が付いたのは<b>「🔎 検索・表示・編集」と「キーワード／正規表現」の2か所</b>です。説明文はこれから増やしていきます。※DBファイルを開いていないときは、説明は読めますがメモの追加はできません。</p>
@@ -7522,6 +7545,237 @@ function popPlace(box, anchor, opt){
   POP_LAST = { left: Math.round(left), top: Math.round(v.top), w: w, h: h, how: v.how, clampedX: clampedX };
   return POP_LAST;
 }
+
+/* ==================================================================
+   自前のスクロールバー（D-05-2・決-120）… レゴの3層
+   ------------------------------------------------------------------
+   ① 登録簿 registerScrollbar(key, def) … バーの「見た目と振る舞いの種類」
+   ② 種     SCROLLBAR_SEED               … どの器に、どの種類で付けるか（データ）
+   ③ 基礎板 attachScrollbar(el, opt)     … 中身を知らず、登録簿を引いて付けるだけ
+   ★増やすときは ①に1行 か ②に1行。読む側（③）は1行も変わらない。
+   ★横スクロールする器は表以外にもある（MDメモのタブ帯 / 書式バー /
+     プレビューのコードブロック等）。同じ問題が出たら②に1行足せば済む。
+   ================================================================== */
+var SCROLLBARS = {};
+function sbNum(v, d){ v = Number(v); return isFinite(v) ? v : d; }
+
+/* def … { label, size, min, mode, make() }
+   ★make() は「バーの入れ物」を作って返すだけ。中の玉は .rtt-sb-knob で探す。 */
+function registerScrollbar(key, def){
+  if(!key || !def || typeof def.make !== 'function') return false;
+  SCROLLBARS[String(key)] = {
+    key  : String(key),
+    label: def.label || String(key),
+    size : sbNum(def.size, 11),      /* 太さ(px)。器ごとに上書きできる（ツリー継承の親） */
+    min  : sbNum(def.min, 24),       /* つまみの最小の長さ(px) */
+    mode : def.mode || 'always',     /* always=いつも出す / auto=はみ出す時だけ */
+    make : def.make
+  };
+  return true;
+}
+function scrollbarKinds(){ var a = [], k; for(k in SCROLLBARS) a.push(k); return a; }
+
+/* 既定の見た目はこの1種類だけ。増やすのは登録簿に1行（実体を増やさない） */
+registerScrollbar('bar', {
+  label: '帯',
+  make : function(){
+    var d = document.createElement('div');
+    d.className = 'rtt-sb';
+    var k = document.createElement('div');
+    k.className = 'rtt-sb-knob';
+    d.appendChild(k);
+    return d;
+  }
+});
+
+/* ★最後に計った結果（見張り番）。
+   over が 0 より大きいのに thumb が min に張り付いていたら「画面が狭すぎる」合図で、
+   D-10「画面を小さくしても使えるように」の手掛かりになる。 */
+var SB_LAST = null;
+function sbLast(){ return SB_LAST; }
+
+/* el  … スクロールする器
+   opt … { axis:'x'|'y', kind:'bar', mode:'always'|'auto', min, size }
+          ★axis は今のうちの装備。将来「縦バーも見えない」と言われたら
+            ここに 'y' を渡すだけで済む（いま動かすのは 'x' のみ）。
+   戻り値 … { el, bar, update(), destroy(), last() }
+            ★裸の値ではなくオブジェクト（あとで欄を足せる） */
+function attachScrollbar(el, opt){
+  if(!el) return null;
+  opt = opt || {};
+  var def = SCROLLBARS[opt.kind || 'bar'] || SCROLLBARS.bar;
+  if(!def) return null;
+
+  var axis = (opt.axis === 'y') ? 'y' : 'x';
+  var mode = opt.mode || def.mode;
+  var min  = sbNum(opt.min,  def.min);
+  var size = sbNum(opt.size, def.size);
+
+  var old = el.querySelector(':scope > .rtt-sb');
+  if(old) old.parentNode.removeChild(old);          /* 二重に付けない */
+
+  var bar = def.make();
+  if(!bar) return null;
+  bar.style.height = size + 'px';
+  bar.setAttribute('data-axis', axis);
+  el.appendChild(bar);
+  var knob = bar.querySelector('.rtt-sb-knob');
+
+  /* ★当てずっぽうの固定値を持たない。毎回その場で測る。 */
+  function measure(){
+    var view    = (axis === 'y') ? el.clientHeight : el.clientWidth;
+    var content = (axis === 'y') ? el.scrollHeight : el.scrollWidth;
+    var pos     = (axis === 'y') ? el.scrollTop    : el.scrollLeft;
+    var over    = Math.max(0, content - view);
+    var ratio   = content > 0 ? (view / content) : 1;
+    var thumb   = Math.max(min, Math.round(view * ratio));
+    if(thumb > view) thumb = view;
+    var left    = over > 0 ? Math.round((view - thumb) * (pos / over)) : 0;
+    return { key:def.key, axis:axis, view:view, content:content, pos:pos,
+             over:over, ratio:ratio, thumb:thumb, left:left,
+             clamped:(over > 0 && thumb <= min) };
+  }
+
+  function update(){
+    var m = measure();
+    SB_LAST = m;
+    bar.style.width = m.view + 'px';               /* 器に追従（決め打ちにしない） */
+    if(mode === 'auto' && m.over <= 0){ bar.style.display = 'none'; return m; }
+    bar.style.display = '';
+    if(knob){
+      knob.style.width = m.thumb + 'px';
+      knob.style.transform = 'translateX(' + m.left + 'px)';
+    }
+    return m;
+  }
+
+  /* ---- つまみをつまんで動かす（⑦ 使いやすさ）---- */
+  var dragFrom = null;
+  function onDown(e){
+    var m = measure();
+    if(m.over <= 0) return;
+    var x = (e.touches ? e.touches[0].clientX : e.clientX);
+    var kb = knob ? knob.getBoundingClientRect() : null;
+    if(kb && x >= kb.left && x <= kb.right){
+      dragFrom = { x:x, pos:m.pos };               /* つまみをつかんだ */
+    }else{
+      /* 帯の空いている所を押した → 1画面ぶん送る（エクセルと同じ） */
+      var br = bar.getBoundingClientRect();
+      el.scrollLeft = m.pos + ((x < (br.left + m.left)) ? -m.view : m.view);
+      update();
+      return;
+    }
+    bar.classList.add('rtt-sb-drag');
+    e.preventDefault();
+  }
+  function onMove(e){
+    if(!dragFrom) return;
+    var m = measure();
+    if(m.over <= 0 || m.view <= m.thumb) return;
+    var x = (e.touches ? e.touches[0].clientX : e.clientX);
+    var move = (x - dragFrom.x) * (m.over / (m.view - m.thumb));
+    el.scrollLeft = dragFrom.pos + move;
+    update();
+    e.preventDefault();
+  }
+  function onUp(){ dragFrom = null; bar.classList.remove('rtt-sb-drag'); }
+
+  bar.addEventListener('mousedown', onDown);
+  bar.addEventListener('touchstart', onDown, {passive:false});
+  document.addEventListener('mousemove', onMove);
+  document.addEventListener('touchmove', onMove, {passive:false});
+  document.addEventListener('mouseup', onUp);
+  document.addEventListener('touchend', onUp);
+  el.addEventListener('scroll', update);
+
+  /* 器や中身の大きさが変わったら測り直す（全画面への出入り・列幅のドラッグ） */
+  var ro = null;
+  try{
+    if(window.ResizeObserver){
+      ro = new ResizeObserver(function(){ update(); });
+      ro.observe(el);
+      if(el.firstElementChild) ro.observe(el.firstElementChild);
+    }
+  }catch(e){}
+
+  /* ★中身が【入れ替わった】ときも測り直す（検索し直し・列の出し入れ）。
+     ResizeObserver だけでは足りない … #results は幅が親いっぱいのまま変わらず、
+     中の表だけが広くなるので発火しないことがある（2026-09-16 に実測）。 */
+  var mo = null, pend = false;
+  try{
+    if(window.MutationObserver){
+      mo = new MutationObserver(function(){
+        if(pend) return;
+        pend = true;
+        var run = function(){ pend = false; update(); };
+        if(window.requestAnimationFrame) requestAnimationFrame(run); else setTimeout(run, 16);
+      });
+      mo.observe(el, {childList:true, subtree:true});
+    }
+  }catch(e){}
+
+  function destroy(){
+    try{ if(ro) ro.disconnect(); }catch(e){}
+    try{ if(mo) mo.disconnect(); }catch(e){}
+    el.removeEventListener('scroll', update);
+    document.removeEventListener('mousemove', onMove);
+    document.removeEventListener('touchmove', onMove);
+    document.removeEventListener('mouseup', onUp);
+    document.removeEventListener('touchend', onUp);
+    if(bar.parentNode) bar.parentNode.removeChild(bar);
+  }
+
+  update();
+  return { el:el, bar:bar, update:update, destroy:destroy, last:function(){ return SB_LAST; } };
+}
+
+/* ② 種（データ）… ここに1行足せば、他の器にも同じバーが付く。
+      読む側（sbMountAll）は1行も変わらない。 */
+var SCROLLBAR_SEED = [
+  { at:'.table-wrap', axis:'x', kind:'bar', mode:'always' }
+];
+var SB_MOUNTED = [];
+function sbMountAll(){
+  sbExport();          /* ★window.WDT はここより後ろで作られる。使うたびに入れ直す（4061行と同じ作法） */
+  var n = 0;
+  for(var i = 0; i < SCROLLBAR_SEED.length; i++){
+    var s = SCROLLBAR_SEED[i];
+    var list = document.querySelectorAll(s.at);
+    for(var j = 0; j < list.length; j++){
+      var h = attachScrollbar(list[j], s);
+      if(h){ SB_MOUNTED.push(h); n++; }
+    }
+  }
+  return n;
+}
+/* 検索し直すと表の中身が入れ替わるので、その後に測り直す口 */
+function sbUpdateAll(){
+  for(var i = 0; i < SB_MOUNTED.length; i++){
+    try{ SB_MOUNTED[i].update(); }catch(e){}
+  }
+}
+if(document.readyState === 'loading'){
+  document.addEventListener('DOMContentLoaded', function(){ sbMountAll(); });
+}else{
+  sbMountAll();
+}
+/* ★起動直後は表がまだ空のことがある。中身が届いたあとに測り直す
+   （MutationObserver でも拾えるが、初回は確実に1回やっておく）。 */
+setTimeout(function(){ sbExport(); sbUpdateAll(); }, 0);
+setTimeout(function(){ sbExport(); sbUpdateAll(); }, 600);
+/* ★窓口は既存の作法に合わせる（registerPart → WDT.addPart と同じ形）。
+   window.WDT はここより後ろで作られるので、作られたあとに入れ直す。 */
+function sbExport(){
+  try{
+    if(window.WDT){
+      window.WDT.addScrollbar   = registerScrollbar;
+      window.WDT.listScrollbars = scrollbarKinds;
+      window.WDT.sbLast         = sbLast;
+      window.WDT.sbUpdate       = sbUpdateAll;
+    }
+  }catch(e){}
+}
+sbExport();
 
 function placeTagFilter(anchor){
   popPlace(tagFilter.el, anchor);
