@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.43</title>
+<title>記録台帳＋MDメモ Ver1.19.44</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -805,6 +805,14 @@ margin:0; background:var(--bg); color:var(--ink);
 /* ★D-05-2（決-122）… 表の上の「使い方のヒント」を隠す（⚙設定 → アドオン）。
    ★消していない。OFF に戻せばそのまま出る。初めての人のために既定は「出す」。 */
 body.wdt-nolead #gridLead{ display:none }
+/* ★「長い文章を隠す」仲間（2026-09-17・利用者の指示）。
+   隠す所を増やすときは ADDONS に body:'wdt-…' の行を1つ足し、ここに1行足す。
+   ★どれも【消して】いない。設定をOFFに戻せばそのまま出る。 */
+body.wdt-nohint  :is(#app-db,.db-scope) .hint{ display:none }
+body.wdt-nointro :is(#app-db,.db-scope) .lead{ display:none }
+/* ★案C … 窓が狭いときだけ、かさばる文章を自動でたたむ（広げれば自動で戻る） */
+body.wdt-autofold :is(#app-db,.db-scope) .lead,
+body.wdt-autofold #gridLead{ display:none }
 .rtt-sb:hover .rtt-sb-knob,
 .rtt-sb.rtt-sb-drag .rtt-sb-knob{ background:var(--accent,#4c8dff) }
 /* ---- D-06 工程7（決-89・決-101）… 表だけの全画面モード -----------------
@@ -1255,6 +1263,11 @@ body.wdt-nolead #gridLead{ display:none }
 /* ---- 表：現在時刻ハイライト ---- */
 :is(#app-db,.db-scope) table.grid tr.row-now > td{background:var(--nowbg) !important}
 :is(#app-db,.db-scope) table.grid tr.row-now > td:first-child{box-shadow:inset 3px 0 0 var(--nowline)}
+/* D-12 … 進行中をまとめる帯（行のまとめ方の登録簿が作る） */
+:is(#app-db,.db-scope) table.grid tr.grp-band > td{
+  background:var(--panel); color:var(--nowline); font-weight:700; font-size:11.5px;
+  text-align:center; letter-spacing:.04em; padding:4px 8px;
+  border-top:2px solid var(--nowline); border-bottom:1px solid var(--line)}
 :is(#app-db,.db-scope) table.grid tr.row-today > td{background:var(--todaybg) !important}
 :is(#app-db,.db-scope) table.grid tr.row-today > td:first-child{box-shadow:inset 3px 0 0 var(--todayline)}
 :is(#app-db,.db-scope) table.grid tr.row-past > td{color:var(--pastink)}
@@ -1369,6 +1382,19 @@ background:var(--bg-0);
 :is(#app-md,.md-scope) .tab.pinned .pin{opacity:1;color:var(--accent);}
 :is(#app-md,.md-scope) .tab .pin:hover{background:var(--bg-2);}
 :is(#app-md,.md-scope) .tab.pinned{border-top:2px solid var(--accent);}
+/* M-04 … 動かしている最中は薄く、落とせる相手には縦線を出す（どこへ入るか分かるように） */
+:is(#app-md,.md-scope) .tab.tab-dragging{opacity:.45;}
+:is(#app-md,.md-scope) .tab.tab-drop{box-shadow:inset 3px 0 0 var(--accent);}
+/* 案5 … 入る位置の縦線 */
+:is(#app-md,.md-scope) .tab-dropline{position:absolute; top:2px; bottom:0; width:2px;
+  background:var(--accent); border-radius:2px; pointer-events:none;}
+/* 案2 … 文字数ではなくタブの幅で省略する（--tabw は JS が設定から配る） */
+:is(#app-md,.md-scope) #tabbar.tabw-auto .tab .name{display:inline-block;
+  max-width:var(--tabw,160px); overflow:hidden; text-overflow:ellipsis;
+  white-space:nowrap; vertical-align:bottom;}
+/* M-03 … 名前を書き換えている最中だと分かるようにする */
+:is(#app-md,.md-scope) .tab .name[contenteditable="true"]{
+  background:var(--bg-0); outline:1px solid var(--accent); padding:0 3px; cursor:text;}
 :is(#app-md,.md-scope) .tab.pinned .close{display:none;}
 /* ---- Ver1.15.01 (P5) 📌 の右クリック／長押し ----
    長押しのときに文字が選択されたり、スマホの「コピー」メニューが出たりすると
@@ -1618,6 +1644,13 @@ background:var(--bg-0);
   font-size:13px; line-height:1.6;
 }
 .wdtx-pop.show{ display:block; }
+/* ★案ア（タグ絞り込みが押せない件）… 窓に収める形。
+   popPlace(…,{fit:true}) が付ける印。箱ぜんたいを縦に積み、
+   【中身の一覧だけ】を内側で動かすので、下端のボタンが窓の外へ出ない。
+   2026-09-17 実測 … これが無いと、タグが多いとき下端が窓から 102px はみ出し、
+   「この条件で絞り込む」を elementFromPoint が拾えなかった（＝押せない）。 */
+.wdtx-pop.wdtx-fit.show{ display:flex; flex-direction:column; overflow:hidden; }
+#tagFilterPop.wdtx-fit .tfrow{ overflow:auto; flex:1 1 auto; min-height:60px; }
 .wdtx-pop .ph{ display:flex; align-items:center; gap:8px; padding:0 0 7px; border-bottom:1px solid #2b2f37; margin-bottom:6px; }
 .wdtx-pop .ph b{ flex:1; font-size:13px; }
 .wdtx-pop button{
@@ -1894,6 +1927,28 @@ body.wdt-bigtap :is(#app-db,.db-scope) table.grid td.op .opbtn{ width:34px; heig
   border:1px solid #3d4046; border-radius:8px; background:#12141a; }
 .rtt-emoji button{ width:32px; height:30px; font-size:17px; line-height:1; padding:0; }
 .rtt-emoji button.on{ outline:2px solid #4c8dff; }
+/* A-01 … カーソルが入った欄の右端に出す😀（ボタンは1つを使い回す） */
+.rtt-emobtn{ position:fixed; z-index:930; width:22px; height:20px; padding:0; line-height:1;
+  font-size:14px; border:none; background:transparent; cursor:pointer; opacity:.8; }
+.rtt-emobtn:hover{ opacity:1; }
+.rtt-emopal{ position:fixed; z-index:940; display:none; width:232px; max-height:190px;
+  background:#1b1e24; border:1px solid #3d4046; border-radius:9px;
+  box-shadow:0 8px 26px rgba(0,0,0,.5); }
+.rtt-emopal{ flex-direction:column; padding:0; }
+.rtt-emopal.show{ display:flex; }
+.rtt-emohd{ display:flex; align-items:center; justify-content:space-between; gap:8px;
+  padding:6px 8px; border-bottom:1px solid #2b2f37; font-size:11.5px; color:#9aa4b2; }
+.rtt-emohd button{ font-size:11px; padding:2px 8px; border-radius:5px;
+  border:1px solid #3d4046; background:#232830; color:#e6e9ef; cursor:pointer; }
+.rtt-emogrid{ display:flex; flex-wrap:wrap; gap:4px; padding:6px; overflow:auto; }
+.rtt-emopal.rtt-emoedit{ width:300px; }
+.rtt-emopal textarea{ width:calc(100% - 12px); height:104px; margin:6px; resize:vertical;
+  background:#12151b; color:#e6e9ef; border:1px solid #3d4046; border-radius:6px;
+  padding:6px; font-size:16px; line-height:1.5; }
+.rtt-emoact{ display:flex; gap:6px; padding:0 6px 8px; }
+.rtt-emoact button{ font-size:11.5px; padding:4px 10px; border-radius:6px;
+  border:1px solid #3d4046; background:#232830; color:#e6e9ef; cursor:pointer; }
+.rtt-emoact button[data-emoact="save"]{ background:#2f6fdb; border-color:#2f6fdb; color:#fff; }
 .rtt-prev{ display:inline-flex; align-items:center; gap:8px; padding:6px 12px; border-radius:8px;
   background:#12141a; border:1px solid #3d4046; font-size:15px; }
 
@@ -2519,7 +2574,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.43</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.44</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2686,6 +2741,7 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.44 で増えたこと（長い説明を隠せるようになり、タブ・タグ絞り込み・進行中の並びも良くなりました）：</strong>①<b>⚙設定のアドオンに「文章を隠す」3つ</b>が増えました。「💬 ▶で始まる補足を隠す」「📃 先頭の長い説明を隠す」「📐 窓が狭いときだけ自動でたたむ」。<b>文章は消えません。OFFに戻せばそのまま出ます。</b>②<b>タグで絞り込む窓</b>が画面からはみ出さなくなり、「この条件で絞り込む」などのボタンが<b>必ず押せる</b>ようになりました。③<b>進行中のもの</b>（開始日〜終了日が今日をまたぐもの）が、表の先頭に<b>「🔵 進行中」の帯</b>でまとまって出るようになりました。④<b>すべての入力欄に絵文字ボタン</b>が付きました。カーソルを入れると右端に😀が出て、押すと絵文字を選べます。⑤<b>MDメモのタブ</b>が、名前の省略・全文の吹き出し・<b>続けて2回押して名前を変える</b>・<b>ドラッグで並べ替え</b>に対応しました（出し方は「⚙メモの設定 ＞🏷 タブの名前と操作」で選べます）。</p>
       <p><strong>Ver1.19.43 で増えたこと（表の【縦】のスクロールバーも自分で描くようにしました）：</strong>Ver1.19.42 で横のバーを自分で描くようにしたとき、<b>ブラウザ任せのバーを隠す指定が【縦にも効いてしまい】、縦のバーが消えていました</b>（行が多くて縦にスクロールできる表でも、つまみが1本も出ない状態）。この版で<b>縦のバーも自分で描く</b>ようにして直しました。表の<b>右端に明るい帯</b>が出ます。<b>つまみをつかんで上下に動かせます</b>し、<b>帯の空いている所を押すと1画面ぶん進みます</b>。※<b>縦のバーは、行が多くてはみ出しているときだけ出ます</b>（行が少ない表で帯が居座って邪魔にならないようにするためです）。横のバーは今までどおり、いつでも出ます。</p>
       <p><strong>Ver1.19.42 で増えたこと（表の横スクロールバーを、自分で描くようにしました）：</strong>Ver1.19.41 で「いつでも見えるように」したつもりでしたが、<b>お使いの Chromium では1本も出ていませんでした</b>。原因は、新しい Chromium（Linux）が<b>スクロールバーを自分の流儀で描く方式</b>に変わっており、こちらが指定した色や太さを<b>無視してしまう</b>ためです。そこでこの版から、<b>ブラウザ任せをやめて、バーを自分で描く</b>ようにしました。表の下に<b>いつでも明るい帯が出ます</b>。帯の<b>つまみをつかんで左右に動かせます</b>し、<b>帯の空いている所を押すと1画面ぶん進みます</b>（エクセルと同じ動きです）。<b>「⛶ 表を全画面」にしたときも同じように出ます</b>。※この仕組みは<b>登録簿</b>になっているので、今後ほかの場所（メモのタブの帯など）で同じ困りごとが出たら、<b>1行足すだけ</b>で同じバーを付けられます。</p>
       <p><strong>Ver1.19.41 で増えたこと（表の横スクロールバーが、いつでも見えるようになりました）：</strong>「🔎 検索・表示・編集」の表の横スクロールバーが、これまでは<b>横にはみ出しているときだけ</b>現れる作りでした。この版から、<b>はみ出していなくても、下端にバーの置き場所が常にある</b>形にしました（エクセルの下部バーと同じ動きです）。表の中身や操作方法は変わりません。縦方向のスクロールバーは、これまでどおり必要なときだけ出ます。</p>
@@ -3221,6 +3277,42 @@ summary:focus-visible,
       よく使うメモ（作業手順の控えなど）はピン留めしておくと、DB画面と行き来しても残ります。<br>
       DB連携タブは閉じる前に必ず作業記録DBへ書き戻すので、書いた内容が消えることはありません。<br>
       「全部のタブを閉じる」を選んだときだけ、まだファイルに保存していないふつうのメモがあれば確認します。
+    </div>
+
+    <h3>🏷 タブの名前と操作</h3>
+    <div class="row">
+      <label style="flex:1;">タブに出す名前</label>
+      <select id="prefTabWay" style="width:220px;"></select>
+    </div>
+    <div class="row">
+      <label style="flex:1;">名前の省略のしかた</label>
+      <select id="prefTabCut" style="width:220px;"></select>
+    </div>
+    <div class="row">
+      <label style="flex:1;">何文字で切るか（0 で省略しない）</label>
+      <input type="number" id="prefTabLen" min="0" max="60" style="width:60px;">
+    </div>
+    <div class="row">
+      <label style="flex:1;">タブの幅（「幅に合わせる」を選んだとき・px）</label>
+      <input type="number" id="prefTabWidth" min="40" max="400" style="width:60px;">
+    </div>
+    <div class="row">
+      <label style="flex:1;">名前を変えるときの操作</label>
+      <select id="prefTabRename" style="width:220px;">
+        <option value="dbl">続けて2回押す</option>
+        <option value="context">右クリック</option>
+        <option value="both">どちらでも</option>
+      </select>
+    </div>
+    <div class="row">
+      <label style="flex:1;">ドラッグ中、入る位置を縦線で出す</label>
+      <input type="checkbox" id="prefTabDropLine">
+    </div>
+    <div class="hint">
+      <b>タブを続けて2回押すと、その場で名前を書き換えられます</b>（Enterで確定・Escで取り消し）。
+      <b>ドラッグで並べ替え</b>もできます。📌ピン留めしたタブは、どこへ落としても先頭へ戻ります。<br>
+      省略しても、<b>マウスを乗せれば全文が出ます</b>。<br>
+      <b>この設定は work.sqlite の中（_meta_opts）に保存されます。</b>
     </div>
 
     <h3>📌 タブのピン留め</h3>
@@ -4265,6 +4357,246 @@ const TBL_ICON_PALETTE = [
   '👷','🧑‍🔧','🧑‍💼','📞','✉️','💬','🗣','🤝',
   '💰','🧾','💴','📮','🔍','💡','✅','⚠️','❗','🚧','🧭','📚'
 ];
+/* ==================================================================
+   すべての入力欄に絵文字ボタン（A-01・案②「カーソルが入ったときだけ」）
+   ------------------------------------------------------------------
+   ① 登録簿 registerEmojiSpot(key, def) … どの入力欄に付けるか
+   ② 設定   WDT.dbOptGet('db','emoji.list' / 'emoji.spot.<key>') … データ
+   ③ 基礎板 emojiBind() … 中身を知らず、登録簿を回すだけ
+   ★増やすときは①に1行。読む側は1行も変わらない。
+   ★★ボタンは【1つだけ】作って使い回す。欄ごとに作ると、欄が増えるたびに
+     ボタンも増えて重くなるうえ、消し忘れが出る。カーソルが入った欄の
+     隣へ動かすだけにしてある（⑤最適なアルゴリズム）。
+   ★絵文字の色は CSS の color では変えられない（落とし穴 #4）。
+     選択中の目印は outline で付ける（.rtt-emoji が既にそうしている）。
+   ================================================================== */
+var EMOJI_SPOTS = {};
+function registerEmojiSpot(key, def){
+  if(!key || !def || !def.sel) return false;
+  EMOJI_SPOTS[String(key)] = {
+    key  : String(key),
+    label: def.label || String(key),
+    sel  : def.sel,
+    when : (typeof def.when === 'function') ? def.when : function(){ return true; }
+  };
+  return true;
+}
+function emojiSpotKeys(){ var a = [], k; for(k in EMOJI_SPOTS) a.push(k); return a; }
+
+registerEmojiSpot('dbtext', { label:'記録台帳の入力欄', sel:'#app-db input[type="text"], #app-db textarea' });
+registerEmojiSpot('dbcell', { label:'表のセル（直接編集）', sel:'#app-db [contenteditable="true"].edit' });
+registerEmojiSpot('md',     { label:'MDメモの本文',        sel:'#editorTextarea' });
+
+/* ★既定の200種類（A-01 の要望「200種類を標準で用意し、利用者が編集して増やせる」）。
+   ★項目アイコン用の TBL_ICON_PALETTE とは別に持つ … あちらは「項目の顔」を選ぶ
+     62個で、入力欄に差し込む用途（顔・手・矢印・記号）が足りないため。
+   ★ここはデータ。利用者が ✎ で書き換えたら dbOpt 側が正になる。 */
+var EMOJI_DEFAULT = (
+  /* 顔・人（32） */
+  '😀😃😄😁😆😅🤣😂🙂🙃😉😊😇🥰😍🤩😘😋😜🤪🤗🤔🤨😐😑😶🙄😏😴🥱😷🤒' +
+  /* 気持ち・評価（24） */
+  '👍👎👌✌️🤝🙏👏💪🫶❤️🧡💛💚💙💜🖤🤍💯🔥⭐🌟✨💫⚡' +
+  /* 仕事・道具（32） */
+  '🔧🔩🛠️⚙️🧰🪛🔨⛏️🪚🧲🔌🔋💡🕯️🧯🪣🧹🧽🚿💧🌡️📐📏✂️📎🖇️📌📍🗝️🔒🔓🔑' +
+  /* 書類・記録（32） */
+  '📝📋📄📑📊📈📉🗒️🗓️📅📆⏰⏱️⏲️🕒🗂️📁📂🗃️🗄️📦📮✉️📧📨📩📤📥📇🔖🏷️📚' +
+  /* 場所・乗り物（24） */
+  '🏭🏢🏠🏗️🚧🚚🚛🚜🚗🛻🚲🛵✈️🚀⛴️🚢🗺️🧭🚪🪜🪟🛗🏬🏪' +
+  /* 状態・記号（32） */
+  '✅❌⭕❗❓⚠️🚫🛑🔴🟠🟡🟢🔵🟣⚫⚪🔺🔻🔶🔷▶️◀️⏫⏬➕➖✔️✖️♻️🔁🔄🔍' +
+  /* 自然・その他（24） */
+  '🌞🌙☁️🌧️❄️🌈🍀🌸🌿🔬🧪🧫💊🩺🍺🍙🍜☕🎯🎉🎁🏆🥇🧠'
+).match(/[\uD800-\uDBFF][\uDC00-\uDFFF](?:️|‍[\uD800-\uDBFF][\uDC00-\uDFFF])*|[←-㋿](?:️)?/g) || [];
+
+/* ★見張り番 … 既定が何個あるか。減っていたら「消した」ことに気づける */
+function emojiDefaultCount(){ return EMOJI_DEFAULT.length; }
+
+/* 設定（データ）… 一覧は利用者が編集できる。空なら既定の一覧 */
+function emojiList(){
+  try{
+    if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
+      var raw = window.WDT.dbOptGet('db', 'emoji.list');
+      if(raw && String(raw).trim()){
+        var a = Array.from(String(raw).trim()).filter(function(c){ return c.trim(); });
+        if(a.length) return a;
+      }
+    }
+  }catch(e){}
+  /* ★既定は EMOJI_DEFAULT（200種類）。項目アイコン用の TBL_ICON_PALETTE(62)
+     ではない … あちらは「項目の顔」を選ぶ用で、入力欄に差し込む用途
+     （顔・手・矢印・記号）が足りないため。2026-09-17 に取り違えて 64 種類しか
+     出ていなかったのを直した。 */
+  return EMOJI_DEFAULT.slice();
+}
+function emojiSpotOn(key){
+  try{
+    if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
+      var v = window.WDT.dbOptGet('db', 'emoji.spot.' + key);
+      if(v === '0' || v === 0 || v === false) return false;
+    }
+  }catch(e){}
+  return true;
+}
+
+/* ★最後に付けた場所（見張り番）。「押しても何も起きない」ときの切り分けに使う */
+var EMOJI_LAST = null;
+var emojiBtn = null, emojiPal = null, emojiTarget = null, emojiBound = false;
+
+/* いまの欄が、どの登録簿の場所に当たるか。当たらなければ null */
+function emojiSpotOf(el){
+  if(!el || !el.matches) return null;
+  var keys = emojiSpotKeys();
+  for(var i = 0; i < keys.length; i++){
+    var s = EMOJI_SPOTS[keys[i]];
+    if(!s.when() || !emojiSpotOn(s.key)) continue;
+    try{ if(el.matches(s.sel)) return s; }catch(e){}
+  }
+  return null;
+}
+
+/* 欄のいまのカーソル位置へ差し込む（末尾に足すのではない） */
+function emojiInsert(el, ch){
+  if(!el) return false;
+  if(el.isContentEditable){
+    el.focus();
+    try{ document.execCommand('insertText', false, ch); return true; }catch(e){}
+    el.textContent += ch;
+    return true;
+  }
+  var s = el.selectionStart, e2 = el.selectionEnd;
+  if(s == null){ el.value += ch; return true; }
+  el.value = el.value.slice(0, s) + ch + el.value.slice(e2);
+  var p = s + ch.length;
+  el.focus();
+  try{ el.setSelectionRange(p, p); }catch(e){}
+  try{ el.dispatchEvent(new Event('input', {bubbles:true})); }catch(e){}
+  return true;
+}
+
+/* パレットの中身を描く。edit=true なら編集の画面にする。
+   ★「一覧を出す」と「編集する」を1つの関数にまとめる … 2か所に散らすと
+     片方だけ直したときに食い違う（決-90 の型）。 */
+function emojiRenderPal(edit){
+  if(!emojiPal) return null;
+  var list = emojiList();
+  if(edit){
+    emojiPal.classList.add('rtt-emoedit');
+    emojiPal.innerHTML =
+        '<div class="rtt-emohd">✎ 絵文字の一覧を編集（そのまま並べて書く。空にすると既定の'
+      + emojiDefaultCount() + '種類に戻ります）</div>'
+      + '<textarea spellcheck="false">' + escapeHtml(list.join('')) + '</textarea>'
+      + '<div class="rtt-emoact"><button type="button" data-emoact="save">保存する</button>'
+      + '<button type="button" data-emoact="cancel">やめる</button></div>';
+  }else{
+    emojiPal.classList.remove('rtt-emoedit');
+    emojiPal.innerHTML =
+        '<div class="rtt-emohd">絵文字（' + list.length + '）'
+      + '<button type="button" data-emoact="edit" title="一覧を自分で編集する">✎ 編集</button></div>'
+      + '<div class="rtt-emogrid">'
+      + list.map(function(c){
+          return '<button type="button" data-emo="' + escapeAttr(c) + '" title="' + escapeAttr(c) + '">'
+               + escapeHtml(c) + '</button>';
+        }).join('')
+      + '</div>';
+  }
+  return { edit: !!edit, n: list.length };
+}
+
+function emojiHide(){
+  if(emojiBtn) emojiBtn.style.display = 'none';
+  if(emojiPal) emojiPal.classList.remove('show');
+}
+
+function emojiPlace(el){
+  if(!emojiBtn) return;
+  var r = el.getBoundingClientRect();
+  emojiBtn.style.display = 'block';
+  emojiBtn.style.left = Math.round(r.right - 26) + 'px';
+  emojiBtn.style.top  = Math.round(r.top + (r.height - 20) / 2) + 'px';
+}
+
+function emojiBind(){
+  if(emojiBound) return false;
+  emojiBound = true;
+
+  emojiBtn = document.createElement('button');
+  emojiBtn.type = 'button';
+  emojiBtn.className = 'rtt-emobtn';
+  emojiBtn.textContent = '😀';
+  emojiBtn.title = '絵文字を入れる';
+  emojiBtn.style.display = 'none';
+  document.body.appendChild(emojiBtn);
+
+  emojiPal = document.createElement('div');
+  emojiPal.className = 'rtt-emoji rtt-emopal';
+  document.body.appendChild(emojiPal);
+
+  /* ★一覧を自分で編集する口（A-01「利用者が編集して増やせる」）。
+     パレットの中に置く … 設定画面まで探しに行かせない（⑦使いやすさ）。
+     保存は dbOptSet。空にして保存すると既定の200種類へ戻る。 */
+  emojiPal.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('[data-emoact]') : null;
+    if(!b) return;
+    e.stopPropagation();
+    var act = b.getAttribute('data-emoact');
+    if(act === 'edit'){ emojiRenderPal(true); return; }
+    if(act === 'cancel'){ emojiRenderPal(false); return; }
+    if(act === 'save'){
+      var ta = emojiPal.querySelector('textarea');
+      var v  = ta ? String(ta.value) : '';
+      try{ if(window.WDT) window.WDT.dbOptSet('db', 'emoji.list', v.trim()); }catch(err){}
+      try{ if(window.scheduleAutosave) window.scheduleAutosave(); }catch(err){}
+      emojiRenderPal(false);
+    }
+  });
+
+  /* 押す直前に欄のフォーカスが外れないようにする（外れるとカーソル位置を見失う） */
+  emojiBtn.addEventListener('mousedown', function(e){ e.preventDefault(); });
+  emojiPal.addEventListener('mousedown', function(e){ e.preventDefault(); });
+
+  emojiBtn.addEventListener('click', function(e){
+    e.preventDefault(); e.stopPropagation();
+    if(emojiPal.classList.contains('show')){ emojiPal.classList.remove('show'); return; }
+    emojiRenderPal(false);
+    var r = emojiBtn.getBoundingClientRect();
+    emojiPal.classList.add('show');
+    emojiPal.style.left = Math.round(Math.max(8, Math.min(r.left - 150, window.innerWidth - 240))) + 'px';
+    emojiPal.style.top  = Math.round(r.bottom + 4) + 'px';
+    if(emojiPal.getBoundingClientRect().bottom > window.innerHeight - 8){
+      emojiPal.style.top = Math.round(Math.max(8, r.top - emojiPal.offsetHeight - 4)) + 'px';
+    }
+  });
+
+  emojiPal.addEventListener('click', function(e){
+    var b = e.target.closest ? e.target.closest('button[data-emo]') : null;
+    if(!b || !emojiTarget) return;
+    emojiInsert(emojiTarget, b.dataset.emo);
+    emojiPal.classList.remove('show');
+  });
+
+  /* ★案② … カーソルが入ったときだけ出す。欄ごとにボタンを作らない */
+  document.addEventListener('focusin', function(e){
+    var s = emojiSpotOf(e.target);
+    if(!s){ emojiHide(); emojiTarget = null; return; }
+    emojiTarget = e.target;
+    EMOJI_LAST = { spot:s.key, tag:e.target.tagName, at:Date.now() };
+    emojiPlace(e.target);
+  });
+  document.addEventListener('focusout', function(){
+    setTimeout(function(){
+      if(emojiPal && emojiPal.classList.contains('show')) return;   /* 選んでいる最中は消さない */
+      if(emojiTarget && document.activeElement === emojiTarget) return;
+      emojiHide();
+    }, 120);
+  });
+  /* 画面が動いたら位置を合わせ直す（帯やポップアップと同じ作法） */
+  window.addEventListener('scroll', function(){ if(emojiTarget && emojiBtn.style.display !== 'none') emojiPlace(emojiTarget); }, true);
+  window.addEventListener('resize', function(){ if(emojiTarget && emojiBtn.style.display !== 'none') emojiPlace(emojiTarget); });
+  return true;
+}
+try{ document.addEventListener('DOMContentLoaded', emojiBind); }catch(e){}
+try{ if(document.readyState !== 'loading') emojiBind(); }catch(e){}
+
 let tblRenameKey = null;
 let tblRenameBound = false;
 
@@ -7553,7 +7885,24 @@ function popPlace(box, anchor, opt){
   box.style.top  = Math.round(v.top) + 'px';
   if(hidden){ box.style.display = keepD; box.style.visibility = keepV; }
 
-  POP_LAST = { left: Math.round(left), top: Math.round(v.top), w: w, h: h, how: v.how, clampedX: clampedX };
+  /* ★案ア … 窓に収める（opt.fit）。残っている高さを【実測】して上限にする。
+     当てずっぽうの 64vh だと、置いた位置によっては下端が窓の外へ出て、
+     一番下のボタンが押せなくなる（2026-09-17・タグ絞り込みで実測）。
+     ★clampedY は「窓が狭くて縮めた」という見張り番（D-10 の手掛かり）。 */
+  var clampedY = false;
+  if(opt.fit){
+    box.classList.add('wdtx-fit');
+    /* ★下に居座る物（コマンドモードの帯 #rkBar・position:fixed・z-index 1450）を避ける。
+       同じ中身を2か所に置かないため、表の高さで使っている fitBottomGuard() を使い回す。
+       2026-09-17 実測 … これが無いと、窓には収まるのに一番下のボタンが
+       帯の【裏】に入り、elementFromPoint が拾えない（＝押せない）。 */
+    var guard = (typeof fitBottomGuard === 'function') ? fitBottomGuard() : 0;
+    var room = Math.max(60, vp.h - v.top - 8 - guard);
+    if(h > room) clampedY = true;
+    box.style.maxHeight = Math.round(room) + 'px';
+  }
+  POP_LAST = { left: Math.round(left), top: Math.round(v.top), w: w, h: h, how: v.how,
+               clampedX: clampedX, clampedY: clampedY, fit: !!opt.fit };
   return POP_LAST;
 }
 
@@ -7874,7 +8223,12 @@ function attachFit(el, opt){
   opt = opt || {};
   function update(){
     var h = calcFit(el, opt);
-    if(h > 0) el.style.maxHeight = Math.round(h) + 'px';
+    /* ★同じ値なら書かない … 書けば「属性が変わった」として下の見張りに
+       戻ってきて、毎フレーム回り続ける（2026-09-17 実測）。 */
+    if(h > 0){
+      var px = Math.round(h) + 'px';
+      if(el.style.maxHeight !== px) el.style.maxHeight = px;
+    }
     return FIT_LAST;
   }
   var ro = null;
@@ -7887,8 +8241,37 @@ function attachFit(el, opt){
   function onWin(){ update(); }
   window.addEventListener('resize', onWin);
   window.addEventListener('scroll', onWin, true);
+  /* ★器より【上】が伸び縮みしたときも測り直す（2026-09-17 実測・利用者の指摘）。
+     節の折りたたみ、検索結果の増減、まとめて操作の帯の出入りでは、
+     器の【位置】だけが下がる。このとき resize も scroll も起きず、
+     html の大きさも変わらないので、上の ResizeObserver では捕まらない。
+     ★実測 … 上を120px伸ばしても maxHeight は 324px のままで、
+       表の下端がコマンド帯の90px下まではみ出し、横バーが帯の裏に隠れた。
+     ★形は attachScrollbar の見張りと同じ（rAF で1フレーム1回に間引く）。 */
+  var mo = null, moPend = false;
+  try{
+    if(window.MutationObserver){
+      var host = (el.closest && el.closest('#app-db')) || el.parentElement;
+      if(host){
+        mo = new MutationObserver(function(){
+          if(moPend) return;
+          moPend = true;
+          /* ★rAF を使わない … 前面でないタブや描画が止まっている窓では
+             requestAnimationFrame が【一度も呼ばれない】ことを実測した
+             （2026-09-17 … 同じ場面で MutationObserver と setTimeout は
+             動くのに rAF だけ来ず、高さが永久に更新されなかった）。
+             測るのは矩形ひとつなので 16ms の間引きで足りる。 */
+          var run = function(){ moPend = false; update(); };
+          setTimeout(run, 16);
+        });
+        mo.observe(host, { childList:true, subtree:true, attributes:true,
+                           attributeFilter:['style','class','open','hidden'] });
+      }
+    }
+  }catch(e){}
   function destroy(){
     try{ if(ro) ro.disconnect(); }catch(e){}
+    try{ if(mo) mo.disconnect(); }catch(e){}
     window.removeEventListener('resize', onWin);
     window.removeEventListener('scroll', onWin, true);
     el.style.maxHeight = '';
@@ -7899,7 +8282,7 @@ function attachFit(el, opt){
 
 /* ② 種（データ）… ここに1行足せば、他の器にも同じ決め方が効く */
 var FIT_SEED = [
-  { at:'.table-wrap', mode:'fill', gap:14, min:160 }
+  { at:'.table-wrap', mode:'fill', gap:0, min:160 }
 ];
 var FIT_MOUNTED = [];
 function fitMountAll(){
@@ -7990,7 +8373,8 @@ function sbExport(){
 sbExport();
 
 function placeTagFilter(anchor){
-  popPlace(tagFilter.el, anchor);
+  /* ★fit:true … タグが多いと下端が窓の外へ出て、ボタンが押せなくなるため（案ア） */
+  popPlace(tagFilter.el, anchor, { fit:true });
 }
 function renderTagFilter(){
   const p = tagFilterEl();
@@ -9904,7 +10288,95 @@ function applyNowHighlight(){
     const dot = tr.querySelector('.rowdot');
     if(dot) dot.textContent = (cls === 'row-now') ? '● 進行中' : (cls === 'row-today' ? '○ 本日' : '');
   });
+  /* D-12 … 色分けが済んでから、その class を見て帯にまとめる（判定は作らない） */
+  try{ applyRowGroups(); }catch(e){}
 }
+/* ==================================================================
+   行のまとめ方の登録簿（D-12・案①「進行中の帯」）… レゴの3層
+   ------------------------------------------------------------------
+   ① 登録簿 registerRowGroup(key, def) … 「どれを・どんな見出しで集めるか」
+   ② 設定   WDT.dbOptGet('db','rowGroup.<key>') … 出す/出さない（データ）
+   ③ 基礎板 applyRowGroups() … 中身を知らず、登録簿を回すだけ
+   ★増やすときは①に1行。読む側は1行も変わらない。
+   ★★判定を【新しく作らない】…「進行中か」は nowRowClass()（9994行）が
+     既に正で、色分けもドットもそこを見ている。ここで2つ目の判定を作ると
+     正が2つになり、片方だけ直したときに食い違う（決-90 の型）。
+     だから match は「もう付いている class」を見るだけにしてある。
+   ★並べ替えそのものには手を入れない。列の見出しを押して並べ替えても、
+     描き直しのあとにこの関数がもう一度走るだけなので壊れない（案②を却下した理由）。
+   ================================================================== */
+var ROW_GROUPS = {};
+function registerRowGroup(key, def){
+  if(!key || !def || typeof def.match !== 'function') return false;
+  ROW_GROUPS[String(key)] = {
+    key  : String(key),
+    label: def.label || String(key),
+    order: (def.order == null) ? 100 : Number(def.order),  /* 小さいほど上 */
+    when : (typeof def.when === 'function') ? def.when : function(){ return true; },
+    match: def.match
+  };
+  return true;
+}
+function rowGroupKeys(){ var a = [], k; for(k in ROW_GROUPS) a.push(k); return a; }
+
+registerRowGroup('now', {
+  label: '🔵 進行中（開始日〜終了日が今日をまたいでいるもの）',
+  order: 10,
+  when : function(){ return nowHighlightOn; },   /* 色分けを切ったら帯も出さない */
+  match: function(tr){ return tr.classList.contains('row-now'); }
+});
+
+/* ★最後にまとめた結果（見張り番）。0件なら帯は出ない。
+   「進行中があるのに帯が出ない」ときの切り分けに使う。 */
+var ROW_GROUP_LAST = null;
+
+/* 設定（データ）… 既定は出す。切りたい人は1行で切れる（拘束しない） */
+function rowGroupOn(key){
+  try{
+    if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
+      var v = window.WDT.dbOptGet('db', 'rowGroup.' + key);
+      if(v === '0' || v === 0 || v === false) return false;
+    }
+  }catch(e){}
+  return true;
+}
+
+function applyRowGroups(){
+  var box = document.getElementById('results');
+  if(!box) return null;
+  var tb = box.querySelector('table.grid tbody') || box.querySelector('table tbody');
+  if(!tb){ ROW_GROUP_LAST = null; return null; }
+  /* 前回の帯を先に片づける（消し忘れると帯が増える） */
+  tb.querySelectorAll('tr.grp-band').forEach(function(tr){ tr.parentNode.removeChild(tr); });
+
+  var keys = rowGroupKeys().sort(function(a, b){ return ROW_GROUPS[a].order - ROW_GROUPS[b].order; });
+  var done = [], at = 0;
+  keys.forEach(function(k){
+    var g = ROW_GROUPS[k];
+    if(!g.when() || !rowGroupOn(k)) return;
+    var hit = [];
+    tb.querySelectorAll('tr').forEach(function(tr){
+      if(!tr.classList.contains('grp-band') && g.match(tr)) hit.push(tr);
+    });
+    if(!hit.length) return;
+    var band = document.createElement('tr');
+    band.className = 'grp-band';
+    band.setAttribute('data-group', k);
+    var cols = (tb.querySelector('tr') && tb.querySelector('tr').cells.length) || 1;
+    var td = document.createElement('td');
+    td.colSpan = cols;
+    td.textContent = g.label + '（' + hit.length + '件）';
+    band.appendChild(td);
+    tb.insertBefore(band, tb.children[at] || null);
+    at++;
+    hit.forEach(function(tr){ tb.insertBefore(tr, tb.children[at] || null); at++; });
+    done.push({ key:k, n:hit.length });
+  });
+  ROW_GROUP_LAST = { at: Date.now(), groups: done,
+                     total: done.reduce(function(s, x){ return s + x.n; }, 0) };
+  return ROW_GROUP_LAST;
+}
+
 // 時間が進めば色も変わるので、30秒ごとに見直す
 setInterval(applyNowHighlight, 30000);
 
@@ -16615,6 +17087,208 @@ function renderAll(){
   renderStatus();
 }
 
+/* ==================================================================
+   タブ名の作り方（M-01・M-02）… レゴの3層
+   ------------------------------------------------------------------
+   ① 登録簿 registerTabName(key, def) … 「何を名前に使うか」の種類
+   ② 設定   WDT.dbOptGet('mde','tabNameWay' / 'tabNameLen') … データ
+   ③ 基礎板 mdeTabLabel(t) … 中身を知らず、登録簿を引くだけ
+   ★増やすときは①に1行。読む側（mdeRenderTabs）は1行も変わらない。
+   ★設定は dbOpt に置く（絶対規律2）。この画面の既存の設定は別の
+     置き場を使っているが、新しい設定をそこへ足さない。
+   ★省略すると全文が見えなくなるので、M-02（ホバーで全文）は対で必須。
+   ================================================================== */
+var TAB_NAME_WAYS = {};
+function registerTabName(key, def){
+  if(!key || !def || typeof def.pick !== 'function') return false;
+  TAB_NAME_WAYS[String(key)] = {
+    key  : String(key),
+    label: def.label || String(key),
+    pick : def.pick
+  };
+  return true;
+}
+function tabNameWays(){ var a = [], k; for(k in TAB_NAME_WAYS) a.push(k); return a; }
+
+registerTabName('file', {
+  label: 'ファイル名',
+  pick : function(t){ return t.name || ''; }
+});
+registerTabName('title', {
+  label: '題名（本文の最初の見出し）',
+  pick : function(t){
+    var m = String(t.content || '').match(/^[ \t]*#{1,6}[ \t]+(.+)$/m);
+    var s = m ? m[1].trim() : '';
+    return s || t.name || '';      /* 見出しが無いメモはファイル名に落とす */
+  }
+});
+
+/* 設定（データ）… 既定は「ファイル名・省略しない」。
+   0 は「省略しない」の意味。当てずっぽうの既定値を持たない。 */
+function mdeTabNameOpt(){
+  var way = 'file', len = 0;
+  try{
+    if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
+      var w = window.WDT.dbOptGet('mde', 'tabNameWay');
+      var n = window.WDT.dbOptGet('mde', 'tabNameLen');
+      if(w && TAB_NAME_WAYS[w]) way = w;
+      if(n != null && n !== '' && isFinite(Number(n))) len = Math.max(0, Math.floor(Number(n)));
+    }
+  }catch(e){}
+  return { way: way, len: len };
+}
+
+/* ---- 省略の【仕方】の登録簿（案2・案3）… 増やすときはここに1行 ----
+   cut(s, n) … n は文字数。0 なら切らない。
+   ★'width' は文字数で切らず、CSS 側（タブの幅）に任せる。
+     文字数で揃えたい人と、窓の広さに合わせたい人の両方を残す（拘束しない）。 */
+var TAB_CUTS = {};
+function registerTabCut(key, def){
+  if(!key || !def || typeof def.cut !== 'function') return false;
+  TAB_CUTS[String(key)] = { key:String(key), label:def.label || String(key),
+                            byCss: !!def.byCss, cut:def.cut };
+  return true;
+}
+function tabCutWays(){ var a = [], k; for(k in TAB_CUTS) a.push(k); return a; }
+
+registerTabCut('head', {
+  label: '頭から◯文字',
+  cut  : function(s, n){ return (n > 0 && s.length > n) ? s.slice(0, n) + '…' : s; }
+});
+registerTabCut('middle', {
+  label: '真ん中を省く（末尾を残す）',
+  cut  : function(s, n){
+    if(!(n > 0) || s.length <= n) return s;
+    var head = Math.ceil((n - 1) / 2), tail = Math.floor((n - 1) / 2);
+    return s.slice(0, head) + '…' + (tail > 0 ? s.slice(s.length - tail) : '');
+  }
+});
+registerTabCut('width', {
+  label: 'タブの幅に合わせる（文字数を決めない）',
+  byCss: true,                      /* ★切るのは CSS。ここでは切らない */
+  cut  : function(s){ return s; }
+});
+
+/* 操作まわりの設定（案4・案5）。既定は今までどおりの動き。 */
+function mdeTabUiOpt(){
+  var o = { cut:'head', width:160, rename:'dbl', dropLine:false };
+  try{
+    if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
+      var c = window.WDT.dbOptGet('mde', 'tabCut');
+      var w = window.WDT.dbOptGet('mde', 'tabWidth');
+      var r = window.WDT.dbOptGet('mde', 'tabRename');
+      var d = window.WDT.dbOptGet('mde', 'tabDropLine');
+      if(c && TAB_CUTS[c]) o.cut = c;
+      if(w != null && w !== '' && isFinite(Number(w))) o.width = Math.max(40, Math.floor(Number(w)));
+      if(r === 'dbl' || r === 'context' || r === 'both') o.rename = r;
+      if(d === '1' || d === 1 || d === true) o.dropLine = true;
+    }
+  }catch(e){}
+  return o;
+}
+
+/* ★最後に作ったラベル（見張り番）。cut が true なら「切った」という記録で、
+   全文ポップアップ（M-02）が本当に要る場面だったことの手掛かりになる。 */
+var TAB_LABEL_LAST = null;
+/* 戻り値は裸の文字列ではなくオブジェクト（あとで欄を足せる） */
+function mdeTabLabel(t){
+  var o    = mdeTabNameOpt();
+  var def  = TAB_NAME_WAYS[o.way] || TAB_NAME_WAYS.file;
+  var full = String(def.pick(t) || '');
+  var text = full, cut = false;
+  var ui   = mdeTabUiOpt();
+  var cdef = TAB_CUTS[ui.cut] || TAB_CUTS.head;
+  if(!cdef.byCss){
+    text = cdef.cut(full, o.len);
+    cut  = (text !== full);
+  }
+  TAB_LABEL_LAST = { way: def.key, len: o.len, cutWay: cdef.key, byCss: cdef.byCss,
+                     full: full, text: text, cut: cut };
+  return TAB_LABEL_LAST;
+}
+
+/* ==================================================================
+   タブの操作（M-03 名前の変更 ／ M-04 並べ替え）
+   ------------------------------------------------------------------
+   ★基礎板（mdeRenderTabs）は名前で呼ぶだけ。中身はここにまとめる。
+   ★📌 と ✕ の上では拾わない … あそこは既に
+     左クリック／右クリック／長押しの3つを使っている（割り込むと壊れる）。
+   ★並べ替えたあとは必ず sortTabsPinnedFirst() を通す …
+     📌は先頭にまとめる決まりで、外すと区切り線の位置と実際の並びが食い違う。
+   ================================================================== */
+var mdeTabDragId = null;
+/* ★どのタブを・いつ押したか（M-03 の2回押しの見分け用）。
+   要素に覚えさせると描き直しで消えるので、外に置く。 */
+var mdeTabClick = { id:null, at:0 };
+
+/* その場で名前を書き換える。戻り値はオブジェクト（あとで欄を足せる） */
+function mdeTabRename(el, t){
+  var span = el && el.querySelector('.name');
+  if(!span || span.isContentEditable) return { ok:false, why:'すでに編集中' };
+  var before = t.name;
+  span.textContent = before;          /* 省略形ではなく全文を出してから編集させる */
+  span.contentEditable = 'true';
+  span.spellcheck = false;
+  span.focus();
+  try{
+    var rg = document.createRange(); rg.selectNodeContents(span);
+    var sel = window.getSelection(); sel.removeAllRanges(); sel.addRange(rg);
+  }catch(e){}
+  var done = false;
+  function finish(commit){
+    if(done) return;
+    done = true;
+    span.contentEditable = 'false';
+    var v = String(span.textContent || '').trim();
+    if(commit && v && v !== before){
+      t.name = v;
+      persistSession();
+      setMdStatus('タブの名前を「' + v + '」にしました。');
+    }
+    mdeRenderTabs();                  /* 省略の設定を通した表示に戻す */
+  }
+  span.addEventListener('keydown', function(e){
+    if(e.key === 'Enter'){ e.preventDefault(); finish(true); }
+    else if(e.key === 'Escape'){ e.preventDefault(); finish(false); }
+    e.stopPropagation();              /* メモ側のショートカットへ抜けさせない */
+  });
+  span.addEventListener('blur', function(){ finish(true); });
+  return { ok:true, before:before };
+}
+
+/* 案5 … 入る位置の縦線。印は1本だけ置く（消し忘れると線が増える） */
+function mdeTabClearDropMark(bar){
+  if(!bar) return;
+  bar.querySelectorAll('.tab.tab-drop').forEach(function(e){ e.classList.remove('tab-drop'); });
+  var old = bar.querySelector('.tab-dropline');
+  if(old && old.parentNode) old.parentNode.removeChild(old);
+}
+function mdeTabShowDropLine(bar, el, e){
+  mdeTabClearDropMark(bar);
+  var line = document.createElement('div');
+  line.className = 'tab-dropline';
+  var r = el.getBoundingClientRect(), br = bar.getBoundingClientRect();
+  /* 相手の左半分なら左へ、右半分なら右へ入る、と見せる */
+  var right = (e.clientX - r.left) > (r.width / 2);
+  line.style.left = Math.round((right ? r.right : r.left) - br.left + bar.scrollLeft - 1) + 'px';
+  bar.style.position = 'relative';
+  bar.appendChild(line);
+}
+
+/* 並べ替える。戻り値の pinFixed は「📌の決まりで押し戻した」という見張り番 */
+function mdeTabMove(fromId, toId){
+  if(fromId == null || toId == null || fromId === toId) return { moved:false };
+  var from = tabs.findIndex(function(x){ return x.id === fromId; });
+  var to   = tabs.findIndex(function(x){ return x.id === toId; });
+  if(from < 0 || to < 0) return { moved:false };
+  var one = tabs.splice(from, 1)[0];
+  tabs.splice(to, 0, one);
+  var pinFixed = sortTabsPinnedFirst();
+  mdeRenderTabs();
+  persistSession();
+  return { moved:true, from:from, to:to, pinFixed:pinFixed };
+}
+
 function mdeRenderTabs(){
   const bar = document.getElementById('tabbar');
   bar.querySelectorAll('.tab').forEach(el=>el.remove());
@@ -16623,6 +17297,10 @@ function mdeRenderTabs(){
      i === pinCount のタブが「普通のタブの1番目」＝線を引く位置になる。
      並べ替えが無効なときは📌が散らばっていて境目が定まらないので線を出さない。 */
   const pinCount = mdePinReorderEnabled() ? tabs.filter(t=>t.pinned).length : 0;
+  /* 案2 … 幅で省略するときだけ CSS に任せる。幅も設定から配る */
+  const tabUi = mdeTabUiOpt();
+  bar.classList.toggle('tabw-auto', (TAB_CUTS[tabUi.cut] || {}).byCss === true);
+  bar.style.setProperty('--tabw', tabUi.width + 'px');
   tabs.forEach((t, i)=>{
     const el = document.createElement('div');
     // Ver1.15.00 (P4): 📌が1つ以上あって、この位置が境目なら区切り線の印を付ける
@@ -16634,14 +17312,42 @@ function mdeRenderTabs(){
     el.innerHTML = `<span class="dot"></span><span class="fsa">${linkIcon}</span><span class="name"></span>`
                  + `<span class="pin" title="${t.pinned ? 'ピン留めを外す（外すと閉じられます）' : 'ピン留めする（DB管理に戻っても閉じません）'}">📌</span>`
                  + `<span class="close" title="閉じる">✕</span>`;
-    el.querySelector('.name').textContent = t.name;
+    /* M-01 … 名前の作り方は登録簿が決める。ここは中身を知らない */
+    const lab = mdeTabLabel(t);
+    el.querySelector('.name').textContent = lab.text;
+    /* M-02 … 省略すると全文が見えなくなるので、ホバーで全文を出す。
+       ★DB連携タブは連携先の説明が優先（そちらのほうが情報量が多い）。
+       連携していないタブには今まで title が1件も付いていなかった。 */
+    if(!t.dbLink) el.title = lab.full;
     if(t.dbLink) el.title = isFormLink(t.dbLink)
       ? `作業記録DB「${t.dbLink.tableLabel}」の入力フォーム「${t.dbLink.colLabel}」欄と連携中`
       : `作業記録DB「${t.dbLink.tableLabel}」#${t.dbLink.id} の「${t.dbLink.colLabel}」と連携中`;
     el.addEventListener('click', (e)=>{
       if(e.target.classList.contains('close') || e.target.classList.contains('pin')) return;
+      /* M-03 … 続けて2回押したら名前の編集に入る。
+         ★dblclick では拾えない … 1回目の click で switchTab → 描き直しになり、
+           タブの要素そのものが作り直されるので、2回目は【別の要素】に当たる
+           （2026-09-17 実測。contentEditable が一度も立たなかった）。
+           だから要素ではなく「どのタブを・いつ押したか」で見分ける。 */
+      if(tabUi.rename === 'dbl' || tabUi.rename === 'both'){
+        const now = Date.now();
+        if(mdeTabClick.id === t.id && (now - mdeTabClick.at) < 450){
+          mdeTabClick = { id:null, at:0 };
+          mdeTabRename(el, t);
+          return;
+        }
+        mdeTabClick = { id:t.id, at:now };
+      }
       switchTab(t.id);
     });
+    /* 案4 … 右クリックで名前を変える（📌の右クリックは既存の「これ以外を閉じる」なので触らない） */
+    if(tabUi.rename === 'context' || tabUi.rename === 'both'){
+      el.addEventListener('contextmenu', (e)=>{
+        if(e.target.classList.contains('close') || e.target.classList.contains('pin')) return;
+        e.preventDefault(); e.stopPropagation();
+        mdeTabRename(el, t);
+      });
+    }
     el.querySelector('.close').addEventListener('click', (e)=>{ e.stopPropagation(); closeTab(t.id); });
     /* ---- Ver1.15.01 (P5) 📌 の操作 ----
          左クリック                 … ピン留めの ON/OFF（従来どおり）
@@ -16674,6 +17380,34 @@ function mdeRenderTabs(){
                             : (mdePinCanAdd() ? 'ピン留めする（DB管理に戻っても閉じません）'
                                               : 'ピン留めは上限に達しています'))
                 + '\n右クリック／長押し: これ以外のタブを閉じる';
+    /* ---- M-04 ドラッグで並べ替える ---- */
+    el.draggable = true;
+    el.addEventListener('dragstart', (e)=>{
+      mdeTabDragId = t.id;
+      el.classList.add('tab-dragging');
+      try{ e.dataTransfer.effectAllowed = 'move';
+           e.dataTransfer.setData('text/plain', String(t.id)); }catch(err){}
+    });
+    el.addEventListener('dragend', ()=>{
+      mdeTabDragId = null; el.classList.remove('tab-dragging');
+      mdeTabClearDropMark(bar);
+    });
+    el.addEventListener('dragover', (e)=>{
+      if(mdeTabDragId == null || mdeTabDragId === t.id) return;
+      e.preventDefault();
+      try{ e.dataTransfer.dropEffect = 'move'; }catch(err){}
+      /* 案5 … 落とす前に「どこへ入るか」を縦線で見せる。設定で相手を光らせる形にも戻せる */
+      if(tabUi.dropLine) mdeTabShowDropLine(bar, el, e);
+      else el.classList.add('tab-drop');
+    });
+    el.addEventListener('dragleave', ()=>el.classList.remove('tab-drop'));
+    el.addEventListener('drop', (e)=>{
+      e.preventDefault(); e.stopPropagation();
+      el.classList.remove('tab-drop');
+      mdeTabClearDropMark(bar);
+      mdeTabMove(mdeTabDragId, t.id);
+      mdeTabDragId = null;
+    });
     bar.appendChild(el);
   });
 }
@@ -17680,6 +18414,25 @@ document.getElementById('btnSettings').addEventListener('click', ()=>{
     const v = settings.backToDbClose || 'none';
     document.querySelectorAll('input[name="prefBackClose"]').forEach(r=>{ r.checked = (r.value === v); });
   })();
+  /* 🏷 タブの設定（M-01〜M-04）… 選択肢は【登録簿から作る】ので、
+     種類を1行足せばこの画面にも自動で出る（読む側に if を増やさない） */
+  (function(){
+    const o  = mdeTabNameOpt();
+    const ui = mdeTabUiOpt();
+    const fill = (id, reg, cur)=>{
+      const sel = document.getElementById(id);
+      if(!sel) return;
+      sel.innerHTML = Object.keys(reg).map(k =>
+        '<option value="' + k + '">' + mdeEscapeHtml(reg[k].label) + '</option>').join('');
+      sel.value = cur;
+    };
+    fill('prefTabWay', TAB_NAME_WAYS, o.way);
+    fill('prefTabCut', TAB_CUTS,      ui.cut);
+    const n1 = document.getElementById('prefTabLen');   if(n1) n1.value = o.len;
+    const n2 = document.getElementById('prefTabWidth'); if(n2) n2.value = ui.width;
+    const r  = document.getElementById('prefTabRename'); if(r) r.value = ui.rename;
+    const d  = document.getElementById('prefTabDropLine'); if(d) d.checked = !!ui.dropLine;
+  })();
   /* Ver1.15.01 (P7): 📌 の設定4つ。開くたびにDBから読み直す（別のDBを開いた後でも合う） */
   (function(){
     const o = mdePinOptsLoad(true);
@@ -17745,6 +18498,34 @@ function mdePinPrefApply(changed){
 }
 (function(){
   const on = (id, fn)=>{ const el2 = document.getElementById(id); if(el2) el2.addEventListener('change', fn); };
+  /* 🏷 タブの設定 … 保存は dbOptSet（絶対規律2）。変えたらその場で描き直す */
+  const tabPref = (name, val, say)=>{
+    let ok = false;
+    try{ ok = !!(window.WDT && window.WDT.dbOptSet('mde', name, String(val))); }catch(err){}
+    try{ if(window.scheduleAutosave) window.scheduleAutosave(); }catch(err){}
+    try{ mdeRenderTabs(); }catch(err){}
+    setMdStatus(ok ? (say + 'を変えました。')
+                   : ('★保存できませんでした（' + say + '）。先にDBを開いてください。'));
+    return ok;
+  };
+  on('prefTabWay',      (e)=>tabPref('tabNameWay',  e.target.value,   '「タブに出す名前」'));
+  on('prefTabCut',      (e)=>tabPref('tabCut',      e.target.value,   '「省略のしかた」'));
+  on('prefTabRename',   (e)=>tabPref('tabRename',   e.target.value,   '「名前を変える操作」'));
+  on('prefTabDropLine', (e)=>tabPref('tabDropLine', e.target.checked ? '1' : '0', '「入る位置の縦線」'));
+  on('prefTabLen', (e)=>{
+    let v = parseInt(e.target.value, 10);
+    if(!isFinite(v) || v < 0) v = 0;
+    if(v > 60) v = 60;
+    e.target.value = v;
+    tabPref('tabNameLen', v, '「何文字で切るか」');
+  });
+  on('prefTabWidth', (e)=>{
+    let v = parseInt(e.target.value, 10);
+    if(!isFinite(v) || v < 40) v = 40;
+    if(v > 400) v = 400;
+    e.target.value = v;
+    tabPref('tabWidth', v, '「タブの幅」');
+  });
   on('prefPinNewTab', (e)=>{
     mdePinOptsLoad(); mdePinOpts.newTabPinned = e.target.checked;
     mdePinPrefApply('「新しいタブを最初からピン留め」');
@@ -18240,6 +19021,44 @@ var ADDONS = [
        + '★文章が消えるわけではありません。OFFに戻せばいつでも出ます。'
        + '慣れてきて案内が要らなくなったら、ONにするとそのぶん表が広く使えます。'
        + '★初めて使う人のために、既定はOFF（出したまま）です。',
+    /* ★detail は必須。無いと buildSettings の a.detail.map(…) が落ち、
+       ⚙設定の画面が【1枚も開かなくなる】（2026-09-17 の回帰テストで実測。
+       設定画面を開く8本のテストが道連れで落ちた）。 */
+    detail:[
+      '表のすぐ上にある案内2行（#gridLead）に body.wdt-nolead を効かせて隠す',
+      '文章そのものは消さない（OFFに戻せばそのまま出る）',
+      '隠したぶん、表を上へ広く使える'
+    ],
+    body:'wdt-nolead', def:false },
+  /* ★ここから下は「長い文章を隠す」仲間（2026-09-17・利用者の指示）。
+     ★body: に class を書くだけで applyAll が配る。読む側に if を増やさない。
+       隠す所を増やすときは、この登録簿に1行＋CSSに1行。 */
+  { id:'hidehints', kind:'bool', name:'💬 ▶で始まる補足の文章を隠す',
+    desc:'画面のあちこちにある「▶ …」で始まる補足（使い方のヒント）をまとめて隠します。'
+       + '★文章は消えません。OFFに戻せばそのまま出ます。慣れてきた人向けです。',
+    detail:[
+      '#app-db の中の .hint に body.wdt-nohint を効かせて隠す',
+      '表の上の案内（📖 の設定）とは別に、こちらは画面全体の補足が対象',
+      '隠したぶん、表や入力欄が上へ寄って広く使える'
+    ],
+    body:'wdt-nohint', def:false },
+  { id:'hideintro', kind:'bool', name:'📃 画面の先頭にある長い説明を隠す',
+    desc:'「作業記録・測定データ目録にかぎらず…」で始まる、各セクションの先頭の'
+       + '長い説明文（.lead）を隠します。★文章は消えません。OFFに戻せば出ます。',
+    detail:[
+      '#app-db の中の .lead に body.wdt-nointro を効かせて隠す',
+      '一番かさばる文章なので、隠すと表がかなり上へ来る',
+      '初めての人のために既定はOFF（出したまま）'
+    ],
+    body:'wdt-nointro', def:false },
+  { id:'autofold', kind:'bool', name:'📐 窓が狭いときだけ自動で案内をたたむ',
+    desc:'窓の高さが足りないときだけ、上の案内を自動でたたんで表に場所をゆずります。'
+       + '★広い窓では今までどおり全部出ます。しきい値は既定520px。',
+    detail:[
+      '窓の高さがしきい値より小さいとき body.wdt-autofold を付ける',
+      '広げれば自動で戻る（手で戻す操作は要らない）',
+      'しきい値は WDT.dbOptSet("db","autofold.h","520") で変えられる'
+    ],
     def:false },
   { id:'quickbar', kind:'bool', name:'🎯 右下のクイックボタンを常に出す',
     desc:'画面の右下に「🔍 探す／☰ メニュー／▲ 一番上へ／🗄 DB／📝 メモ／⚙ 設定」の丸ボタンを出します。'
@@ -18317,6 +19136,8 @@ function defaults(){
                       既定は false＝出したまま（初めての人が困らないように）。
                       慣れた人が ON にすると、そのぶん表が広く使える。 */
                    gridlead:false,
+                   /* ★文章を隠す仲間の既定。初めての人のために全部OFF＝出したまま */
+                   hidehints:false, hideintro:false, autofold:false,
                    stickyhead:true, cmdrank:true,
                    /* ★D-06 工程3（決-94）… 既定は 38px＝「ふつう」。
                       利用者が実際の画面で3案を見比べて選んだ値（7行 → 15行）。
@@ -18608,6 +19429,36 @@ function applyRowDensity(){
   }catch(e){}
 }
 
+/* ★案C（2026-09-17）… 窓が狭いときだけ案内をたたんで、表に場所をゆずる。
+   ★しきい値は決め打ちにしない。設定から読む（既定520px）。
+   ★戻すのは自動。手で開き直す操作を要らなくする（⑦使いやすさ）。
+   ★見張り番 AUTOFOLD_LAST … いま畳んでいるか・何pxで判断したかを残す。 */
+var AUTOFOLD_LAST = null;
+function autoFoldH(){
+  try{
+    if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
+      var v = window.WDT.dbOptGet('db', 'autofold.h');
+      if(v != null && v !== '' && isFinite(Number(v))) return Math.max(200, Math.floor(Number(v)));
+    }
+  }catch(e){}
+  return 520;
+}
+function applyAutoFold(){
+  var on = false;
+  try{ on = !!(st && st.addons && st.addons.autofold); }catch(e){}
+  var h  = window.innerHeight, lim = autoFoldH();
+  var fold = on && (h < lim);
+  document.body.classList.toggle('wdt-autofold', fold);
+  AUTOFOLD_LAST = { on: on, winH: h, limit: lim, folded: fold, at: Date.now() };
+  return AUTOFOLD_LAST;
+}
+try{
+  window.addEventListener('resize', function(){
+    try{ applyAutoFold(); }catch(e){}
+    try{ if(typeof fitUpdateAll === 'function') fitUpdateAll(); }catch(e){}
+  });
+}catch(e){}
+
 function applyAll(){
   var shell = el('appShell');
   if(shell){
@@ -18617,9 +19468,17 @@ function applyAll(){
   document.body.classList.toggle('wdt-mobfix',   mobFixOn());
   document.body.classList.toggle('wdt-bigtap',   !!st.addons.bigtap);
   document.body.classList.toggle('wdt-quickbar', !!st.addons.quickbar);
-  /* ★D-05-2（決-122）… 表の上の案内を隠す。隠したぶん表が伸びるので、
-     高さを測り直す（fitUpdateAll が無い環境でも落ちないように try で包む）。 */
-  document.body.classList.toggle('wdt-nolead', !!st.addons.gridlead);
+  /* ★「文章を隠す」仲間は【登録簿を回すだけ】で配る（2026-09-17）。
+     ここに if を1つも増やさない。隠す所を増やすときは ADDONS に
+     body:'wdt-…' を書いた行を1つ足し、CSS を1行足すだけ。
+     ★D-05-2（決-122）… 隠したぶん表が伸びるので高さを測り直す
+     （fitUpdateAll が無い環境でも落ちないように try で包む）。 */
+  try{
+    ADDONS.forEach(function(a){
+      if(a.body) document.body.classList.toggle(a.body, !!st.addons[a.id]);
+    });
+  }catch(e){}
+  try{ applyAutoFold(); }catch(e){}
   try{ if(window.WDT && WDT.fitUpdate) WDT.fitUpdate(); }catch(e){}
   /* Ver1.9.10 追加分（クラスが付いていないとき＝有効、という向きに注意） */
   document.body.classList.toggle('wdt-nosticky',  !st.addons.stickyhead);
