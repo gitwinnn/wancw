@@ -802,6 +802,9 @@ margin:0; background:var(--bg); color:var(--ink);
 .rtt-sb-knob{ height:100%; min-width:24px; box-sizing:border-box; border-radius:inherit;
   background:var(--sub,#9aa4b2); transition:background .12s }
 .rtt-sb[data-axis="y"] > .rtt-sb-knob{ width:100%; min-width:0; min-height:24px }
+/* ★D-05-2（決-122）… 表の上の「使い方のヒント」を隠す（⚙設定 → アドオン）。
+   ★消していない。OFF に戻せばそのまま出る。初めての人のために既定は「出す」。 */
+body.wdt-nolead #gridLead{ display:none }
 .rtt-sb:hover .rtt-sb-knob,
 .rtt-sb.rtt-sb-drag .rtt-sb-knob{ background:var(--accent,#4c8dff) }
 /* ---- D-06 工程7（決-89・決-101）… 表だけの全画面モード -----------------
@@ -2644,7 +2647,7 @@ summary:focus-visible,
       <input type="checkbox" id="chkTodayFocus" onchange="toggleTodayFocus(this.checked)"> 開いたら今日へ
     </label>
     <button class="ghost small" id="p-grid-fullscreen" onclick="toggleTableFullscreen()" title="表だけを画面いっぱいに広げます（もう一度押すか Esc で元に戻ります）">⛶ 表を全画面</button>
-    <span class="hint">▶ <b>列の見出しをクリック</b>で並べ替え（1回目＝順、2回目＝逆順、3回目＝解除）。タグのセルは <b>1回クリック＝編集</b> ／ <b>ダブルクリック＝絞り込み</b>。<br>
+    <span class="hint" id="gridLead">▶ <b>列の見出しをクリック</b>で並べ替え（1回目＝順、2回目＝逆順、3回目＝解除）。タグのセルは <b>1回クリック＝編集</b> ／ <b>ダブルクリック＝絞り込み</b>。<br>
     ▶ 入力欄にカーソルが無いときは<b>コマンドモード</b>です。<b>?</b> でキーの一覧、<b>j / k</b> で行の移動、<b>/</b> で検索欄へ。画面の一番下の帯にいまの状態が出ます。</span>
   </div>
   <div class="sortbar" id="sortBar"></div>
@@ -7768,14 +7771,178 @@ function attachScrollbar(el, opt){
   return { el:el, bar:bar, update:update, destroy:destroy, last:function(){ return SB_LAST; } };
 }
 
+/* ==================================================================
+   器の高さの決め方（D-05-2・決-122）… スクロールバーと【同じ3層】
+   ------------------------------------------------------------------
+   ① 登録簿 registerFit(key, def) … 高さの決め方の「種類」
+   ② 種     FIT_SEED              … どの器にどの決め方を使うか（データ）
+   ③ 基礎板 attachFit(el, opt)    … 中身を知らず、登録簿を引くだけ
+   ★なぜ要るか … 高さが max-height:62vh の決め打ちで、画面の下に
+     【使われない空白】が残っていた（実測 130〜198px）。しかも表の下端が
+     画面の外へ出ると、下端に貼り付いている横バーも一緒に外へ出て見えない。
+     利用者の言葉「このスペースがもったいない」「下までスクロールしていない
+     状態でもバーが出るようにして」。★高さを画面に合わせれば両方いっぺんに直る。
+   ================================================================== */
+var FITS = {};
+function registerFit(key, def){
+  if(!key || !def || typeof def.calc !== 'function') return false;
+  FITS[String(key)] = {
+    key : String(key),
+    label: def.label || String(key),
+    gap : sbNum(def.gap, 0),      /* 下に残す余白(px)。器ごとに上書きできる */
+    min : sbNum(def.min, 120),    /* これ以上は縮めない */
+    max : sbNum(def.max, 0),      /* 0 なら上限なし */
+    vh  : sbNum(def.vh, 62),      /* 'vh' のときに使う割合 */
+    calc: def.calc
+  };
+  return true;
+}
+function fitKinds(){ var a = [], k; for(k in FITS) a.push(k); return a; }
+
+/* ★画面の下端まで使い切る（今回の既定）。
+   a … { top, vpH, gap, vh } を渡す。当てずっぽうの固定値は持たない。 */
+registerFit('fill', {
+  label: '画面の下端まで',
+  calc : function(a){ return a.vpH - a.top - a.gap; }
+});
+/* ★従来どおり「画面の割合」。種の1語で戻せる＝拘束していない（決-97 の物差し②） */
+registerFit('vh', {
+  label: '画面の割合',
+  calc : function(a){ return a.vpH * (a.vh / 100); }
+});
+
+/* ★最後に計った結果（見張り番）。clampedMin が true なら「画面が狭すぎて
+   下限に張り付いた」という記録で、D-10 の手掛かりになる。 */
+var FIT_LAST = null;
+function fitLast(){ return FIT_LAST; }
+
+/* ★下に居座って隠してくる物（コマンドモードの帯など）の高さを実測して避ける。
+   決め打ちの数字を持たない（⑤最適なアルゴリズム）。 */
+function fitBottomGuard(){
+  var h = 0, i, ids = ['rkBar'];
+  for(i = 0; i < ids.length; i++){
+    var el = document.getElementById(ids[i]);
+    if(!el) continue;
+    var cs = window.getComputedStyle(el);
+    if(cs.display === 'none' || cs.visibility === 'hidden') continue;
+    if(cs.position !== 'fixed') continue;
+    var r = el.getBoundingClientRect();
+    if(r.height > h) h = r.height;
+  }
+  return h;
+}
+
+/* el  … 高さを決めたい器
+   opt … { mode:'fill'|'vh', gap, min, max, vh }
+   戻り値 … { el, update(), destroy(), last() }  ★スクロールバーと同じ形 */
+function calcFit(el, opt){
+  if(!el) return 0;
+  opt = opt || {};
+  var def = FITS[opt.mode || 'fill'] || FITS.fill;
+  if(!def) return 0;
+  var r    = el.getBoundingClientRect();
+  var gap  = sbNum(opt.gap, def.gap) + fitBottomGuard();
+  var min  = sbNum(opt.min, def.min);
+  var max  = sbNum(opt.max, def.max);
+  var vpH  = window.innerHeight;
+  /* ★まだ画面に入っていない（ずっと下にある）ときは高さを決めない。
+     見えていない物の高さを決めると、スクロールして来たときに跳ねる。
+     ★上にはみ出しているときは「画面の上端から」とみなす（0 に丸める）。
+     2026-09-16 実測 … これを入れないと top=2356 のような値で計算してしまい、
+     want が負になって下限に張り付いた。 */
+  if(r.top > vpH){
+    FIT_LAST = { key:def.key, top:Math.round(r.top), vpH:vpH, gap:gap,
+                 want:0, got:0, min:min, max:max,
+                 clampedMin:false, clampedMax:false, offscreen:true };
+    return 0;
+  }
+  var a    = { top: Math.max(0, r.top), vpH: vpH, gap: gap,
+               vh: sbNum(opt.vh, def.vh) };
+  var want = def.calc(a);
+  var got  = want;
+  var cMin = false, cMax = false;
+  if(got < min){ got = min; cMin = true; }
+  if(max > 0 && got > max){ got = max; cMax = true; }
+  FIT_LAST = { key:def.key, top:Math.round(a.top), vpH:a.vpH, gap:gap,
+               want:Math.round(want), got:Math.round(got), min:min, max:max,
+               clampedMin:cMin, clampedMax:cMax, offscreen:false };
+  return got;
+}
+
+function attachFit(el, opt){
+  if(!el) return null;
+  opt = opt || {};
+  function update(){
+    var h = calcFit(el, opt);
+    if(h > 0) el.style.maxHeight = Math.round(h) + 'px';
+    return FIT_LAST;
+  }
+  var ro = null;
+  try{
+    if(window.ResizeObserver){
+      ro = new ResizeObserver(function(){ update(); });
+      ro.observe(document.documentElement);
+    }
+  }catch(e){}
+  function onWin(){ update(); }
+  window.addEventListener('resize', onWin);
+  window.addEventListener('scroll', onWin, true);
+  function destroy(){
+    try{ if(ro) ro.disconnect(); }catch(e){}
+    window.removeEventListener('resize', onWin);
+    window.removeEventListener('scroll', onWin, true);
+    el.style.maxHeight = '';
+  }
+  update();
+  return { el:el, update:update, destroy:destroy, last:function(){ return FIT_LAST; } };
+}
+
+/* ② 種（データ）… ここに1行足せば、他の器にも同じ決め方が効く */
+var FIT_SEED = [
+  { at:'.table-wrap', mode:'fill', gap:14, min:160 }
+];
+var FIT_MOUNTED = [];
+function fitMountAll(){
+  fitExport();
+  var n = 0;
+  for(var i = 0; i < FIT_SEED.length; i++){
+    var s = FIT_SEED[i];
+    var list = document.querySelectorAll(s.at);
+    for(var j = 0; j < list.length; j++){
+      var h = attachFit(list[j], s);
+      if(h){ FIT_MOUNTED.push(h); n++; }
+    }
+  }
+  return n;
+}
+function fitUpdateAll(){
+  for(var i = 0; i < FIT_MOUNTED.length; i++){
+    try{ FIT_MOUNTED[i].update(); }catch(e){}
+  }
+  try{ sbUpdateAll(); }catch(e){}   /* 高さが変わればバーの長さも変わる */
+}
+function fitExport(){
+  try{
+    if(window.WDT){
+      window.WDT.addFit    = registerFit;
+      window.WDT.listFits  = fitKinds;
+      window.WDT.fitLast   = fitLast;
+      window.WDT.fitUpdate = fitUpdateAll;
+      window.WDT.calcFit   = calcFit;
+    }
+  }catch(e){}
+}
+fitExport();
+
 /* ② 種（データ）… ここに1行足せば、他の器にも同じバーが付く。
       読む側（sbMountAll）は1行も変わらない。 */
 var SCROLLBAR_SEED = [
   { at:'.table-wrap', axis:'x', kind:'bar', mode:'always' },
-  /* ★縦は「はみ出しているときだけ」出す（mode:'auto'）。
-     いつも出すと、行が少ない表でも右端に帯が居座って邪魔になるため。
+  /* ★縦も【いつでも出す】（利用者の指示「バーは必ず表示」・2026-09-16）。
+     はみ出していないときは、つまみが帯いっぱいに伸びて「動かせない」ことが
+     ひと目で分かる（エクセルと同じ見え方）。
      ★この1行を足すだけで縦バーが増えた＝登録簿の形が効いている証拠（決-121）。 */
-  { at:'.table-wrap', axis:'y', kind:'bar', mode:'auto' }
+  { at:'.table-wrap', axis:'y', kind:'bar', mode:'always' }
 ];
 var SB_MOUNTED = [];
 function sbMountAll(){
@@ -7797,15 +7964,17 @@ function sbUpdateAll(){
     try{ SB_MOUNTED[i].update(); }catch(e){}
   }
 }
+/* ★高さを先に決めてから、バーを配る（順番が逆だとバーの長さが古い高さのままになる） */
 if(document.readyState === 'loading'){
-  document.addEventListener('DOMContentLoaded', function(){ sbMountAll(); });
+  document.addEventListener('DOMContentLoaded', function(){ fitMountAll(); sbMountAll(); });
 }else{
+  fitMountAll();
   sbMountAll();
 }
 /* ★起動直後は表がまだ空のことがある。中身が届いたあとに測り直す
    （MutationObserver でも拾えるが、初回は確実に1回やっておく）。 */
-setTimeout(function(){ sbExport(); sbUpdateAll(); }, 0);
-setTimeout(function(){ sbExport(); sbUpdateAll(); }, 600);
+setTimeout(function(){ sbExport(); fitUpdateAll(); }, 0);
+setTimeout(function(){ sbExport(); fitUpdateAll(); }, 600);
 /* ★窓口は既存の作法に合わせる（registerPart → WDT.addPart と同じ形）。
    window.WDT はここより後ろで作られるので、作られたあとに入れ直す。 */
 function sbExport(){
@@ -18062,6 +18231,16 @@ var ADDONS = [
   { id:'bigtap', kind:'bool', name:'👆 指で押しやすい大きさ',
     desc:'ボタンの当たり判定と文字を大きくします。スマホや、手袋をしたままの操作に向きます。パソコンでは1画面に入る情報が減ります。',
     detail:['ボタンの上下左右の余白を拡大','ボタン文字を 13px → 14px に','表の「削除」ボタンも大きく'] },
+  /* ★D-05-2（決-122）… 表の上の「使い方のヒント」を隠せるようにする。
+     ★消すのではなく【隠すだけ】。初めての人には出したまま（既定は出す）で、
+       慣れた人だけが畳んで、そのぶん表を広く使える（利用者の指示・2026-09-16）。 */
+  { id:'gridlead', kind:'bool', name:'📖 表の上の「使い方のヒント」を隠す',
+    desc:'「🔎 検索・表示・編集」の表のすぐ上にある、▶で始まる2行の案内'
+       + '（列の見出しをクリックで並べ替え…／入力欄にカーソルが無いときはコマンドモード…）を隠します。'
+       + '★文章が消えるわけではありません。OFFに戻せばいつでも出ます。'
+       + '慣れてきて案内が要らなくなったら、ONにするとそのぶん表が広く使えます。'
+       + '★初めて使う人のために、既定はOFF（出したまま）です。',
+    def:false },
   { id:'quickbar', kind:'bool', name:'🎯 右下のクイックボタンを常に出す',
     desc:'画面の右下に「🔍 探す／☰ メニュー／▲ 一番上へ／🗄 DB／📝 メモ／⚙ 設定」の丸ボタンを出します。'
        + 'ヘッダーを「表示しない」にしたときは、この設定に関係なく自動で出ます（迷子にならないための逃げ道）。'
@@ -18134,6 +18313,10 @@ function defaults(){
        作ったので、出すかどうかは利用者が決める。 */
     rowTouchShow   : false,
     addons     : { mobilefix:'auto', bigtap:false, quickbar:false, autofocus:false,
+                   /* ★D-05-2（決-122）… 表の上の案内を隠すか。
+                      既定は false＝出したまま（初めての人が困らないように）。
+                      慣れた人が ON にすると、そのぶん表が広く使える。 */
+                   gridlead:false,
                    stickyhead:true, cmdrank:true,
                    /* ★D-06 工程3（決-94）… 既定は 38px＝「ふつう」。
                       利用者が実際の画面で3案を見比べて選んだ値（7行 → 15行）。
@@ -18434,6 +18617,10 @@ function applyAll(){
   document.body.classList.toggle('wdt-mobfix',   mobFixOn());
   document.body.classList.toggle('wdt-bigtap',   !!st.addons.bigtap);
   document.body.classList.toggle('wdt-quickbar', !!st.addons.quickbar);
+  /* ★D-05-2（決-122）… 表の上の案内を隠す。隠したぶん表が伸びるので、
+     高さを測り直す（fitUpdateAll が無い環境でも落ちないように try で包む）。 */
+  document.body.classList.toggle('wdt-nolead', !!st.addons.gridlead);
+  try{ if(window.WDT && WDT.fitUpdate) WDT.fitUpdate(); }catch(e){}
   /* Ver1.9.10 追加分（クラスが付いていないとき＝有効、という向きに注意） */
   document.body.classList.toggle('wdt-nosticky',  !st.addons.stickyhead);
   /* ★工程9（決-82）… 「1つだけ開く」は【スキンが持ち主】になった。
