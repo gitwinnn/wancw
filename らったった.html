@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>記録台帳＋MDメモ Ver1.19.44</title>
+<title>記録台帳＋MDメモ Ver1.19.45</title>
 
 <!-- ============================================================
      ライセンス表記 / Third party licenses   (Ver1.16.07 で追加)
@@ -1934,7 +1934,52 @@ body.wdt-bigtap :is(#app-db,.db-scope) table.grid td.op .opbtn{ width:34px; heig
 .rtt-emopal{ position:fixed; z-index:940; display:none; width:232px; max-height:190px;
   background:#1b1e24; border:1px solid #3d4046; border-radius:9px;
   box-shadow:0 8px 26px rgba(0,0,0,.5); }
-.rtt-emopal{ flex-direction:column; padding:0; }
+/* ★flex-wrap:nowrap を必ず書く（A-01・決-133）。
+   .rtt-emoji（項目アイコン用）が flex-wrap:wrap を持っており、ここで
+   flex-direction:column と合わさると「縦に並べて、あふれたら【右の列へ折り返す】」
+   になる。2026-09-19 実測 … 見出しの下に 128px の空白ができ、絵文字が
+   右の細い列へ押し出されていた（利用者の言葉「このスペースがもったいない」）。 */
+.rtt-emopal{ flex-direction:column; flex-wrap:nowrap; padding:0; }
+.rtt-emogrid{ align-content:flex-start; }
+/* A-01 第2段（決-133）… 探す欄・分類の札・よく使う */
+.rtt-emosbar{ display:flex; gap:5px; flex-wrap:wrap; align-items:center;
+  padding:7px 9px; border-bottom:1px solid #2b2f37; }
+.rtt-emoq{ flex:1; min-width:140px; padding:5px 9px; font-size:12.5px;
+  background:#12151b; color:#e6e9ef; border:1px solid #3d4046; border-radius:6px; }
+.rtt-emocat{ font-size:11.5px; padding:3px 9px; border-radius:99px; cursor:pointer;
+  border:1px solid #3d4046; background:#232830; color:#9aa4b2; user-select:none; }
+.rtt-emocat:hover{ background:#39414f; }
+.rtt-emocat.on{ background:#2f6fdb; border-color:#2f6fdb; color:#fff; }
+.rtt-emorecent{ display:flex; gap:4px; flex-wrap:wrap; align-items:center;
+  padding:6px 9px; border-bottom:1px solid #2b2f37; }
+.rtt-emolb{ font-size:11px; color:#9aa4b2; margin-right:4px; }
+.rtt-emoesc{ font-size:10.5px; color:#9aa4b2; }
+.rtt-emonone{ padding:16px 10px; font-size:12px; color:#9aa4b2; }
+.rtt-emopal .rtt-emorecent button{ width:32px; height:30px; font-size:17px; padding:0; }
+/* A-01 第3段（決-133）… 編集画面（案C） */
+.rtt-emopal.rtt-emoedit{ width:520px; }
+.rtt-emoedbody{ padding:8px 10px; overflow:auto; }
+.rtt-emolb2{ font-size:11.5px; color:#9aa4b2; margin:8px 0 4px; }
+.rtt-emopaste{ width:100%; height:56px; background:#12151b; color:#e6e9ef;
+  border:1px solid #3d4046; border-radius:6px; padding:6px; font-size:18px; line-height:1.4;
+  resize:vertical; }
+/* ★伝言はボタンと幅を取り合わない … 同じ行に置くとボタンが潰れて
+   文字が横に切れる（2026-09-19 実測・写真で発覚）。必ず次の行へ落とす。 */
+.rtt-emomsg{ font-size:11.5px; color:#5ec98a; flex:1 1 100%; margin:2px 0 0; }
+.rtt-emoesc{ overflow:hidden; text-overflow:ellipsis; white-space:nowrap; }
+.rtt-emoedgrid{ display:flex; flex-wrap:wrap; gap:4px; padding:6px; background:#12151b;
+  border:1px solid #3d4046; border-radius:6px; max-height:150px; overflow:auto;
+  align-content:flex-start; }
+.rtt-emoedgrid button{ width:32px; height:30px; font-size:17px; padding:0; }
+.rtt-emoedgrid button.on{ outline:2px solid #4c8dff; }
+.rtt-emoedtags{ display:flex; flex-wrap:wrap; gap:5px; align-items:center; padding:2px 0 6px; }
+.rtt-emonew{ border-style:dashed !important; color:#5ec98a !important; }
+.rtt-emonewbox{ display:inline-flex; gap:5px; align-items:center; }
+.rtt-emonewbox input{ width:140px; padding:3px 9px; font-size:11.5px; border-radius:99px;
+  border:1px solid #4c8dff; background:#12151b; color:#e6e9ef; }
+.rtt-emonewbox button{ font-size:11.5px; padding:3px 9px; border-radius:6px;
+  border:1px solid #3d4046; background:#232830; color:#e6e9ef; cursor:pointer; }
+.rtt-emomine{ border-color:#5ec98a !important; }
 .rtt-emopal.show{ display:flex; }
 .rtt-emohd{ display:flex; align-items:center; justify-content:space-between; gap:8px;
   padding:6px 8px; border-bottom:1px solid #2b2f37; font-size:11.5px; color:#9aa4b2; }
@@ -1945,7 +1990,22 @@ body.wdt-bigtap :is(#app-db,.db-scope) table.grid td.op .opbtn{ width:34px; heig
 .rtt-emopal textarea{ width:calc(100% - 12px); height:104px; margin:6px; resize:vertical;
   background:#12151b; color:#e6e9ef; border:1px solid #3d4046; border-radius:6px;
   padding:6px; font-size:16px; line-height:1.5; }
-.rtt-emoact{ display:flex; gap:6px; padding:0 6px 8px; }
+/* ★ボタンは縮めない・折り返さない（A-01 第3段）。
+   2026-09-19 実測 … これが無いと「② 追加する」「既定の1849個に戻す」が
+   幅を奪い合い、【1文字ずつ縦に並ぶ】形にひしゃげた。
+   検査は全部 PASS していたが、写真を見て初めて分かった（落とし穴 #124 の型）。 */
+.rtt-emoact{ display:flex; gap:6px; padding:4px 6px 8px; flex-wrap:wrap; align-items:center; }
+/* ★★絵文字の粒（32×30px）の指定を、文字のボタンにまで効かせない。
+   パレットは class="rtt-emoji rtt-emopal" の2枚重ねなので、
+   .rtt-emoji button{ width:32px; height:30px } が【中の全ボタン】に当たる。
+   2026-09-19 実測 … そのせいで「追加する」が箱30pxに押し込められ、
+   中身68pxが横に切れていた。flex-wrap の取り違えと同じ型。 */
+.rtt-emopal .rtt-emoact button,
+.rtt-emopal .rtt-emohd button,
+.rtt-emopal .rtt-emonewbox button{ width:auto; height:auto; }
+.rtt-emoact button{ flex:0 0 auto; white-space:nowrap; }
+.rtt-emohd button{ flex:0 0 auto; white-space:nowrap; }
+.rtt-emohd .rtt-emocnt{ flex:0 0 auto; white-space:nowrap; }
 .rtt-emoact button{ font-size:11.5px; padding:4px 10px; border-radius:6px;
   border:1px solid #3d4046; background:#232830; color:#e6e9ef; cursor:pointer; }
 .rtt-emoact button[data-emoact="save"]{ background:#2f6fdb; border-color:#2f6fdb; color:#fff; }
@@ -2574,7 +2634,7 @@ summary:focus-visible,
 <body>
 <div id="appShell">
 <div id="modeSwitcher">
-  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.44</span></span>
+  <span class="msTitle">🗂 記録台帳＋MDメモ <span class="verNo" style="color:#6f757e;font-weight:400;font-size:11px">Ver1.19.45</span></span>
   <button id="msBtnDb" class="msActive" onclick="setAppMode('db')">🗄 作業記録DB</button>
   <button id="msBtnMd" onclick="setAppMode('md')">📝 Markdownメモ</button>
   <button id="msBtnSet" class="msSet" onclick="WDT.openSettings()" title="設定（ショートカット・表示・アドオン）">⚙ 設定</button>
@@ -2741,6 +2801,7 @@ summary:focus-visible,
       <p><strong>日付・時刻の入力（Ver1.4.00）：</strong>日付の欄には「今日」ボタンと「📅」ボタンが付きます。📅を押すと小さなカレンダーが開き、日をクリックするだけで入ります（‹ ›で月、« »で年を移動）。時刻の欄は「今」と「🕐」、日時の欄は「今」と「📅🕐」です。表の中の日付・時刻セルも、クリックすれば同じカレンダー／時計が開きます。Escキーか「閉じる」で閉じられます。</p>
       <p><strong>予定表を作る（Ver1.4.00）：</strong>「🗂 項目（テーブル）管理」の一番下にある「📅 予定表テンプレートを作る」を押すと、<b>日付／終了日／終日／開始時刻／終了時刻／件名／場所／相手／内容／タグ</b>がそろった項目がすぐできます。列の型に「時刻」「日時」「終日（チェック）」が加わったので、既にある項目でも「⚙ 列の型・予定表としての役割を変える」から作り替えられます。</p>
       <p><strong>今の予定に色が付く（Ver1.4.00）：</strong>開始〜終了の範囲に<b>今の時刻</b>が入っている行は緑色（● 進行中）、今日の予定は黄色（○ 本日）、終わった予定は文字が薄くなります。30秒ごとに自動で見直すので、開きっぱなしにしておけば時間が来ると色が変わります。色分けは「🎨 今の色分け」ボタンで切り替えられます。判定のルールは、<b>終了時刻が空なら1時間の予定</b>、<b>終日にチェックが入っていればその日いっぱい</b>、<b>終了時刻が開始より前なら日をまたいだ予定</b>とみなします。「📅 今日／今週／今月／これから」のボタンで絞り込みもできます。</p>
+      <p><strong>Ver1.19.45 で増えたこと（絵文字が9倍に増え、会社と家で設定が揃うようになりました）：</strong>①<b>入力欄の絵文字が200種類→1849種類</b>になりました（Unicode公式データが出どころです）。<b>分類の札</b>（かお・いきもの・たべもの…）で絞ったり、<b>「ねこ」「はーと」のように名前で探せます</b>。どこかで見つけた絵文字を<b>貼り付けて追加</b>したり、<b>自分だけの札</b>（「すき」等）を作って絵文字に付けることもできます。②<b>MDメモのタブをドラッグして並べ替えると、「ファイルをドロップして開く」の画面が出たまま消えなくなる不具合</b>を直しました。③<b>「🎨 今の色分け」などの設定7つが、パソコンのブラウザではなくDBファイルの中に保存される</b>ようになりました。<b>会社と家で同じ設定になります</b>（これまでは片方で色分けをOFFにすると、DBを持ち歩いてももう片方には伝わりませんでした）。④<b>ダブルクリック（続けて2回押す）と見なす速さ</b>を、⚙設定の「🖥表示」から変えられるようになりました。<b>試し場所で実際に2回押して確かめたり、「5回ためして測る」で自分の速さに自動で合わせたり</b>できます。⑤<b>MDメモのタブに出す名前に「件名」</b>を選べるようになりました（既定は「題名」）。連携している作業記録DBの、その表でいちばん最初の一行テキスト欄の中身がタブ名になります。</p>
       <p><strong>Ver1.19.44 で増えたこと（長い説明を隠せるようになり、タブ・タグ絞り込み・進行中の並びも良くなりました）：</strong>①<b>⚙設定のアドオンに「文章を隠す」3つ</b>が増えました。「💬 ▶で始まる補足を隠す」「📃 先頭の長い説明を隠す」「📐 窓が狭いときだけ自動でたたむ」。<b>文章は消えません。OFFに戻せばそのまま出ます。</b>②<b>タグで絞り込む窓</b>が画面からはみ出さなくなり、「この条件で絞り込む」などのボタンが<b>必ず押せる</b>ようになりました。③<b>進行中のもの</b>（開始日〜終了日が今日をまたぐもの）が、表の先頭に<b>「🔵 進行中」の帯</b>でまとまって出るようになりました。④<b>すべての入力欄に絵文字ボタン</b>が付きました。カーソルを入れると右端に😀が出て、押すと絵文字を選べます。⑤<b>MDメモのタブ</b>が、名前の省略・全文の吹き出し・<b>続けて2回押して名前を変える</b>・<b>ドラッグで並べ替え</b>に対応しました（出し方は「⚙メモの設定 ＞🏷 タブの名前と操作」で選べます）。</p>
       <p><strong>Ver1.19.43 で増えたこと（表の【縦】のスクロールバーも自分で描くようにしました）：</strong>Ver1.19.42 で横のバーを自分で描くようにしたとき、<b>ブラウザ任せのバーを隠す指定が【縦にも効いてしまい】、縦のバーが消えていました</b>（行が多くて縦にスクロールできる表でも、つまみが1本も出ない状態）。この版で<b>縦のバーも自分で描く</b>ようにして直しました。表の<b>右端に明るい帯</b>が出ます。<b>つまみをつかんで上下に動かせます</b>し、<b>帯の空いている所を押すと1画面ぶん進みます</b>。※<b>縦のバーは、行が多くてはみ出しているときだけ出ます</b>（行が少ない表で帯が居座って邪魔にならないようにするためです）。横のバーは今までどおり、いつでも出ます。</p>
       <p><strong>Ver1.19.42 で増えたこと（表の横スクロールバーを、自分で描くようにしました）：</strong>Ver1.19.41 で「いつでも見えるように」したつもりでしたが、<b>お使いの Chromium では1本も出ていませんでした</b>。原因は、新しい Chromium（Linux）が<b>スクロールバーを自分の流儀で描く方式</b>に変わっており、こちらが指定した色や太さを<b>無視してしまう</b>ためです。そこでこの版から、<b>ブラウザ任せをやめて、バーを自分で描く</b>ようにしました。表の下に<b>いつでも明るい帯が出ます</b>。帯の<b>つまみをつかんで左右に動かせます</b>し、<b>帯の空いている所を押すと1画面ぶん進みます</b>（エクセルと同じ動きです）。<b>「⛶ 表を全画面」にしたときも同じように出ます</b>。※この仕組みは<b>登録簿</b>になっているので、今後ほかの場所（メモのタブの帯など）で同じ困りごとが出たら、<b>1行足すだけ</b>で同じバーを付けられます。</p>
@@ -3658,19 +3719,139 @@ function applyTheme(t){
     var bs = document.querySelectorAll('.db-scope'), i;
     for(i = 0; i < bs.length; i++) bs[i].setAttribute('data-theme', t);
   }catch(e){}
-  try{ localStorage.setItem('wdt_theme', t); }catch(e){}
+  /* ★ここで保存してはいけない（決-137 の実測）。
+     保存(prefSet)は「覚える」だけでなく「配る(apply)」もするので、
+     apply → applyTheme → prefSet → apply … と【お互いを呼び合う輪】になる。
+     2026-09-19 実測 … applyTheme が起動時に【7864回】走り、
+     ページの読み込みが 332ミリ秒 → 4608ミリ秒（14倍）になっていた。
+     ★「当てる」と「覚える」は別の口にする（決-82 と同じ考え方）。
+       覚えるのは toggleTheme 側の prefSet。ここは当てるだけ。 */
   const btn = document.getElementById('themeBtn');
   if(btn) btn.textContent = t === 'dark' ? '☀ ライトモード' : '🌙 ダークモード';
 }
+/* ==================================================================
+   設定の登録簿（決-134）… レゴの3層
+   ------------------------------------------------------------------
+   ① 登録簿 registerPref(key, def) … 「どんな設定があるか」を1行で足す
+   ② 種     registerPref(…) の並び   … データ
+   ③ 基礎板 prefGet / prefSet / prefsApply … 中身を知らず、登録簿を回すだけ
+   ★なぜ要るか（2026-09-19 実測）… 設定が localStorage（ブラウザごと・
+     パソコンごと）に入っていて、DBファイルに乗らなかった。会社で一度
+     「🎨 今の色分け」を OFF にすると、DBを家へ持ち帰っても OFF は伝わらず、
+     「会社では進行中の帯が出ない・家では出る」という食い違いになった。
+     絶対規律2「設定は WDT.dbOptSet / dbOptGet のみ」に反していた。
+   ★保存先は _meta_opts の scope='db' / name='pref.<key>'。DBに乗るので、
+     ファイルを持ち歩けば会社でも家でも同じになる。
+   ★起動直後はまだDBが無い（dbOptGet は null を返す）。だから
+     いったん既定で動かし、DBが届いたら prefsApply() で配り直す。
+   ================================================================== */
+var PREFS = {};
+function registerPref(key, def){
+  if(!key || !def) return false;
+  PREFS[String(key)] = {
+    key  : String(key),
+    label: def.label || String(key),
+    def  : (def.def == null ? '' : String(def.def)),
+    apply: (typeof def.apply === 'function') ? def.apply : null
+  };
+  return true;
+}
+function prefKeys(){ var a = [], k; for(k in PREFS) a.push(k); return a; }
+
+/* ★最後にやったこと（見張り番）。「効いていないのでは」を後から調べられる */
+var PREF_LAST = null;
+function prefLast(){ return PREF_LAST; }
+
+/* 読む … DBに無ければ既定。★裸の値ではなく必ず文字列を返す */
+function prefGet(key){
+  var d = PREFS[key];
+  try{
+    if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
+      var v = window.WDT.dbOptGet('db', 'pref.' + key);
+      if(v != null && v !== '') return String(v);
+    }
+  }catch(e){}
+  return d ? d.def : '';
+}
+/* 書く … DBへ入れて、その場で配る。ブラウザ側の保存は使わない（絶対規律2） */
+/* ★輪を切る見張り（決-137）… apply の中でうっかり prefSet を呼んでも、
+   そこで止める。2026-09-19 実測 … applyTheme が保存を呼び、保存が
+   applyTheme を呼ぶ輪になって、起動時に【7864回】走っていた。
+   同じ形は誰でも書いてしまうので、仕組みの側で止める。 */
+var PREF_BUSY = {};
+function prefSet(key, v){
+  var d = PREFS[key];
+  v = (v == null ? '' : String(v));
+  if(PREF_BUSY[key]){
+    PREF_LAST = { how:'skip', key:key, why:'配っている最中の呼び出し', at:Date.now() };
+    return PREF_LAST;
+  }
+  var saved = false;
+  try{
+    if(window.WDT && typeof window.WDT.dbOptSet === 'function'){
+      saved = !!window.WDT.dbOptSet('db', 'pref.' + key, v);
+      if(window.scheduleAutosave) window.scheduleAutosave();
+    }
+  }catch(e){}
+  PREF_LAST = { how:'set', key:key, value:v, saved:saved, at:Date.now() };
+  if(d && d.apply){
+    PREF_BUSY[key] = true;                       /* ★輪を切る（決-137） */
+    try{ d.apply(v); }catch(e){}
+    finally{ PREF_BUSY[key] = false; }
+  }
+  return PREF_LAST;
+}
+/* ★キーが動く設定（表ごと・名前ごと）用。登録簿には載せられないので、
+   前置き＋名前で同じ保存先を使う。例 prefGetK('colvis', 'work_log') */
+function prefGetK(prefix, name, dflt){
+  try{
+    if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
+      var v = window.WDT.dbOptGet('db', 'pref.' + prefix + '.' + name);
+      if(v != null && v !== '') return String(v);
+    }
+  }catch(e){}
+  return (dflt == null ? null : String(dflt));
+}
+function prefSetK(prefix, name, v){
+  var ok = false;
+  try{
+    if(window.WDT && typeof window.WDT.dbOptSet === 'function'){
+      ok = !!window.WDT.dbOptSet('db', 'pref.' + prefix + '.' + name,
+                                 (v == null ? '' : String(v)));
+      if(window.scheduleAutosave) window.scheduleAutosave();
+    }
+  }catch(e){}
+  PREF_LAST = { how:'setK', key:prefix + '.' + name, saved:ok, at:Date.now() };
+  return ok;
+}
+
+/* DBが届いたあとに全部を配り直す（onDbReady から呼ばれる） */
+function prefsApply(){
+  var list = [], k;
+  for(k in PREFS){
+    if(!Object.prototype.hasOwnProperty.call(PREFS, k)) continue;
+    var v = prefGet(k);
+    list.push(k + '=' + v);
+    if(PREFS[k].apply){ try{ PREFS[k].apply(v); }catch(e){} }
+  }
+  PREF_LAST = { how:'applyAll', n:list.length, list:list.join(' '), at:Date.now() };
+  return PREF_LAST;
+}
+
+registerPref('theme', {
+  label:'画面の明るさ（ダーク／ライト）', def:'dark',
+  apply:function(v){ try{ applyTheme(v || 'dark'); }catch(e){} }
+});
 function initTheme(){
-  let saved = null;
-  try{ saved = localStorage.getItem('wdt_theme'); }catch(e){}
-  applyTheme(saved || 'dark');
+  /* ★起動時はまだDBが無いので既定(dark)。DBが届いたら prefsApply が配り直す */
+  applyTheme(prefGet('theme') || 'dark');
 }
 function toggleTheme(){
   const el = document.getElementById('app-db');
   const cur = el ? el.getAttribute('data-theme') : null;
-  applyTheme(cur === 'dark' ? 'light' : 'dark');
+  /* ★覚えるのはここ（prefSet が保存して、そのまま applyTheme も呼ぶ）。
+     applyTheme の中で保存すると輪になる（決-137 の実測・14倍遅くなった）。 */
+  prefSet('theme', cur === 'dark' ? 'light' : 'dark');
 }
 
 // ====== IndexedDB 簡易ラッパー（自動保存・前回ファイルの記憶に使用）======
@@ -4391,25 +4572,47 @@ registerEmojiSpot('md',     { label:'MDメモの本文',        sel:'#editorText
    ★項目アイコン用の TBL_ICON_PALETTE とは別に持つ … あちらは「項目の顔」を選ぶ
      62個で、入力欄に差し込む用途（顔・手・矢印・記号）が足りないため。
    ★ここはデータ。利用者が ✎ で書き換えたら dbOpt 側が正になる。 */
-var EMOJI_DEFAULT = (
-  /* 顔・人（32） */
-  '😀😃😄😁😆😅🤣😂🙂🙃😉😊😇🥰😍🤩😘😋😜🤪🤗🤔🤨😐😑😶🙄😏😴🥱😷🤒' +
-  /* 気持ち・評価（24） */
-  '👍👎👌✌️🤝🙏👏💪🫶❤️🧡💛💚💙💜🖤🤍💯🔥⭐🌟✨💫⚡' +
-  /* 仕事・道具（32） */
-  '🔧🔩🛠️⚙️🧰🪛🔨⛏️🪚🧲🔌🔋💡🕯️🧯🪣🧹🧽🚿💧🌡️📐📏✂️📎🖇️📌📍🗝️🔒🔓🔑' +
-  /* 書類・記録（32） */
-  '📝📋📄📑📊📈📉🗒️🗓️📅📆⏰⏱️⏲️🕒🗂️📁📂🗃️🗄️📦📮✉️📧📨📩📤📥📇🔖🏷️📚' +
-  /* 場所・乗り物（24） */
-  '🏭🏢🏠🏗️🚧🚚🚛🚜🚗🛻🚲🛵✈️🚀⛴️🚢🗺️🧭🚪🪜🪟🛗🏬🏪' +
-  /* 状態・記号（32） */
-  '✅❌⭕❗❓⚠️🚫🛑🔴🟠🟡🟢🔵🟣⚫⚪🔺🔻🔶🔷▶️◀️⏫⏬➕➖✔️✖️♻️🔁🔄🔍' +
-  /* 自然・その他（24） */
-  '🌞🌙☁️🌧️❄️🌈🍀🌸🌿🔬🧪🧫💊🩺🍺🍙🍜☕🎯🎉🎁🏆🥇🧠'
-).match(/[\uD800-\uDBFF][\uDC00-\uDFFF](?:️|‍[\uD800-\uDBFF][\uDC00-\uDFFF])*|[←-㋿](?:️)?/g) || [];
+/* ==================================================================
+   絵文字の種（A-01・決-133）… ★データ。コードに埋め込まない
+   ------------------------------------------------------------------
+   出どころ … Unicode 公式の emoji-test.txt（絵文字 14.0）
+   作り直す … python3 tools/gen_emoji.py
+   ★記憶で並べたものではない。1849個・肌の色ちがい5色は除いてある
+     （入れると 3624 個になり、同じ絵が5つ並んで探しにくくなるため。
+       利用者が 2026-09-19 に「入れない」と決定）。
+   形 … { g:[群の名前…9], s:[[小群の日本語, 群の番号]…98],
+          e:[[絵文字, 小群の番号, 英語名, 日本語の読み]…1849] }
+   ================================================================== */
+var EMOJI_SEED = {"ver":"Unicode Emoji 14.0 / emoji-test.txt 2021-08-26","g":["かお","ひと・て","いきもの","たべもの","おでかけ","あそび","もの","きごう","はた"],"s":[["もじ",7],["いきもの",2],["いきもの とり",2],["いきもの むし",2],["いきもの どうぶつ",2],["いきもの うみ",2],["いきもの は虫類",2],["やじるし",7],["げいじゅつ てづくり",5],["そうさ",7],["しょう",5],["からだ",1],["ほん かみ",6],["かお どうぶつ",0],["ふく",6],["パソコン",6],["はた くに",8],["おかね",7],["たべもの しょっき",3],["のみもの",3],["きもち しるし",0],["イベント",5],["かお こい",0],["かお こまる",0],["かお かそう",0],["かお めがね",0],["かお て",0],["かお ぼうし",0],["かお おこる",0],["かお まじめ",0],["かお ねむい",0],["かお わらう",0],["かお した",0],["かお ぐあいわるい",0],["ひと かぞく",1],["はた",8],["たべもの アジア",3],["たべもの くだもの",3],["たべもの うみ",3],["たべもの ごはん",3],["たべもの おかし あまい",3],["たべもの やさい",3],["ゲーム あそび",5],["せいべつ",7],["かたち",7],["て",1],["て",1],["て",1],["て",1],["て",1],["て",1],["ホテル",4],["せいかつ",6],["すうじ",7],["あかり えいぞう",6],["かぎ",6],["メール",6],["けいさん",7],["いりょう",6],["おかね",6],["かお どうぶつ",0],["おんがく",6],["がっき",6],["じむ",6],["もの",6],["きごう",7],["ひと",1],["ひと うごく",1],["ひと くうそう",1],["ひと ポーズ",1],["ひと やすむ",1],["ひと しごと",1],["ひと スポーツ",1],["ひと しるし",1],["でんわ",6],["たてもの",4],["ばしょ しぜん",4],["ちず",4],["ばしょ",4],["たてもの しゅうきょう",4],["しょくぶつ はな",2],["しょくぶつ",2],["きごう",7],["しゅうきょう",7],["かがく",6],["そら てんき",4],["おと",6],["スポーツ",5],["はた",8],["とけい じかん",4],["どうぐ",6],["のりもの そら",4],["のりもの りく",4],["ひょうしき",7],["のりもの うみ",4],["ちゅうい",7],["かく",6],["せいざ",7]],"e":[["😀",31,"grinning face","かお にこにこ わらう"],["😃",31,"grinning face with big eyes","かお にこにこ め わらう"],["😄",31,"grinning face with smiling eyes","かお にこにこ め わらう"],["😁",31,"beaming face with smiling eyes","かお にこにこ め わらう"],["😆",31,"grinning squinting face","かお にこにこ わらう"],["😅",31,"grinning face with sweat","かお にこにこ わらう"],["🤣",31,"rolling on the floor laughing","かお わらう"],["😂",31,"face with tears of joy","かお なく わらう"],["🙂",31,"slightly smiling face","かお にこにこ わらう"],["🙃",31,"upside-down face","かお した わらう"],["🫠",31,"melting face","かお わらう"],["😉",31,"winking face","かお わらう"],["😊",31,"smiling face with smiling eyes","かお にこにこ め わらう"],["😇",31,"smiling face with halo","かお にこにこ わらう"],["🥰",22,"smiling face with hearts","かお こい すき はーと"],["😍",22,"smiling face with heart-eyes","かお こい すき にこにこ はーと め わらう ハート"],["🤩",22,"star-struck","かお きらきら こい"],["😘",22,"face blowing a kiss","かお こい ちゅー キス"],["😗",22,"kissing face","かお こい"],["☺️",22,"smiling face","かお こい にこにこ わらう"],["😚",22,"kissing face with closed eyes","かお こい め"],["😙",22,"kissing face with smiling eyes","かお こい にこにこ め わらう"],["🥲",22,"smiling face with tear","かお こい にこにこ わらう"],["😋",32,"face savoring food","かお した"],["😛",32,"face with tongue","かお した"],["😜",32,"winking face with tongue","かお した"],["🤪",32,"zany face","かお した"],["😝",32,"squinting face with tongue","かお した"],["🤑",32,"money-mouth face","おかね かお くち した"],["🤗",26,"smiling face with open hands","かお て にこにこ わらう"],["🤭",26,"face with hand over mouth","かお くち て"],["🫢",26,"face with open eyes and hand over mouth","かお くち て め"],["🫣",26,"face with peeking eye","かお て め"],["🤫",26,"shushing face","かお て"],["🤔",26,"thinking face","かお て"],["🫡",26,"saluting face","かお て"],["🤐",29,"zipper-mouth face","かお くち まじめ"],["🤨",29,"face with raised eyebrow","かお まじめ"],["😐",29,"neutral face","かお まじめ むひょう"],["😑",29,"expressionless face","かお まじめ むひょう"],["😶",29,"face without mouth","かお くち まじめ"],["🫥",29,"dotted line face","かお まじめ"],["😶‍🌫️",29,"face in clouds","かお まじめ"],["😏",29,"smirking face","かお まじめ"],["😒",29,"unamused face","かお ふまん まじめ"],["🙄",29,"face with rolling eyes","かお まじめ め"],["😬",29,"grimacing face","かお まじめ"],["😮‍💨",29,"face exhaling","かお まじめ"],["🤥",29,"lying face","かお まじめ"],["😌",30,"relieved face","かお ねむい ほっと"],["😔",30,"pensive face","かお しょんぼり ねむい"],["😪",30,"sleepy face","かお ねむい"],["🤤",30,"drooling face","かお ねむい"],["😴",30,"sleeping face","かお ねむい"],["😷",33,"face with medical mask","かお ぐあいわるい マスク"],["🤒",33,"face with thermometer","かお ぐあいわるい ねつ"],["🤕",33,"face with head-bandage","かお ぐあいわるい ばんそうこう"],["🤢",33,"nauseated face","かお ぐあいわるい"],["🤮",33,"face vomiting","かお ぐあいわるい"],["🤧",33,"sneezing face","かお ぐあいわるい"],["🥵",33,"hot face","あつい かお ぐあいわるい"],["🥶",33,"cold face","かお ぐあいわるい さむい"],["🥴",33,"woozy face","かお ぐあいわるい"],["😵",33,"face with crossed-out eyes","かお ぐあいわるい め"],["😵‍💫",33,"face with spiral eyes","かお ぐあいわるい め"],["🤯",33,"exploding head","かお ぐあいわるい ばくはつ"],["🤠",27,"cowboy hat face","かお ぼうし カウボーイ"],["🥳",27,"partying face","かお ぼうし"],["🥸",27,"disguised face","かお ぼうし"],["😎",25,"smiling face with sunglasses","かお にこにこ めがね わらう サングラス"],["🤓",25,"nerd face","かお めがね"],["🧐",25,"face with monocle","かお めがね"],["😕",23,"confused face","かお こまる"],["🫤",23,"face with diagonal mouth","かお くち こまる"],["😟",23,"worried face","かお こまる しんぱい"],["🙁",23,"slightly frowning face","かお こまる"],["☹️",23,"frowning face","かお こまる"],["😮",23,"face with open mouth","かお くち こまる"],["😯",23,"hushed face","かお こまる"],["😲",23,"astonished face","かお こまる"],["😳",23,"flushed face","かお こまる てれる"],["🥺",23,"pleading face","うるうる かお こまる"],["🥹",23,"face holding back tears","かお こまる なく なみだ"],["😦",23,"frowning face with open mouth","かお くち こまる"],["😧",23,"anguished face","かお こまる"],["😨",23,"fearful face","かお こまる こわい"],["😰",23,"anxious face with sweat","かお こまる ふあん"],["😥",23,"sad but relieved face","かお かなしい こまる ほっと"],["😢",23,"crying face","かお こまる なく"],["😭",23,"loudly crying face","かお こまる なく"],["😱",23,"face screaming in fear","かお こまる"],["😖",23,"confounded face","かお こまる"],["😣",23,"persevering face","かお こまる"],["😞",23,"disappointed face","かお こまる"],["😓",23,"downcast face with sweat","かお こまる"],["😩",23,"weary face","かお こまる つかれた"],["😫",23,"tired face","かお こまる つかれた"],["🥱",23,"yawning face","あくび かお こまる"],["😤",28,"face with steam from nose","おこる かお はな"],["😡",28,"pouting face","おこる かお"],["😠",28,"angry face","おこる かお"],["🤬",28,"face with symbols on mouth","おこる かお くち"],["😈",28,"smiling face with horns","おこる かお て にこにこ わらう"],["👿",28,"angry face with horns","おこる かお て"],["💀",28,"skull","おこる かお がいこつ どくろ"],["☠️",28,"skull and crossbones","おこる かお がいこつ どくろ"],["💩",24,"pile of poo","うんち かお かそう"],["🤡",24,"clown face","かお かそう ピエロ"],["👹",24,"ogre","おに かお かそう"],["👺",24,"goblin","かお かそう てんぐ"],["👻",24,"ghost","おばけ かお かそう"],["👽",24,"alien","うちゅうじん かお かそう"],["👾",24,"alien monster","うちゅうじん かお かそう"],["🤖",24,"robot","かお かそう ロボット"],["😺",13,"grinning cat","かお どうぶつ にこにこ ねこ わらう"],["😸",13,"grinning cat with smiling eyes","かお どうぶつ にこにこ ねこ め わらう"],["😹",13,"cat with tears of joy","うれしい かお どうぶつ なく なみだ ねこ わらう"],["😻",13,"smiling cat with heart-eyes","かお すき どうぶつ にこにこ ねこ はーと め わらう ハート"],["😼",13,"cat with wry smile","かお どうぶつ ねこ わらう"],["😽",13,"kissing cat","かお どうぶつ ねこ"],["🙀",13,"weary cat","かお つかれた どうぶつ ねこ"],["😿",13,"crying cat","かお どうぶつ なく ねこ"],["😾",13,"pouting cat","おこる かお どうぶつ ねこ"],["🙈",60,"see-no-evil monkey","かお さる どうぶつ"],["🙉",60,"hear-no-evil monkey","かお さる どうぶつ"],["🙊",60,"speak-no-evil monkey","かお さる どうぶつ"],["💋",20,"kiss mark","きもち しるし ちゅー キス"],["💌",20,"love letter","きもち しるし ラブレター"],["💘",20,"heart with arrow","きもち しるし すき はーと やじるし ハート"],["💝",20,"heart with ribbon","きもち しるし すき はーと ハート リボン"],["💖",20,"sparkling heart","きもち しるし しんぞう"],["💗",20,"growing heart","きもち しるし はーと"],["💓",20,"beating heart","きもち しるし はーと"],["💞",20,"revolving hearts","きもち しるし はーと"],["💕",20,"two hearts","きもち しるし はーと"],["💟",20,"heart decoration","きもち しるし すき はーと ハート"],["❣️",20,"heart exclamation","きもち しるし しんぞう びっくり"],["💔",20,"broken heart","きもち しるし しんぞう"],["❤️‍🔥",20,"heart on fire","きもち しるし すき はーと ひ ほのお ハート"],["❤️‍🩹",20,"mending heart","きもち しるし しんぞう"],["❤️",20,"red heart","きもち しるし しんぞう"],["🧡",20,"orange heart","きもち しるし しんぞう"],["💛",20,"yellow heart","きもち しるし しんぞう"],["💚",20,"green heart","きもち しるし しんぞう"],["💙",20,"blue heart","きもち しるし しんぞう"],["💜",20,"purple heart","きもち しるし しんぞう"],["🤎",20,"brown heart","きもち しるし しんぞう"],["🖤",20,"black heart","きもち しるし しんぞう"],["🤍",20,"white heart","きもち しるし しんぞう"],["💯",20,"hundred points","きもち しるし ひゃくてん"],["💢",20,"anger symbol","きもち しるし"],["💥",20,"collision","きもち しるし"],["💫",20,"dizzy","きもち しるし めまい"],["💦",20,"sweat droplets","きもち しるし"],["💨",20,"dashing away","きもち しるし"],["🕳️",20,"hole","きもち しるし"],["💣",20,"bomb","きもち しるし"],["💬",20,"speech balloon","きもち しるし ふうせん"],["👁️‍🗨️",20,"eye in speech bubble","きもち しるし め"],["🗨️",20,"left speech bubble","きもち しるし ひだり"],["🗯️",20,"right anger bubble","きもち しるし みぎ"],["💭",20,"thought balloon","きもち しるし ふうせん"],["💤",20,"zzz","きもち しるし"],["👋",46,"waving hand","て"],["🤚",46,"raised back of hand","て"],["🖐️",46,"hand with fingers splayed","て ゆび"],["✋",46,"raised hand","て"],["🖖",46,"vulcan salute","て"],["🫱",46,"rightwards hand","て"],["🫲",46,"leftwards hand","て"],["🫳",46,"palm down hand","した て"],["🫴",46,"palm up hand","うえ て"],["👌",47,"OK hand","て"],["🤌",47,"pinched fingers","て ゆび"],["🤏",47,"pinching hand","て"],["✌️",47,"victory hand","て ピース"],["🤞",47,"crossed fingers","て ゆびクロス"],["🫰",47,"hand with index finger and thumb crossed","て"],["🤟",47,"love-you gesture","て"],["🤘",47,"sign of the horns","て"],["🤙",47,"call me hand","て でんわ"],["👈",49,"backhand index pointing left","て ひだり"],["👉",49,"backhand index pointing right","て みぎ"],["👆",49,"backhand index pointing up","うえ て"],["🖕",49,"middle finger","て"],["👇",49,"backhand index pointing down","した て"],["☝️",49,"index pointing up","うえ て"],["🫵",49,"index pointing at the viewer","て"],["👍",45,"thumbs up","いいね て グッド"],["👎",45,"thumbs down","だめ て"],["✊",45,"raised fist","こぶし て グー"],["👊",45,"oncoming fist","こぶし て グー"],["🤛",45,"left-facing fist","こぶし て ひだり グー"],["🤜",45,"right-facing fist","こぶし て みぎ グー"],["👏",50,"clapping hands","て"],["🙌",50,"raising hands","て ばんざい"],["🫶",50,"heart hands","すき て はーと ハート"],["👐",50,"open hands","て"],["🤲",50,"palms up together","うえ て"],["🤝",50,"handshake","あくしゅ て"],["🙏",50,"folded hands","いのる おねがい て"],["✍️",48,"writing hand","かく て"],["💅",48,"nail polish","つめ て"],["🤳",48,"selfie","じどり て セルフィー"],["💪",11,"flexed biceps","からだ きんにく ちから"],["🦾",11,"mechanical arm","からだ"],["🦿",11,"mechanical leg","あし からだ"],["🦵",11,"leg","あし からだ"],["🦶",11,"foot","あし からだ"],["👂",11,"ear","からだ みみ"],["🦻",11,"ear with hearing aid","からだ みみ"],["👃",11,"nose","からだ はな"],["🧠",11,"brain","からだ のう"],["🫀",11,"anatomical heart","からだ しんぞう"],["🫁",11,"lungs","からだ はい"],["🦷",11,"tooth","からだ は"],["🦴",11,"bone","からだ ほね"],["👀",11,"eyes","からだ め"],["👁️",11,"eye","からだ め"],["👅",11,"tongue","からだ した"],["👄",11,"mouth","からだ くち"],["🫦",11,"biting lip","からだ"],["👶",66,"baby","あかちゃん ひと"],["🧒",66,"child","こども ひと"],["👦",66,"boy","おとこのこ ひと"],["👧",66,"girl","おんなのこ ひと"],["🧑",66,"person","ひと"],["👱",66,"person: blond hair","ひと"],["👨",66,"man","おとこ だんせい ひと"],["🧔",66,"person: beard","ひと"],["🧔‍♂️",66,"man: beard","おとこ だんせい ひと"],["🧔‍♀️",66,"woman: beard","おんな じょせい ひと"],["👨‍🦰",66,"man: red hair","おとこ だんせい ひと"],["👨‍🦱",66,"man: curly hair","おとこ だんせい ひと"],["👨‍🦳",66,"man: white hair","おとこ だんせい ひと"],["👨‍🦲",66,"man: bald","おとこ だんせい ひと"],["👩",66,"woman","おんな じょせい ひと"],["👩‍🦰",66,"woman: red hair","おんな じょせい ひと"],["🧑‍🦰",66,"person: red hair","ひと"],["👩‍🦱",66,"woman: curly hair","おんな じょせい ひと"],["🧑‍🦱",66,"person: curly hair","ひと"],["👩‍🦳",66,"woman: white hair","おんな じょせい ひと"],["🧑‍🦳",66,"person: white hair","ひと"],["👩‍🦲",66,"woman: bald","おんな じょせい ひと"],["🧑‍🦲",66,"person: bald","ひと"],["👱‍♀️",66,"woman: blond hair","おんな じょせい ひと"],["👱‍♂️",66,"man: blond hair","おとこ だんせい ひと"],["🧓",66,"older person","としより ひと"],["👴",66,"old man","おとこ だんせい ひと"],["👵",66,"old woman","おんな じょせい ひと"],["🙍",69,"person frowning","こまる ひと ポーズ"],["🙍‍♂️",69,"man frowning","おとこ こまる だんせい ひと ポーズ"],["🙍‍♀️",69,"woman frowning","おんな こまる じょせい ひと ポーズ"],["🙎",69,"person pouting","おこる ひと ポーズ"],["🙎‍♂️",69,"man pouting","おこる おとこ だんせい ひと ポーズ"],["🙎‍♀️",69,"woman pouting","おこる おんな じょせい ひと ポーズ"],["🙅",69,"person gesturing NO","ひと ポーズ"],["🙅‍♂️",69,"man gesturing NO","おとこ だんせい ひと ポーズ"],["🙅‍♀️",69,"woman gesturing NO","おんな じょせい ひと ポーズ"],["🙆",69,"person gesturing OK","ひと ポーズ"],["🙆‍♂️",69,"man gesturing OK","おとこ だんせい ひと ポーズ"],["🙆‍♀️",69,"woman gesturing OK","おんな じょせい ひと ポーズ"],["💁",69,"person tipping hand","ひと ポーズ"],["💁‍♂️",69,"man tipping hand","おとこ だんせい ひと ポーズ"],["💁‍♀️",69,"woman tipping hand","おんな じょせい ひと ポーズ"],["🙋",69,"person raising hand","ひと ポーズ"],["🙋‍♂️",69,"man raising hand","おとこ だんせい ひと ポーズ"],["🙋‍♀️",69,"woman raising hand","おんな じょせい ひと ポーズ"],["🧏",69,"deaf person","ひと ポーズ"],["🧏‍♂️",69,"deaf man","おとこ だんせい ひと ポーズ"],["🧏‍♀️",69,"deaf woman","おんな じょせい ひと ポーズ"],["🙇",69,"person bowing","ひと ポーズ"],["🙇‍♂️",69,"man bowing","おとこ だんせい ひと ポーズ"],["🙇‍♀️",69,"woman bowing","おんな じょせい ひと ポーズ"],["🤦",69,"person facepalming","ひと ポーズ"],["🤦‍♂️",69,"man facepalming","おとこ だんせい ひと ポーズ"],["🤦‍♀️",69,"woman facepalming","おんな じょせい ひと ポーズ"],["🤷",69,"person shrugging","ひと ポーズ"],["🤷‍♂️",69,"man shrugging","おとこ だんせい ひと ポーズ"],["🤷‍♀️",69,"woman shrugging","おんな じょせい ひと ポーズ"],["🧑‍⚕️",71,"health worker","いしゃ しごと ひと びょういん"],["👨‍⚕️",71,"man health worker","いしゃ おとこ しごと だんせい ひと びょういん"],["👩‍⚕️",71,"woman health worker","いしゃ おんな しごと じょせい ひと びょういん"],["🧑‍🎓",71,"student","がくせい しごと ひと"],["👨‍🎓",71,"man student","おとこ がくせい しごと だんせい ひと"],["👩‍🎓",71,"woman student","おんな がくせい しごと じょせい ひと"],["🧑‍🏫",71,"teacher","しごと せんせい ひと"],["👨‍🏫",71,"man teacher","おとこ しごと せんせい だんせい ひと"],["👩‍🏫",71,"woman teacher","おんな しごと じょせい せんせい ひと"],["🧑‍⚖️",71,"judge","さいばん しごと ひと"],["👨‍⚖️",71,"man judge","おとこ さいばん しごと だんせい ひと"],["👩‍⚖️",71,"woman judge","おんな さいばん しごと じょせい ひと"],["🧑‍🌾",71,"farmer","しごと のうか ひと"],["👨‍🌾",71,"man farmer","おとこ しごと だんせい のうか ひと"],["👩‍🌾",71,"woman farmer","おんな しごと じょせい のうか ひと"],["🧑‍🍳",71,"cook","しごと ひと りょうり コック"],["👨‍🍳",71,"man cook","おとこ しごと だんせい ひと りょうり コック"],["👩‍🍳",71,"woman cook","おんな しごと じょせい ひと りょうり コック"],["🧑‍🔧",71,"mechanic","しごと ひと"],["👨‍🔧",71,"man mechanic","おとこ しごと だんせい ひと"],["👩‍🔧",71,"woman mechanic","おんな しごと じょせい ひと"],["🧑‍🏭",71,"factory worker","こうじょう しごと ひと"],["👨‍🏭",71,"man factory worker","おとこ こうじょう しごと だんせい ひと"],["👩‍🏭",71,"woman factory worker","おんな こうじょう しごと じょせい ひと"],["🧑‍💼",71,"office worker","かいしゃ しごと じむ ひと"],["👨‍💼",71,"man office worker","おとこ かいしゃ しごと じむ だんせい ひと"],["👩‍💼",71,"woman office worker","おんな かいしゃ しごと じむ じょせい ひと"],["🧑‍🔬",71,"scientist","かがくしゃ しごと ひと"],["👨‍🔬",71,"man scientist","おとこ かがくしゃ しごと だんせい ひと"],["👩‍🔬",71,"woman scientist","おんな かがくしゃ しごと じょせい ひと"],["🧑‍💻",71,"technologist","ぎじゅつ しごと ひと"],["👨‍💻",71,"man technologist","おとこ ぎじゅつ しごと だんせい ひと"],["👩‍💻",71,"woman technologist","おんな ぎじゅつ しごと じょせい ひと"],["🧑‍🎤",71,"singer","かしゅ しごと ひと"],["👨‍🎤",71,"man singer","おとこ かしゅ しごと だんせい ひと"],["👩‍🎤",71,"woman singer","おんな かしゅ しごと じょせい ひと"],["🧑‍🎨",71,"artist","げいじゅつ しごと ひと"],["👨‍🎨",71,"man artist","おとこ げいじゅつ しごと だんせい ひと"],["👩‍🎨",71,"woman artist","おんな げいじゅつ しごと じょせい ひと"],["🧑‍✈️",71,"pilot","しごと ひと パイロット"],["👨‍✈️",71,"man pilot","おとこ しごと だんせい ひと パイロット"],["👩‍✈️",71,"woman pilot","おんな しごと じょせい ひと パイロット"],["🧑‍🚀",71,"astronaut","うちゅう しごと ひと"],["👨‍🚀",71,"man astronaut","うちゅう おとこ しごと だんせい ひと"],["👩‍🚀",71,"woman astronaut","うちゅう おんな しごと じょせい ひと"],["🧑‍🚒",71,"firefighter","しごと しょうぼう ひと"],["👨‍🚒",71,"man firefighter","おとこ しごと しょうぼう だんせい ひと"],["👩‍🚒",71,"woman firefighter","おんな しごと しょうぼう じょせい ひと"],["👮",71,"police officer","けいさつ しごと ひと"],["👮‍♂️",71,"man police officer","おとこ けいさつ しごと だんせい ひと"],["👮‍♀️",71,"woman police officer","おんな けいさつ しごと じょせい ひと"],["🕵️",71,"detective","しごと たんてい ひと"],["🕵️‍♂️",71,"man detective","おとこ しごと たんてい だんせい ひと"],["🕵️‍♀️",71,"woman detective","おんな しごと じょせい たんてい ひと"],["💂",71,"guard","けいび しごと ひと"],["💂‍♂️",71,"man guard","おとこ けいび しごと だんせい ひと"],["💂‍♀️",71,"woman guard","おんな けいび しごと じょせい ひと"],["🥷",71,"ninja","しごと ひと"],["👷",71,"construction worker","こうじ しごと ひと"],["👷‍♂️",71,"man construction worker","おとこ こうじ しごと だんせい ひと"],["👷‍♀️",71,"woman construction worker","おんな こうじ しごと じょせい ひと"],["🫅",71,"person with crown","おうかん しごと ひと"],["🤴",71,"prince","しごと ひと"],["👸",71,"princess","しごと ひと"],["👳",71,"person wearing turban","しごと ひと"],["👳‍♂️",71,"man wearing turban","おとこ しごと だんせい ひと"],["👳‍♀️",71,"woman wearing turban","おんな しごと じょせい ひと"],["👲",71,"person with skullcap","しごと ひと"],["🧕",71,"woman with headscarf","おんな しごと じょせい ひと"],["🤵",71,"person in tuxedo","けっこん しごと ひと"],["🤵‍♂️",71,"man in tuxedo","おとこ けっこん しごと だんせい ひと"],["🤵‍♀️",71,"woman in tuxedo","おんな けっこん しごと じょせい ひと"],["👰",71,"person with veil","しごと ひと"],["👰‍♂️",71,"man with veil","おとこ しごと だんせい ひと"],["👰‍♀️",71,"woman with veil","おんな しごと じょせい ひと"],["🤰",71,"pregnant woman","おんな しごと じょせい にんしん ひと"],["🫃",71,"pregnant man","おとこ しごと だんせい にんしん ひと"],["🫄",71,"pregnant person","しごと にんしん ひと"],["🤱",71,"breast-feeding","しごと ひと"],["👩‍🍼",71,"woman feeding baby","あかちゃん おんな しごと じょせい ひと"],["👨‍🍼",71,"man feeding baby","あかちゃん おとこ しごと だんせい ひと"],["🧑‍🍼",71,"person feeding baby","あかちゃん しごと ひと"],["👼",68,"baby angel","あかちゃん くうそう てんし ひと"],["🎅",68,"Santa Claus","くうそう ひと サンタ"],["🤶",68,"Mrs. Claus","くうそう ひと"],["🧑‍🎄",68,"mx claus","くうそう ひと"],["🦸",68,"superhero","くうそう ひと ヒーロー"],["🦸‍♂️",68,"man superhero","おとこ くうそう だんせい ひと ヒーロー"],["🦸‍♀️",68,"woman superhero","おんな くうそう じょせい ひと ヒーロー"],["🦹",68,"supervillain","くうそう ひと"],["🦹‍♂️",68,"man supervillain","おとこ くうそう だんせい ひと"],["🦹‍♀️",68,"woman supervillain","おんな くうそう じょせい ひと"],["🧙",68,"mage","くうそう ひと まほう"],["🧙‍♂️",68,"man mage","おとこ くうそう だんせい ひと まほう"],["🧙‍♀️",68,"woman mage","おんな くうそう じょせい ひと まほう"],["🧚",68,"fairy","くうそう ひと ようせい"],["🧚‍♂️",68,"man fairy","おとこ くうそう だんせい ひと ようせい"],["🧚‍♀️",68,"woman fairy","おんな くうそう じょせい ひと ようせい"],["🧛",68,"vampire","きゅうけつき くうそう ひと"],["🧛‍♂️",68,"man vampire","おとこ きゅうけつき くうそう だんせい ひと"],["🧛‍♀️",68,"woman vampire","おんな きゅうけつき くうそう じょせい ひと"],["🧜",68,"merperson","くうそう ひと"],["🧜‍♂️",68,"merman","くうそう ひと"],["🧜‍♀️",68,"mermaid","くうそう にんぎょ ひと"],["🧝",68,"elf","くうそう ひと"],["🧝‍♂️",68,"man elf","おとこ くうそう だんせい ひと"],["🧝‍♀️",68,"woman elf","おんな くうそう じょせい ひと"],["🧞",68,"genie","くうそう ひと まじん"],["🧞‍♂️",68,"man genie","おとこ くうそう だんせい ひと まじん"],["🧞‍♀️",68,"woman genie","おんな くうそう じょせい ひと まじん"],["🧟",68,"zombie","くうそう ひと ゾンビ"],["🧟‍♂️",68,"man zombie","おとこ くうそう だんせい ひと ゾンビ"],["🧟‍♀️",68,"woman zombie","おんな くうそう じょせい ひと ゾンビ"],["🧌",68,"troll","くうそう ひと"],["💆",67,"person getting massage","うごく ひと マッサージ"],["💆‍♂️",67,"man getting massage","うごく おとこ だんせい ひと マッサージ"],["💆‍♀️",67,"woman getting massage","うごく おんな じょせい ひと マッサージ"],["💇",67,"person getting haircut","うごく かみ ひと"],["💇‍♂️",67,"man getting haircut","うごく おとこ かみ だんせい ひと"],["💇‍♀️",67,"woman getting haircut","うごく おんな かみ じょせい ひと"],["🚶",67,"person walking","あるく うごく ひと"],["🚶‍♂️",67,"man walking","あるく うごく おとこ だんせい ひと"],["🚶‍♀️",67,"woman walking","あるく うごく おんな じょせい ひと"],["🧍",67,"person standing","うごく たつ ひと"],["🧍‍♂️",67,"man standing","うごく おとこ たつ だんせい ひと"],["🧍‍♀️",67,"woman standing","うごく おんな じょせい たつ ひと"],["🧎",67,"person kneeling","うごく ひざまずく ひと"],["🧎‍♂️",67,"man kneeling","うごく おとこ だんせい ひざまずく ひと"],["🧎‍♀️",67,"woman kneeling","うごく おんな じょせい ひざまずく ひと"],["🧑‍🦯",67,"person with white cane","うごく ひと"],["👨‍🦯",67,"man with white cane","うごく おとこ だんせい ひと"],["👩‍🦯",67,"woman with white cane","うごく おんな じょせい ひと"],["🧑‍🦼",67,"person in motorized wheelchair","うごく ひと"],["👨‍🦼",67,"man in motorized wheelchair","うごく おとこ だんせい ひと"],["👩‍🦼",67,"woman in motorized wheelchair","うごく おんな じょせい ひと"],["🧑‍🦽",67,"person in manual wheelchair","うごく ひと"],["👨‍🦽",67,"man in manual wheelchair","うごく おとこ だんせい ひと"],["👩‍🦽",67,"woman in manual wheelchair","うごく おんな じょせい ひと"],["🏃",67,"person running","うごく はしる ひと"],["🏃‍♂️",67,"man running","うごく おとこ だんせい はしる ひと"],["🏃‍♀️",67,"woman running","うごく おんな じょせい はしる ひと"],["💃",67,"woman dancing","うごく おどる おんな じょせい ひと"],["🕺",67,"man dancing","うごく おとこ おどる だんせい ひと"],["🕴️",67,"person in suit levitating","うごく ひと"],["👯",67,"people with bunny ears","うごく ひと"],["👯‍♂️",67,"men with bunny ears","うごく ひと"],["👯‍♀️",67,"women with bunny ears","うごく ひと"],["🧖",67,"person in steamy room","うごく ひと"],["🧖‍♂️",67,"man in steamy room","うごく おとこ だんせい ひと"],["🧖‍♀️",67,"woman in steamy room","うごく おんな じょせい ひと"],["🧗",67,"person climbing","うごく ひと"],["🧗‍♂️",67,"man climbing","うごく おとこ だんせい ひと"],["🧗‍♀️",67,"woman climbing","うごく おんな じょせい ひと"],["🤺",72,"person fencing","ひと スポーツ"],["🏇",72,"horse racing","うま ひと スポーツ"],["⛷️",72,"skier","ひと スポーツ"],["🏂",72,"snowboarder","ひと スポーツ"],["🏌️",72,"person golfing","ひと スポーツ"],["🏌️‍♂️",72,"man golfing","おとこ だんせい ひと スポーツ"],["🏌️‍♀️",72,"woman golfing","おんな じょせい ひと スポーツ"],["🏄",72,"person surfing","ひと スポーツ"],["🏄‍♂️",72,"man surfing","おとこ だんせい ひと スポーツ"],["🏄‍♀️",72,"woman surfing","おんな じょせい ひと スポーツ"],["🚣",72,"person rowing boat","ひと ふね スポーツ"],["🚣‍♂️",72,"man rowing boat","おとこ だんせい ひと ふね スポーツ"],["🚣‍♀️",72,"woman rowing boat","おんな じょせい ひと ふね スポーツ"],["🏊",72,"person swimming","ひと スポーツ"],["🏊‍♂️",72,"man swimming","おとこ だんせい ひと スポーツ"],["🏊‍♀️",72,"woman swimming","おんな じょせい ひと スポーツ"],["⛹️",72,"person bouncing ball","ひと スポーツ"],["⛹️‍♂️",72,"man bouncing ball","おとこ だんせい ひと スポーツ"],["⛹️‍♀️",72,"woman bouncing ball","おんな じょせい ひと スポーツ"],["🏋️",72,"person lifting weights","ひと スポーツ"],["🏋️‍♂️",72,"man lifting weights","おとこ だんせい ひと スポーツ"],["🏋️‍♀️",72,"woman lifting weights","おんな じょせい ひと スポーツ"],["🚴",72,"person biking","ひと スポーツ"],["🚴‍♂️",72,"man biking","おとこ だんせい ひと スポーツ"],["🚴‍♀️",72,"woman biking","おんな じょせい ひと スポーツ"],["🚵",72,"person mountain biking","ひと やま スポーツ"],["🚵‍♂️",72,"man mountain biking","おとこ だんせい ひと やま スポーツ"],["🚵‍♀️",72,"woman mountain biking","おんな じょせい ひと やま スポーツ"],["🤸",72,"person cartwheeling","ひと スポーツ"],["🤸‍♂️",72,"man cartwheeling","おとこ だんせい ひと スポーツ"],["🤸‍♀️",72,"woman cartwheeling","おんな じょせい ひと スポーツ"],["🤼",72,"people wrestling","ひと スポーツ"],["🤼‍♂️",72,"men wrestling","ひと スポーツ"],["🤼‍♀️",72,"women wrestling","ひと スポーツ"],["🤽",72,"person playing water polo","ひと スポーツ"],["🤽‍♂️",72,"man playing water polo","おとこ だんせい ひと スポーツ"],["🤽‍♀️",72,"woman playing water polo","おんな じょせい ひと スポーツ"],["🤾",72,"person playing handball","ひと スポーツ"],["🤾‍♂️",72,"man playing handball","おとこ だんせい ひと スポーツ"],["🤾‍♀️",72,"woman playing handball","おんな じょせい ひと スポーツ"],["🤹",72,"person juggling","ひと スポーツ"],["🤹‍♂️",72,"man juggling","おとこ だんせい ひと スポーツ"],["🤹‍♀️",72,"woman juggling","おんな じょせい ひと スポーツ"],["🧘",70,"person in lotus position","ひと やすむ"],["🧘‍♂️",70,"man in lotus position","おとこ だんせい ひと やすむ"],["🧘‍♀️",70,"woman in lotus position","おんな じょせい ひと やすむ"],["🛀",70,"person taking bath","ひと やすむ"],["🛌",70,"person in bed","ひと やすむ ベッド"],["🧑‍🤝‍🧑",34,"people holding hands","かぞく てをつなぐ ひと"],["👭",34,"women holding hands","かぞく てをつなぐ ひと"],["👫",34,"woman and man holding hands","おとこ おんな かぞく じょせい だんせい てをつなぐ ひと"],["👬",34,"men holding hands","かぞく てをつなぐ ひと"],["💏",34,"kiss","かぞく ちゅー ひと キス"],["👩‍❤️‍💋‍👨",34,"kiss: woman, man","おとこ おんな かぞく じょせい だんせい ちゅー ひと キス"],["👨‍❤️‍💋‍👨",34,"kiss: man, man","おとこ かぞく だんせい ちゅー ひと キス"],["👩‍❤️‍💋‍👩",34,"kiss: woman, woman","おんな かぞく じょせい ちゅー ひと キス"],["💑",34,"couple with heart","かぞく しんぞう ひと カップル"],["👩‍❤️‍👨",34,"couple with heart: woman, man","おとこ おんな かぞく じょせい すき だんせい はーと ひと カップル ハート"],["👨‍❤️‍👨",34,"couple with heart: man, man","おとこ かぞく すき だんせい はーと ひと カップル ハート"],["👩‍❤️‍👩",34,"couple with heart: woman, woman","おんな かぞく じょせい すき はーと ひと カップル ハート"],["👪",34,"family","かぞく ひと"],["👨‍👩‍👦",34,"family: man, woman, boy","おとこ おとこのこ おんな かぞく じょせい だんせい ひと"],["👨‍👩‍👧",34,"family: man, woman, girl","おとこ おんな おんなのこ かぞく じょせい だんせい ひと"],["👨‍👩‍👧‍👦",34,"family: man, woman, girl, boy","おとこ おとこのこ おんな おんなのこ かぞく じょせい だんせい ひと"],["👨‍👩‍👦‍👦",34,"family: man, woman, boy, boy","おとこ おとこのこ おんな かぞく じょせい だんせい ひと"],["👨‍👩‍👧‍👧",34,"family: man, woman, girl, girl","おとこ おんな おんなのこ かぞく じょせい だんせい ひと"],["👨‍👨‍👦",34,"family: man, man, boy","おとこ おとこのこ かぞく だんせい ひと"],["👨‍👨‍👧",34,"family: man, man, girl","おとこ おんなのこ かぞく だんせい ひと"],["👨‍👨‍👧‍👦",34,"family: man, man, girl, boy","おとこ おとこのこ おんなのこ かぞく だんせい ひと"],["👨‍👨‍👦‍👦",34,"family: man, man, boy, boy","おとこ おとこのこ かぞく だんせい ひと"],["👨‍👨‍👧‍👧",34,"family: man, man, girl, girl","おとこ おんなのこ かぞく だんせい ひと"],["👩‍👩‍👦",34,"family: woman, woman, boy","おとこのこ おんな かぞく じょせい ひと"],["👩‍👩‍👧",34,"family: woman, woman, girl","おんな おんなのこ かぞく じょせい ひと"],["👩‍👩‍👧‍👦",34,"family: woman, woman, girl, boy","おとこのこ おんな おんなのこ かぞく じょせい ひと"],["👩‍👩‍👦‍👦",34,"family: woman, woman, boy, boy","おとこのこ おんな かぞく じょせい ひと"],["👩‍👩‍👧‍👧",34,"family: woman, woman, girl, girl","おんな おんなのこ かぞく じょせい ひと"],["👨‍👦",34,"family: man, boy","おとこ おとこのこ かぞく だんせい ひと"],["👨‍👦‍👦",34,"family: man, boy, boy","おとこ おとこのこ かぞく だんせい ひと"],["👨‍👧",34,"family: man, girl","おとこ おんなのこ かぞく だんせい ひと"],["👨‍👧‍👦",34,"family: man, girl, boy","おとこ おとこのこ おんなのこ かぞく だんせい ひと"],["👨‍👧‍👧",34,"family: man, girl, girl","おとこ おんなのこ かぞく だんせい ひと"],["👩‍👦",34,"family: woman, boy","おとこのこ おんな かぞく じょせい ひと"],["👩‍👦‍👦",34,"family: woman, boy, boy","おとこのこ おんな かぞく じょせい ひと"],["👩‍👧",34,"family: woman, girl","おんな おんなのこ かぞく じょせい ひと"],["👩‍👧‍👦",34,"family: woman, girl, boy","おとこのこ おんな おんなのこ かぞく じょせい ひと"],["👩‍👧‍👧",34,"family: woman, girl, girl","おんな おんなのこ かぞく じょせい ひと"],["🗣️",73,"speaking head","しるし ひと"],["👤",73,"bust in silhouette","しるし ひと"],["👥",73,"busts in silhouette","しるし ひと"],["🫂",73,"people hugging","しるし ひと"],["👣",73,"footprints","しるし ひと"],["🐵",4,"monkey face","いきもの さる どうぶつ"],["🐒",4,"monkey","いきもの さる どうぶつ"],["🦍",4,"gorilla","いきもの どうぶつ ゴリラ"],["🦧",4,"orangutan","いきもの どうぶつ"],["🐶",4,"dog face","いきもの いぬ どうぶつ"],["🐕",4,"dog","いきもの いぬ どうぶつ"],["🦮",4,"guide dog","いきもの いぬ どうぶつ"],["🐕‍🦺",4,"service dog","いきもの いぬ どうぶつ"],["🐩",4,"poodle","いきもの いぬ どうぶつ"],["🐺",4,"wolf","いきもの おおかみ どうぶつ"],["🦊",4,"fox","いきもの きつね どうぶつ"],["🦝",4,"raccoon","あらいぐま いきもの どうぶつ"],["🐱",4,"cat face","いきもの どうぶつ ねこ"],["🐈",4,"cat","いきもの どうぶつ ねこ"],["🐈‍⬛",4,"black cat","いきもの どうぶつ ねこ"],["🦁",4,"lion","いきもの どうぶつ ライオン"],["🐯",4,"tiger face","いきもの とら どうぶつ"],["🐅",4,"tiger","いきもの とら どうぶつ"],["🐆",4,"leopard","いきもの どうぶつ ひょう"],["🐴",4,"horse face","いきもの うま どうぶつ"],["🐎",4,"horse","いきもの うま どうぶつ"],["🦄",4,"unicorn","いきもの どうぶつ ユニコーン"],["🦓",4,"zebra","いきもの しまうま どうぶつ"],["🦌",4,"deer","いきもの しか どうぶつ"],["🦬",4,"bison","いきもの どうぶつ"],["🐮",4,"cow face","いきもの うし どうぶつ"],["🐂",4,"ox","いきもの うし どうぶつ"],["🐃",4,"water buffalo","いきもの すいぎゅう どうぶつ"],["🐄",4,"cow","いきもの うし どうぶつ"],["🐷",4,"pig face","いきもの どうぶつ ぶた"],["🐖",4,"pig","いきもの どうぶつ ぶた"],["🐗",4,"boar","いきもの いのしし どうぶつ"],["🐽",4,"pig nose","いきもの どうぶつ はな ぶた"],["🐏",4,"ram","いきもの どうぶつ ひつじ"],["🐑",4,"ewe","いきもの どうぶつ ひつじ"],["🐐",4,"goat","いきもの どうぶつ やぎ"],["🐪",4,"camel","いきもの どうぶつ らくだ"],["🐫",4,"two-hump camel","いきもの どうぶつ らくだ"],["🦙",4,"llama","いきもの どうぶつ リャマ"],["🦒",4,"giraffe","いきもの どうぶつ キリン"],["🐘",4,"elephant","いきもの ぞう どうぶつ"],["🦣",4,"mammoth","いきもの どうぶつ マンモス"],["🦏",4,"rhinoceros","いきもの どうぶつ サイ"],["🦛",4,"hippopotamus","いきもの どうぶつ カバ"],["🐭",4,"mouse face","いきもの どうぶつ マウス"],["🐁",4,"mouse","いきもの どうぶつ マウス"],["🐀",4,"rat","いきもの どうぶつ ねずみ"],["🐹",4,"hamster","いきもの どうぶつ ハムスター"],["🐰",4,"rabbit face","いきもの うさぎ どうぶつ"],["🐇",4,"rabbit","いきもの うさぎ どうぶつ"],["🐿️",4,"chipmunk","いきもの どうぶつ りす"],["🦫",4,"beaver","いきもの どうぶつ ビーバー"],["🦔",4,"hedgehog","いきもの どうぶつ はりねずみ"],["🦇",4,"bat","いきもの こうもり どうぶつ"],["🐻",4,"bear","いきもの くま どうぶつ"],["🐻‍❄️",4,"polar bear","いきもの くま どうぶつ"],["🐨",4,"koala","いきもの どうぶつ"],["🐼",4,"panda","いきもの どうぶつ パンダ"],["🦥",4,"sloth","いきもの どうぶつ ナマケモノ"],["🦦",4,"otter","いきもの どうぶつ カワウソ"],["🦨",4,"skunk","いきもの どうぶつ スカンク"],["🦘",4,"kangaroo","いきもの どうぶつ カンガルー"],["🦡",4,"badger","いきもの どうぶつ アナグマ"],["🐾",4,"paw prints","あしあと いきもの どうぶつ"],["🦃",2,"turkey","いきもの しちめんちょう とり"],["🐔",2,"chicken","いきもの とり にわとり"],["🐓",2,"rooster","いきもの とり にわとり"],["🐣",2,"hatching chick","いきもの とり ひよこ"],["🐤",2,"baby chick","あかちゃん いきもの とり ひよこ"],["🐥",2,"front-facing baby chick","あかちゃん いきもの とり ひよこ"],["🐦",2,"bird","いきもの とり"],["🐧",2,"penguin","いきもの とり ペンギン"],["🕊️",2,"dove","いきもの とり はと"],["🦅",2,"eagle","いきもの とり わし"],["🦆",2,"duck","いきもの かも とり"],["🦢",2,"swan","いきもの とり はくちょう"],["🦉",2,"owl","いきもの とり ふくろう"],["🦤",2,"dodo","いきもの とり"],["🪶",2,"feather","いきもの とり"],["🦩",2,"flamingo","いきもの とり フラミンゴ"],["🦚",2,"peacock","いきもの くじゃく とり"],["🦜",2,"parrot","いきもの とり オウム"],["🐸",1,"frog","いきもの かえる"],["🐊",6,"crocodile","いきもの は虫類 ワニ"],["🐢",6,"turtle","いきもの かめ は虫類"],["🦎",6,"lizard","いきもの とかげ は虫類"],["🐍",6,"snake","いきもの は虫類 へび"],["🐲",6,"dragon face","いきもの は虫類 ドラゴン"],["🐉",6,"dragon","いきもの は虫類 ドラゴン"],["🦕",6,"sauropod","いきもの は虫類"],["🦖",6,"T-Rex","いきもの は虫類"],["🐳",5,"spouting whale","いきもの うみ くじら"],["🐋",5,"whale","いきもの うみ くじら"],["🐬",5,"dolphin","いきもの うみ イルカ"],["🦭",5,"seal","いきもの うみ アザラシ"],["🐟",5,"fish","いきもの うみ さかな"],["🐠",5,"tropical fish","いきもの うみ さかな トロピカル"],["🐡",5,"blowfish","いきもの うみ"],["🦈",5,"shark","いきもの うみ サメ"],["🐙",5,"octopus","いきもの うみ たこ"],["🐚",5,"spiral shell","いきもの うみ かい"],["🪸",5,"coral","いきもの うみ"],["🐌",3,"snail","いきもの かたつむり むし"],["🦋",3,"butterfly","いきもの ちょう むし"],["🐛",3,"bug","いきもの むし"],["🐜",3,"ant","あり いきもの むし"],["🐝",3,"honeybee","いきもの むし"],["🪲",3,"beetle","いきもの かぶとむし むし"],["🐞",3,"lady beetle","いきもの かぶとむし むし"],["🦗",3,"cricket","いきもの こおろぎ むし"],["🪳",3,"cockroach","いきもの むし ゴキブリ"],["🕷️",3,"spider","いきもの くも むし"],["🕸️",3,"spider web","いきもの くも むし"],["🦂",3,"scorpion","いきもの さそり むし"],["🦟",3,"mosquito","いきもの か むし"],["🪰",3,"fly","いきもの はえ むし"],["🪱",3,"worm","いきもの みみず むし"],["🦠",3,"microbe","いきもの ばいきん むし"],["💐",80,"bouquet","しょくぶつ はな はなたば"],["🌸",80,"cherry blossom","さくら しょくぶつ はな"],["💮",80,"white flower","しょくぶつ はな"],["🪷",80,"lotus","しょくぶつ はな"],["🏵️",80,"rosette","しょくぶつ はな"],["🌹",80,"rose","しょくぶつ はな バラ"],["🥀",80,"wilted flower","しょくぶつ はな"],["🌺",80,"hibiscus","しょくぶつ はな ハイビスカス"],["🌻",80,"sunflower","しょくぶつ はな ひまわり"],["🌼",80,"blossom","さくら しょくぶつ はな"],["🌷",80,"tulip","しょくぶつ はな チューリップ"],["🌱",81,"seedling","しょくぶつ め"],["🪴",81,"potted plant","しょくぶつ"],["🌲",81,"evergreen tree","き しょくぶつ"],["🌳",81,"deciduous tree","き しょくぶつ"],["🌴",81,"palm tree","き しょくぶつ"],["🌵",81,"cactus","しょくぶつ サボテン"],["🌾",81,"sheaf of rice","こめ ごはん しょくぶつ"],["🌿",81,"herb","くさ しょくぶつ"],["☘️",81,"shamrock","しょくぶつ クローバー"],["🍀",81,"four leaf clover","しょくぶつ は クローバー"],["🍁",81,"maple leaf","かえで しょくぶつ は もみじ"],["🍂",81,"fallen leaf","しょくぶつ は"],["🍃",81,"leaf fluttering in wind","かぜ しょくぶつ は"],["🪹",81,"empty nest","しょくぶつ"],["🪺",81,"nest with eggs","しょくぶつ"],["🍇",37,"grapes","くだもの たべもの ぶどう"],["🍈",37,"melon","くだもの たべもの メロン"],["🍉",37,"watermelon","くだもの すいか たべもの"],["🍊",37,"tangerine","くだもの たべもの みかん"],["🍋",37,"lemon","くだもの たべもの レモン"],["🍌",37,"banana","くだもの たべもの バナナ"],["🍍",37,"pineapple","くだもの たべもの パイナップル"],["🥭",37,"mango","くだもの たべもの マンゴー"],["🍎",37,"red apple","くだもの たべもの りんご"],["🍏",37,"green apple","くだもの たべもの りんご"],["🍐",37,"pear","くだもの たべもの なし"],["🍑",37,"peach","くだもの たべもの もも"],["🍒",37,"cherries","くだもの さくらんぼ たべもの"],["🍓",37,"strawberry","いちご くだもの たべもの"],["🫐",37,"blueberries","くだもの たべもの ブルーベリー"],["🥝",37,"kiwi fruit","くだもの たべもの キウイ"],["🍅",37,"tomato","くだもの たべもの トマト"],["🫒",37,"olive","くだもの たべもの オリーブ"],["🥥",37,"coconut","くだもの たべもの ヤシ"],["🥑",41,"avocado","たべもの やさい アボカド"],["🍆",41,"eggplant","たべもの なす やさい"],["🥔",41,"potato","じゃがいも たべもの やさい"],["🥕",41,"carrot","たべもの にんじん やさい"],["🌽",41,"ear of corn","たべもの とうもろこし みみ やさい"],["🌶️",41,"hot pepper","あつい たべもの とうがらし やさい"],["🫑",41,"bell pepper","たべもの とうがらし やさい ベル"],["🥒",41,"cucumber","きゅうり たべもの やさい"],["🥬",41,"leafy green","たべもの やさい"],["🥦",41,"broccoli","たべもの やさい ブロッコリー"],["🧄",41,"garlic","たべもの にんにく やさい"],["🧅",41,"onion","たべもの たまねぎ やさい"],["🍄",41,"mushroom","きのこ たべもの やさい"],["🥜",41,"peanuts","たべもの やさい ピーナッツ"],["🫘",41,"beans","たべもの まめ やさい"],["🌰",41,"chestnut","くり たべもの やさい"],["🍞",39,"bread","ごはん たべもの パン"],["🥐",39,"croissant","ごはん たべもの クロワッサン"],["🥖",39,"baguette bread","ごはん たべもの パン"],["🫓",39,"flatbread","ごはん たべもの"],["🥨",39,"pretzel","ごはん たべもの プレッツェル"],["🥯",39,"bagel","ごはん たべもの ベーグル"],["🥞",39,"pancakes","ごはん たべもの パンケーキ"],["🧇",39,"waffle","ごはん たべもの ワッフル"],["🧀",39,"cheese wedge","ごはん たべもの チーズ"],["🍖",39,"meat on bone","ごはん たべもの にく ほね"],["🍗",39,"poultry leg","あし ごはん たべもの にく"],["🥩",39,"cut of meat","ごはん たべもの にく"],["🥓",39,"bacon","ごはん たべもの ベーコン"],["🍔",39,"hamburger","ごはん たべもの ハンバーガー"],["🍟",39,"french fries","ごはん たべもの ポテト"],["🍕",39,"pizza","ごはん たべもの ピザ"],["🌭",39,"hot dog","ごはん たべもの ホットドッグ"],["🥪",39,"sandwich","ごはん たべもの サンド"],["🌮",39,"taco","ごはん たべもの タコス"],["🌯",39,"burrito","ごはん たべもの ブリトー"],["🫔",39,"tamale","ごはん たべもの"],["🥙",39,"stuffed flatbread","ごはん たべもの"],["🧆",39,"falafel","ごはん たべもの"],["🥚",39,"egg","ごはん たべもの たまご"],["🍳",39,"cooking","ごはん たべもの りょうり"],["🥘",39,"shallow pan of food","ごはん たべもの"],["🍲",39,"pot of food","ごはん たべもの なべ りょうり"],["🫕",39,"fondue","ごはん たべもの"],["🥣",39,"bowl with spoon","ごはん たべもの スプーン"],["🥗",39,"green salad","ごはん たべもの サラダ"],["🍿",39,"popcorn","ごはん たべもの ポップコーン"],["🧈",39,"butter","ごはん たべもの バター"],["🧂",39,"salt","ごはん しお たべもの"],["🥫",39,"canned food","かんづめ ごはん たべもの"],["🍱",36,"bento box","たべもの べんとう アジア"],["🍘",36,"rice cracker","せんべい たべもの アジア"],["🍙",36,"rice ball","おにぎり たべもの アジア"],["🍚",36,"cooked rice","こめ ごはん たべもの アジア"],["🍛",36,"curry rice","こめ ごはん たべもの アジア カレー"],["🍜",36,"steaming bowl","たべもの めん アジア ラーメン"],["🍝",36,"spaghetti","たべもの アジア パスタ"],["🍠",36,"roasted sweet potato","たべもの やきいも アジア"],["🍢",36,"oden","おでん たべもの アジア"],["🍣",36,"sushi","すし たべもの アジア"],["🍤",36,"fried shrimp","えび たべもの アジア"],["🍥",36,"fish cake with swirl","かまぼこ たべもの なると アジア"],["🥮",36,"moon cake","げっぺい たべもの アジア"],["🍡",36,"dango","たべもの だんご アジア"],["🥟",36,"dumpling","ぎょうざ たべもの アジア"],["🥠",36,"fortune cookie","たべもの アジア クッキー"],["🥡",36,"takeout box","たべもの べんとう アジア"],["🦀",38,"crab","うみ たべもの"],["🦞",38,"lobster","うみ たべもの"],["🦐",38,"shrimp","うみ たべもの"],["🦑",38,"squid","うみ たべもの"],["🦪",38,"oyster","うみ かき たべもの"],["🍦",40,"soft ice cream","あまい おかし たべもの アイス"],["🍧",40,"shaved ice","あまい おかし かきごおり たべもの"],["🍨",40,"ice cream","あまい おかし たべもの アイス"],["🍩",40,"doughnut","あまい おかし たべもの ドーナツ"],["🍪",40,"cookie","あまい おかし たべもの クッキー"],["🎂",40,"birthday cake","あまい おかし たべもの たんじょうび ケーキ"],["🍰",40,"shortcake","あまい おかし たべもの"],["🧁",40,"cupcake","あまい おかし たべもの"],["🥧",40,"pie","あまい おかし たべもの パイ"],["🍫",40,"chocolate bar","あまい おかし たべもの チョコ"],["🍬",40,"candy","あまい あめ おかし たべもの"],["🍭",40,"lollipop","あまい あめ おかし たべもの"],["🍮",40,"custard","あまい おかし たべもの プリン"],["🍯",40,"honey pot","あまい おかし たべもの なべ はちみつ"],["🍼",19,"baby bottle","のみもの ほにゅうびん"],["🥛",19,"glass of milk","ぎゅうにゅう のみもの"],["☕",19,"hot beverage","あつい のみもの"],["🫖",19,"teapot","きゅうす のみもの"],["🍵",19,"teacup without handle","おちゃ のみもの"],["🍶",19,"sake","さけ のみもの"],["🍾",19,"bottle with popping cork","かんぱい のみもの シャンパン"],["🍷",19,"wine glass","のみもの ワイン"],["🍸",19,"cocktail glass","のみもの カクテル"],["🍹",19,"tropical drink","のみもの トロピカル"],["🍺",19,"beer mug","のみもの ビール"],["🍻",19,"clinking beer mugs","かんぱい のみもの ビール"],["🥂",19,"clinking glasses","のみもの めがね"],["🥃",19,"tumbler glass","のみもの"],["🫗",19,"pouring liquid","のみもの"],["🥤",19,"cup with straw","のみもの カップ"],["🧋",19,"bubble tea","のみもの タピオカ"],["🧃",19,"beverage box","のみもの ジュース"],["🧉",19,"mate","のみもの マテちゃ"],["🧊",19,"ice","こおり のみもの"],["🥢",18,"chopsticks","しょっき たべもの はし"],["🍽️",18,"fork and knife with plate","さら しょっき たべもの ナイフ フォーク"],["🍴",18,"fork and knife","しょっき たべもの ナイフ フォーク"],["🥄",18,"spoon","しょっき たべもの スプーン"],["🔪",18,"kitchen knife","しょっき たべもの ナイフ"],["🫙",18,"jar","しょっき たべもの"],["🏺",18,"amphora","しょっき たべもの"],["🌍",77,"globe showing Europe-Africa","ちきゅう ちず"],["🌎",77,"globe showing Americas","ちきゅう ちず"],["🌏",77,"globe showing Asia-Australia","ちきゅう ちず オーストラリア"],["🌐",77,"globe with meridians","ちきゅう ちず"],["🗺️",77,"world map","ちず"],["🗾",77,"map of Japan","ちず にほん"],["🧭",77,"compass","ちず コンパス"],["🏔️",76,"snow-capped mountain","しぜん ばしょ やま ゆき"],["⛰️",76,"mountain","しぜん ばしょ やま"],["🌋",76,"volcano","かざん しぜん ばしょ"],["🗻",76,"mount fuji","しぜん ばしょ"],["🏕️",76,"camping","しぜん ばしょ"],["🏖️",76,"beach with umbrella","かさ しぜん ばしょ ビーチ"],["🏜️",76,"desert","さばく しぜん ばしょ"],["🏝️",76,"desert island","さばく しぜん しま ばしょ"],["🏞️",76,"national park","しぜん ばしょ"],["🏟️",75,"stadium","たてもの"],["🏛️",75,"classical building","たてもの ビル"],["🏗️",75,"building construction","こうじ たてもの ビル"],["🧱",75,"brick","たてもの"],["🪨",75,"rock","たてもの"],["🪵",75,"wood","たてもの"],["🛖",75,"hut","たてもの"],["🏘️",75,"houses","たてもの"],["🏚️",75,"derelict house","いえ たてもの"],["🏠",75,"house","いえ たてもの"],["🏡",75,"house with garden","いえ たてもの"],["🏢",75,"office building","かいしゃ じむ たてもの ビル"],["🏣",75,"Japanese post office","かいしゃ じむ たてもの にほん"],["🏤",75,"post office","かいしゃ じむ たてもの"],["🏥",75,"hospital","たてもの びょういん"],["🏦",75,"bank","ぎんこう たてもの"],["🏨",75,"hotel","たてもの ホテル"],["🏩",75,"love hotel","あい すき たてもの ホテル"],["🏪",75,"convenience store","たてもの みせ"],["🏫",75,"school","がっこう たてもの"],["🏬",75,"department store","たてもの みせ"],["🏭",75,"factory","こうじょう たてもの"],["🏯",75,"Japanese castle","しろ たてもの にほん"],["🏰",75,"castle","しろ たてもの"],["💒",75,"wedding","けっこん たてもの"],["🗼",75,"Tokyo tower","たてもの"],["🗽",75,"Statue of Liberty","たてもの"],["⛪",79,"church","きょうかい しゅうきょう たてもの"],["🕌",79,"mosque","しゅうきょう たてもの モスク"],["🛕",79,"hindu temple","おてら しゅうきょう たてもの"],["🕍",79,"synagogue","しゅうきょう たてもの"],["⛩️",79,"shinto shrine","しゅうきょう じんじゃ たてもの"],["🕋",79,"kaaba","しゅうきょう たてもの"],["⛲",78,"fountain","ばしょ ふんすい"],["⛺",78,"tent","ばしょ テント"],["🌁",78,"foggy","ばしょ"],["🌃",78,"night with stars","ばしょ"],["🏙️",78,"cityscape","ばしょ"],["🌄",78,"sunrise over mountains","あさひ ばしょ"],["🌅",78,"sunrise","あさひ ばしょ"],["🌆",78,"cityscape at dusk","ばしょ"],["🌇",78,"sunset","ばしょ ゆうひ"],["🌉",78,"bridge at night","はし ばしょ"],["♨️",78,"hot springs","おんせん ばしょ"],["🎠",78,"carousel horse","うま ばしょ"],["🛝",78,"playground slide","ばしょ"],["🎡",78,"ferris wheel","ばしょ"],["🎢",78,"roller coaster","ばしょ"],["💈",78,"barber pole","ばしょ"],["🎪",78,"circus tent","ばしょ テント"],["🚂",92,"locomotive","きかんしゃ のりもの りく"],["🚃",92,"railway car","くるま でんしゃ のりもの りく"],["🚄",92,"high-speed train","でんしゃ のりもの りく"],["🚅",92,"bullet train","でんしゃ のりもの りく"],["🚆",92,"train","でんしゃ のりもの りく"],["🚇",92,"metro","ちかてつ のりもの りく"],["🚈",92,"light rail","のりもの りく"],["🚉",92,"station","のりもの りく"],["🚊",92,"tram","のりもの りく ろめんでんしゃ"],["🚝",92,"monorail","のりもの りく モノレール"],["🚞",92,"mountain railway","でんしゃ のりもの やま りく"],["🚋",92,"tram car","くるま のりもの りく ろめんでんしゃ"],["🚌",92,"bus","のりもの りく バス"],["🚍",92,"oncoming bus","のりもの りく バス"],["🚎",92,"trolleybus","のりもの りく バス"],["🚐",92,"minibus","のりもの りく"],["🚑",92,"ambulance","きゅうきゅうしゃ のりもの りく"],["🚒",92,"fire engine","しょうぼうしゃ のりもの りく"],["🚓",92,"police car","くるま けいさつ のりもの りく"],["🚔",92,"oncoming police car","くるま けいさつ のりもの りく"],["🚕",92,"taxi","のりもの りく タクシー"],["🚖",92,"oncoming taxi","のりもの りく タクシー"],["🚗",92,"automobile","のりもの りく"],["🚘",92,"oncoming automobile","のりもの りく"],["🚙",92,"sport utility vehicle","のりもの りく"],["🛻",92,"pickup truck","のりもの りく トラック"],["🚚",92,"delivery truck","のりもの りく トラック"],["🚛",92,"articulated lorry","のりもの りく"],["🚜",92,"tractor","のりもの りく トラクター"],["🏎️",92,"racing car","くるま のりもの りく"],["🏍️",92,"motorcycle","のりもの りく バイク"],["🛵",92,"motor scooter","のりもの りく バイク"],["🦽",92,"manual wheelchair","のりもの りく"],["🦼",92,"motorized wheelchair","のりもの りく"],["🛺",92,"auto rickshaw","のりもの りく"],["🚲",92,"bicycle","じてんしゃ のりもの りく"],["🛴",92,"kick scooter","のりもの りく バイク"],["🛹",92,"skateboard","のりもの りく"],["🛼",92,"roller skate","のりもの りく スケート"],["🚏",92,"bus stop","のりもの りく バス"],["🛣️",92,"motorway","のりもの りく"],["🛤️",92,"railway track","でんしゃ のりもの りく"],["🛢️",92,"oil drum","のりもの りく ドラム"],["⛽",92,"fuel pump","のりもの りく ガソリン"],["🛞",92,"wheel","のりもの りく"],["🚨",92,"police car light","くるま けいさつ のりもの りく"],["🚥",92,"horizontal traffic light","しんごう のりもの りく"],["🚦",92,"vertical traffic light","しんごう のりもの りく"],["🛑",92,"stop sign","のりもの りく"],["🚧",92,"construction","こうじ のりもの りく"],["⚓",94,"anchor","いかり うみ のりもの"],["🛟",94,"ring buoy","うきわ うみ のりもの"],["⛵",94,"sailboat","うみ のりもの"],["🛶",94,"canoe","うみ のりもの カヌー"],["🚤",94,"speedboat","うみ のりもの"],["🛳️",94,"passenger ship","うみ のりもの ふね"],["⛴️",94,"ferry","うみ のりもの フェリー"],["🛥️",94,"motor boat","うみ のりもの ふね"],["🚢",94,"ship","うみ のりもの ふね"],["✈️",91,"airplane","そら のりもの ひこうき"],["🛩️",91,"small airplane","そら のりもの ひこうき"],["🛫",91,"airplane departure","そら のりもの ひこうき"],["🛬",91,"airplane arrival","そら のりもの ひこうき"],["🪂",91,"parachute","そら のりもの"],["💺",91,"seat","そら のりもの"],["🚁",91,"helicopter","そら のりもの ヘリコプター"],["🚟",91,"suspension railway","そら でんしゃ のりもの"],["🚠",91,"mountain cableway","そら のりもの やま"],["🚡",91,"aerial tramway","そら のりもの"],["🛰️",91,"satellite","えいせい そら のりもの"],["🚀",91,"rocket","そら のりもの ロケット"],["🛸",91,"flying saucer","そら のりもの"],["🛎️",51,"bellhop bell","ベル ホテル"],["🧳",51,"luggage","ホテル"],["⌛",89,"hourglass done","じかん すなどけい とけい"],["⏳",89,"hourglass not done","じかん すなどけい とけい"],["⌚",89,"watch","じかん とけい"],["⏰",89,"alarm clock","じかん とけい めざまし"],["⏱️",89,"stopwatch","じかん とけい"],["⏲️",89,"timer clock","じかん とけい"],["🕰️",89,"mantelpiece clock","じかん とけい"],["🕛",89,"twelve o’clock","じかん とけい"],["🕧",89,"twelve-thirty","じかん とけい"],["🕐",89,"one o’clock","じかん とけい"],["🕜",89,"one-thirty","じかん とけい"],["🕑",89,"two o’clock","じかん とけい"],["🕝",89,"two-thirty","じかん とけい"],["🕒",89,"three o’clock","じかん とけい"],["🕞",89,"three-thirty","じかん とけい"],["🕓",89,"four o’clock","じかん とけい"],["🕟",89,"four-thirty","じかん とけい"],["🕔",89,"five o’clock","じかん とけい"],["🕠",89,"five-thirty","じかん とけい"],["🕕",89,"six o’clock","じかん とけい"],["🕡",89,"six-thirty","じかん とけい"],["🕖",89,"seven o’clock","じかん とけい"],["🕢",89,"seven-thirty","じかん とけい"],["🕗",89,"eight o’clock","じかん とけい"],["🕣",89,"eight-thirty","じかん とけい"],["🕘",89,"nine o’clock","じかん とけい"],["🕤",89,"nine-thirty","じかん とけい"],["🕙",89,"ten o’clock","じかん とけい"],["🕥",89,"ten-thirty","じかん とけい"],["🕚",89,"eleven o’clock","じかん とけい"],["🕦",89,"eleven-thirty","じかん とけい"],["🌑",85,"new moon","そら つき てんき"],["🌒",85,"waxing crescent moon","そら つき てんき"],["🌓",85,"first quarter moon","そら つき てんき"],["🌔",85,"waxing gibbous moon","そら つき てんき"],["🌕",85,"full moon","そら つき てんき"],["🌖",85,"waning gibbous moon","そら つき てんき"],["🌗",85,"last quarter moon","そら つき てんき"],["🌘",85,"waning crescent moon","そら つき てんき"],["🌙",85,"crescent moon","そら つき てんき"],["🌚",85,"new moon face","そら つき てんき"],["🌛",85,"first quarter moon face","そら つき てんき"],["🌜",85,"last quarter moon face","そら つき てんき"],["🌡️",85,"thermometer","そら てんき ねつ"],["☀️",85,"sun","そら たいよう てんき ひ"],["🌝",85,"full moon face","そら つき てんき"],["🌞",85,"sun with face","そら たいよう てんき ひ"],["🪐",85,"ringed planet","そら てんき"],["⭐",85,"star","そら てんき ほし"],["🌟",85,"glowing star","そら てんき ほし"],["🌠",85,"shooting star","そら てんき ほし"],["🌌",85,"milky way","そら てんき"],["☁️",85,"cloud","くも そら てんき"],["⛅",85,"sun behind cloud","くも そら たいよう てんき ひ"],["⛈️",85,"cloud with lightning and rain","あめ かみなり くも そら てんき"],["🌤️",85,"sun behind small cloud","くも そら たいよう てんき ひ"],["🌥️",85,"sun behind large cloud","くも そら たいよう てんき ひ"],["🌦️",85,"sun behind rain cloud","あめ くも そら たいよう てんき ひ"],["🌧️",85,"cloud with rain","あめ くも そら てんき"],["🌨️",85,"cloud with snow","くも そら てんき ゆき"],["🌩️",85,"cloud with lightning","かみなり くも そら てんき"],["🌪️",85,"tornado","そら たつまき てんき"],["🌫️",85,"fog","きり そら てんき"],["🌬️",85,"wind face","かぜ そら てんき"],["🌀",85,"cyclone","そら てんき"],["🌈",85,"rainbow","そら てんき にじ"],["🌂",85,"closed umbrella","かさ そら てんき"],["☂️",85,"umbrella","かさ そら てんき"],["☔",85,"umbrella with rain drops","あめ かさ そら てんき"],["⛱️",85,"umbrella on ground","かさ そら てんき"],["⚡",85,"high voltage","そら てんき"],["❄️",85,"snowflake","そら てんき"],["☃️",85,"snowman","そら てんき"],["⛄",85,"snowman without snow","そら てんき ゆき"],["☄️",85,"comet","そら てんき"],["🔥",85,"fire","そら てんき ひ ほのお"],["💧",85,"droplet","そら てんき みず"],["🌊",85,"water wave","そら てんき なみ"],["🎃",21,"jack-o-lantern","ちょうちん イベント"],["🎄",21,"Christmas tree","き イベント"],["🎆",21,"fireworks","はなび イベント"],["🎇",21,"sparkler","イベント"],["🧨",21,"firecracker","イベント"],["✨",21,"sparkles","きらきら イベント"],["🎈",21,"balloon","ふうせん イベント"],["🎉",21,"party popper","おいわい イベント クラッカー"],["🎊",21,"confetti ball","おいわい イベント"],["🎋",21,"tanabata tree","き イベント"],["🎍",21,"pine decoration","イベント"],["🎎",21,"Japanese dolls","にほん イベント"],["🎏",21,"carp streamer","イベント"],["🎐",21,"wind chime","かぜ イベント"],["🎑",21,"moon viewing ceremony","つき イベント"],["🧧",21,"red envelope","てがみ イベント"],["🎀",21,"ribbon","イベント リボン"],["🎁",21,"wrapped gift","イベント プレゼント"],["🎗️",21,"reminder ribbon","イベント リボン"],["🎟️",21,"admission tickets","イベント"],["🎫",21,"ticket","イベント チケット"],["🎖️",10,"military medal","しょう メダル"],["🏆",10,"trophy","しょう トロフィー"],["🏅",10,"sports medal","しょう メダル"],["🥇",10,"1st place medal","しょう メダル"],["🥈",10,"2nd place medal","しょう メダル"],["🥉",10,"3rd place medal","しょう メダル"],["⚽",87,"soccer ball","サッカー スポーツ"],["⚾",87,"baseball","やきゅう スポーツ"],["🥎",87,"softball","スポーツ"],["🏀",87,"basketball","スポーツ バスケ"],["🏐",87,"volleyball","スポーツ バレー"],["🏈",87,"american football","スポーツ フットボール"],["🏉",87,"rugby football","スポーツ フットボール ラグビー"],["🎾",87,"tennis","スポーツ テニス"],["🥏",87,"flying disc","スポーツ"],["🎳",87,"bowling","スポーツ ボウリング"],["🏏",87,"cricket game","こおろぎ ゲーム スポーツ"],["🏑",87,"field hockey","スポーツ"],["🏒",87,"ice hockey","こおり スポーツ"],["🥍",87,"lacrosse","スポーツ"],["🏓",87,"ping pong","スポーツ"],["🏸",87,"badminton","スポーツ バドミントン"],["🥊",87,"boxing glove","スポーツ"],["🥋",87,"martial arts uniform","スポーツ"],["🥅",87,"goal net","スポーツ"],["⛳",87,"flag in hole","はた スポーツ"],["⛸️",87,"ice skate","こおり スケート スポーツ"],["🎣",87,"fishing pole","つり スポーツ"],["🤿",87,"diving mask","スポーツ ダイビング マスク"],["🎽",87,"running shirt","はしる シャツ スポーツ"],["🎿",87,"skis","スポーツ"],["🛷",87,"sled","スポーツ"],["🥌",87,"curling stone","スポーツ"],["🎯",42,"bullseye","あそび ゲーム"],["🪀",42,"yo-yo","あそび ゲーム"],["🪁",42,"kite","あそび ゲーム"],["🎱",42,"pool 8 ball","あそび ゲーム"],["🔮",42,"crystal ball","あそび ゲーム"],["🪄",42,"magic wand","あそび ゲーム"],["🧿",42,"nazar amulet","あそび ゲーム"],["🪬",42,"hamsa","あそび ゲーム"],["🎮",42,"video game","あそび ゲーム ビデオ"],["🕹️",42,"joystick","あそび ゲーム"],["🎰",42,"slot machine","あそび ゲーム"],["🎲",42,"game die","あそび ゲーム"],["🧩",42,"puzzle piece","あそび ゲーム パズル"],["🧸",42,"teddy bear","あそび くま ぬいぐるみ ゲーム"],["🪅",42,"piñata","あそび ゲーム"],["🪩",42,"mirror ball","あそび ゲーム"],["🪆",42,"nesting dolls","あそび ゲーム"],["♠️",42,"spade suit","あそび ゲーム"],["♥️",42,"heart suit","あそび すき はーと ゲーム ハート"],["♦️",42,"diamond suit","あそび ひしがた ゲーム"],["♣️",42,"club suit","あそび ゲーム"],["♟️",42,"chess pawn","あそび ゲーム チェス"],["🃏",42,"joker","あそび ゲーム"],["🀄",42,"mahjong red dragon","あそび ゲーム ドラゴン"],["🎴",42,"flower playing cards","あそび ゲーム"],["🎭",8,"performing arts","げいじゅつ てづくり"],["🖼️",8,"framed picture","げいじゅつ てづくり"],["🎨",8,"artist palette","げいじゅつ てづくり"],["🧵",8,"thread","げいじゅつ てづくり"],["🪡",8,"sewing needle","げいじゅつ てづくり"],["🧶",8,"yarn","げいじゅつ てづくり"],["🪢",8,"knot","げいじゅつ てづくり"],["👓",14,"glasses","ふく めがね"],["🕶️",14,"sunglasses","ふく サングラス"],["🥽",14,"goggles","ふく"],["🥼",14,"lab coat","ふく"],["🦺",14,"safety vest","ふく"],["👔",14,"necktie","ふく"],["👕",14,"t-shirt","ふく シャツ"],["👖",14,"jeans","ふく ジーンズ"],["🧣",14,"scarf","ふく"],["🧤",14,"gloves","ふく"],["🧥",14,"coat","ふく"],["🧦",14,"socks","ふく"],["👗",14,"dress","ふく ドレス"],["👘",14,"kimono","きもの ふく"],["🥻",14,"sari","ふく"],["🩱",14,"one-piece swimsuit","ふく"],["🩲",14,"briefs","ふく"],["🩳",14,"shorts","ふく"],["👙",14,"bikini","ふく みずぎ"],["👚",14,"woman’s clothes","おんな じょせい ふく"],["👛",14,"purse","さいふ ふく"],["👜",14,"handbag","ふく"],["👝",14,"clutch bag","かばん ふく"],["🛍️",14,"shopping bags","ふく"],["🎒",14,"backpack","ふく リュック"],["🩴",14,"thong sandal","ふく"],["👞",14,"man’s shoe","おとこ くつ だんせい ふく"],["👟",14,"running shoe","くつ はしる ふく"],["🥾",14,"hiking boot","ふく ブーツ"],["🥿",14,"flat shoe","くつ ふく"],["👠",14,"high-heeled shoe","くつ ふく"],["👡",14,"woman’s sandal","おんな じょせい ふく"],["🩰",14,"ballet shoes","ふく"],["👢",14,"woman’s boot","おんな じょせい ふく ブーツ"],["👑",14,"crown","おうかん ふく"],["👒",14,"woman’s hat","おんな じょせい ふく ぼうし"],["🎩",14,"top hat","ふく ぼうし"],["🎓",14,"graduation cap","ふく"],["🧢",14,"billed cap","ふく"],["🪖",14,"military helmet","ふく"],["⛑️",14,"rescue worker’s helmet","しごと ふく"],["📿",14,"prayer beads","ふく"],["💄",14,"lipstick","くちべに ふく"],["💍",14,"ring","ふく ゆびわ"],["💎",14,"gem stone","ふく ほうせき"],["🔇",86,"muted speaker","おと スピーカー"],["🔈",86,"speaker low volume","おと スピーカー"],["🔉",86,"speaker medium volume","おと スピーカー"],["🔊",86,"speaker high volume","おと スピーカー"],["📢",86,"loudspeaker","おと"],["📣",86,"megaphone","おと メガホン"],["📯",86,"postal horn","おと"],["🔔",86,"bell","おと ベル"],["🔕",86,"bell with slash","おと ベル"],["🎼",61,"musical score","おんがく"],["🎵",61,"musical note","おんがく"],["🎶",61,"musical notes","おんがく"],["🎙️",61,"studio microphone","おんがく マイク"],["🎚️",61,"level slider","おんがく"],["🎛️",61,"control knobs","おんがく"],["🎤",61,"microphone","おんがく マイク"],["🎧",61,"headphone","おんがく ヘッドホン"],["📻",61,"radio","おんがく ラジオ"],["🎷",62,"saxophone","がっき サックス"],["🪗",62,"accordion","がっき"],["🎸",62,"guitar","がっき ギター"],["🎹",62,"musical keyboard","がっき キーボード"],["🎺",62,"trumpet","がっき トランペット"],["🎻",62,"violin","がっき バイオリン"],["🪕",62,"banjo","がっき"],["🥁",62,"drum","がっき ドラム"],["🪘",62,"long drum","がっき ドラム"],["📱",74,"mobile phone","でんわ スマホ"],["📲",74,"mobile phone with arrow","でんわ やじるし スマホ"],["☎️",74,"telephone","でんわ"],["📞",74,"telephone receiver","でんわ"],["📟",74,"pager","でんわ ポケベル"],["📠",74,"fax machine","でんわ ファックス"],["🔋",15,"battery","でんち パソコン"],["🪫",15,"low battery","でんち パソコン"],["🔌",15,"electric plug","パソコン プラグ"],["💻",15,"laptop","パソコン"],["🖥️",15,"desktop computer","パソコン"],["🖨️",15,"printer","パソコン プリンタ"],["⌨️",15,"keyboard","キーボード パソコン"],["🖱️",15,"computer mouse","パソコン マウス"],["🖲️",15,"trackball","パソコン"],["💽",15,"computer disk","ディスク パソコン"],["💾",15,"floppy disk","ディスク パソコン フロッピー"],["💿",15,"optical disk","ディスク パソコン"],["📀",15,"dvd","パソコン"],["🧮",15,"abacus","パソコン"],["🎥",54,"movie camera","あかり えいが えいぞう カメラ"],["🎞️",54,"film frames","あかり えいぞう フィルム"],["📽️",54,"film projector","あかり えいぞう フィルム プロジェクタ"],["🎬",54,"clapper board","あかり えいぞう"],["📺",54,"television","あかり えいぞう テレビ"],["📷",54,"camera","あかり えいぞう カメラ"],["📸",54,"camera with flash","あかり えいぞう カメラ"],["📹",54,"video camera","あかり えいぞう カメラ ビデオ"],["📼",54,"videocassette","あかり えいぞう"],["🔍",54,"magnifying glass tilted left","あかり えいぞう ひだり"],["🔎",54,"magnifying glass tilted right","あかり えいぞう みぎ"],["🕯️",54,"candle","あかり えいぞう ろうそく"],["💡",54,"light bulb","あかり えいぞう でんきゅう"],["🔦",54,"flashlight","あかり えいぞう ライト"],["🏮",54,"red paper lantern","あかり えいぞう ちょうちん"],["🪔",54,"diya lamp","あかり えいぞう"],["📔",12,"notebook with decorative cover","かみ ほん ノート"],["📕",12,"closed book","かみ ほん"],["📖",12,"open book","かみ ほん"],["📗",12,"green book","かみ ほん"],["📘",12,"blue book","かみ ほん"],["📙",12,"orange book","かみ ほん"],["📚",12,"books","かみ ほん"],["📓",12,"notebook","かみ ほん ノート"],["📒",12,"ledger","かみ ほん"],["📃",12,"page with curl","かみ ほん"],["📜",12,"scroll","かみ ほん"],["📄",12,"page facing up","うえ かみ ほん"],["📰",12,"newspaper","かみ しんぶん ほん"],["🗞️",12,"rolled-up newspaper","うえ かみ しんぶん ほん"],["📑",12,"bookmark tabs","かみ ほん"],["🔖",12,"bookmark","かみ ほん"],["🏷️",12,"label","かみ ほん ラベル"],["💰",59,"money bag","おかね かばん"],["🪙",59,"coin","おかね"],["💴",59,"yen banknote","えん おかね"],["💵",59,"dollar banknote","おかね ドル"],["💶",59,"euro banknote","おかね ユーロ"],["💷",59,"pound banknote","おかね"],["💸",59,"money with wings","おかね"],["💳",59,"credit card","おかね カード"],["🧾",59,"receipt","おかね レシート"],["💹",59,"chart increasing with yen","えん おかね グラフ"],["✉️",56,"envelope","てがみ メール"],["📧",56,"e-mail","メール"],["📨",56,"incoming envelope","てがみ メール"],["📩",56,"envelope with arrow","てがみ やじるし メール"],["📤",56,"outbox tray","メール"],["📥",56,"inbox tray","うけとり メール"],["📦",56,"package","こづつみ メール"],["📫",56,"closed mailbox with raised flag","はた メール"],["📪",56,"closed mailbox with lowered flag","はた メール"],["📬",56,"open mailbox with raised flag","はた メール"],["📭",56,"open mailbox with lowered flag","はた メール"],["📮",56,"postbox","メール"],["🗳️",56,"ballot box with ballot","メール"],["✏️",96,"pencil","えんぴつ かく"],["✒️",96,"black nib","かく"],["🖋️",96,"fountain pen","かく ふんすい ペン"],["🖊️",96,"pen","かく ペン"],["🖌️",96,"paintbrush","かく ふで"],["🖍️",96,"crayon","かく クレヨン"],["📝",96,"memo","かく メモ"],["💼",63,"briefcase","じむ"],["📁",63,"file folder","じむ ファイル フォルダ"],["📂",63,"open file folder","じむ ファイル フォルダ"],["🗂️",63,"card index dividers","じむ"],["📅",63,"calendar","じむ カレンダー"],["📆",63,"tear-off calendar","じむ カレンダー"],["🗒️",63,"spiral notepad","じむ"],["🗓️",63,"spiral calendar","じむ カレンダー"],["📇",63,"card index","じむ"],["📈",63,"chart increasing","じむ グラフ"],["📉",63,"chart decreasing","じむ グラフ"],["📊",63,"bar chart","じむ グラフ"],["📋",63,"clipboard","じむ クリップボード"],["📌",63,"pushpin","じむ ピン"],["📍",63,"round pushpin","じむ ピン"],["📎",63,"paperclip","じむ クリップ"],["🖇️",63,"linked paperclips","じむ"],["📏",63,"straight ruler","じむ ものさし"],["📐",63,"triangular ruler","じむ ものさし"],["✂️",63,"scissors","じむ はさみ"],["🗃️",63,"card file box","じむ ファイル"],["🗄️",63,"file cabinet","じむ ファイル"],["🗑️",63,"wastebasket","じむ"],["🔒",55,"locked","かぎ"],["🔓",55,"unlocked","かぎ"],["🔏",55,"locked with pen","かぎ ペン"],["🔐",55,"locked with key","かぎ"],["🔑",55,"key","かぎ"],["🗝️",55,"old key","かぎ"],["🔨",90,"hammer","かなづち どうぐ"],["🪓",90,"axe","おの どうぐ"],["⛏️",90,"pick","つるはし どうぐ"],["⚒️",90,"hammer and pick","かなづち つるはし どうぐ"],["🛠️",90,"hammer and wrench","かなづち どうぐ スパナ"],["🗡️",90,"dagger","どうぐ"],["⚔️",90,"crossed swords","どうぐ"],["🔫",90,"water pistol","どうぐ"],["🪃",90,"boomerang","どうぐ"],["🏹",90,"bow and arrow","どうぐ やじるし"],["🛡️",90,"shield","どうぐ"],["🪚",90,"carpentry saw","どうぐ"],["🔧",90,"wrench","どうぐ スパナ"],["🪛",90,"screwdriver","どうぐ ドライバー"],["🔩",90,"nut and bolt","どうぐ ボルト"],["⚙️",90,"gear","どうぐ はぐるま"],["🗜️",90,"clamp","どうぐ"],["⚖️",90,"balance scale","どうぐ"],["🦯",90,"white cane","どうぐ"],["🔗",90,"link","どうぐ"],["⛓️",90,"chains","どうぐ"],["🪝",90,"hook","どうぐ"],["🧰",90,"toolbox","どうぐ"],["🧲",90,"magnet","じしゃく どうぐ"],["🪜",90,"ladder","どうぐ はしご"],["⚗️",84,"alembic","かがく"],["🧪",84,"test tube","かがく しけんかん"],["🧫",84,"petri dish","かがく"],["🧬",84,"dna","DNA かがく"],["🔬",84,"microscope","かがく けんびきょう"],["🔭",84,"telescope","かがく ぼうえんきょう"],["📡",84,"satellite antenna","えいせい かがく"],["💉",58,"syringe","いりょう ちゅうしゃ"],["🩸",58,"drop of blood","いりょう ち"],["💊",58,"pill","いりょう くすり"],["🩹",58,"adhesive bandage","いりょう ばんそうこう"],["🩼",58,"crutch","いりょう"],["🩺",58,"stethoscope","いりょう ちょうしんき"],["🩻",58,"x-ray","いりょう"],["🚪",52,"door","せいかつ ドア"],["🛗",52,"elevator","せいかつ"],["🪞",52,"mirror","せいかつ"],["🪟",52,"window","せいかつ"],["🛏️",52,"bed","せいかつ ベッド"],["🛋️",52,"couch and lamp","せいかつ ソファ"],["🪑",52,"chair","せいかつ"],["🚽",52,"toilet","せいかつ トイレ"],["🪠",52,"plunger","せいかつ"],["🚿",52,"shower","せいかつ シャワー"],["🛁",52,"bathtub","おふろ せいかつ"],["🪤",52,"mouse trap","せいかつ マウス"],["🪒",52,"razor","せいかつ"],["🧴",52,"lotion bottle","せいかつ"],["🧷",52,"safety pin","せいかつ"],["🧹",52,"broom","せいかつ ほうき"],["🧺",52,"basket","かご せいかつ"],["🧻",52,"roll of paper","あきれる せいかつ"],["🪣",52,"bucket","せいかつ バケツ"],["🧼",52,"soap","せいかつ せっけん"],["🫧",52,"bubbles","せいかつ"],["🪥",52,"toothbrush","せいかつ"],["🧽",52,"sponge","せいかつ スポンジ"],["🧯",52,"fire extinguisher","せいかつ ひ ほのお"],["🛒",52,"shopping cart","せいかつ"],["🚬",64,"cigarette","たばこ もの"],["⚰️",64,"coffin","ひつぎ もの"],["🪦",64,"headstone","もの"],["⚱️",64,"funeral urn","もの"],["🗿",64,"moai","もの"],["🪧",64,"placard","もの"],["🪪",64,"identification card","もの"],["🏧",93,"ATM sign","ひょうしき"],["🚮",93,"litter in bin sign","ひょうしき"],["🚰",93,"potable water","ひょうしき"],["♿",93,"wheelchair symbol","ひょうしき"],["🚹",93,"men’s room","ひょうしき"],["🚺",93,"women’s room","ひょうしき"],["🚻",93,"restroom","ひょうしき"],["🚼",93,"baby symbol","あかちゃん ひょうしき"],["🚾",93,"water closet","ひょうしき"],["🛂",93,"passport control","ひょうしき"],["🛃",93,"customs","ひょうしき"],["🛄",93,"baggage claim","ひょうしき"],["🛅",93,"left luggage","ひだり ひょうしき"],["⚠️",95,"warning","きけん ちゅうい"],["🚸",95,"children crossing","ちゅうい"],["⛔",95,"no entry","ちゅうい"],["🚫",95,"prohibited","きんし ちゅうい"],["🚳",95,"no bicycles","ちゅうい"],["🚭",95,"no smoking","ちゅうい"],["🚯",95,"no littering","ちゅうい"],["🚱",95,"non-potable water","ちゅうい"],["🚷",95,"no pedestrians","ちゅうい"],["📵",95,"no mobile phones","ちゅうい"],["🔞",95,"no one under eighteen","ちゅうい"],["☢️",95,"radioactive","ちゅうい"],["☣️",95,"biohazard","ちゅうい"],["⬆️",7,"up arrow","うえ やじるし"],["↗️",7,"up-right arrow","うえ みぎ やじるし"],["➡️",7,"right arrow","みぎ やじるし"],["↘️",7,"down-right arrow","した みぎ やじるし"],["⬇️",7,"down arrow","した やじるし"],["↙️",7,"down-left arrow","した ひだり やじるし"],["⬅️",7,"left arrow","ひだり やじるし"],["↖️",7,"up-left arrow","うえ ひだり やじるし"],["↕️",7,"up-down arrow","うえ した やじるし"],["↔️",7,"left-right arrow","ひだり みぎ やじるし"],["↩️",7,"right arrow curving left","ひだり みぎ やじるし"],["↪️",7,"left arrow curving right","ひだり みぎ やじるし"],["⤴️",7,"right arrow curving up","うえ みぎ やじるし"],["⤵️",7,"right arrow curving down","した みぎ やじるし"],["🔃",7,"clockwise vertical arrows","やじるし"],["🔄",7,"counterclockwise arrows button","やじるし"],["🔙",7,"BACK arrow","やじるし"],["🔚",7,"END arrow","やじるし"],["🔛",7,"ON! arrow","やじるし"],["🔜",7,"SOON arrow","やじるし"],["🔝",7,"TOP arrow","やじるし"],["🛐",83,"place of worship","しゅうきょう"],["⚛️",83,"atom symbol","しゅうきょう"],["🕉️",83,"om","しゅうきょう"],["✡️",83,"star of David","しゅうきょう ほし"],["☸️",83,"wheel of dharma","しゅうきょう"],["☯️",83,"yin yang","しゅうきょう"],["✝️",83,"latin cross","しゅうきょう"],["☦️",83,"orthodox cross","しゅうきょう"],["☪️",83,"star and crescent","しゅうきょう ほし"],["☮️",83,"peace symbol","しゅうきょう"],["🕎",83,"menorah","しゅうきょう"],["🔯",83,"dotted six-pointed star","しゅうきょう ほし"],["♈",97,"Aries","せいざ"],["♉",97,"Taurus","せいざ"],["♊",97,"Gemini","せいざ"],["♋",97,"Cancer","せいざ"],["♌",97,"Leo","せいざ"],["♍",97,"Virgo","せいざ"],["♎",97,"Libra","せいざ"],["♏",97,"Scorpio","せいざ"],["♐",97,"Sagittarius","せいざ"],["♑",97,"Capricorn","せいざ"],["♒",97,"Aquarius","せいざ"],["♓",97,"Pisces","せいざ"],["⛎",97,"Ophiuchus","せいざ"],["🔀",9,"shuffle tracks button","そうさ"],["🔁",9,"repeat button","そうさ"],["🔂",9,"repeat single button","そうさ"],["▶️",9,"play button","そうさ"],["⏩",9,"fast-forward button","そうさ"],["⏭️",9,"next track button","そうさ"],["⏯️",9,"play or pause button","そうさ"],["◀️",9,"reverse button","そうさ"],["⏪",9,"fast reverse button","そうさ"],["⏮️",9,"last track button","そうさ"],["🔼",9,"upwards button","そうさ"],["⏫",9,"fast up button","うえ そうさ"],["🔽",9,"downwards button","そうさ"],["⏬",9,"fast down button","した そうさ"],["⏸️",9,"pause button","そうさ"],["⏹️",9,"stop button","そうさ"],["⏺️",9,"record button","そうさ"],["⏏️",9,"eject button","そうさ"],["🎦",9,"cinema","そうさ"],["🔅",9,"dim button","そうさ"],["🔆",9,"bright button","そうさ"],["📶",9,"antenna bars","そうさ"],["📳",9,"vibration mode","そうさ"],["📴",9,"mobile phone off","そうさ スマホ"],["♀️",43,"female sign","せいべつ"],["♂️",43,"male sign","せいべつ"],["⚧️",43,"transgender symbol","せいべつ"],["✖️",57,"multiply","かける けいさん"],["➕",57,"plus","けいさん たす"],["➖",57,"minus","けいさん ひく"],["➗",57,"divide","けいさん わる"],["🟰",57,"heavy equals sign","けいさん"],["♾️",57,"infinity","けいさん むげん"],["‼️",82,"double exclamation mark","きごう びっくり"],["⁉️",82,"exclamation question mark","きごう はてな びっくり"],["❓",82,"red question mark","きごう はてな"],["❔",82,"white question mark","きごう はてな"],["❕",82,"white exclamation mark","きごう びっくり"],["❗",82,"red exclamation mark","きごう びっくり"],["〰️",82,"wavy dash","きごう"],["💱",17,"currency exchange","おかね"],["💲",17,"heavy dollar sign","おかね ドル"],["⚕️",65,"medical symbol","きごう"],["♻️",65,"recycling symbol","きごう リサイクル"],["⚜️",65,"fleur-de-lis","きごう"],["🔱",65,"trident emblem","きごう"],["📛",65,"name badge","きごう"],["🔰",65,"Japanese symbol for beginner","きごう にほん"],["⭕",65,"hollow red circle","きごう まる"],["✅",65,"check mark button","きごう チェック"],["☑️",65,"check box with check","きごう チェック"],["✔️",65,"check mark","きごう チェック"],["❌",65,"cross mark","きごう ばつ"],["❎",65,"cross mark button","きごう ばつ"],["➰",65,"curly loop","きごう"],["➿",65,"double curly loop","きごう"],["〽️",65,"part alternation mark","きごう"],["✳️",65,"eight-spoked asterisk","きごう"],["✴️",65,"eight-pointed star","きごう ほし"],["❇️",65,"sparkle","きごう きらきら"],["©️",65,"copyright","きごう ちょさく"],["®️",65,"registered","きごう"],["™️",65,"trade mark","きごう"],["#️⃣",53,"keycap: #","すうじ"],["*️⃣",53,"keycap: *","すうじ"],["0️⃣",53,"keycap: 0","すうじ"],["1️⃣",53,"keycap: 1","すうじ"],["2️⃣",53,"keycap: 2","すうじ"],["3️⃣",53,"keycap: 3","すうじ"],["4️⃣",53,"keycap: 4","すうじ"],["5️⃣",53,"keycap: 5","すうじ"],["6️⃣",53,"keycap: 6","すうじ"],["7️⃣",53,"keycap: 7","すうじ"],["8️⃣",53,"keycap: 8","すうじ"],["9️⃣",53,"keycap: 9","すうじ"],["🔟",53,"keycap: 10","すうじ"],["🔠",0,"input latin uppercase","もじ"],["🔡",0,"input latin lowercase","もじ"],["🔢",0,"input numbers","もじ"],["🔣",0,"input symbols","もじ"],["🔤",0,"input latin letters","もじ"],["🅰️",0,"A button (blood type)","ち もじ"],["🆎",0,"AB button (blood type)","ち もじ"],["🅱️",0,"B button (blood type)","ち もじ"],["🆑",0,"CL button","もじ"],["🆒",0,"COOL button","もじ"],["🆓",0,"FREE button","もじ"],["ℹ️",0,"information","もじ"],["🆔",0,"ID button","もじ"],["Ⓜ️",0,"circled M","もじ"],["🆕",0,"NEW button","もじ"],["🆖",0,"NG button","もじ"],["🅾️",0,"O button (blood type)","ち もじ"],["🆗",0,"OK button","もじ"],["🅿️",0,"P button","もじ"],["🆘",0,"SOS button","もじ"],["🆙",0,"UP! button","うえ もじ"],["🆚",0,"VS button","もじ"],["🈁",0,"Japanese “here” button","にほん もじ"],["🈂️",0,"Japanese “service charge” button","にほん もじ"],["🈷️",0,"Japanese “monthly amount” button","にほん もじ"],["🈶",0,"Japanese “not free of charge” button","にほん もじ"],["🈯",0,"Japanese “reserved” button","にほん もじ"],["🉐",0,"Japanese “bargain” button","にほん もじ"],["🈹",0,"Japanese “discount” button","にほん もじ"],["🈚",0,"Japanese “free of charge” button","にほん もじ"],["🈲",0,"Japanese “prohibited” button","きんし にほん もじ"],["🉑",0,"Japanese “acceptable” button","にほん もじ"],["🈸",0,"Japanese “application” button","にほん もじ"],["🈴",0,"Japanese “passing grade” button","にほん もじ"],["🈳",0,"Japanese “vacancy” button","にほん もじ"],["㊗️",0,"Japanese “congratulations” button","にほん もじ"],["㊙️",0,"Japanese “secret” button","にほん もじ"],["🈺",0,"Japanese “open for business” button","にほん もじ"],["🈵",0,"Japanese “no vacancy” button","にほん もじ"],["🔴",44,"red circle","かたち まる"],["🟠",44,"orange circle","かたち まる"],["🟡",44,"yellow circle","かたち まる"],["🟢",44,"green circle","かたち まる"],["🔵",44,"blue circle","かたち まる"],["🟣",44,"purple circle","かたち まる"],["🟤",44,"brown circle","かたち まる"],["⚫",44,"black circle","かたち まる"],["⚪",44,"white circle","かたち まる"],["🟥",44,"red square","かたち しかく"],["🟧",44,"orange square","かたち しかく"],["🟨",44,"yellow square","かたち しかく"],["🟩",44,"green square","かたち しかく"],["🟦",44,"blue square","かたち しかく"],["🟪",44,"purple square","かたち しかく"],["🟫",44,"brown square","かたち しかく"],["⬛",44,"black large square","かたち しかく"],["⬜",44,"white large square","かたち しかく"],["◼️",44,"black medium square","かたち しかく"],["◻️",44,"white medium square","かたち しかく"],["◾",44,"black medium-small square","かたち しかく"],["◽",44,"white medium-small square","かたち しかく"],["▪️",44,"black small square","かたち しかく"],["▫️",44,"white small square","かたち しかく"],["🔶",44,"large orange diamond","かたち ひしがた"],["🔷",44,"large blue diamond","かたち ひしがた"],["🔸",44,"small orange diamond","かたち ひしがた"],["🔹",44,"small blue diamond","かたち ひしがた"],["🔺",44,"red triangle pointed up","うえ かたち さんかく"],["🔻",44,"red triangle pointed down","かたち さんかく した"],["💠",44,"diamond with a dot","かたち ひしがた"],["🔘",44,"radio button","かたち ラジオ"],["🔳",44,"white square button","かたち しかく"],["🔲",44,"black square button","かたち しかく"],["🏁",35,"chequered flag","はた"],["🚩",35,"triangular flag","はた"],["🎌",35,"crossed flags","はた"],["🏴",35,"black flag","はた"],["🏳️",35,"white flag","はた"],["🏳️‍🌈",35,"rainbow flag","にじ はた"],["🏳️‍⚧️",35,"transgender flag","はた"],["🏴‍☠️",35,"pirate flag","はた"],["🇦🇨",16,"flag: Ascension Island","くに しま はた"],["🇦🇩",16,"flag: Andorra","くに はた"],["🇦🇪",16,"flag: United Arab Emirates","くに はた"],["🇦🇫",16,"flag: Afghanistan","くに はた"],["🇦🇬",16,"flag: Antigua & Barbuda","くに はた"],["🇦🇮",16,"flag: Anguilla","くに はた"],["🇦🇱",16,"flag: Albania","くに はた"],["🇦🇲",16,"flag: Armenia","くに はた"],["🇦🇴",16,"flag: Angola","くに はた"],["🇦🇶",16,"flag: Antarctica","くに はた"],["🇦🇷",16,"flag: Argentina","くに はた"],["🇦🇸",16,"flag: American Samoa","くに はた"],["🇦🇹",16,"flag: Austria","くに はた"],["🇦🇺",16,"flag: Australia","くに はた オーストラリア"],["🇦🇼",16,"flag: Aruba","くに はた"],["🇦🇽",16,"flag: Åland Islands","くに はた"],["🇦🇿",16,"flag: Azerbaijan","くに はた"],["🇧🇦",16,"flag: Bosnia & Herzegovina","くに はた"],["🇧🇧",16,"flag: Barbados","くに はた"],["🇧🇩",16,"flag: Bangladesh","くに はた"],["🇧🇪",16,"flag: Belgium","くに はた"],["🇧🇫",16,"flag: Burkina Faso","くに はた"],["🇧🇬",16,"flag: Bulgaria","くに はた"],["🇧🇭",16,"flag: Bahrain","くに はた"],["🇧🇮",16,"flag: Burundi","くに はた"],["🇧🇯",16,"flag: Benin","くに はた"],["🇧🇱",16,"flag: St. Barthélemy","くに はた"],["🇧🇲",16,"flag: Bermuda","くに はた"],["🇧🇳",16,"flag: Brunei","くに はた"],["🇧🇴",16,"flag: Bolivia","くに はた"],["🇧🇶",16,"flag: Caribbean Netherlands","くに はた"],["🇧🇷",16,"flag: Brazil","くに はた ブラジル"],["🇧🇸",16,"flag: Bahamas","くに はた"],["🇧🇹",16,"flag: Bhutan","くに はた"],["🇧🇻",16,"flag: Bouvet Island","くに しま はた"],["🇧🇼",16,"flag: Botswana","くに はた"],["🇧🇾",16,"flag: Belarus","くに はた"],["🇧🇿",16,"flag: Belize","くに はた"],["🇨🇦",16,"flag: Canada","くに はた カナダ"],["🇨🇨",16,"flag: Cocos (Keeling) Islands","くに はた"],["🇨🇩",16,"flag: Congo - Kinshasa","くに はた"],["🇨🇫",16,"flag: Central African Republic","くに はた"],["🇨🇬",16,"flag: Congo - Brazzaville","くに はた"],["🇨🇭",16,"flag: Switzerland","くに はた"],["🇨🇮",16,"flag: Côte d’Ivoire","くに はた"],["🇨🇰",16,"flag: Cook Islands","くに はた りょうり コック"],["🇨🇱",16,"flag: Chile","くに はた"],["🇨🇲",16,"flag: Cameroon","くに はた"],["🇨🇳",16,"flag: China","くに ちゅうごく はた"],["🇨🇴",16,"flag: Colombia","くに はた"],["🇨🇵",16,"flag: Clipperton Island","くに しま はた"],["🇨🇷",16,"flag: Costa Rica","くに はた"],["🇨🇺",16,"flag: Cuba","くに はた"],["🇨🇻",16,"flag: Cape Verde","くに はた"],["🇨🇼",16,"flag: Curaçao","くに はた"],["🇨🇽",16,"flag: Christmas Island","くに しま はた"],["🇨🇾",16,"flag: Cyprus","くに はた"],["🇨🇿",16,"flag: Czechia","くに はた"],["🇩🇪",16,"flag: Germany","くに はた ドイツ"],["🇩🇬",16,"flag: Diego Garcia","くに はた"],["🇩🇯",16,"flag: Djibouti","くに はた"],["🇩🇰",16,"flag: Denmark","くに はた"],["🇩🇲",16,"flag: Dominica","くに はた"],["🇩🇴",16,"flag: Dominican Republic","くに はた"],["🇩🇿",16,"flag: Algeria","くに はた"],["🇪🇦",16,"flag: Ceuta & Melilla","くに はた"],["🇪🇨",16,"flag: Ecuador","くに はた"],["🇪🇪",16,"flag: Estonia","くに はた"],["🇪🇬",16,"flag: Egypt","くに はた"],["🇪🇭",16,"flag: Western Sahara","くに はた"],["🇪🇷",16,"flag: Eritrea","くに はた"],["🇪🇸",16,"flag: Spain","くに はた"],["🇪🇹",16,"flag: Ethiopia","くに はた"],["🇪🇺",16,"flag: European Union","くに はた"],["🇫🇮",16,"flag: Finland","くに はた"],["🇫🇯",16,"flag: Fiji","くに はた"],["🇫🇰",16,"flag: Falkland Islands","くに はた"],["🇫🇲",16,"flag: Micronesia","くに はた"],["🇫🇴",16,"flag: Faroe Islands","くに はた"],["🇫🇷",16,"flag: France","くに はた フランス"],["🇬🇦",16,"flag: Gabon","くに はた"],["🇬🇧",16,"flag: United Kingdom","くに はた イギリス"],["🇬🇩",16,"flag: Grenada","くに はた"],["🇬🇪",16,"flag: Georgia","くに はた"],["🇬🇫",16,"flag: French Guiana","くに はた"],["🇬🇬",16,"flag: Guernsey","くに はた"],["🇬🇭",16,"flag: Ghana","くに はた"],["🇬🇮",16,"flag: Gibraltar","くに はた"],["🇬🇱",16,"flag: Greenland","くに はた"],["🇬🇲",16,"flag: Gambia","くに はた"],["🇬🇳",16,"flag: Guinea","くに はた"],["🇬🇵",16,"flag: Guadeloupe","くに はた"],["🇬🇶",16,"flag: Equatorial Guinea","くに はた"],["🇬🇷",16,"flag: Greece","くに はた"],["🇬🇸",16,"flag: South Georgia & South Sandwich Islands","くに はた サンド"],["🇬🇹",16,"flag: Guatemala","くに はた"],["🇬🇺",16,"flag: Guam","くに はた"],["🇬🇼",16,"flag: Guinea-Bissau","くに はた"],["🇬🇾",16,"flag: Guyana","くに はた"],["🇭🇰",16,"flag: Hong Kong SAR China","くに ちゅうごく はた"],["🇭🇲",16,"flag: Heard & McDonald Islands","くに はた"],["🇭🇳",16,"flag: Honduras","くに はた"],["🇭🇷",16,"flag: Croatia","くに はた"],["🇭🇹",16,"flag: Haiti","くに はた"],["🇭🇺",16,"flag: Hungary","くに はた"],["🇮🇨",16,"flag: Canary Islands","くに はた"],["🇮🇩",16,"flag: Indonesia","くに はた"],["🇮🇪",16,"flag: Ireland","くに はた"],["🇮🇱",16,"flag: Israel","くに はた"],["🇮🇲",16,"flag: Isle of Man","おとこ くに だんせい はた"],["🇮🇳",16,"flag: India","くに はた インド"],["🇮🇴",16,"flag: British Indian Ocean Territory","くに はた"],["🇮🇶",16,"flag: Iraq","くに はた"],["🇮🇷",16,"flag: Iran","くに はた"],["🇮🇸",16,"flag: Iceland","くに はた"],["🇮🇹",16,"flag: Italy","くに はた イタリア"],["🇯🇪",16,"flag: Jersey","くに はた"],["🇯🇲",16,"flag: Jamaica","くに はた"],["🇯🇴",16,"flag: Jordan","くに はた"],["🇯🇵",16,"flag: Japan","くに にほん はた"],["🇰🇪",16,"flag: Kenya","くに はた"],["🇰🇬",16,"flag: Kyrgyzstan","くに はた"],["🇰🇭",16,"flag: Cambodia","くに はた"],["🇰🇮",16,"flag: Kiribati","くに はた"],["🇰🇲",16,"flag: Comoros","くに はた"],["🇰🇳",16,"flag: St. Kitts & Nevis","くに はた"],["🇰🇵",16,"flag: North Korea","かんこく くに はた"],["🇰🇷",16,"flag: South Korea","かんこく くに はた"],["🇰🇼",16,"flag: Kuwait","くに はた"],["🇰🇾",16,"flag: Cayman Islands","くに はた"],["🇰🇿",16,"flag: Kazakhstan","くに はた"],["🇱🇦",16,"flag: Laos","くに はた"],["🇱🇧",16,"flag: Lebanon","くに はた"],["🇱🇨",16,"flag: St. Lucia","くに はた"],["🇱🇮",16,"flag: Liechtenstein","くに はた"],["🇱🇰",16,"flag: Sri Lanka","くに はた"],["🇱🇷",16,"flag: Liberia","くに はた"],["🇱🇸",16,"flag: Lesotho","くに はた"],["🇱🇹",16,"flag: Lithuania","くに はた"],["🇱🇺",16,"flag: Luxembourg","くに はた"],["🇱🇻",16,"flag: Latvia","くに はた"],["🇱🇾",16,"flag: Libya","くに はた"],["🇲🇦",16,"flag: Morocco","くに はた"],["🇲🇨",16,"flag: Monaco","くに はた"],["🇲🇩",16,"flag: Moldova","くに はた"],["🇲🇪",16,"flag: Montenegro","くに はた"],["🇲🇫",16,"flag: St. Martin","くに はた"],["🇲🇬",16,"flag: Madagascar","くに はた"],["🇲🇭",16,"flag: Marshall Islands","くに はた"],["🇲🇰",16,"flag: North Macedonia","くに はた"],["🇲🇱",16,"flag: Mali","くに はた"],["🇲🇲",16,"flag: Myanmar (Burma)","くに はた"],["🇲🇳",16,"flag: Mongolia","くに はた"],["🇲🇴",16,"flag: Macao SAR China","くに ちゅうごく はた"],["🇲🇵",16,"flag: Northern Mariana Islands","くに はた"],["🇲🇶",16,"flag: Martinique","くに はた"],["🇲🇷",16,"flag: Mauritania","くに はた"],["🇲🇸",16,"flag: Montserrat","くに はた"],["🇲🇹",16,"flag: Malta","くに はた"],["🇲🇺",16,"flag: Mauritius","くに はた"],["🇲🇻",16,"flag: Maldives","くに はた"],["🇲🇼",16,"flag: Malawi","くに はた"],["🇲🇽",16,"flag: Mexico","くに はた"],["🇲🇾",16,"flag: Malaysia","くに はた"],["🇲🇿",16,"flag: Mozambique","くに はた"],["🇳🇦",16,"flag: Namibia","くに はた"],["🇳🇨",16,"flag: New Caledonia","くに はた"],["🇳🇪",16,"flag: Niger","くに はた"],["🇳🇫",16,"flag: Norfolk Island","くに しま はた"],["🇳🇬",16,"flag: Nigeria","くに はた"],["🇳🇮",16,"flag: Nicaragua","くに はた"],["🇳🇱",16,"flag: Netherlands","くに はた"],["🇳🇴",16,"flag: Norway","くに はた"],["🇳🇵",16,"flag: Nepal","くに はた"],["🇳🇷",16,"flag: Nauru","くに はた"],["🇳🇺",16,"flag: Niue","くに はた"],["🇳🇿",16,"flag: New Zealand","くに はた"],["🇴🇲",16,"flag: Oman","くに はた"],["🇵🇦",16,"flag: Panama","くに はた"],["🇵🇪",16,"flag: Peru","くに はた"],["🇵🇫",16,"flag: French Polynesia","くに はた"],["🇵🇬",16,"flag: Papua New Guinea","くに はた"],["🇵🇭",16,"flag: Philippines","くに はた"],["🇵🇰",16,"flag: Pakistan","くに はた"],["🇵🇱",16,"flag: Poland","くに はた"],["🇵🇲",16,"flag: St. Pierre & Miquelon","くに はた"],["🇵🇳",16,"flag: Pitcairn Islands","くに はた"],["🇵🇷",16,"flag: Puerto Rico","くに はた"],["🇵🇸",16,"flag: Palestinian Territories","くに はた"],["🇵🇹",16,"flag: Portugal","くに はた"],["🇵🇼",16,"flag: Palau","くに はた"],["🇵🇾",16,"flag: Paraguay","くに はた"],["🇶🇦",16,"flag: Qatar","くに はた"],["🇷🇪",16,"flag: Réunion","くに はた"],["🇷🇴",16,"flag: Romania","くに はた"],["🇷🇸",16,"flag: Serbia","くに はた"],["🇷🇺",16,"flag: Russia","くに はた ロシア"],["🇷🇼",16,"flag: Rwanda","くに はた"],["🇸🇦",16,"flag: Saudi Arabia","くに はた"],["🇸🇧",16,"flag: Solomon Islands","くに はた"],["🇸🇨",16,"flag: Seychelles","くに はた"],["🇸🇩",16,"flag: Sudan","くに はた"],["🇸🇪",16,"flag: Sweden","くに はた"],["🇸🇬",16,"flag: Singapore","くに はた"],["🇸🇭",16,"flag: St. Helena","くに はた"],["🇸🇮",16,"flag: Slovenia","くに はた"],["🇸🇯",16,"flag: Svalbard & Jan Mayen","くに はた"],["🇸🇰",16,"flag: Slovakia","くに はた"],["🇸🇱",16,"flag: Sierra Leone","くに はた"],["🇸🇲",16,"flag: San Marino","くに はた"],["🇸🇳",16,"flag: Senegal","くに はた"],["🇸🇴",16,"flag: Somalia","くに はた"],["🇸🇷",16,"flag: Suriname","くに はた"],["🇸🇸",16,"flag: South Sudan","くに はた"],["🇸🇹",16,"flag: São Tomé & Príncipe","くに はた"],["🇸🇻",16,"flag: El Salvador","くに はた"],["🇸🇽",16,"flag: Sint Maarten","くに はた"],["🇸🇾",16,"flag: Syria","くに はた"],["🇸🇿",16,"flag: Eswatini","くに はた"],["🇹🇦",16,"flag: Tristan da Cunha","くに はた"],["🇹🇨",16,"flag: Turks & Caicos Islands","くに はた"],["🇹🇩",16,"flag: Chad","くに はた"],["🇹🇫",16,"flag: French Southern Territories","くに はた"],["🇹🇬",16,"flag: Togo","くに はた"],["🇹🇭",16,"flag: Thailand","くに はた タイ"],["🇹🇯",16,"flag: Tajikistan","くに はた"],["🇹🇰",16,"flag: Tokelau","くに はた"],["🇹🇱",16,"flag: Timor-Leste","くに はた"],["🇹🇲",16,"flag: Turkmenistan","くに はた"],["🇹🇳",16,"flag: Tunisia","くに はた"],["🇹🇴",16,"flag: Tonga","くに はた"],["🇹🇷",16,"flag: Turkey","くに しちめんちょう はた"],["🇹🇹",16,"flag: Trinidad & Tobago","くに はた"],["🇹🇻",16,"flag: Tuvalu","くに はた"],["🇹🇼",16,"flag: Taiwan","くに たいわん はた"],["🇹🇿",16,"flag: Tanzania","くに はた"],["🇺🇦",16,"flag: Ukraine","くに はた"],["🇺🇬",16,"flag: Uganda","くに はた"],["🇺🇲",16,"flag: U.S. Outlying Islands","くに はた"],["🇺🇳",16,"flag: United Nations","くに はた"],["🇺🇸",16,"flag: United States","くに はた アメリカ"],["🇺🇾",16,"flag: Uruguay","くに はた"],["🇺🇿",16,"flag: Uzbekistan","くに はた"],["🇻🇦",16,"flag: Vatican City","くに はた"],["🇻🇨",16,"flag: St. Vincent & Grenadines","くに はた"],["🇻🇪",16,"flag: Venezuela","くに はた"],["🇻🇬",16,"flag: British Virgin Islands","くに はた"],["🇻🇮",16,"flag: U.S. Virgin Islands","くに はた"],["🇻🇳",16,"flag: Vietnam","くに はた"],["🇻🇺",16,"flag: Vanuatu","くに はた"],["🇼🇫",16,"flag: Wallis & Futuna","くに はた"],["🇼🇸",16,"flag: Samoa","くに はた"],["🇽🇰",16,"flag: Kosovo","くに はた"],["🇾🇪",16,"flag: Yemen","くに はた"],["🇾🇹",16,"flag: Mayotte","くに はた"],["🇿🇦",16,"flag: South Africa","くに はた"],["🇿🇲",16,"flag: Zambia","くに はた"],["🇿🇼",16,"flag: Zimbabwe","くに はた"],["🏴󠁧󠁢󠁥󠁮󠁧󠁿",88,"flag: England","はた"],["🏴󠁧󠁢󠁳󠁣󠁴󠁿",88,"flag: Scotland","はた"],["🏴󠁧󠁢󠁷󠁬󠁳󠁿",88,"flag: Wales","はた"]]};
+
+/* 既定の一覧（文字だけ）。これまでと同じ形なので、読む側は1行も変わらない */
+var EMOJI_DEFAULT = EMOJI_SEED.e.map(function(r){ return r[0]; });
 
 /* ★見張り番 … 既定が何個あるか。減っていたら「消した」ことに気づける */
 function emojiDefaultCount(){ return EMOJI_DEFAULT.length; }
+
+/* ★絵文字を「見た目1個」で分ける（A-01・決-133）。
+   ★なぜ要るか（2026-09-19 実測）… 一覧を保存して読み直すとき Array.from を
+     使っていたため、【部品が2つある絵文字が半分に割れて】いた。
+     既定200個のうち 32個 が該当し（✌️＝✌+U+FE0F、❤️、⚙️ など）、
+     保存するたび 200個 → 232個 に化けた。画面には白黒の記号や
+     見えない空白のボタンが並ぶので、利用者には「編集できない」と見えた。
+   ★Intl.Segmenter が「見た目1個（書記素）」で分けてくれる。無い環境では
+     EMOJI_DEFAULT を分けているのと同じ正規表現に戻す（会社PCの古い版への保険）。 */
+var EMOJI_RE = /[\uD800-\uDBFF][\uDC00-\uDFFF](?:️|‍[\uD800-\uDBFF][\uDC00-\uDFFF])*|[←-㋿](?:️)?/g;
+function emojiSplit(s){
+  s = String(s == null ? '' : s);
+  if(!s) return [];
+  try{
+    if(typeof Intl !== 'undefined' && Intl.Segmenter){
+      var seg = new Intl.Segmenter('ja', { granularity:'grapheme' });
+      var out = [], it = seg.segment(s), x;
+      for(x of it){ if(x.segment && x.segment.trim()) out.push(x.segment); }
+      if(out.length) return out;
+    }
+  }catch(e){}
+  return (s.match(EMOJI_RE) || []).filter(function(c){ return c.trim(); });
+}
 
 /* 設定（データ）… 一覧は利用者が編集できる。空なら既定の一覧 */
 function emojiList(){
@@ -4417,7 +4620,8 @@ function emojiList(){
     if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
       var raw = window.WDT.dbOptGet('db', 'emoji.list');
       if(raw && String(raw).trim()){
-        var a = Array.from(String(raw).trim()).filter(function(c){ return c.trim(); });
+        /* ★Array.from は使わない … 絵文字が部品ごとに割れる（決-133） */
+      var a = emojiSplit(String(raw).trim());
         if(a.length) return a;
       }
     }
@@ -4428,6 +4632,160 @@ function emojiList(){
      出ていなかったのを直した。 */
   return EMOJI_DEFAULT.slice();
 }
+/* ★ひらがな・カタカナの違いを吸収する（A-01・決-133）。
+   これが無いと「はーと」と打っても「ハート」に当たらず【0件】になる
+   （見本づくりで実測）。 */
+function emojiKana(s){
+  return String(s == null ? '' : s).toLowerCase()
+    .replace(/[\u30a1-\u30f6]/g, function(c){
+      return String.fromCharCode(c.charCodeAt(0) - 0x60);
+    });
+}
+/* ★探すための文字列は【先に1回だけ】作る … 打つたびに作り直すと重い */
+var EMOJI_IDX = null;
+/* ★いま出している一覧そのものに対して作る（自分で足した絵文字も入る）。
+   札を足したり付け外ししたら EMOJI_IDX = null にして作り直させる。 */
+function emojiIndex(){
+  if(EMOJI_IDX) return EMOJI_IDX;
+  var list = emojiList(), tags = emojiTags();
+  EMOJI_IDX = list.map(function(c){ return emojiWordsOf(c, tags); });
+  return EMOJI_IDX;
+}
+/* 分類の札の一覧（登録簿。読む側はこれを回すだけ） */
+function emojiCats(){ return EMOJI_SEED.g.slice(); }
+
+/* ==================================================================
+   自分の札（A-01 第3段・決-133）… 利用者が作る分類
+   ------------------------------------------------------------------
+   形 … { "ねこ":"🐱🐈🐈‍⬛", "すき":"❤️🥰" }   札の名前 → その札を付けた絵文字
+   ★1つの絵文字に札を何枚でも付けられる（多対多）。案Bを却下した理由がこれ。
+   ★保存は dbOptSet のみ（絶対規律2）。DBに入るので別のPCでも引き継げる。
+   ================================================================== */
+function emojiTags(){
+  try{
+    if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
+      var v = window.WDT.dbOptGet('db', 'emoji.tags');
+      if(v){
+        var o = JSON.parse(String(v));
+        if(o && typeof o === 'object') return o;
+      }
+    }
+  }catch(e){}
+  return {};
+}
+function emojiTagNames(){
+  var o = emojiTags(), a = [], k;
+  for(k in o){ if(Object.prototype.hasOwnProperty.call(o, k)) a.push(k); }
+  return a;
+}
+function emojiTagsSave(o){
+  try{
+    if(window.WDT && typeof window.WDT.dbOptSet === 'function'){
+      window.WDT.dbOptSet('db', 'emoji.tags', JSON.stringify(o || {}));
+      if(window.scheduleAutosave) window.scheduleAutosave();
+    }
+  }catch(e){}
+  EMOJI_IDX = null;                 /* 探す言葉を作り直させる */
+  return o;
+}
+/* 札を1枚足す（同じ名前があれば何もしない）。戻り値は増えたかどうか */
+function emojiTagAdd(name){
+  name = String(name == null ? '' : name).trim();
+  if(!name) return { added:false, why:'名前が空' };
+  var o = emojiTags();
+  if(Object.prototype.hasOwnProperty.call(o, name)) return { added:false, why:'もうある' };
+  o[name] = '';
+  emojiTagsSave(o);
+  return { added:true, name:name };
+}
+/* 絵文字に札を付ける／外す（押すたびに切り替わる） */
+function emojiTagToggle(name, ch){
+  var o = emojiTags();
+  if(!Object.prototype.hasOwnProperty.call(o, name)) o[name] = '';
+  var a = emojiSplit(o[name]);
+  var i = a.indexOf(ch);
+  if(i >= 0) a.splice(i, 1); else a.push(ch);
+  o[name] = a.join('');
+  emojiTagsSave(o);
+  return { name:name, ch:ch, on:(i < 0), n:a.length };
+}
+function emojiTagHas(name, ch){
+  var o = emojiTags();
+  return !!o[name] && emojiSplit(o[name]).indexOf(ch) >= 0;
+}
+
+/* 絵文字1個ぶんの「探す言葉」… 既定の種にある物はその名前、
+   自分で足した物は付けた札の名前で探せる。★どちらも同じ形で返す。 */
+var EMOJI_BYCHAR = null;
+function emojiByChar(){
+  if(EMOJI_BYCHAR) return EMOJI_BYCHAR;
+  EMOJI_BYCHAR = {};
+  for(var i = 0; i < EMOJI_SEED.e.length; i++) EMOJI_BYCHAR[EMOJI_SEED.e[i][0]] = EMOJI_SEED.e[i];
+  return EMOJI_BYCHAR;
+}
+function emojiWordsOf(ch, tagMap){
+  var r = emojiByChar()[ch], w = '';
+  if(r) w = r[3] + ' ' + r[2] + ' ' + (EMOJI_SEED.s[r[1]][0] || '');
+  var o = tagMap || emojiTags(), k;
+  for(k in o){
+    if(!Object.prototype.hasOwnProperty.call(o, k)) continue;
+    if(o[k] && o[k].indexOf(ch) >= 0) w += ' ' + k;
+  }
+  return emojiKana(w);
+}
+
+/* いま出すものを決める。kw=探す言葉 / cat=群の番号（-1 でぜんぶ）
+   戻り値は絵文字の配列。★裸の値ではなく配列を返し、あとで欄を足せる形に保つ */
+/* いま出すものを決める。
+   kw  … 探す言葉（ひらがな・カタカナ・英語）
+   cat … -1 でぜんぶ ／ 0〜8 は既定の群 ／ 't:<札の名前>' は自分の札
+   ★どんな一覧（自分で足した絵文字を含む）にも同じやり方で当たる。 */
+function emojiFilter(kw, cat){
+  var list = emojiList();
+  kw = emojiKana(String(kw || '').trim());
+  var useTag = (typeof cat === 'string' && cat.indexOf('t:') === 0);
+  var tagName = useTag ? cat.slice(2) : null;
+  var g = (!useTag && cat != null && cat !== '' && +cat >= 0) ? +cat : -1;
+  if(!kw && g < 0 && !useTag) return list;
+  var idx = emojiIndex(), by = emojiByChar(), out = [];
+  var tagList = useTag ? emojiSplit(emojiTags()[tagName] || '') : null;
+  for(var i = 0; i < list.length; i++){
+    var c = list[i];
+    if(useTag){ if(tagList.indexOf(c) < 0) continue; }
+    else if(g >= 0){
+      var r = by[c];
+      if(!r || EMOJI_SEED.s[r[1]][1] !== g) continue;   /* 種に無い物は群で絞れない */
+    }
+    if(kw && (idx[i] || '').indexOf(kw) < 0) continue;
+    out.push(c);
+  }
+  return out;
+}
+
+/* ★よく使う（利用者の決定・2026-09-19「残す」）。
+   保存は dbOptSet のみ（絶対規律2）。DBに入るので別のPCでも引き継げる。 */
+function emojiRecents(){
+  try{
+    if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
+      var v = window.WDT.dbOptGet('db', 'emoji.recent');
+      if(v) return emojiSplit(String(v)).slice(0, 16);
+    }
+  }catch(e){}
+  return [];
+}
+function emojiPushRecent(ch){
+  var a = emojiRecents().filter(function(x){ return x !== ch; });
+  a.unshift(ch);
+  a = a.slice(0, 16);
+  try{
+    if(window.WDT && typeof window.WDT.dbOptSet === 'function'){
+      window.WDT.dbOptSet('db', 'emoji.recent', a.join(''));
+      if(window.scheduleAutosave) window.scheduleAutosave();
+    }
+  }catch(e){}
+  return a;
+}
+
 function emojiSpotOn(key){
   try{
     if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
@@ -4480,26 +4838,174 @@ function emojiRenderPal(edit){
   if(!emojiPal) return null;
   var list = emojiList();
   if(edit){
+    /* ★案C（利用者が2026-09-19に選択）… 貼る → 1個選ぶ → 札を何枚でも付け外し。
+       ★prompt() は使わない … 枠の中（sandbox の iframe）では黙って無視される。 */
     emojiPal.classList.add('rtt-emoedit');
     emojiPal.innerHTML =
-        '<div class="rtt-emohd">✎ 絵文字の一覧を編集（そのまま並べて書く。空にすると既定の'
-      + emojiDefaultCount() + '種類に戻ります）</div>'
-      + '<textarea spellcheck="false">' + escapeHtml(list.join('')) + '</textarea>'
-      + '<div class="rtt-emoact"><button type="button" data-emoact="save">保存する</button>'
-      + '<button type="button" data-emoact="cancel">やめる</button></div>';
+        '<div class="rtt-emohd"><span class="rtt-emocnt">✎ 絵文字を足す・札を付ける</span>'
+      + '<span class="rtt-emoesc">直したそばから保存</span>'
+      + '<button type="button" data-emoact="cancel">← 一覧</button></div>'
+      + '<div class="rtt-emoedbody">'
+      +   '<div class="rtt-emolb2">① 見つけた絵文字を貼る（どこかのサイトからコピーしたもの）</div>'
+      +   '<textarea class="rtt-emopaste" spellcheck="false" '
+      +     'placeholder="ここに貼り付けてください"></textarea>'
+      +   '<div class="rtt-emoact">'
+      +     '<button type="button" data-emoact="add">追加する</button>'
+      +     '<button type="button" data-emoact="reset" title="足したものを消して、'
+      +       '既定の' + EMOJI_SEED.e.length + '個に戻します（札は消えません）">既定に戻す</button>'
+      +     '<span class="rtt-emomsg"></span></div>'
+      +   '<div class="rtt-emolb2">③ 絵文字を1個押してから、下の札を付け外しします</div>'
+      +   '<div class="rtt-emoedgrid"></div>'
+      +   '<div class="rtt-emolb2">④ 札（押すと付く・もう一度押すと外れる）</div>'
+      +   '<div class="rtt-emoedtags"></div>'
+      + '</div>';
+    emojiRenderEdit();
   }else{
     emojiPal.classList.remove('rtt-emoedit');
+    /* ★枠は1回だけ作り、中の一覧だけを描き替える（emojiRenderGrid）。
+       毎回まるごと作り直すと、探す欄に打った文字とカーソルが飛ぶ。 */
     emojiPal.innerHTML =
-        '<div class="rtt-emohd">絵文字（' + list.length + '）'
+        '<div class="rtt-emohd"><span class="rtt-emocnt"></span>'
+      + '<span class="rtt-emoesc">Esc で閉じる・何も入りません</span>'
       + '<button type="button" data-emoact="edit" title="一覧を自分で編集する">✎ 編集</button></div>'
-      + '<div class="rtt-emogrid">'
-      + list.map(function(c){
-          return '<button type="button" data-emo="' + escapeAttr(c) + '" title="' + escapeAttr(c) + '">'
-               + escapeHtml(c) + '</button>';
-        }).join('')
-      + '</div>';
+      + '<div class="rtt-emosbar">'
+      +   '<input type="text" class="rtt-emoq" spellcheck="false"'
+      +     ' placeholder="名前で探す（ねこ / ネコ / cat）">'
+      +   '<span class="rtt-emocat on" data-cat="-1">ぜんぶ</span>'
+      +   emojiCats().map(function(g, i){
+            return '<span class="rtt-emocat" data-cat="' + i + '">' + escapeHtml(g) + '</span>';
+          }).join('')
+      +   /* ★自分の札（登録簿を回すだけ。読む側に if を増やさない） */
+          emojiTagNames().map(function(t){
+            return '<span class="rtt-emocat rtt-emomine" data-cat="t:' + escapeAttr(t) + '">'
+                 + escapeHtml(t) + '</span>';
+          }).join('')
+      + '</div>'
+      + '<div class="rtt-emorecent"></div>'
+      + '<div class="rtt-emogrid"></div>';
+    emojiRenderGrid();
   }
   return { edit: !!edit, n: list.length };
+}
+
+/* ★パレットの大きさは決め打ちにしない（A-01・決-133／物差し⑤）。
+   2026-09-19 実測 … width:232px / max-height:190px の決め打ちで、
+   200個のうち【30個】しか見えなかった（中身の高さは 1164px）。
+   画面の残りを測って広げると 135個 見えた。
+   ★表の高さ（calcFit）と同じ考え方。狭い画面では自動で小さくなる。
+   anchor … 😀ボタンの矩形（ここから下へ開く）
+   戻り値 … 実際に決めた大きさ（見張り番。あとで欄を足せるようオブジェクト） */
+var EMOJI_FIT_LAST = null;
+function emojiFitLast(){ return EMOJI_FIT_LAST; }
+function emojiFitPal(anchor){
+  if(!emojiPal) return null;
+  var margin = 16;                       /* 画面のふちに残す余白 */
+  var wantW  = 560;                      /* これ以上は広げない（横に間延びさせない） */
+  var minH   = 180;
+  var r   = emojiPal.getBoundingClientRect();
+  var top = anchor ? (anchor.bottom + 4) : r.top;
+  var vpW = window.innerWidth, vpH = window.innerHeight;
+  var w = Math.max(232, Math.min(wantW, vpW - margin * 2));
+  /* 下に入りきらないときは、上へ開く余地も見て広いほうを使う */
+  var below = vpH - top - margin;
+  var above = (anchor ? anchor.top : top) - margin;
+  var up    = below < minH && above > below;
+  var h = Math.max(minH, Math.round(up ? above : below));
+  emojiPal.style.width     = w + 'px';
+  emojiPal.style.maxHeight = h + 'px';
+  /* 右端からはみ出さないように、左の位置も測り直す */
+  var left = Math.max(margin / 2, Math.min(
+    parseFloat(emojiPal.style.left) || 0, vpW - w - margin / 2));
+  emojiPal.style.left = Math.round(left) + 'px';
+  if(up) emojiPal.style.top = Math.round(Math.max(margin / 2, (anchor ? anchor.top : top) - h - 4)) + 'px';
+  EMOJI_FIT_LAST = { w:w, h:h, left:Math.round(left), up:up,
+                     vpW:vpW, vpH:vpH, below:Math.round(below), above:Math.round(above) };
+  return EMOJI_FIT_LAST;
+}
+
+/* いまの絞り込み（データ。コードに埋め込まない） */
+var emojiQ = '', emojiCat = -1;
+/* ★最後に描いた結果（見張り番）… 何個出したか・何ミリ秒かかったかを残す */
+var EMOJI_GRID_LAST = null;
+function emojiGridLast(){ return EMOJI_GRID_LAST; }
+
+function emojiBtnHtml(c){
+  return '<button type="button" data-emo="' + escapeAttr(c) + '" title="' + escapeAttr(c) + '">'
+       + escapeHtml(c) + '</button>';
+}
+/* 一覧の中身だけを描き替える（枠と探す欄はそのまま＝カーソルが飛ばない） */
+function emojiRenderGrid(){
+  if(!emojiPal) return null;
+  var t0 = (window.performance && performance.now) ? performance.now() : 0;
+  var grid = emojiPal.querySelector('.rtt-emogrid');
+  var cnt  = emojiPal.querySelector('.rtt-emocnt');
+  var rec  = emojiPal.querySelector('.rtt-emorecent');
+  if(!grid) return null;
+  var list = emojiFilter(emojiQ, emojiCat);
+  var all  = emojiList().length;
+  grid.innerHTML = list.length
+    ? list.map(emojiBtnHtml).join('')
+    : '<div class="rtt-emonone">見つかりませんでした。別の言い方をお試しください（例: ねこ / cat）</div>';
+  if(cnt) cnt.textContent = '絵文字（' + list.length + ' / ' + all + '）';
+  if(rec){
+    var r = emojiRecents();
+    rec.innerHTML = r.length
+      ? '<span class="rtt-emolb">よく使う</span>' + r.map(emojiBtnHtml).join('')
+      : '';
+    rec.style.display = r.length ? '' : 'none';
+  }
+  EMOJI_GRID_LAST = { n:list.length, all:all, q:emojiQ, cat:emojiCat,
+                      ms:(t0 ? Math.round((performance.now() - t0) * 10) / 10 : null) };
+  return EMOJI_GRID_LAST;
+}
+
+/* 編集画面でいま選んでいる絵文字（データ。1個だけ） */
+var emojiPick = null;
+/* ★最後に描いた編集画面（見張り番） */
+var EMOJI_EDIT_LAST = null;
+function emojiEditLast(){ return EMOJI_EDIT_LAST; }
+
+function emojiRenderEdit(){
+  if(!emojiPal) return null;
+  var grid = emojiPal.querySelector('.rtt-emoedgrid');
+  var tagsEl = emojiPal.querySelector('.rtt-emoedtags');
+  if(!grid || !tagsEl) return null;
+  var list = emojiList();
+  /* 一覧は多いので、直近に足したものが先に見えるよう後ろから出す */
+  var show = list.slice().reverse();
+  grid.innerHTML = show.map(function(c){
+    return '<button type="button" data-pick="' + escapeAttr(c) + '"'
+         + (c === emojiPick ? ' class="on"' : '') + '>' + escapeHtml(c) + '</button>';
+  }).join('');
+  var names = emojiTagNames();
+  tagsEl.innerHTML = names.map(function(t){
+    var on = emojiPick && emojiTagHas(t, emojiPick);
+    return '<span class="rtt-emocat' + (on ? ' on' : '') + '" data-tag="' + escapeAttr(t) + '">'
+         + escapeHtml(t) + '</span>';
+  }).join('')
+  + '<span class="rtt-emocat rtt-emonew" data-newtag="1">＋ 新しい札</span>';
+  EMOJI_EDIT_LAST = { n:list.length, pick:emojiPick, tags:names.length };
+  return EMOJI_EDIT_LAST;
+}
+
+/* 「＋新しい札」… その場に入力欄を出す（prompt を使わない） */
+function emojiNewTagBox(){
+  var tagsEl = emojiPal && emojiPal.querySelector('.rtt-emoedtags');
+  if(!tagsEl) return null;
+  var box = tagsEl.querySelector('.rtt-emonewbox');
+  if(box){ box.querySelector('input').focus(); return box; }
+  box = document.createElement('span');
+  box.className = 'rtt-emonewbox';
+  box.innerHTML = '<input type="text" placeholder="札の名前（例: ねこ）" spellcheck="false">'
+                + '<button type="button" data-newok="1">作る</button>'
+                + '<button type="button" data-newca="1">やめる</button>';
+  tagsEl.appendChild(box);
+  box.querySelector('input').focus();
+  return box;
+}
+function emojiMsg(s){
+  var m = emojiPal && emojiPal.querySelector('.rtt-emomsg');
+  if(m) m.textContent = s || '';
 }
 
 function emojiHide(){
@@ -4539,16 +5045,85 @@ function emojiBind(){
     if(!b) return;
     e.stopPropagation();
     var act = b.getAttribute('data-emoact');
-    if(act === 'edit'){ emojiRenderPal(true); return; }
+    if(act === 'edit'){ emojiPick = null; emojiRenderPal(true); return; }
     if(act === 'cancel'){ emojiRenderPal(false); return; }
-    if(act === 'save'){
-      var ta = emojiPal.querySelector('textarea');
-      var v  = ta ? String(ta.value) : '';
-      try{ if(window.WDT) window.WDT.dbOptSet('db', 'emoji.list', v.trim()); }catch(err){}
+    /* ② 追加する … 貼り付けた分を一覧の後ろへ足す（既にある物は足さない） */
+    if(act === 'add'){
+      var ta = emojiPal.querySelector('.rtt-emopaste');
+      var got = emojiSplit(ta ? ta.value : '');
+      if(!got.length){ emojiMsg('貼り付け欄が空です'); return; }
+      var cur = emojiList(), added = 0, dup = 0;
+      for(var i = 0; i < got.length; i++){
+        if(cur.indexOf(got[i]) >= 0){ dup++; continue; }
+        cur.push(got[i]); added++;
+      }
+      try{ if(window.WDT) window.WDT.dbOptSet('db', 'emoji.list', cur.join('')); }catch(err){}
       try{ if(window.scheduleAutosave) window.scheduleAutosave(); }catch(err){}
-      emojiRenderPal(false);
+      EMOJI_IDX = null;
+      if(ta) ta.value = '';
+      emojiPick = added ? got[got.length - 1] : emojiPick;
+      emojiRenderEdit();
+      emojiMsg('読み取り ' + got.length + '個 → 新しく ' + added + '個 追加'
+               + (dup ? '（' + dup + '個は前からありました）' : ''));
+      return;
+    }
+    /* 既定に戻す */
+    if(act === 'reset'){
+      try{ if(window.WDT) window.WDT.dbOptSet('db', 'emoji.list', ''); }catch(err){}
+      try{ if(window.scheduleAutosave) window.scheduleAutosave(); }catch(err){}
+      EMOJI_IDX = null; emojiPick = null;
+      emojiRenderEdit();
+      emojiMsg('既定の ' + EMOJI_SEED.e.length + '個に戻しました（札は消えていません）');
+      return;
     }
   });
+
+  /* ---- 編集画面の中の操作（案C）---- */
+  emojiPal.addEventListener('click', function(e){
+    if(!emojiPal.classList.contains('rtt-emoedit')) return;
+    /* ③ 絵文字を1個選ぶ */
+    var pk = e.target.closest ? e.target.closest('[data-pick]') : null;
+    if(pk){
+      emojiPick = pk.getAttribute('data-pick');
+      emojiRenderEdit();
+      emojiMsg('「' + emojiPick + '」を選びました。下の札を押すと付きます');
+      return;
+    }
+    /* ＋新しい札 */
+    if(e.target.closest && e.target.closest('[data-newtag]')){ emojiNewTagBox(); return; }
+    if(e.target.closest && e.target.closest('[data-newok]')){
+      var inp = emojiPal.querySelector('.rtt-emonewbox input');
+      var r = emojiTagAdd(inp ? inp.value : '');
+      emojiRenderEdit();
+      emojiMsg(r.added ? '札「' + r.name + '」を作りました' : ('作れません（' + r.why + '）'));
+      return;
+    }
+    if(e.target.closest && e.target.closest('[data-newca]')){ emojiRenderEdit(); return; }
+    /* ④ 札を付ける／外す */
+    var tg = e.target.closest ? e.target.closest('[data-tag]') : null;
+    if(tg){
+      if(!emojiPick){ emojiMsg('先に上の絵文字を1個押してください'); return; }
+      var t = tg.getAttribute('data-tag');
+      var res = emojiTagToggle(t, emojiPick);
+      emojiRenderEdit();
+      emojiMsg('「' + emojiPick + '」の札「' + t + '」を' + (res.on ? '付けました' : '外しました'));
+      return;
+    }
+  });
+  /* 新しい札の入力欄で Enter / Esc */
+  emojiPal.addEventListener('keydown', function(e){
+    var inp = e.target;
+    if(!inp.closest || !inp.closest('.rtt-emonewbox')) return;
+    if(e.key === 'Enter'){
+      e.preventDefault(); e.stopPropagation();
+      var r = emojiTagAdd(inp.value);
+      emojiRenderEdit();
+      emojiMsg(r.added ? '札「' + r.name + '」を作りました' : ('作れません（' + r.why + '）'));
+    }else if(e.key === 'Escape'){
+      e.preventDefault(); e.stopPropagation();
+      emojiRenderEdit();
+    }
+  }, true);
 
   /* 押す直前に欄のフォーカスが外れないようにする（外れるとカーソル位置を見失う） */
   emojiBtn.addEventListener('mousedown', function(e){ e.preventDefault(); });
@@ -4562,20 +5137,56 @@ function emojiBind(){
     emojiPal.classList.add('show');
     emojiPal.style.left = Math.round(Math.max(8, Math.min(r.left - 150, window.innerWidth - 240))) + 'px';
     emojiPal.style.top  = Math.round(r.bottom + 4) + 'px';
+    emojiFitPal(r);
     if(emojiPal.getBoundingClientRect().bottom > window.innerHeight - 8){
       emojiPal.style.top = Math.round(Math.max(8, r.top - emojiPal.offsetHeight - 4)) + 'px';
     }
   });
 
   emojiPal.addEventListener('click', function(e){
+    /* 分類の札を押した（読む側に if を増やさず、data-cat を見るだけ） */
+    var c = e.target.closest ? e.target.closest('[data-cat]') : null;
+    if(c){
+      /* ★自分の札は 't:<名前>' という文字列。数に直すと NaN になり、
+         絞り込みが素通しになって【全部出てしまう】（2026-09-19 実測）。 */
+      var cv = c.getAttribute('data-cat');
+      emojiCat = (cv && cv.indexOf('t:') === 0) ? cv : parseInt(cv, 10);
+      var all = emojiPal.querySelectorAll('.rtt-emocat');
+      for(var i = 0; i < all.length; i++) all[i].classList.remove('on');
+      c.classList.add('on');
+      emojiRenderGrid();
+      return;
+    }
     var b = e.target.closest ? e.target.closest('button[data-emo]') : null;
     if(!b || !emojiTarget) return;
     emojiInsert(emojiTarget, b.dataset.emo);
+    emojiPushRecent(b.dataset.emo);      /* ★よく使うへ（利用者の決定） */
     emojiPal.classList.remove('show');
   });
+  /* 探す欄（打つたびに一覧だけ描き替える） */
+  emojiPal.addEventListener('input', function(e){
+    if(!e.target.classList.contains('rtt-emoq')) return;
+    emojiQ = e.target.value;
+    emojiRenderGrid();
+  });
+  /* ★Esc … 何も入れずに閉じて、元の欄へ戻る（利用者の指示・2026-09-19）。
+     ★この作業場ではコマンドモードにも Esc を使うので、
+       パレットが開いているときだけ横取りし、そこで止める。 */
+  document.addEventListener('keydown', function(e){
+    if(e.key !== 'Escape') return;
+    if(!emojiPal || !emojiPal.classList.contains('show')) return;
+    e.preventDefault(); e.stopPropagation();
+    emojiPal.classList.remove('show');
+    if(emojiTarget){ try{ emojiTarget.focus(); }catch(err){} }
+  }, true);
 
   /* ★案② … カーソルが入ったときだけ出す。欄ごとにボタンを作らない */
   document.addEventListener('focusin', function(e){
+    /* ★パレットの中（探す欄など）に入ったときは、何もしない。
+       2026-09-19 実測 … これが無いと、探す欄に触った瞬間に
+       「入力欄から離れた」と見なして emojiHide() が走り、
+       パレットが閉じて検索が一切使えなかった。 */
+    if(emojiPal && emojiPal.contains(e.target)) return;
     var s = emojiSpotOf(e.target);
     if(!s){ emojiHide(); emojiTarget = null; return; }
     emojiTarget = e.target;
@@ -5212,14 +5823,14 @@ function showAll(tableKey){
 }
 function getColumnVisibility(tableKey){
   try{
-    const raw = localStorage.getItem('wdt_colvis_' + tableKey);
+    const raw = prefGetK('colvis', tableKey, '');   /* ★DBへ（決-134） */
     return raw ? JSON.parse(raw) : {};
   }catch(e){ return {}; }
 }
 function setColumnVisible(tableKey, col, visible){
   const v = getColumnVisibility(tableKey);
   v[col] = visible;
-  try{ localStorage.setItem('wdt_colvis_' + tableKey, JSON.stringify(v)); }catch(e){}
+  try{ prefSetK('colvis', tableKey, JSON.stringify(v)); }catch(e){}
 }
 function toggleAllSections(open){
   document.querySelectorAll('details.card').forEach(function(d){ d.open = open; });
@@ -5768,12 +6379,12 @@ function mvRuleSummary(r){
 function mvOpt(name){
   const dflt = (name === 'backup');   /* 控えは既定でON、ファイル保存は既定でOFF */
   try{
-    const v = localStorage.getItem('wdt_mv_' + name);
+    const v = prefGetK('mv', name, null);           /* ★DBへ（決-134） */
     return v === null ? dflt : (v === '1');
   }catch(e){ return dflt; }
 }
 function mvOptSet(name, on){
-  try{ localStorage.setItem('wdt_mv_' + name, on ? '1' : '0'); }catch(e){}
+  try{ prefSetK('mv', name, on ? '1' : '0'); }catch(e){}
 }
 
 /* ---------- 移動ダイアログ ---------- */
@@ -7919,6 +8530,25 @@ function popPlace(box, anchor, opt){
 var SCROLLBARS = {};
 function sbNum(v, d){ v = Number(v); return isFinite(v) ? v : d; }
 
+/* 見張りの間引き … 短い間に何度呼ばれても、ms に1回だけ走らせる（既定16ms）。
+   ★rAF を使わない … 前面でないタブや描画が止まっている窓では
+     requestAnimationFrame が【一度も呼ばれない】ことを実測した
+     （2026-09-17 … 同じ場面で MutationObserver と setTimeout は動くのに
+     rAF だけ来ず、高さが永久に更新されなかった）。
+     測るのは矩形ひとつなので 16ms の間引きで足りる。
+   ★2026-09-19 … 同じ罠が attachScrollbar 側にも残っていた（落とし穴 #128）。
+     同じ間引きを2か所に手書きしていたのが原因なので、ここ1か所に集めた。
+   ★fn を呼ぶ【前】に掛け金を外す … fn が書いた style がこの見張りに
+     戻ってきたとき、次の16msの窓で測り直せるようにするため（順序を変えない）。 */
+function sbThrottle(fn, ms){
+  var pend = false;
+  return function(){
+    if(pend) return;
+    pend = true;
+    setTimeout(function(){ pend = false; fn(); }, sbNum(ms, 16));
+  };
+}
+
 /* def … { label, size, min, mode, make() }
    ★make() は「バーの入れ物」を作って返すだけ。中の玉は .rtt-sb-knob で探す。 */
 function registerScrollbar(key, def){
@@ -8091,16 +8721,14 @@ function attachScrollbar(el, opt){
 
   /* ★中身が【入れ替わった】ときも測り直す（検索し直し・列の出し入れ）。
      ResizeObserver だけでは足りない … #results は幅が親いっぱいのまま変わらず、
-     中の表だけが広くなるので発火しないことがある（2026-09-16 に実測）。 */
-  var mo = null, pend = false;
+     中の表だけが広くなるので発火しないことがある（2026-09-16 に実測）。
+     ★間引きは sbThrottle に集約（落とし穴 #128・2026-09-19）。
+       ここは 2026-09-17 に attachFit だけを直したとき取り残され、
+       rAF のまま2日間生き残っていた。 */
+  var mo = null;
   try{
     if(window.MutationObserver){
-      mo = new MutationObserver(function(){
-        if(pend) return;
-        pend = true;
-        var run = function(){ pend = false; update(); };
-        if(window.requestAnimationFrame) requestAnimationFrame(run); else setTimeout(run, 16);
-      });
+      mo = new MutationObserver(sbThrottle(update));
       mo.observe(el, {childList:true, subtree:true});
     }
   }catch(e){}
@@ -8247,23 +8875,14 @@ function attachFit(el, opt){
      html の大きさも変わらないので、上の ResizeObserver では捕まらない。
      ★実測 … 上を120px伸ばしても maxHeight は 324px のままで、
        表の下端がコマンド帯の90px下まではみ出し、横バーが帯の裏に隠れた。
-     ★形は attachScrollbar の見張りと同じ（rAF で1フレーム1回に間引く）。 */
-  var mo = null, moPend = false;
+     ★形は attachScrollbar の見張りと同じ … 間引きは sbThrottle を共用する
+       （rAF を使わない理由は sbThrottle の側に1か所だけ書いてある）。 */
+  var mo = null;
   try{
     if(window.MutationObserver){
       var host = (el.closest && el.closest('#app-db')) || el.parentElement;
       if(host){
-        mo = new MutationObserver(function(){
-          if(moPend) return;
-          moPend = true;
-          /* ★rAF を使わない … 前面でないタブや描画が止まっている窓では
-             requestAnimationFrame が【一度も呼ばれない】ことを実測した
-             （2026-09-17 … 同じ場面で MutationObserver と setTimeout は
-             動くのに rAF だけ来ず、高さが永久に更新されなかった）。
-             測るのは矩形ひとつなので 16ms の間引きで足りる。 */
-          var run = function(){ moPend = false; update(); };
-          setTimeout(run, 16);
-        });
+        mo = new MutationObserver(sbThrottle(update));
         mo.observe(host, { childList:true, subtree:true, attributes:true,
                            attributeFilter:['style','class','open','hidden'] });
       }
@@ -8367,6 +8986,22 @@ function sbExport(){
       window.WDT.listScrollbars = scrollbarKinds;
       window.WDT.sbLast         = sbLast;
       window.WDT.sbUpdate       = sbUpdateAll;
+      /* 設定の登録簿（決-134）… 1行で増やせる口と、見張り番 */
+      if(typeof registerPref === 'function'){
+        window.WDT.addPref    = registerPref;
+        window.WDT.listPrefs  = prefKeys;
+        window.WDT.prefGet    = prefGet;
+        window.WDT.prefSet    = prefSet;
+        window.WDT.prefsApply = prefsApply;
+        window.WDT.prefLast   = prefLast;
+        window.WDT.prefGetK   = prefGetK;   /* 表ごと・名前ごとの設定 */
+        window.WDT.prefSetK   = prefSetK;
+      }
+      /* ★運び物の登録簿（決-132）の窓口は【ここには置けない】。
+         registerDragKind はこの関数から見えない囲いの中に在るため、
+         typeof が 'function' にならず、黙って何も出していなかった
+         （2026-09-19 実測。pw_m04 を書いて初めて分かった・落とし穴 #9 の型）。
+         窓口は registerDragKind の在る場所（dragExport）から出している。 */
     }
   }catch(e){}
 }
@@ -9834,7 +10469,18 @@ function saveCell(id, col, newVal, type, td){
    初期化の1行で例外が出ると、この変数が「未初期化」のまま残って
    以降すべての描画が止まってしまうため、必ず包んでから読む。 */
 let gridMarkdownOn = true;
-try{ gridMarkdownOn = (localStorage.getItem('workdb_grid_md') !== '0'); }catch(e){ gridMarkdownOn = true; }
+registerPref('gridmd', {
+  label:'表の中で Markdown を描く', def:'1',
+  apply:function(v){
+    gridMarkdownOn = (v !== '0');
+    try{ if(typeof updateMdToggleLabel === 'function') updateMdToggleLabel(); }catch(e){}
+    try{
+      document.querySelectorAll('#app-db td.mdcell').forEach(function(td){
+        if(!td.classList.contains('editing') && typeof refreshMdCell === 'function') refreshMdCell(td);
+      });
+    }catch(e){}
+  }
+});
 
 // 改行を含む文字列を、そのまま属性値に入れても壊れない形にする
 function escapeAttrRaw(s){
@@ -9877,7 +10523,7 @@ function updateMdToggleLabel(){
 
 function toggleGridMarkdown(){
   gridMarkdownOn = !gridMarkdownOn;
-  try{ localStorage.setItem('workdb_grid_md', gridMarkdownOn ? '1' : '0'); }catch(e){}
+  prefSet('gridmd', gridMarkdownOn ? '1' : '0');   /* ★DBへ（決-134） */
   updateMdToggleLabel();
   document.querySelectorAll('#app-db td.mdcell').forEach(td => {
     if(!td.classList.contains('editing')) refreshMdCell(td);
@@ -10007,6 +10653,37 @@ window.WorkDB = {
     }finally{ formSyncGuard = false; }
     setStatus('Markdownメモの内容を入力欄「' + this.getColumnLabel(table, col) + '」に反映しました。', 'ok');
     return true;
+  },
+
+  /* ★件名（M-01・決-136）… その表の列を上から見て、最初に出てくる
+     「一行テキスト」の列。列名は表ごとに違う（実測 … 作業記録=作業の見出し／
+     予定表=件名／Claudeチャット保存=項目）ので、名前を決め打ちにせず
+     【型の順番】で決める。利用者が写真4枚で示した規則そのもの。
+     戻り値は裸の値ではなくオブジェクト（あとで欄を足せる・物差し④）。 */
+  subjectCol(table){
+    const cols = metaColumnsByTable[table] || [];   /* order_no 順で入っている */
+    for(let i = 0; i < cols.length; i++){
+      if(cols[i].col_type === 'text') return { col:cols[i].col_name, label:cols[i].label };
+    }
+    return null;
+  },
+  getSubject(table, id){
+    const c = this.subjectCol(table);
+    if(!c) return { ok:false, why:'一行テキストの列が無い', col:null, label:null, value:'' };
+    if(!db) return { ok:false, why:'DBがまだ無い', col:c.col, label:c.label, value:'' };
+    if(this.isFormRowId(id)) return { ok:true, col:c.col, label:c.label, value:'' };
+    try{
+      const st = db.prepare('SELECT ' + c.col + ' FROM ' + table + ' WHERE id=?');
+      st.bind([id]);
+      let v = '';
+      let found = false;
+      if(st.step()){ const r = st.get(); v = (r[0] == null) ? '' : String(r[0]); found = true; }
+      st.free();
+      return { ok:found, why:found ? '' : '行が見つからない',
+               col:c.col, label:c.label, value:v };
+    }catch(e){
+      return { ok:false, why:String(e).slice(0, 60), col:c.col, label:c.label, value:'' };
+    }
   },
 
   getCellRaw(table, id, col){
@@ -10265,7 +10942,32 @@ function rowRangeMs(get, roles){
 
 /* ---------- 現在時刻のハイライト ---------- */
 let nowHighlightOn = true;
-try{ nowHighlightOn = (localStorage.getItem('wdt_nowhl') !== '0'); }catch(e){ nowHighlightOn = true; }
+/* ★ブラウザ側の保存から読むのをやめた（決-134）。
+   ブラウザごとに残るため「会社では出ない・家では出る」が起きていた。
+   いまは既定(ON)で始まり、DBが届いたら prefsApply() が配り直す。 */
+/* ★ダブルクリック（続けて2回押す）と見なす間隔（決-137）。
+   これまで 450 ミリ秒の決め打ちだった。手の速さは人によって違うので、
+   設定できるようにし、⚙設定に「試し場所」も置いた。
+   ★読む側は dblMs() を呼ぶだけ。決め打ちの数字をコードに残さない。 */
+registerPref('dblms', {
+  label:'ダブルクリック（続けて2回押す）と見なす速さ', def:'450',
+  apply:function(){}      /* 押した瞬間に読むので、配り直すものは無い */
+});
+function dblMs(){
+  var v = 450;
+  try{ v = Number(prefGet('dblms')); }catch(e){ v = 450; }
+  if(!isFinite(v)) v = 450;
+  return Math.max(120, Math.min(2000, Math.round(v)));
+}
+
+registerPref('nowhl', {
+  label:'今の時刻の色分け（進行中の帯も含む）', def:'1',
+  apply:function(v){
+    nowHighlightOn = (v !== '0');
+    try{ if(typeof updateNowHlLabel === 'function') updateNowHlLabel(); }catch(e){}
+    try{ if(typeof applyNowHighlight === 'function') applyNowHighlight(); }catch(e){}
+  }
+});
 
 function nowRowClass(start, end){
   const now = Date.now();
@@ -10386,7 +11088,7 @@ function updateNowHlButton(){
 }
 function toggleNowHighlight(){
   nowHighlightOn = !nowHighlightOn;
-  try{ localStorage.setItem('wdt_nowhl', nowHighlightOn ? '1' : '0'); }catch(e){}
+  prefSet('nowhl', nowHighlightOn ? '1' : '0');   /* ★DBへ（決-134） */
   updateNowHlButton();
   applyNowHighlight();
   setStatus(nowHighlightOn ? '今の時刻に当てはまる行に色を付けます。' : '現在時刻の色分けをやめました。', 'ok');
@@ -11623,7 +12325,14 @@ const tagPick = {
   sortMode:false,        // Ver1.8.00: コンボの並べ替えモード（◀ ▶ を出す）
   groupByCat:true        // Ver1.8.00: 個別タグをカテゴリごとに区切って出す
 };
-try{ tagPick.groupByCat = localStorage.getItem('wdt_tag_group') !== '0'; }catch(e){}
+registerPref('taggroup', {
+  label:'タグをカテゴリごとに区切って出す', def:'1',
+  apply:function(v){
+    tagPick.groupByCat = (v !== '0');
+    try{ if(typeof renderTagPicker === 'function' && tagPick.back && tagPick.back.isConnected)
+           renderTagPicker(); }catch(e){}
+  }
+});
 
 function tagPickerEl(){
   if(tagPick.back && tagPick.back.isConnected) return tagPick.back;
@@ -11689,7 +12398,7 @@ function tagPickerEl(){
   });
   back.querySelector('#tgpCatBtn').addEventListener('click', () => {
     tagPick.groupByCat = !tagPick.groupByCat;
-    try{ localStorage.setItem('wdt_tag_group', tagPick.groupByCat ? '1' : '0'); }catch(e){}
+    prefSet('taggroup', tagPick.groupByCat ? '1' : '0');   /* ★DBへ（決-134） */
     renderTagPicker();
   });
   back.querySelector('#tgpManage').addEventListener('click', () => {
@@ -14469,9 +15178,14 @@ function renderInline(text){
    mdeHardBreaks が true のときは、行の切れ目をそのまま <br> にする
    （GitHubのコメント欄と同じ考え方）。
    ヘッダーの［↵ 改行］ボタンで、いつでも元の動きに戻せる。 */
-window.mdeHardBreaks = (function(){
-  try{ return localStorage.getItem('rtt_md_hardbreaks') !== '0'; }catch(e){ return true; }
-})();
+window.mdeHardBreaks = true;
+registerPref('mdbreaks', {
+  label:'MDメモ … 行の切れ目をそのまま改行にする', def:'1',
+  apply:function(v){
+    window.mdeHardBreaks = (v !== '0');
+    try{ if(typeof refreshAllMarkdown === 'function') refreshAllMarkdown(); }catch(e){}
+  }
+});
 function mdJoinLines(buf){
   if(window.mdeHardBreaks !== false){
     return buf.map(s => renderInline(String(s).replace(/[ \t]+$/, ''))).join('<br>\n');
@@ -17123,10 +17837,31 @@ registerTabName('title', {
   }
 });
 
-/* 設定（データ）… 既定は「ファイル名・省略しない」。
+/* ★件名（M-01・決-136）… DBと連携しているタブだけで使える。
+   連携していないタブ（ふつうの .md）は件名を持たないので、題名 → ファイル名 に落とす。
+   ★判定は自分で作らない … WorkDB.getSubject が「型の順番で最初の一行テキスト」を返す。 */
+registerTabName('subject', {
+  label: '件名（DBの最初の一行テキスト欄）',
+  pick : function(t){
+    try{
+      if(t.dbLink && window.WorkDB && typeof window.WorkDB.getSubject === 'function'){
+        var r = window.WorkDB.getSubject(t.dbLink.table, t.dbLink.id);
+        if(r && r.ok && String(r.value).trim()) return String(r.value).trim();
+      }
+    }catch(e){}
+    /* 件名が空・連携していない → 題名 → ファイル名 の順に落とす */
+    try{
+      var w = TAB_NAME_WAYS['title'];
+      if(w) return w.pick(t);
+    }catch(e){}
+    return t.name || '';
+  }
+});
+
+/* 設定（データ）… ★既定は「題名（本文の最初の見出し）」（利用者の指示・決-136）。
    0 は「省略しない」の意味。当てずっぽうの既定値を持たない。 */
 function mdeTabNameOpt(){
-  var way = 'file', len = 0;
+  var way = 'title', len = 0;
   try{
     if(window.WDT && typeof window.WDT.dbOptGet === 'function'){
       var w = window.WDT.dbOptGet('mde', 'tabNameWay');
@@ -17331,7 +18066,9 @@ function mdeRenderTabs(){
            だから要素ではなく「どのタブを・いつ押したか」で見分ける。 */
       if(tabUi.rename === 'dbl' || tabUi.rename === 'both'){
         const now = Date.now();
-        if(mdeTabClick.id === t.id && (now - mdeTabClick.at) < 450){
+        /* ★決め打ちの 450 をやめた（決-137）。⚙設定で変えられる */
+        var lim = (typeof dblMs === 'function') ? dblMs() : 450;
+        if(mdeTabClick.id === t.id && (now - mdeTabClick.at) < lim){
           mdeTabClick = { id:null, at:0 };
           mdeTabRename(el, t);
           return;
@@ -17386,7 +18123,10 @@ function mdeRenderTabs(){
       mdeTabDragId = t.id;
       el.classList.add('tab-dragging');
       try{ e.dataTransfer.effectAllowed = 'move';
-           e.dataTransfer.setData('text/plain', String(t.id)); }catch(err){}
+           e.dataTransfer.setData('text/plain', String(t.id));
+           /* ★「これはファイルではなくタブだ」と名乗る（決-132）。
+              窓ぜんぶを見張っている側が、これを見て覆いを出さずに済む。 */
+           e.dataTransfer.setData(MDE_TAB_DRAG_TYPE, String(t.id)); }catch(err){}
     });
     el.addEventListener('dragend', ()=>{
       mdeTabDragId = null; el.classList.remove('tab-dragging');
@@ -17402,6 +18142,17 @@ function mdeRenderTabs(){
     });
     el.addEventListener('dragleave', ()=>el.classList.remove('tab-drop'));
     el.addEventListener('drop', (e)=>{
+      /* ★自分あての荷物でなければ、手を出さずに通す（決-132・2026-09-19 実測）。
+         ここで無条件に stopPropagation すると、ファイルをタブの【上】へ
+         落としたとき、開く係にも覆いを消す係にも話が届かず、
+         「ファイルをドロップして開く」が出たまま残って画面が使えなくなる。
+         ★dragend の保険では直らない … OS から運んできたファイルは、
+           ページの中で始まったドラッグではないので dragend が起きない。 */
+      if(dragKindOf(e.dataTransfer) !== 'tab'){
+        el.classList.remove('tab-drop');
+        mdeTabClearDropMark(bar);
+        return;
+      }
       e.preventDefault(); e.stopPropagation();
       el.classList.remove('tab-drop');
       mdeTabClearDropMark(bar);
@@ -18601,29 +19352,111 @@ document.querySelectorAll('.vmBtn').forEach(btn=>{
   });
 })();
 
+/* ==================================================================
+   運び物の登録簿（M-04 の直し・決-132）… レゴの3層
+   ------------------------------------------------------------------
+   ① 登録簿 registerDragKind(key, def) … 「いま何を運んでいるか」の見分け方
+   ② 種     DRAG_KINDS                 … file / tab（増やすのはここに1行）
+   ③ 基礎板 dragKindOf(dt)             … 中身を知らず、登録簿を順に当てるだけ
+   ★なぜ要るか（2026-09-19 実測）… 窓ぜんぶを見張る dragenter が
+     【運び物を見ずに】覆いを出していた。タブを並べ替えようとドラッグすると
+     「📄 ファイルをドロップして開く」が全画面に出る。しかもタブの drop は
+     e.stopPropagation() を呼ぶので、覆いを消す係（窓の drop）に話が届かず、
+     ★手を離しても覆いが残り、画面が使えなくなっていた。
+   ★同じ事故は「ファイルをタブの【上】へ落とした」ときにも起きる（実測）。
+     運び物を見るだけでは直らないので、dragend の保険を別に置く。
+   ================================================================== */
+/* ★タブが「私はタブです」と名乗るための合言葉。名乗る側（dragstart）と
+   見分ける側（登録簿）で【同じ1つ】を使う。文字列を2か所に書かない。 */
+var MDE_TAB_DRAG_TYPE = 'application/x-rtt-tab';
+var DRAG_KINDS = [];
+function registerDragKind(key, def){
+  if(!key || !def || typeof def.match !== 'function') return false;
+  DRAG_KINDS.push({ key:String(key), label:def.label || String(key), match:def.match });
+  return true;
+}
+function dragKindNames(){ return DRAG_KINDS.map(function(d){ return d.key; }); }
+/* ★最後に見分けた結果（見張り番）。「なぜ覆いが出た／出なかった」を後から読める */
+var DRAG_LAST = null;
+function dragLast(){ return DRAG_LAST; }
+
+function dragTypesOf(dt){
+  try{ return dt && dt.types ? Array.prototype.slice.call(dt.types) : []; }
+  catch(e){ return []; }
+}
+/* 登録簿を順に当て、最初に当たった種類を返す。どれにも当たらなければ 'unknown' */
+function dragKindOf(dt){
+  var types = dragTypesOf(dt);
+  for(var i = 0; i < DRAG_KINDS.length; i++){
+    var hit = false;
+    try{ hit = !!DRAG_KINDS[i].match(dt, types); }catch(e){ hit = false; }
+    if(hit){ return DRAG_KINDS[i].key; }
+  }
+  return 'unknown';
+}
+/* ★種は「データ」。増やすときはここに1行足すだけで、読む側は1行も変わらない。 */
+registerDragKind('file', { label:'ファイル',
+  match:function(dt, types){ return types.indexOf('Files') >= 0; } });
+/* ★窓口はここから出す（決-132）… registerDragKind はこの場所にしか見えない。
+   window.WDT はここより後ろで作られるので、作られたあとに入れ直す
+   （sbExport と同じ作法）。★外から確かめられないと、テストも書けない。 */
+function dragExport(){
+  try{
+    if(window.WDT){
+      window.WDT.addDragKind   = registerDragKind;
+      window.WDT.listDragKinds = dragKindNames;
+      window.WDT.dragKindOf    = dragKindOf;
+      window.WDT.dragLast      = dragLast;
+    }
+  }catch(e){}
+}
+try{ setTimeout(dragExport, 0); setTimeout(dragExport, 600); }catch(e){}
+
+registerDragKind('tab', { label:'MDメモのタブ',
+  match:function(dt, types){ return types.indexOf(MDE_TAB_DRAG_TYPE) >= 0; } });
+
+/* 覆いの出し入れは【1か所だけ】。2か所に書くと、片方だけ直して残る（落とし穴 #128 の型） */
+function mdDropOverlay(on, why){
+  var ov = document.getElementById('dropOverlay');
+  if(ov) ov.classList.toggle('show', !!on);
+  DRAG_LAST = { kind:(why && why.kind) || null, overlay:!!on,
+                why:(why && why.why) || '', at:Date.now() };
+  return DRAG_LAST;
+}
+
 // ドラッグ&ドロップ（ウィンドウ全体）
 let dragCounter = 0;
 window.addEventListener('dragenter', (e)=>{
   if(window.currentAppMode !== 'md') return;
+  const kind = dragKindOf(e.dataTransfer);
+  if(kind !== 'file'){ mdDropOverlay(false, {kind:kind, why:'ファイル以外は覆わない'}); return; }
   e.preventDefault(); dragCounter++;
-  document.getElementById('dropOverlay').classList.add('show');
+  mdDropOverlay(true, {kind:kind, why:'dragenter'});
 });
 window.addEventListener('dragover', (e)=>{
   if(window.currentAppMode !== 'md') return;
+  if(dragKindOf(e.dataTransfer) !== 'file') return;
   e.preventDefault();
 });
 window.addEventListener('dragleave', (e)=>{
   if(window.currentAppMode !== 'md') return;
   dragCounter = Math.max(0, dragCounter-1);
-  if(dragCounter===0) document.getElementById('dropOverlay').classList.remove('show');
+  if(dragCounter===0) mdDropOverlay(false, {kind:'-', why:'dragleave'});
 });
 window.addEventListener('drop', async (e)=>{
   if(window.currentAppMode !== 'md') return;
   e.preventDefault();
   dragCounter = 0;
-  document.getElementById('dropOverlay').classList.remove('show');
+  mdDropOverlay(false, {kind:dragKindOf(e.dataTransfer), why:'drop'});
   await handleDropItems(e.dataTransfer);
 });
+/* ★保険 … dragend は【運び始めた側】に必ず届く。途中で誰かが
+   e.stopPropagation() を呼んでも、ここで必ず後片付けできる。
+   これが無いと、ファイルをタブの上へ落としたとき覆いが残る（2026-09-19 実測）。 */
+window.addEventListener('dragend', ()=>{
+  dragCounter = 0;
+  mdDropOverlay(false, {kind:'-', why:'dragend の保険'});
+}, true);
 
 // 離脱前の警告（未保存の変更がある場合）
 window.addEventListener('beforeunload', (e)=>{
@@ -18952,6 +19785,38 @@ registerAddonKind('choice', {
   }
 });
 
+/* ★どのページに出すか（決-135）… 既定は 'addon'。
+   登録簿に page:'disp' と1語足すだけで「🖥 表示」へ移る。戻すのも1語。
+   ★なぜ欄にするか … カードの描き方を2か所に増やさないため（物差し③）。 */
+function addonPageOf(a){ return (a && a.page) ? String(a.page) : 'addon'; }
+/* カード1枚の描き方は【ここ1か所だけ】。棚が増えても増やさない（物差し③） */
+function addonCardHtml(a){
+  var cur = st.addons[a.id];
+  /* ★種類の登録簿に任せる（決-94）。ここに if を増やさない。
+     新しい見せ方は registerAddonKind を1行足すだけで届く。 */
+  var sw = addonKindOf(a.kind).input(a, cur);
+  return '<div class="wdtx-card"><div class="wdtx-row" style="margin:0">'
+       + '<b style="flex:1">' + a.name + '</b>' + sw + '</div>'
+       + '<div class="wdtx-hint" style="margin-top:6px">' + a.desc + '</div>'
+       + '<details style="margin-top:6px"><summary class="wdtx-hint" style="cursor:pointer">中で何をしているか</summary>'
+       + '<ul class="wdtx-hint" style="margin:6px 0 0 -10px">'
+       + a.detail.map(function(d){ return '<li>' + d + '</li>'; }).join('')
+       + '</ul></details></div>';
+}
+function addonCardsHtml(pg){
+  var list = addonsOnPage(pg);
+  ADDON_PAGE_LAST = { pg:pg, n:list.length,
+                      addon:addonsOnPage('addon').length,
+                      disp:addonsOnPage('disp').length, at:Date.now() };
+  return list.map(addonCardHtml).join('');
+}
+function addonsOnPage(pg){
+  return ADDONS.filter(function(a){ return addonPageOf(a) === pg; });
+}
+/* ★最後に振り分けた結果（見張り番）。「表示に出したはずなのに出ない」を調べられる */
+var ADDON_PAGE_LAST = null;
+function addonPageLast(){ return ADDON_PAGE_LAST; }
+
 var ADDONS = [
   { id:'mobilefix', kind:'tri', name:'📱 スマホ表示の不具合修正',
     desc:'スマホのブラウザ（Vanadium・Chrome など）で、Markdownメモの一番下にある「分割／編集／プレビュー」ボタンが画面外に隠れて押せない問題を直します。'
@@ -19015,7 +19880,7 @@ var ADDONS = [
   /* ★D-05-2（決-122）… 表の上の「使い方のヒント」を隠せるようにする。
      ★消すのではなく【隠すだけ】。初めての人には出したまま（既定は出す）で、
        慣れた人だけが畳んで、そのぶん表を広く使える（利用者の指示・2026-09-16）。 */
-  { id:'gridlead', kind:'bool', name:'📖 表の上の「使い方のヒント」を隠す',
+  { id:'gridlead', page:'disp', kind:'bool', name:'📖 表の上の「使い方のヒント」を隠す',
     desc:'「🔎 検索・表示・編集」の表のすぐ上にある、▶で始まる2行の案内'
        + '（列の見出しをクリックで並べ替え…／入力欄にカーソルが無いときはコマンドモード…）を隠します。'
        + '★文章が消えるわけではありません。OFFに戻せばいつでも出ます。'
@@ -19033,7 +19898,7 @@ var ADDONS = [
   /* ★ここから下は「長い文章を隠す」仲間（2026-09-17・利用者の指示）。
      ★body: に class を書くだけで applyAll が配る。読む側に if を増やさない。
        隠す所を増やすときは、この登録簿に1行＋CSSに1行。 */
-  { id:'hidehints', kind:'bool', name:'💬 ▶で始まる補足の文章を隠す',
+  { id:'hidehints', page:'disp', kind:'bool', name:'💬 ▶で始まる補足の文章を隠す',
     desc:'画面のあちこちにある「▶ …」で始まる補足（使い方のヒント）をまとめて隠します。'
        + '★文章は消えません。OFFに戻せばそのまま出ます。慣れてきた人向けです。',
     detail:[
@@ -19042,7 +19907,7 @@ var ADDONS = [
       '隠したぶん、表や入力欄が上へ寄って広く使える'
     ],
     body:'wdt-nohint', def:false },
-  { id:'hideintro', kind:'bool', name:'📃 画面の先頭にある長い説明を隠す',
+  { id:'hideintro', page:'disp', kind:'bool', name:'📃 画面の先頭にある長い説明を隠す',
     desc:'「作業記録・測定データ目録にかぎらず…」で始まる、各セクションの先頭の'
        + '長い説明文（.lead）を隠します。★文章は消えません。OFFに戻せば出ます。',
     detail:[
@@ -19051,7 +19916,7 @@ var ADDONS = [
       '初めての人のために既定はOFF（出したまま）'
     ],
     body:'wdt-nointro', def:false },
-  { id:'autofold', kind:'bool', name:'📐 窓が狭いときだけ自動で案内をたたむ',
+  { id:'autofold', page:'disp', kind:'bool', name:'📐 窓が狭いときだけ自動で案内をたたむ',
     desc:'窓の高さが足りないときだけ、上の案内を自動でたたんで表に場所をゆずります。'
        + '★広い窓では今までどおり全部出ます。しきい値は既定520px。',
     detail:[
@@ -19647,6 +20512,9 @@ function onDbReady(){
   /* Ver1.14.01 (回0): DBが開けたので、設定をDBと同期する。
      ここは loadMeta() からも呼ばれるので、DBを開き直すたびに自動で追従する。 */
   try{ syncOptsWithDb(); }catch(e){}
+  /* ★DBが読めるようになったので、設定を配り直す（決-134）。
+     起動直後は dbOptGet が null を返すため、ここまでは既定で動いている。 */
+  try{ if(typeof prefsApply === 'function') prefsApply(); }catch(e){}
   /* Ver1.15.02 (B8-b): メモ側にも「DBが使えるようになった」ことを知らせる。
      メモのタブ一覧（並び・📌・本文）は _meta_opts に入っているので、
      ここで読み直させる。メモ側は IIFE に包まれていて外から見えないため、
@@ -20093,6 +20961,98 @@ function openSettings(){
   var b = el('wdtSettings');
   if(b) b.classList.add('show');
 }
+/* ==================================================================
+   ダブルクリックの速さ（決-137・案C）… 押して・見て・調節する
+   ------------------------------------------------------------------
+   ★当てずっぽうの既定値で済ませない（物差し⑤）。
+     「5回ためして測る」は、実際の間隔のうち【いちばん遅いもの】に
+     1.3倍の余裕を足して、その人に合う値を出す。
+   ★見張り番 DBL_LAST … 最後に測った間隔と成否を残す。
+   ================================================================== */
+var dblPadState = { last:0, measuring:0, gaps:[] };
+var DBL_LAST = null;
+function dblLast(){ return DBL_LAST; }
+
+function dblSyncUi(msg, good){
+  var r = document.getElementById('wdtDblRange');
+  var v = document.getElementById('wdtDblVal');
+  var m = document.getElementById('wdtDblMsg');
+  var ms = dblMs();
+  if(r && Number(r.value) !== ms) r.value = ms;
+  if(v) v.textContent = ms + ' ミリ秒';
+  if(m){
+    m.textContent = msg || '';
+    m.style.color = (msg == null) ? '' : (good === false ? '#e57373' : '#5ec98a');
+  }
+  return ms;
+}
+function dblPadPaint(cls, text){
+  var p = document.getElementById('wdtDblPad');
+  if(!p) return;
+  p.style.borderColor = (cls === 'hit') ? '#5ec98a' : (cls === 'miss' ? '#e57373' : '');
+  p.style.color       = (cls === 'hit') ? '#5ec98a' : (cls === 'miss' ? '#e57373' : '');
+  if(text) p.textContent = text;
+  if(cls){
+    setTimeout(function(){
+      var q = document.getElementById('wdtDblPad');
+      if(!q) return;
+      q.style.borderColor = ''; q.style.color = '';
+      q.textContent = 'ここを続けて2回押してください';
+    }, 1100);
+  }
+}
+function dblMeasureStart(){
+  dblPadState = { last:0, measuring:5, gaps:[] };
+  dblSyncUi('5回ぶん測ります。試し場所を「続けて2回押す」を5回くり返してください');
+}
+function dblPadHit(){
+  var now = Date.now();
+  var gap = dblPadState.last ? (now - dblPadState.last) : null;
+
+  if(dblPadState.measuring > 0){
+    if(gap !== null && gap < 3000){
+      dblPadState.gaps.push(gap);
+      dblPadState.measuring--;
+      dblPadState.last = 0;
+      if(dblPadState.measuring === 0){
+        var mx = Math.max.apply(null, dblPadState.gaps);
+        var want = Math.min(1200, Math.max(150, Math.round(mx * 1.3 / 10) * 10));
+        prefSet('dblms', String(want));
+        DBL_LAST = { how:'measure', gaps:dblPadState.gaps.slice(), max:mx,
+                     set:want, at:Date.now() };
+        dblSyncUi('測りました … あなたの間隔 ' + dblPadState.gaps.join(' / ')
+                  + ' ミリ秒。いちばん遅い ' + mx + ' に余裕を足して '
+                  + want + ' ミリ秒にしました');
+        dblPadPaint('hit', '✓ 測り終わりました');
+        return;
+      }
+      dblSyncUi('あと ' + dblPadState.measuring + ' 回（いま ' + gap + ' ミリ秒）');
+      return;
+    }
+    dblPadState.last = now;
+    dblSyncUi('あと ' + dblPadState.measuring + ' 回 …（1回目を押しました）');
+    return;
+  }
+
+  var lim = dblMs();
+  if(gap !== null && gap < lim){
+    dblPadState.last = 0;
+    DBL_LAST = { how:'try', gap:gap, limit:lim, ok:true, at:Date.now() };
+    dblSyncUi('✓ 反応しました（' + gap + ' ミリ秒。設定は ' + lim + ' ミリ秒）');
+    dblPadPaint('hit', '✓ 反応しました');
+    return;
+  }
+  if(gap !== null){
+    DBL_LAST = { how:'try', gap:gap, limit:lim, ok:false, at:Date.now() };
+    dblSyncUi('✗ 間に合いませんでした（' + gap + ' ミリ秒かかりました。設定は ' + lim
+              + ' ミリ秒）。つまみを大きくすると反応しやすくなります', false);
+    dblPadPaint('miss', '✗ 間に合いませんでした');
+  }else{
+    dblSyncUi('1回目を押しました。続けてもう1回どうぞ');
+  }
+  dblPadState.last = now;
+}
+
 function closeSettings(){
   stopRecord();
   var b = el('wdtSettings');
@@ -20389,6 +21349,37 @@ function buildSettings(){
      + '（表の中の列ではないためです）。'
      + '<br>※ Ver1.18.00 より前に作った行は、記録が無いので'
      + '<b>「登録日時」を初期値として入れてあります</b>。</div>';
+  /* ★「表示を隠す」たぐいの設定は、アドオンではなくここに出す（決-135・利用者の指示）。
+     どれをここに出すかは登録簿の page:'disp' が決める。読む側は振り分けるだけ。 */
+  if(addonsOnPage('disp').length){
+    h += '<h3>長い文章・案内の出し方</h3>';
+    h += '<div class="wdtx-hint" style="margin-bottom:6px">'
+       + '慣れてきたら隠せます。<b>文章は消えません。</b>OFFに戻せばそのまま出ます。'
+       + '★初めての人のために、既定はぜんぶ OFF（出したまま）です。</div>';
+    h += addonCardsHtml('disp');
+  }
+  /* ★ダブルクリックの速さ（決-137・案C・利用者の指示）。
+     「試し場所」をその場に置く … 押して・反応を見て・調節する、を1画面で終える。 */
+  h += '<h3>ダブルクリック（続けて2回押す）の速さ</h3>';
+  h += '<div class="wdtx-hint" style="margin-bottom:6px">'
+     + 'MDメモのタブを<b>続けて2回押して名前を変える</b>ときなどに使います。'
+     + '<b>短いほど素早く押す必要があります。</b>'
+     + '下の枠を2回押すと、実際に何ミリ秒かかったかが出ます。</div>';
+  h += '<div class="wdtx-row"><label style="flex:0 0 130px">速さ</label>'
+     + '<input type="range" id="wdtDblRange" min="150" max="1200" step="10" '
+     +   'value="' + dblMs() + '" style="flex:1">'
+     + '<b id="wdtDblVal" style="flex:0 0 96px;text-align:right">' + dblMs() + ' ミリ秒</b>'
+     + '</div>';
+  h += '<div class="wdtx-row"><label style="flex:0 0 130px">試し場所</label>'
+     + '<div id="wdtDblPad" style="flex:1;height:64px;border:2px dashed var(--line,#3d4046);'
+     +   'border-radius:8px;display:flex;align-items:center;justify-content:center;'
+     +   'cursor:pointer;user-select:none;font-size:13px">ここを続けて2回押してください</div>'
+     + '</div>';
+  h += '<div class="wdtx-row"><label style="flex:0 0 130px"></label>'
+     + '<button type="button" id="wdtDblMeasure">📏 5回ためして、自分の速さを測る</button>'
+     + '<button type="button" id="wdtDblReset">既定(450)に戻す</button>'
+     + '<span id="wdtDblMsg" class="wdtx-hint" style="flex:1"></span></div>';
+
   h += '<h3>Markdownメモ専用の設定</h3>';
   h += '<div class="wdtx-row"><button type="button" id="wdtOpenMdSet">📝 メモの設定を開く（ツールバー・自動保存・プラグイン）</button></div>';
   h += '</div>';
@@ -20478,19 +21469,7 @@ function buildSettings(){
   /* ---- アドオン ---- */
   h += '<div class="wdtx-page" data-pg="addon">';
   h += '<h3>アドオン（追加機能）</h3>';
-  h += ADDONS.map(function(a){
-    var cur = st.addons[a.id];
-    /* ★種類の登録簿に任せる（決-94）。ここに if を増やさない。
-       新しい見せ方は registerAddonKind を1行足すだけで届く。 */
-    var sw = addonKindOf(a.kind).input(a, cur);
-    return '<div class="wdtx-card"><div class="wdtx-row" style="margin:0">'
-         + '<b style="flex:1">' + a.name + '</b>' + sw + '</div>'
-         + '<div class="wdtx-hint" style="margin-top:6px">' + a.desc + '</div>'
-         + '<details style="margin-top:6px"><summary class="wdtx-hint" style="cursor:pointer">中で何をしているか</summary>'
-         + '<ul class="wdtx-hint" style="margin:6px 0 0 -10px">'
-         + a.detail.map(function(d){ return '<li>' + d + '</li>'; }).join('')
-         + '</ul></details></div>';
-  }).join('');
+  h += addonCardsHtml('addon');
   h += '<div class="wdtx-hint" id="wdtMobState"></div>';
 
   h += '<h3>アドオンで「できること」「できないこと」</h3>';
@@ -20802,6 +21781,15 @@ function bindSettings(){
       }, 60);
       return;
     }
+    /* ---- ダブルクリックの速さ（決-137）---- */
+    if(t.id === 'wdtDblPad'){ dblPadHit(); return; }
+    if(t.id === 'wdtDblMeasure'){ dblMeasureStart(); return; }
+    if(t.id === 'wdtDblReset'){
+      prefSet('dblms', '450');
+      dblPadState = { last:0, measuring:0, gaps:[] };
+      dblSyncUi('既定(450ミリ秒)に戻しました');
+      return;
+    }
     if(t.id === 'wdtOpenMdSet'){
       closeSettings();
       if(typeof setAppMode === 'function') setAppMode('md');
@@ -20941,6 +21929,15 @@ function bindSettings(){
     }
   });
 
+  /* ★つまみは動かしている最中にも効かせたいので input でも受ける（決-137）。
+     2026-09-19 実測 … change だけだと、動かしても保存されず、
+     試し場所の判定も古い値のままだった（自分で押して気づいた）。 */
+  box.addEventListener('input', function(e){
+    if(e.target && e.target.id === 'wdtDblRange'){
+      prefSet('dblms', String(e.target.value));
+      dblSyncUi('速さを ' + dblMs() + ' ミリ秒にしました。下の試し場所で試せます');
+    }
+  });
   box.addEventListener('change', function(e){
     var t = e.target;
     /* ★工程9（決-82）… スキンは st に持たない。RTTPARTS.setSkin() が
@@ -21236,6 +22233,18 @@ return {
   startMode: startMode,
   renderFavBar: renderFavBar,
   get: function(){ return st; },
+
+  /* アドオンの棚（決-135）… どのアドオンをどのページに出しているかを見る口。
+     ★ADDONS は この囲い(IIFE)の中にあり、外からは見えない（落とし穴 #9）。
+       だから窓口はここに置く。移すのは登録簿に page:'disp' と1語。 */
+  addonsOnPage: function(pg){
+    try{ return addonsOnPage(pg).map(function(a){ return a.id; }); }catch(e){ return []; }
+  },
+  addonPageLast: function(){ try{ return addonPageLast(); }catch(e){ return null; } },
+  /* ダブルクリックの速さ（決-137）… いまの値と、最後に測った結果を見る口 */
+  dblMs:   function(){ try{ return dblMs(); }catch(e){ return 450; } },
+  dblLast: function(){ try{ return dblLast(); }catch(e){ return null; } },
+  countAddons:   function(){ try{ return ADDONS.length; }catch(e){ return -1; } },
 
   /* ---- Ver1.14.01 (回0 前提工事) で増えた窓口 ----
      第6段階の他の機能（ひな型・フォーカス演出・並び順の記憶 など）が
@@ -22605,7 +23614,7 @@ function updateBrLabel(){
 }
 function toggleHardBreaks(){
   window.mdeHardBreaks = !hardBreaksOn();
-  lsSet('rtt_md_hardbreaks', window.mdeHardBreaks ? '1' : '0');
+  prefSet('mdbreaks', window.mdeHardBreaks ? '1' : '0');   /* ★DBへ（決-134） */
   updateBrLabel();
   refreshAllMarkdown();
   tell(window.mdeHardBreaks
