@@ -11799,22 +11799,41 @@ function roleOptions(sel){
     .map(v => '<option value="' + v + '"' + (v === (sel || '') ? ' selected' : '') + '>' + ROLE_LABELS[v] + '</option>')
     .join('');
 }
-/* ---- Ver1.19.60（2026-09-22・利用者の指示）… 決-185 の「融合の役割」は撤去 ------
-   ★利用者の言葉（原文）
-     「『⚙ 列の型…』はいらない」
-     「🗂 項目（テーブル）管理の癒合用の項目もいらない」
-     「『⚙ 表示する列』に変数を足す … 普通の表の時と融合のときの判別 …
-       今後もっと増える可能性がある。そこを考慮する」
-
-   ★なぜ要らなくなったか … 決-186 で融合画面の左が【表そのもの】になったので、
-     「どの列を1本えらぶか」という問いが消えました。代わりに要るのは
-     **「その場面では、どの列を出すか」**で、それは既にある
-     「⚙ 表示する列」（colvis）とまったく同じ問いです。だから**新しい設定を作らず、
-     既にある設定に【場面】という軸を1本足す**のが正しい形です（決-187）。
-
-   ★`_meta_columns` の `fuse_role` 列そのものは残しています（4107行の移行と
-     4644行の SELECT）。列を落とすと古いDBとの行き来で事故る型なので、
-     **使うのをやめるだけ**にしてあります。読む所はもうどこにもありません。 */
+/* ---- L-06（決-185「案3」・2026-09-22 利用者が選択）… 融合画面での役割 --------
+   ★登録簿です。3つ目の置き場（例：右にも列を出す）が欲しくなったら、
+     ここに1行足すだけで選べるようになります（描く側は1行も変わりません）。
+   ★空（使わない）が既定 … 何も設定していない表では、これまでどおり
+     「型で自動的に選ぶ」が働きます（拘束しない・物差し②）。 */
+var FUSE_ROLE_LABELS = {
+  ''     : '（自動）',
+  'list' : '左の一覧',
+  'title': '上の題名'
+};
+function fuseRoleOptions(sel){
+  return ['', 'list', 'title']
+    .map(v => '<option value="' + v + '"' + (v === (sel || '') ? ' selected' : '') + '>'
+            + FUSE_ROLE_LABELS[v] + '</option>')
+    .join('');
+}
+/* 同じ役割は1つの項目に1列だけ（予定表の role と同じ作法）。 */
+function setColumnFuseRole(tableKey, colName, role){
+  const c = (metaColumnsByTable[tableKey] || []).find(x => x.col_name === colName);
+  if(!c) return;
+  pushHistory();
+  if(role) db.run('UPDATE _meta_columns SET fuse_role=NULL WHERE table_key=? AND fuse_role=?', [tableKey, role]);
+  db.run('UPDATE _meta_columns SET fuse_role=? WHERE table_key=? AND col_name=?', [role || null, tableKey, colName]);
+  loadMeta(); renderTableManager();
+  /* ★融合の盤は列から作り直すので、ここで作り直しておく（次に開いたときから効く）*/
+  try{ if(window.RTTPARTS && window.RTTPARTS.registerFusionBoard){ window.RTTPARTS.registerFusionBoard(currentCols()); } }catch(e){}
+  /* ★Ver1.19.59（利用者の指摘「項目を変えても更新されない」）
+     上の1行は【設計図】を新しくするだけで、いま画面に出ている盤は古いままでした。
+     いま融合画面に居るなら、その場で組み直します（居なければ何もしません）。 */
+  try{ if(window.RTTPARTS && window.RTTPARTS.fusionRefresh){ window.RTTPARTS.fusionRefresh(); } }catch(e){}
+  setStatus('列「' + c.label + '」の融合画面での役割を「'
+            + (FUSE_ROLE_LABELS[role] || FUSE_ROLE_LABELS['']) + '」にしました。', 'ok');
+  scheduleAutosave();
+}
+try{ window.setColumnFuseRole = setColumnFuseRole; }catch(e){}
 function rolePanelHtml(tableKey){
   const cols = metaColumnsByTable[tableKey] || [];
   if(!cols.length) return '';
@@ -11832,10 +11851,11 @@ function rolePanelHtml(tableKey){
        + colTypeOptions(c.col_type) + '</select>'
        + '<span>役割</span><select onchange="setColumnRole(\'' + tableKey + '\',\'' + c.col_name + '\', this.value)">'
        + roleOptions(c.role) + '</select>'
-       /* ★Ver1.19.60（2026-09-22・利用者の指示「『⚙ 列の型…』はいらない」）
-          融合画面での役割を選ぶ欄は、ここから外しました。融合の左は
-          【表そのもの】になったので、列を1本えらぶ意味が無くなったためです（決-186）。
-          ★代わりの置き場は「⚙ 表示する列」（場面ごとの列の出し分け・決-187）。 */
+       /* ★L-06（利用者が案3を選択・2026-09-22）… 融合画面でこの列をどう使うか。
+          ★予定表の「役割」とは別の欄。同じ列が両方を兼ねることがあるため。 */
+       + '<span>融合</span><select title="⇄ 融合画面で、この列をどこに出すか"'
+       + ' onchange="setColumnFuseRole(\'' + tableKey + '\',\'' + c.col_name + '\', this.value)">'
+       + fuseRoleOptions(c.fuse_role) + '</select>'
        /* B-13 … 編集の可否。★欄（editable）は最初から在り、表を描く側も既に見ている。
           足りなかったのは「利用者が変える口」だけだった（2026-09-20）。 */
        + '<span>編集</span><label class="coledit" title="外すと、この列は表の中で打ち込めなくなります">'
@@ -26422,15 +26442,62 @@ function registerColumnParts(){
   return cols.length;
 }
 
-var FUSION_LAST_PICK = null;   /* ★「いま何を置いたか」を後から見られるようにする */
+/* ---- L-06 第1弾（2026-09-22）… 融合の盤を「いまの列」から組み立てる -------
+   利用者の絵（2026-09-07 受領・L-06 §3）:
+     左の細い列＝日付が時系列で縦に並ぶ ／ 上の一行＝題名 ／ 広い右側＝MDメモ
+
+   ★列の名前を決め打ちしません（物差し②「拘束しない」）。
+     `_meta_columns` の col_type を見て「日付の列」「最初の一行テキストの列」を選びます。
+     だから、利用者が列を増やしても・名前を変えても、そのまま付いていきます。
+   ★該当する列が無い表（日付列が無いなど）では、その行を置かないだけで、
+     盤は壊れずに立ちます（#61 の逃げ道）。 */
+function fusionPickCols(cols){
+  var i, c, dateCol = null, titleCol = null, why = 'type';
+  /* ★① 利用者が「項目管理」で決めた役割がいちばん強い（決-185「案3」）。
+     ★決めていない表では ② の型による自動選択、それでも決まらなければ ③ の逃げ道。
+       だから「設定しなくても動く」まま、「決めれば必ずそのとおり」になります。 */
+  for(i = 0; i < cols.length; i++){
+    c = cols[i];
+    if(c.fuse_role === 'list'  && !dateCol)  { dateCol  = c; why = 'user'; }
+    if(c.fuse_role === 'title' && !titleCol) { titleCol = c; why = 'user'; }
+  }
+  for(i = 0; i < cols.length; i++){
+    c = cols[i];
+    if(c.fuse_role) continue;              /* 役割を決めた列は、勝手に別用途へ回さない */
+    if(!dateCol && (c.col_type === 'date' || c.col_type === 'datetime')) dateCol = c;
+    else if(!titleCol && c.col_type === 'text') titleCol = c;
+  }
+  /* ★逃げ道（2026-09-22・利用者の表で「メモだけ」になった件）
+     日付の型／一行テキストの型が1つも無い表でも、融合画面が【メモだけ】に
+     なってしまわないようにする。型で選べなければ、
+       左 … いちばん最初の列 ／ 上 … その次の列
+     を使う。★「何も出ない」より「とりあえず出る」ほうが、
+       利用者が自分で直せる（物差し⑦・#61 の逃げ道と同じ考え方）。 */
+  if(!dateCol && cols.length){ dateCol = cols[0]; why = 'fallback'; }
+  if(!titleCol){
+    for(i = 0; i < cols.length; i++){
+      if(cols[i] !== dateCol){ titleCol = cols[i]; why = 'fallback'; break; }
+    }
+  }
+  return {date: dateCol, title: titleCol, why: why, count: cols.length};
+}
+
+var FUSION_LAST_PICK = null;   /* ★「なぜこの列を選んだか」を後から見られるようにする */
 function fusionPick(){ return FUSION_LAST_PICK; }
 
 function registerFusionBoard(cols){
-  var rows = [];
-  /* ★Ver1.19.60 … 「どの列を1本えらぶか」（決-185 の fusionPickCols）は
-     撤去しました。左が【表そのもの】になったので、選ぶ対象がありません。
-     どの列を出すかは「⚙ 表示する列」が場面ごとに決めます（決-187）。
-     ★調べるための控えは残します。中身を「置いた物の一覧」に変えました。 */
+  var pick = fusionPickCols(cols || []), rows = [];
+  /* ★調べるための控え … 画面が思ったとおりにならないとき、
+     RTTPARTS.fusionPick() で「どの列をどう選んだか」が分かる。
+     2026-09-22 に利用者の表で「メモだけ」になった件は、これが無くて原因追及に手間取った。 */
+  FUSION_LAST_PICK = {
+    table: currentTable,
+    count: pick.count,
+    why  : pick.why,
+    date : pick.date ? {name: pick.date.col_name, type: pick.date.col_type} : null,
+    title: pick.title ? {name: pick.title.col_name, type: pick.title.col_type} : null,
+    types: (cols || []).map(function(c){ return c.col_name + ':' + c.col_type; })
+  };
   /* ---- Ver1.19.59（2026-09-22・利用者が画面で示した形）--------------------
      ★利用者の言葉（原文）
        「もともとの表の部品をそのまま左側にもってくればいいだけ」
@@ -26466,12 +26533,6 @@ function registerFusionBoard(cols){
              label:'メモ：本文', tags:'md section board star'});
   /* ★md.tabs（タブの帯）は【置きません】。利用者の指示「タブはない」。
      置きたくなったら、ここに1行足すだけです。 */
-  FUSION_LAST_PICK = {
-    table: currentTable,
-    count: (cols || []).length,
-    placed: rows.map(function(r){ return r.at + ':' + r.part; }),
-    types : (cols || []).map(function(c){ return c.col_name + ':' + c.col_type; })
-  };
   return registerBoard('l06', rows);
 }
 
